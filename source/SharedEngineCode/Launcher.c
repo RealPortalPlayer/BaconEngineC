@@ -5,8 +5,12 @@
 
 #include "SharedEngineCode/Launcher.h"
 
-struct Configuration* GetConfiguration(const char* path) {
-    struct Configuration* configuration = malloc(sizeof(struct Configuration));
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+Configuration* GetConfiguration(const char* path) {
+    Configuration* configuration = malloc(sizeof(Configuration));
 
     if (configuration == NULL)
         return NULL;
@@ -16,7 +20,7 @@ struct Configuration* GetConfiguration(const char* path) {
     configuration->clientBinary = dlopen("binary.dylib", RTLD_NOW);
 
     if (configuration->clientBinary == NULL) {
-        configuration->success = 0;
+        configuration->code = ERROR_CODE_BINARY;
         configuration->errorMessage = dlerror();
         return configuration;
     }
@@ -24,7 +28,7 @@ struct Configuration* GetConfiguration(const char* path) {
     const char* (*name)() = dlsym(configuration->clientBinary, "GetName");
 
     if (name == NULL) {
-        configuration->success = 0;
+        configuration->code = ERROR_CODE_NAME_NULL;
         configuration->errorMessage = dlerror();
         return configuration;
     }
@@ -33,12 +37,16 @@ struct Configuration* GetConfiguration(const char* path) {
     configuration->Start = dlsym(configuration->clientBinary, "Start");
 
     if (configuration->Start == NULL) {
-        configuration->success = 0;
+        configuration->code = ERROR_CODE_ENTRY_NULL;
         configuration->errorMessage = dlerror();
         return configuration;
     }
 
-    configuration->success = 1;
+    configuration->code = ERROR_CODE_NULL;
 
     return configuration;
 }
+
+#ifdef __cplusplus
+};
+#endif

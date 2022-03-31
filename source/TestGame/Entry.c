@@ -1,6 +1,8 @@
 #include <BaconEngine/EntryPoint.h>
+#include <BaconEngine/Rendering/Window.h>
 
 int ClientStart(int argc, char** argv) {
+    SetTitle("Title");
     return 0;
 }
 
