@@ -24,33 +24,32 @@ void InitializeWindow(const char* windowTitle, Vector2UI windowSize) {
     position.y = SDL_WINDOWPOS_CENTERED;
 }
 
-void DestroyWindow() {
+void DestroyWindow(void) {
     if (window == NULL)
         return;
 
     LOG_INFO("Destroying window.");
-
     SDL_DestroyWindow(window);
 }
 
-SDL_Window* GetSDLWindow() {
+SDL_Window* GetSDLWindow(void) {
     return window;
 }
 
-const char* GetTitle() {
+const char* GetTitle(void) {
     return title;
 }
 
-Vector2UI GetSize() {
+Vector2UI GetSize(void) {
     return size;
 }
 
-Vector2UI GetPosition() {
+Vector2UI GetPosition(void) {
     return position;
 }
 
 void SetTitle(const char* newTitle) {
-    if (window == NULL)
+    if (window == NULL || newTitle == NULL)
         return;
 
     LOG_DEBUG("Setting the title from '%s' to '%s'.", title, newTitle);

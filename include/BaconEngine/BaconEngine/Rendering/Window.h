@@ -12,11 +12,11 @@ extern "C" {
 #endif
 
 void InitializeWindow(const char* windowTitle, Vector2UI windowSize);
-void DestroyWindow();
-SDL_Window* GetSDLWindow();
-const char* GetTitle();
-Vector2UI GetSize();
-Vector2UI GetPosition();
+void DestroyWindow(void);
+SDL_Window* GetSDLWindow(void);
+const char* GetTitle(void);
+Vector2UI GetSize(void);
+Vector2UI GetPosition(void);
 void SetTitle(const char* newTitle);
 void SetSize(Vector2UI newSize);
 void SetWidth(unsigned int newWidth);
