@@ -28,6 +28,11 @@ typedef struct {
 } Vector2UL;
 
 typedef struct {
+    long long x;
+    long long y;
+} Vector2LL;
+
+typedef struct {
     float x;
     float y;
 } Vector2F;
@@ -60,6 +65,12 @@ typedef struct {
     unsigned long y;
     unsigned long z;
 } Vector3UL;
+
+typedef struct {
+    long long x;
+    long long y;
+    long long z;
+} Vector3LL;
 
 typedef struct {
     float x;
@@ -100,6 +111,13 @@ typedef struct {
     unsigned long z;
     unsigned long w;
 } Vector4UL;
+
+typedef struct {
+    long long x;
+    long long y;
+    long long z;
+    long long w;
+} Vector4LL;
 
 typedef struct {
     float x;

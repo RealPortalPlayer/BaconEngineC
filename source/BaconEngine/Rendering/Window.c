@@ -15,7 +15,7 @@ void InitializeWindow(const char* windowTitle, Vector2UI windowSize) {
     if (window != NULL)
         return;
 
-    LOG_INFO("Creating window!\nTitle: %s\nSize: (%u, %u)", windowTitle, windowSize.x, windowSize.y);
+    LOG_INFO("Creating window!\nTitle: %s\nSize: (%u, %u).", windowTitle, windowSize.x, windowSize.y);
 
     window = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, (int) windowSize.x, (int) windowSize.y, SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
     title = (char*) windowTitle;

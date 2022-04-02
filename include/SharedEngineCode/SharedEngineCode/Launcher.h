@@ -18,14 +18,17 @@ typedef enum {
 
 typedef struct Configuration {
     ErrorCodes code;
-    const char* errorMessage; // The message from something like dlopen.
-    const char* clientName;
-    void* clientBinary;
-    int (*Start)(struct Configuration*, int, char**);
+    union {
+        const char* errorMessage; // The message from something like dlopen.
+        struct {
+            const char* clientName;
+            void* clientBinary;
+            int (*Start)(struct Configuration*, int, char**);
+        };
+    };
 } Configuration;
 
 /**
- * @param path - The direct path to the BaconInitializer file.
  * @return The initialized configuration file. NULL if malloc fails.
  */
 Configuration* GetConfiguration(const char* path);

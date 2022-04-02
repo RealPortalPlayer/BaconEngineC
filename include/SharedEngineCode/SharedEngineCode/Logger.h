@@ -19,7 +19,7 @@ typedef enum {
     LOG_LEVEL_FATAL,
 } LogLevels;
 
-LogLevels currentLogLevel;
+volatile LogLevels currentLogLevel;
 
 void LogImplementation(LogLevels logLevel, const char* message, ...);
 

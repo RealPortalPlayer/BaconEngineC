@@ -51,15 +51,19 @@ __attribute__((visibility("default"))) int Start(struct Configuration* configura
                     switch (event.type) {
                         case SDL_QUIT:
                             ClientShutdown();
+                            running = 0;
                             break;
                     }
                 }
             }
 
+            if (running == 0)
+                break;
+
             continue;
         }
 
-        printf("\r" ANSI_BRIGHT_FOREGROUND_GREEN);
+        printf(ANSI_BRIGHT_FOREGROUND_GREEN);
 
         if (cheats)
             printf("[C] ");
@@ -69,6 +73,11 @@ __attribute__((visibility("default"))) int Start(struct Configuration* configura
         char input[2046];
 
         fgets(input, sizeof(input), stdin);
+
+        if (strlen(input) == 1)
+            continue;
+
+        LOG_INFO("%s", input);
     }
 
     DestroyWindow();

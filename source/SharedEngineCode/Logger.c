@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-LogLevels currentLogLevel = LOG_LEVEL_INFO;
+volatile LogLevels currentLogLevel = LOG_LEVEL_INFO;
 
 void LogImplementation(LogLevels logLevel, const char* message, ...) {
     if (currentLogLevel == LOG_LEVEL_NULL || logLevel < currentLogLevel)

@@ -4,6 +4,7 @@
 #include <SharedEngineCode/Launcher.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <SharedEngineCode/OperatingSystem.h>
 
 int main(int argc, char* argv[]) {
     argumentCount = argc;
@@ -11,7 +12,8 @@ int main(int argc, char* argv[]) {
 
     if (GetArgumentIndex("--enable-debug-logs") != -1 || GetArgumentIndex("-edl") != -1)
         currentLogLevel = LOG_LEVEL_DEBUG;
-    else if (GetArgumentIndex("--enable-trace-logs") != -1 || GetArgumentIndex("-etl") != -1)
+
+    if (GetArgumentIndex("--enable-trace-logs") != -1 || GetArgumentIndex("-etl") != -1)
         currentLogLevel = LOG_LEVEL_TRACE;
 
     LOG_TRACE("Built: %s", __TIMESTAMP__);
@@ -20,21 +22,18 @@ int main(int argc, char* argv[]) {
         LOG_INFO("Arguments\n"
                  "--help: Shows information about each argument.\n"
                  "--client <path> (-c): Specifies what client you want to run.\n"
-                 "--exit <exit code>: Exits after the engine is initialized.\n"
                  "--server (-s): Starts the client as a server instance.\n"
-                 "--width <new width> (-w): The width of the window.\n"
-                 "--height <new height> (-h): The height of the window.\n"
-                 "--fullscreen [true/false]: If the window should be fullscreen.\n"
                  "--strict: Crash the client if there is any API error.\n"
                  "--enable-debug-logs (-edl): Enables debugging logs.\n"
                  "--enable-trace-logs (-etl): Enables tracing logs. This will also enable debug logs, too.\n"
-                 "--dont-parse <argument> (--): Do not parse argument's beyond this point.\n"
-                 "--vsync: Enables V-Sync.");
+                 "--dont-parse <argument> (--): Do not parse argument's beyond this point.");
         return 0;
     }
 
+#if OS_POSIX_COMPLIANT
     if (getuid() == 0)
         LOG_WARN("You're running as root! This is usually unnecessary. If a client says you require to be root, then it's probably a virus.");
+#endif
 
     const char* clientPath = GetArgumentValue("--client");
 
@@ -72,7 +71,6 @@ int main(int argc, char* argv[]) {
     int returnValue = configuration->Start(configuration, argc, argv);
 
     free(configuration);
-
     LOG_INFO("Goodbye!");
 
     return returnValue;
