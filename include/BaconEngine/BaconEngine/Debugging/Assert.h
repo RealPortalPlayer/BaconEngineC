@@ -7,7 +7,7 @@
 #define ASSERT(check, ...) do { \
     LOG_TRACE("Assert checking: %s", #check); \
     if (!(check)) {             \
-        LOG_FATAL("Assertion Failed!\nCode: %s\nMessage: %s", #check, __VA_ARGS__); \
+        LOG_FATAL("Assertion Failed\nCode: %s\nMessage: %s", #check, __VA_ARGS__); \
         abort();                \
     }                           \
 } while (0)

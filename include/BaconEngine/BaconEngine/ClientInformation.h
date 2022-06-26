@@ -9,8 +9,8 @@
 extern "C" {
 #endif
 
-volatile int running = 1;
-volatile int cheats = 0;
+    volatile int running = 1;
+    volatile int cheats = 0;
 
 #ifdef __cplusplus
 };
