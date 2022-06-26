@@ -19,20 +19,21 @@ int main(int argc, char* argv[]) {
     LOG_TRACE("Built: %s", __TIMESTAMP__);
 
     if (GetArgumentIndex("--help") != -1) {
-        LOG_INFO("Arguments\n"
-                 "--help: Shows information about each argument.\n"
-                 "--client <path> (-c): Specifies what client you want to run.\n"
-                 "--server (-s): Starts the client as a server instance.\n"
-                 "--strict: Crash the client if there is any API error.\n"
-                 "--enable-debug-logs (-edl): Enables debugging logs.\n"
-                 "--enable-trace-logs (-etl): Enables tracing logs. This will also enable debug logs, too.\n"
-                 "--dont-parse <argument> (--): Do not parse argument's beyond this point.");
+        LOG_INFO("Arguments:\n"
+                 "--help: Shows information about each argument\n"
+                 "--client <path> (-c): Specifies what client you want to run\n"
+                 "--server (-s): Starts the client as a server instance\n"
+                 "--strict: Crash the client if there is any API error\n"
+                 "--enable-debug-logs (-edl): Enables debugging logs\n"
+                 "--enable-trace-logs (-etl): Enables tracing logs. This will also enable debug logs, too\n"
+                 "--dont-parse <argument> (--): Do not parse argument's beyond this point");
         return 0;
     }
 
+    // TODO: OS_WINDOWS
 #if OS_POSIX_COMPLIANT
     if (getuid() == 0)
-        LOG_WARN("You're running as root! This is usually unnecessary. If a client says you require to be root, then it's probably a virus.");
+        LOG_WARN("You're running as root! If a client says you require to be root, then it's probably a virus");
 #endif
 
     const char* clientPath = GetArgumentValue("--client");
@@ -41,7 +42,7 @@ int main(int argc, char* argv[]) {
         clientPath = GetArgumentValue("-c");
 
     if (clientPath == NULL) {
-        LOG_WARN("You didn't specify what client you wanted to open, defaulting to 'Client'.");
+        LOG_WARN("You didn't specify what client you wanted to open, defaulting to 'Client'");
 
         clientPath = "./Client";
     }
@@ -50,28 +51,28 @@ int main(int argc, char* argv[]) {
 
     switch (configuration->code) {
         case ERROR_CODE_BINARY:
-            LOG_FATAL("Failed to load the binary! %s", configuration->errorMessage);
+            LOG_FATAL("Failed to load the binary: %s", configuration->errorMessage);
             return 1;
 
         case ERROR_CODE_ENTRY_NULL:
         case ERROR_CODE_NAME_NULL:
-            LOG_FATAL("Failed to get important methods. %s", configuration->errorMessage);
+            LOG_FATAL("Failed to get important methods: %s", configuration->errorMessage);
             return 1;
 
         case ERROR_CODE_NULL:
             break;
 
         default:
-            LOG_FATAL("Unknown error!");
+            LOG_FATAL("Unknown error: %i", configuration->code);
             return 1;
     }
 
-    LOG_INFO("Ready. Starting '%s'.", configuration->clientName);
+    LOG_INFO("Ready, starting '%s'", configuration->clientName);
 
     int returnValue = configuration->Start(configuration, argc, argv);
 
     free(configuration);
-    LOG_INFO("Goodbye!");
+    LOG_INFO("Goodbye");
 
     return returnValue;
 }

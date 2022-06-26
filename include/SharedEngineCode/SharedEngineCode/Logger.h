@@ -9,19 +9,19 @@
 extern "C" {
 #endif
 
-typedef enum {
-    LOG_LEVEL_NULL,
-    LOG_LEVEL_TRACE,
-    LOG_LEVEL_DEBUG,
-    LOG_LEVEL_INFO,
-    LOG_LEVEL_WARN,
-    LOG_LEVEL_ERROR,
-    LOG_LEVEL_FATAL,
-} LogLevels;
+    typedef enum {
+        LOG_LEVEL_NULL,
+        LOG_LEVEL_TRACE,
+        LOG_LEVEL_DEBUG,
+        LOG_LEVEL_INFO,
+        LOG_LEVEL_WARN,
+        LOG_LEVEL_ERROR,
+        LOG_LEVEL_FATAL
+    } LogLevels;
 
-volatile LogLevels currentLogLevel;
+    volatile LogLevels currentLogLevel;
 
-void LogImplementation(LogLevels logLevel, const char* message, ...);
+    void LogImplementation(LogLevels logLevel, const char* message, ...);
 
 #ifdef __cplusplus
 };

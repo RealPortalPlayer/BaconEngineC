@@ -1,4 +1,5 @@
 #include <SharedEngineCode/Logger.h>
+#include <BaconEngine/Debugging/Assert.h>
 
 #include "BaconEngine/Rendering/Window.h"
 
@@ -6,96 +7,127 @@
 extern "C" {
 #endif
 
-static SDL_Window* window = NULL;
-static char* title = NULL;
-static Vector2UI size = {};
-static Vector2UI position = {};
+    static SDL_Window* window = NULL;
+    static SDL_Renderer* renderer = NULL;
+    static char* title = NULL;
+    static Vector2U size = {};
+    static Vector2U position = {};
 
-void InitializeWindow(const char* windowTitle, Vector2UI windowSize) {
-    if (window != NULL)
-        return;
+    void InitializeWindow(const char* windowTitle, Vector2U windowSize) {
+        if (window != NULL)
+            return;
 
-    LOG_INFO("Creating window!\nTitle: %s\nSize: (%u, %u).", windowTitle, windowSize.x, windowSize.y);
+        ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0, "Failed to initialize SDL: %s", SDL_GetError());
+        LOG_INFO("Creating window\nTitle: %s\nSize: (%u, %u)", windowTitle, windowSize.x, windowSize.y);
+        ASSERT((window = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, (int) windowSize.x,
+                                         (int) windowSize.y, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN)) != NULL, "Failed to create window: %s", SDL_GetError());
+        ASSERT((renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED)) != NULL, "Failed to create renderer: %s", SDL_GetError());
 
-    window = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, (int) windowSize.x, (int) windowSize.y, SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
-    title = (char*) windowTitle;
-    size = windowSize;
-    position.x = SDL_WINDOWPOS_CENTERED;
-    position.y = SDL_WINDOWPOS_CENTERED;
-}
+        title = (char*) windowTitle;
+        size = windowSize;
+        position.x = SDL_WINDOWPOS_CENTERED;
+        position.y = SDL_WINDOWPOS_CENTERED;
+    }
 
-void DestroyWindow(void) {
-    if (window == NULL)
-        return;
+    void DestroyWindow(void) {
+        if (window == NULL)
+            return;
 
-    LOG_INFO("Destroying window.");
-    SDL_DestroyWindow(window);
-}
+        LOG_INFO("Destroying window");
+        SDL_DestroyWindow(window);
+    }
 
-SDL_Window* GetSDLWindow(void) {
-    return window;
-}
+    SDL_Window* GetSDLWindow(void) {
+        return window;
+    }
 
-const char* GetTitle(void) {
-    return title;
-}
+    SDL_Renderer* GetSDLRenderer(void) {
+        return renderer;
+    }
 
-Vector2UI GetSize(void) {
-    return size;
-}
+    const char* GetTitle(void) {
+        return title;
+    }
 
-Vector2UI GetPosition(void) {
-    return position;
-}
+    Vector2U GetSize(void) {
+        return size;
+    }
 
-void SetTitle(const char* newTitle) {
-    if (window == NULL || newTitle == NULL)
-        return;
+    Vector2U GetPosition(void) {
+        return position;
+    }
 
-    LOG_DEBUG("Setting the title from '%s' to '%s'.", title, newTitle);
+    int IsWindowVisible(void) {
+        return (SDL_GetWindowFlags(window) & SDL_WINDOW_SHOWN) != 0;
+    }
 
-    title = (char*) newTitle;
+    int IsWindowStillOpened(void) {
+        return window != NULL;
+    }
 
-    SDL_SetWindowTitle(window, newTitle);
-}
+    void SetTitle(const char* newTitle) {
+        if (window == NULL || title == newTitle)
+            return;
 
-void SetSize(Vector2UI newSize) {
-    if (window == NULL)
-        return;
+        if (newTitle == NULL)
+            newTitle = "";
 
-    LOG_DEBUG("Setting the size from (%u, %u) to (%u, %u).", size.x, size.y, newSize.x, newSize.y);
+        LOG_DEBUG("Changing title\nOld Title: %s\nNew Title: %s.", title, newTitle);
 
-    size = newSize;
+        title = (char*) newTitle;
 
-    SDL_SetWindowSize(window, (int) newSize.x, (int) newSize.y);
-}
+        SDL_SetWindowTitle(window, newTitle);
+    }
 
-void SetWidth(unsigned int newWidth) {
-    SetSize((Vector2UI) {newWidth, size.y});
-}
+    void SetSize(Vector2U newSize) {
+        if (window == NULL || size.x == newSize.x && size.y == newSize.y)
+            return;
 
-void SetHeight(unsigned int newHeight) {
-    SetSize((Vector2UI) {size.x, newHeight});
-}
+        LOG_DEBUG("Changing size\nWindow: %s\nOld Size: (%u, %u)\nNew Size: (%u, %u)", title, size.x, size.y, newSize.x, newSize.y);
 
-void SetPosition(Vector2UI newPosition) {
-    if (window == NULL)
-        return;
+        size = newSize;
 
-    LOG_DEBUG("Setting the position from (%u, %u) to (%u, %u).", position.x, position.y, newPosition.x, newPosition.y);
+        SDL_SetWindowSize(window, (int) newSize.x, (int) newSize.y);
+    }
 
-    position = newPosition;
+    void SetWidth(unsigned int newWidth) {
+        SetSize((Vector2U) {newWidth, size.y});
+    }
 
-    SDL_SetWindowSize(window, (int) newPosition.x, (int) newPosition.y);
-}
+    void SetHeight(unsigned int newHeight) {
+        SetSize((Vector2U) {size.x, newHeight});
+    }
 
-void SetX(unsigned int newX) {
-    SetPosition((Vector2UI) {newX, position.y});
-}
+    void SetPosition(Vector2U newPosition) {
+        if (window == NULL || position.x == newPosition.x && position.y == newPosition.y)
+            return;
 
-void SetY(unsigned int newY) {
-    SetPosition((Vector2UI) {position.x, newY});
-}
+        LOG_DEBUG("Changing position\nWindow: %s\nOld Position: (%u, %u)\nNew Position: (%u, %u)", title, position.x, position.y, newPosition.x, newPosition.y);
+
+        position = newPosition;
+
+        SDL_SetWindowSize(window, (int) newPosition.x, (int) newPosition.y);
+    }
+
+    void SetX(unsigned int newX) {
+        SetPosition((Vector2U) {newX, position.y});
+    }
+
+    void SetY(unsigned int newY) {
+        SetPosition((Vector2U) {position.x, newY});
+    }
+
+    void SetWindowVisibility(int visible) {
+        if (window == NULL || IsWindowVisible() == visible)
+            return;
+
+        LOG_DEBUG("Setting window to %s", visible ? "visible" : "invisible");
+
+        if (visible)
+            SDL_ShowWindow(window);
+        else
+            SDL_HideWindow(window);
+    }
 
 #ifdef __cplusplus
 };

@@ -11,12 +11,14 @@
 #include "Debugging/Assert.h"
 #include "ClientInformation.h"
 #include "Rendering/Window.h"
+#include "Rendering/Renderer.h"
+#include "Rendering/LayerStack.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int ClientStart(int argc, char **argv);
+int ClientStart(int argc, char** argv);
 int ClientShutdown(void);
 __attribute__((visibility("default"))) int SupportsServer(void);
 __attribute__((visibility("default"))) const char* GetName(void);
@@ -30,20 +32,30 @@ __attribute__((visibility("default"))) int Start(struct Configuration* configura
     else if (GetArgumentIndex("--enable-trace-logs") != -1 || GetArgumentIndex("-etl") != -1)
         currentLogLevel = LOG_LEVEL_TRACE;
 
-    LOG_INFO("Starting BaconEngine.");
+    // NOTE: Avoid putting log statements, or anything that uses the logging library before this line.
+    //       Doing so could potentially prevent debug and trace logs from showing due to it now being fully initialized yet.
 
-    if (IS_SERVER_MODE_ENABLED( ) && !SupportsServer()) {
-        LOG_FATAL("This client does not support servers.");
+    LOG_INFO("Starting BaconEngine");
+
+    if (IS_SERVER_MODE_ENABLED() && !SupportsServer()) {
+        LOG_FATAL("This client does not support servers");
         return 1;
     }
 
-    if (!IS_SERVER_MODE_ENABLED())
-        InitializeWindow(configuration->clientName, (Vector2UI) {1080, 720});
+    if (!IS_SERVER_MODE_ENABLED()) {
+        InitializeWindow(configuration->clientName, (Vector2U) {1080, 720}); // TODO: --width --height
+        InitializeLayers();
+    }
 
-    ASSERT(ClientStart(argc, argv) == 0, "Client start returned non-zero.");
+    ASSERT(ClientStart(argc, argv) == 0, "Client start returned non-zero");
+
+    ClearScreen();
+    SetWindowVisibility(1);
+    CreateLayer("Test", OnToggleDummy, OnStartShutdownDummy, OnEventDummy, OnRenderDummy, OnRenderDummy, OnStartShutdownDummy);
 
     while (running) {
-        if (!IS_SERVER_MODE_ENABLED()) {
+        if (!IS_SERVER_MODE_ENABLED() && IsWindowStillOpened()) {
+            ClearScreen();
             {
                 SDL_Event event;
 
@@ -59,6 +71,8 @@ __attribute__((visibility("default"))) int Start(struct Configuration* configura
 
             if (running == 0)
                 break;
+
+            SDL_RenderPresent(GetSDLRenderer());
 
             continue;
         }
@@ -81,6 +95,7 @@ __attribute__((visibility("default"))) int Start(struct Configuration* configura
     }
 
     DestroyWindow();
+    DestroyLayers();
 
     return 0;
 }
