@@ -3,8 +3,12 @@
 
 #pragma once
 
-#include <BaconEngine/Math/Vector.h>
+#include <SharedEngineCode/Internal/CppHeader.h>
 
-extern Vector4U clearColor;
+#include "BaconEngine/Math/Vector.h"
 
-void ClearScreen(void);
+CPP_GUARD_START()
+    extern Vector4U clearColor;
+
+    void ClearScreen(void);
+CPP_GUARD_END()

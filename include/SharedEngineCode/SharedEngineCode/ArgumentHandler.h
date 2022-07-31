@@ -3,23 +3,19 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "Internal/CppHeader.h"
 
-int argumentCount;
-char** argumentVector;
+CPP_GUARD_START()
+    int addedArgumentsCount;
+    char** argumentVector;
 
-/**
- * @return The index if the argument was found, -1 if not.
- */
-int GetArgumentIndex(const char* argument);
+    /**
+    *  @return The index if the argument was found, -1 if not.
+    */
+    int GetArgumentIndex(const char* argument);
 
-/**
- * @return The value next to the argument if found, NULL if not.
- */
-const char* GetArgumentValue(const char* argument);
-
-#ifdef __cplusplus
-};
-#endif
+    /**
+    * @return The value next to the argument if found, NULL if not.
+    */
+    const char* GetArgumentValue(const char* argument);
+CPP_GUARD_END()

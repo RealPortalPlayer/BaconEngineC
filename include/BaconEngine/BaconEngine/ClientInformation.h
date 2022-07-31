@@ -3,18 +3,12 @@
 
 #pragma once
 
-#include <SharedEngineCode/ArgumentHandler.h>
+#include <SharedEngineCode/Internal/CppHeader.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+CPP_GUARD_START()
+    volatile int running;
+    volatile int cheats;
 
-    volatile int running = 1;
-    volatile int cheats = 0;
-
-#ifdef __cplusplus
-};
-#endif
-
-#define IS_SERVER_MODE_ENABLED() (GetArgumentIndex("--server") != -1 || GetArgumentIndex("-s") != -1)
-#define IS_STRICT_MODE_ENABLED() (GetArgumentIndex("--strict") != -1)
+    int IsServerModeEnabled(void);
+    int IsStrictModeEnabled(void);
+CPP_GUARD_END()

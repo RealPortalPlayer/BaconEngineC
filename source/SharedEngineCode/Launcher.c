@@ -1,52 +1,39 @@
-#include <stdlib.h>
 #include <dlfcn.h>
 #include <string.h>
 #include <unistd.h>
 
 #include "SharedEngineCode/Launcher.h"
+#include "SharedEngineCode/Internal/CppHeader.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-    Configuration* GetConfiguration(const char* path) {
-        Configuration* configuration = malloc(sizeof(Configuration));
-
-        if (configuration == NULL)
-            return NULL;
-
+CPP_GUARD_START()
+    void CreateLauncherConfiguration(LauncherConfiguration* configuration, const char* path) {
         chdir(path);
 
         configuration->clientBinary = dlopen("binary.dylib", RTLD_NOW);
 
         if (configuration->clientBinary == NULL) {
-            configuration->code = ERROR_CODE_BINARY;
+            configuration->code = LAUNCHER_ERROR_CODE_BINARY;
             configuration->errorMessage = dlerror();
-            return configuration;
+            return;
         }
 
-        const char* (*name)() = dlsym(configuration->clientBinary, "GetName");
+        const char* (*name)(void) = dlsym(configuration->clientBinary, "GetClientName");
 
         if (name == NULL) {
-            configuration->code = ERROR_CODE_NAME_NULL;
+            configuration->code = LAUNCHER_ERROR_CODE_NAME_NULL;
             configuration->errorMessage = dlerror();
-            return configuration;
+            return;
         }
 
         configuration->clientName = name();
-        configuration->Start = dlsym(configuration->clientBinary, "Start");
+        configuration->Start = dlsym(configuration->clientBinary, "StartBaconEngine");
 
         if (configuration->Start == NULL) {
-            configuration->code = ERROR_CODE_ENTRY_NULL;
+            configuration->code = LAUNCHER_ERROR_CODE_ENTRY_NULL;
             configuration->errorMessage = dlerror();
-            return configuration;
+            return;
         }
 
-        configuration->code = ERROR_CODE_NULL;
-
-        return configuration;
+        configuration->code = LAUNCHER_ERROR_CODE_NULL;
     }
-
-#ifdef __cplusplus
-};
-#endif
+CPP_GUARD_END()

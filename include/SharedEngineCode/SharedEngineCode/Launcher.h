@@ -5,34 +5,30 @@
 
 #include <limits.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "Internal/CppHeader.h"
 
-typedef enum {
-    ERROR_CODE_NULL, // No error.
-    ERROR_CODE_BINARY, // Errored while opening binary file.
-    ERROR_CODE_NAME_NULL, // Errored attempting to load the name method.
-    ERROR_CODE_ENTRY_NULL // Errored attempting to load the entry point.
-} ErrorCodes;
+CPP_GUARD_START()
+    typedef enum {
+        LAUNCHER_ERROR_CODE_NULL, // No error.
+        LAUNCHER_ERROR_CODE_BINARY, // Errored while opening binary file.
+        LAUNCHER_ERROR_CODE_NAME_NULL, // Errored attempting to load the name method.
+        LAUNCHER_ERROR_CODE_ENTRY_NULL // Errored attempting to load the entry point.
+    } LauncherErrorCodes;
 
-typedef struct Configuration {
-    ErrorCodes code;
-    union {
-        const char* errorMessage; // The message from something like dlopen.
-        struct {
-            const char* clientName;
-            void* clientBinary;
-            int (*Start)(struct Configuration*, int, char**);
+    typedef struct LauncherConfiguration {
+        LauncherErrorCodes code;
+        union {
+            const char* errorMessage; // The message from something like dlopen.
+            struct {
+                const char* clientName;
+                void* clientBinary;
+                int (*Start)(struct LauncherConfiguration, int, char**);
+            };
         };
-    };
-} Configuration;
+    } LauncherConfiguration;
 
-/**
- * @return The initialized configuration file. NULL if malloc fails.
- */
-Configuration* GetConfiguration(const char* path);
-
-#ifdef __cplusplus
-};
-#endif
+    /**
+    * @return The initialized configuration file. NULL if malloc fails.
+    */
+    void CreateLauncherConfiguration(LauncherConfiguration* configuration, const char* path);
+CPP_GUARD_END()

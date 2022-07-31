@@ -5,9 +5,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <SharedEngineCode/OperatingSystem.h>
+#include <dlfcn.h>
 
 int main(int argc, char* argv[]) {
-    argumentCount = argc;
+    addedArgumentsCount = argc;
     argumentVector = argv;
 
     if (GetArgumentIndex("--enable-debug-logs") != -1 || GetArgumentIndex("-edl") != -1)
@@ -23,10 +24,12 @@ int main(int argc, char* argv[]) {
                  "--help: Shows information about each argument\n"
                  "--client <path> (-c): Specifies what client you want to run\n"
                  "--server (-s): Starts the client as a server instance\n"
-                 "--strict: Crash the client if there is any API error\n"
+                 "--no-strict (-ns): Don't crash the client when an API error occurs.\n"
                  "--enable-debug-logs (-edl): Enables debugging logs\n"
                  "--enable-trace-logs (-etl): Enables tracing logs. This will also enable debug logs, too\n"
-                 "--dont-parse <argument> (--): Do not parse argument's beyond this point");
+                 "--dont-parse <argument> (--): Do not parse argument's beyond this point\n"
+                 "--width <width>: Changes the width of the window\n"
+                 "--height <height>: Changes the height of the window");
         return 0;
     }
 
@@ -47,31 +50,34 @@ int main(int argc, char* argv[]) {
         clientPath = "./Client";
     }
 
-    Configuration* configuration = GetConfiguration(clientPath);
+    LOG_INFO("Getting configuration information");
 
-    switch (configuration->code) {
-        case ERROR_CODE_BINARY:
-            LOG_FATAL("Failed to load the binary: %s", configuration->errorMessage);
-            return 1;
+    LauncherConfiguration configuration = {};
 
-        case ERROR_CODE_ENTRY_NULL:
-        case ERROR_CODE_NAME_NULL:
-            LOG_FATAL("Failed to get important methods: %s", configuration->errorMessage);
-            return 1;
+    CreateLauncherConfiguration(&configuration, clientPath);
 
-        case ERROR_CODE_NULL:
-            break;
+    if (configuration.code != LAUNCHER_ERROR_CODE_NULL) {
+        switch (configuration.code) {
+            case LAUNCHER_ERROR_CODE_BINARY:
+                LOG_FATAL("Failed to load the binary: %s", configuration.errorMessage);
+                return 1;
 
-        default:
-            LOG_FATAL("Unknown error: %i", configuration->code);
-            return 1;
+            case LAUNCHER_ERROR_CODE_ENTRY_NULL:
+            case LAUNCHER_ERROR_CODE_NAME_NULL:
+                LOG_FATAL("Failed to get important methods: %s", configuration.errorMessage);
+                return 1;
+
+            default:
+                LOG_FATAL("Unknown error: %i", configuration.code);
+                return 1;
+        }
     }
 
-    LOG_INFO("Ready, starting '%s'", configuration->clientName);
+    LOG_INFO("Ready, starting '%s'", configuration.clientName);
 
-    int returnValue = configuration->Start(configuration, argc, argv);
+    int returnValue = configuration.Start(configuration, argc, argv);
 
-    free(configuration);
+    dlclose(configuration.clientBinary);
     LOG_INFO("Goodbye");
 
     return returnValue;

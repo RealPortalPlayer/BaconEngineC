@@ -1,12 +1,10 @@
 #include <SharedEngineCode/Logger.h>
 #include <BaconEngine/Debugging/Assert.h>
+#include <SharedEngineCode/Internal/CppHeader.h>
 
 #include "BaconEngine/Rendering/Window.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
+CPP_GUARD_START()
     static SDL_Window* window = NULL;
     static SDL_Renderer* renderer = NULL;
     static char* title = NULL;
@@ -37,23 +35,23 @@ extern "C" {
         SDL_DestroyWindow(window);
     }
 
-    SDL_Window* GetSDLWindow(void) {
+    SDL_Window* GetInternalSDLWindow(void) {
         return window;
     }
 
-    SDL_Renderer* GetSDLRenderer(void) {
+    SDL_Renderer* GetInternalSDLRenderer(void) {
         return renderer;
     }
 
-    const char* GetTitle(void) {
+    const char* GetWindowTitle(void) {
         return title;
     }
 
-    Vector2U GetSize(void) {
+    Vector2U GetWindowSize(void) {
         return size;
     }
 
-    Vector2U GetPosition(void) {
+    Vector2U GetWindowPosition(void) {
         return position;
     }
 
@@ -65,7 +63,7 @@ extern "C" {
         return window != NULL;
     }
 
-    void SetTitle(const char* newTitle) {
+    void SetWindowTitle(const char* newTitle) {
         if (window == NULL || title == newTitle)
             return;
 
@@ -79,7 +77,7 @@ extern "C" {
         SDL_SetWindowTitle(window, newTitle);
     }
 
-    void SetSize(Vector2U newSize) {
+    void SetWindowSize(Vector2U newSize) {
         if (window == NULL || size.x == newSize.x && size.y == newSize.y)
             return;
 
@@ -90,15 +88,15 @@ extern "C" {
         SDL_SetWindowSize(window, (int) newSize.x, (int) newSize.y);
     }
 
-    void SetWidth(unsigned int newWidth) {
-        SetSize((Vector2U) {newWidth, size.y});
+    void SetWindowWidth(unsigned int newWidth) {
+        SetWindowSize((Vector2U) {newWidth, size.y});
     }
 
-    void SetHeight(unsigned int newHeight) {
-        SetSize((Vector2U) {size.x, newHeight});
+    void SetWindowHeight(unsigned int newHeight) {
+        SetWindowSize((Vector2U) {size.x, newHeight});
     }
 
-    void SetPosition(Vector2U newPosition) {
+    void SetWindowPosition(Vector2U newPosition) {
         if (window == NULL || position.x == newPosition.x && position.y == newPosition.y)
             return;
 
@@ -109,12 +107,12 @@ extern "C" {
         SDL_SetWindowSize(window, (int) newPosition.x, (int) newPosition.y);
     }
 
-    void SetX(unsigned int newX) {
-        SetPosition((Vector2U) {newX, position.y});
+    void SetWindowXPosition(unsigned int newX) {
+        SetWindowPosition((Vector2U) {newX, position.y});
     }
 
-    void SetY(unsigned int newY) {
-        SetPosition((Vector2U) {position.x, newY});
+    void SetWindowYPosition(unsigned int newY) {
+        SetWindowPosition((Vector2U) {position.x, newY});
     }
 
     void SetWindowVisibility(int visible) {
@@ -128,7 +126,4 @@ extern "C" {
         else
             SDL_HideWindow(window);
     }
-
-#ifdef __cplusplus
-};
-#endif
+CPP_GUARD_END()

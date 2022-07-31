@@ -3,10 +3,9 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <SharedEngineCode/Internal/CppHeader.h>
 
+CPP_GUARD_START()
     typedef struct {
         short x;
         short y;
@@ -204,7 +203,4 @@ extern "C" {
         long double z;
         long double w;
     } Vector4LD; // Long Double
-
-#ifdef __cplusplus
-};
-#endif
+CPP_GUARD_END()
