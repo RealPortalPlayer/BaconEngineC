@@ -2,10 +2,14 @@
 #include <SharedEngineCode/Logger.h>
 #include <stddef.h>
 #include <SharedEngineCode/Launcher.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <SharedEngineCode/OperatingSystem.h>
-#include <dlfcn.h>
+
+#if OS_POSIX_COMPLIANT
+#   include <unistd.h>
+#   include <dlfcn.h>
+#elif OS_WINDOWS
+#   include <Windows.h>
+#endif
 
 int main(int argc, char* argv[]) {
     addedArgumentsCount = argc;
@@ -52,7 +56,9 @@ int main(int argc, char* argv[]) {
 
     LOG_INFO("Getting configuration information");
 
-    LauncherConfiguration configuration = {};
+    LauncherConfiguration configuration = {
+        .code = LAUNCHER_ERROR_CODE_NULL
+    };
 
     CreateLauncherConfiguration(&configuration, clientPath);
 
@@ -77,7 +83,11 @@ int main(int argc, char* argv[]) {
 
     int returnValue = configuration.Start(configuration, argc, argv);
 
+#if OS_POSIX_COMPLIANT
     dlclose(configuration.clientBinary);
+#elif OS_WINDOWS
+    FreeLibrary(configuration.clientBinary);
+#endif
     LOG_INFO("Goodbye");
 
     return returnValue;

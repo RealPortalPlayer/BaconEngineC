@@ -47,7 +47,7 @@ CPP_GUARD_START()
 
         int argumentCount = 0;
         int requiredArguments = 0;
-        Arguments parsedArguments = {arguments, {}, {}};
+        Arguments parsedArguments = {arguments, {""}, {0}};
 
         for (int i = 0; arguments[i]; i++)
             argumentCount++;

@@ -11,6 +11,7 @@
 #include <string.h>
 #include <SDL.h>
 #include <SharedEngineCode/Internal/CppHeader.h>
+#include <SharedEngineCode/OperatingSystem.h>
 
 #include "Debugging/Assert.h"
 #include "ClientInformation.h"
@@ -19,11 +20,17 @@
 #include "Debugging/StrictMode.h"
 #include "Console/Console.h"
 
+#if OS_POSIX_COMPLIANT
+#   define EXPOSE_FUNC __attribute__((visibility("default")))
+#elif OS_WINDOWS
+#   define EXPOSE_FUNC __declspec(dllexport)
+#endif
+
 CPP_GUARD_START()
     int ClientStart(int argc, char** argv);
     int ClientShutdown(void);
-    __attribute__((visibility("default"))) int ClientSupportsServer(void);
-    __attribute__((visibility("default"))) const char* GetClientName(void);
+    EXPOSE_FUNC int ClientSupportsServer(void);
+    EXPOSE_FUNC const char* GetClientName(void);
 
     void HelpCommand(Command this, CommandContext context) {
         const char* commandName = GetArgumentString(context.arguments, "command", "");
@@ -101,11 +108,11 @@ CPP_GUARD_START()
         LOG_INFO("Cheats is now %s", cheats ? "enabled" : "disabled");
     }
 
-    void StopCommand() {
+    void StopCommand(Command this, CommandContext context) {
         running = 0;
     }
 
-    __attribute__((visibility("default"))) int StartBaconEngine(struct LauncherConfiguration configuration, int argc, char** argv) {
+    EXPOSE_FUNC int StartBaconEngine(struct LauncherConfiguration configuration, int argc, char** argv) {
         static int alreadyStarted = 0;
 
         addedArgumentsCount = argc;
@@ -225,7 +232,7 @@ CPP_GUARD_START()
                 continue;
 
             const char* commandName = strtok(input, " ");
-            const char* arguments[MAX_ARGUMENTS] = {}; // TODO: Parse quotes.
+            const char* arguments[MAX_ARGUMENTS] = {""}; // TODO: Parse quotes.
 
             for (int i = 0; i < MAX_ARGUMENTS; i++) {
                 const char* argument = strtok(NULL, " ");

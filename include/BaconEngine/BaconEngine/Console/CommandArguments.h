@@ -14,6 +14,6 @@ CPP_GUARD_START()
     } CommandArguments;
 CPP_GUARD_END()
 
-#define CREATE_EMPTY_COMMAND_ARGUMENTS() (CommandArguments) {.keys = {}, .values = {}}
+#define CREATE_EMPTY_COMMAND_ARGUMENTS() (CommandArguments) {.keys = {""}, .values = {0}}
 #define CREATE_ARGUMENTS(theKeys, theValues) (CommandArguments) {.keys = {theKeys}, .values = {theValues}}
 #define MULTIPLE(...) __VA_ARGS__

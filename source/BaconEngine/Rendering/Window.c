@@ -8,8 +8,8 @@ CPP_GUARD_START()
     static SDL_Window* window = NULL;
     static SDL_Renderer* renderer = NULL;
     static char* title = NULL;
-    static Vector2U size = {};
-    static Vector2U position = {};
+    static Vector2U size = {0, 0};
+    static Vector2U position = {0, 0};
 
     void InitializeWindow(const char* windowTitle, Vector2U windowSize) {
         if (window != NULL)
