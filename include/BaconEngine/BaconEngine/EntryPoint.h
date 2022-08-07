@@ -18,7 +18,6 @@
 #include "Rendering/Window.h"
 #include "Rendering/Renderer.h"
 #include "Debugging/StrictMode.h"
-#include "Console/Console.h"
 
 #if OS_POSIX_COMPLIANT
 #   define EXPOSE_FUNC __attribute__((visibility("default")))
@@ -32,87 +31,7 @@ CPP_GUARD_START()
     EXPOSE_FUNC int ClientSupportsServer(void);
     EXPOSE_FUNC const char* GetClientName(void);
 
-    void HelpCommand(Command this, CommandContext context) {
-        const char* commandName = GetArgumentString(context.arguments, "command", "");
-
-        if (commandName[0] == '\0') {
-            LOG_INFO("Commands:");
-
-            for (int i = 0; i < GetCommandAmount(); i++) {
-                Command command = GetCommands()[i];
-
-                printf("%s%s - %s", i != 0 ? "\n" : "", command.name, command.description);
-
-                for (int j = 0; j < MAX_ARGUMENTS; j++) {
-                    if (command.arguments.keys[j] == NULL)
-                        break;
-
-                    printf("%s%s%s%s", j == 0 ? " - " : " ",
-                           command.arguments.values[j] ? "<" : "[",
-                           command.arguments.keys[j],
-                           command.arguments.values[j] ? ">" : "]");
-                }
-            }
-
-            printf("\n");
-            return;
-        }
-
-        int found = 0;
-
-        for (int i = 0; i < GetCommandAmount(); ++i) {
-            Command command = GetCommands()[i];
-
-            if (strcmp(command.name, commandName) != 0)
-                continue;
-
-            found = 1;
-
-            LOG_INFO("Command:");
-            printf("%s - %s", command.name, command.description);
-
-            for (int j = 0; j < MAX_ARGUMENTS; j++) {
-                if (command.arguments.keys[j] == NULL)
-                    break;
-
-                printf("%s%s%s%s", j == 0 ? " - " : " ",
-                       command.arguments.values[j] ? "<" : "[",
-                       command.arguments.keys[j],
-                       command.arguments.values[j] ? ">" : "]");
-            }
-
-            break;
-        }
-
-        if (!found) {
-            LOG_ERROR("%s was not found", commandName);
-            return;
-        }
-
-        printf("\n");
-    }
-
-    void CheatsCommand(Command this, CommandContext context) {
-        if (context.client != NULL) {
-            // TODO: Tell user.
-            return;
-        }
-
-        if (!ContainsArgument(context.arguments, "enable")) {
-            LOG_INFO("Cheats is %s", cheats ? "enabled" : "disabled");
-            return;
-        }
-
-        cheats = GetArgumentBoolean(context.arguments, "enable", 0);
-
-        LOG_INFO("Cheats is now %s", cheats ? "enabled" : "disabled");
-    }
-
-    void StopCommand(Command this, CommandContext context) {
-        running = 0;
-    }
-
-    EXPOSE_FUNC int StartBaconEngine(struct LauncherConfiguration configuration, int argc, char** argv) {
+    __attribute__((unused)) EXPOSE_FUNC int StartBaconEngine(int argc, char** argv) {
         static int alreadyStarted = 0;
 
         addedArgumentsCount = argc;
@@ -139,9 +58,6 @@ CPP_GUARD_START()
         }
 
         LOG_DEBUG("Registering commands");
-        RegisterCommand("help", "Shows every command information.", CREATE_ARGUMENTS("command", 0), &HelpCommand);
-        RegisterCommand("cheats", "Enable or disable cheat commands.", CREATE_ARGUMENTS("enable", 0), &CheatsCommand);
-        RegisterCommand("stop", "Stops the engine.", CREATE_EMPTY_COMMAND_ARGUMENTS(), &StopCommand);
 
         if (!IsServerModeEnabled()) {
             int width = 1080;
@@ -151,14 +67,34 @@ CPP_GUARD_START()
                 const char* preParsedWidth = GetArgumentValue("--width");
                 const char* preParsedHeight = GetArgumentValue("--height");
 
-                if (preParsedWidth != NULL)
-                    width = atoi(preParsedWidth);
+                if (preParsedWidth != NULL) {
+                    char* error;
+                    int parsedWith = (int) strtol(preParsedWidth, &error, 0);
 
-                if (preParsedHeight != NULL)
-                    height = atoi(preParsedHeight);
+                    if (error != NULL) {
+                        LOG_ERROR("Invalid width was supplied, ignoring...");
+
+                        parsedWith = 1080;
+                    }
+
+                    width = parsedWith;
+                }
+
+                if (preParsedHeight != NULL) {
+                    char* error;
+                    int parsedHeight = (int) strtol(preParsedHeight, &error, 0);
+
+                    if (error != NULL) {
+                        LOG_ERROR("Invalid height was supplied, ignoring...");
+
+                        parsedHeight = 720;
+                    }
+
+                    height = parsedHeight;
+                }
             }
 
-            InitializeWindow(configuration.clientName, (Vector2U) {width, height});
+            InitializeWindow(GetClientName(), (Vector2U) {width, height});
         }
 
         ASSERT(ClientStart(argc, argv) == 0, "Client start returned non-zero");
@@ -190,60 +126,12 @@ CPP_GUARD_START()
                 continue;
             }
 
-            printf(ANSI_BRIGHT_FOREGROUND_GREEN);
+            printf(cheats ? ANSI_FOREGROUND_GREEN : ANSI_BRIGHT_FOREGROUND_GREEN);
 
             if (cheats)
                 printf("[C] ");
 
             printf("> " ANSI_RESET);
-
-            char input[2046] = {'\0'};
-            {
-                char preInput[2046];
-
-                fgets(preInput, sizeof(preInput), stdin);
-
-                preInput[strcspn(preInput, "\n")] = '\0';
-
-                int writer = 0;
-
-                for (int i = 0; i < 2046; i++) {
-                    if (preInput[i] == '\0')
-                        break;
-
-                    if (preInput[i] == ' ' && writer == 0)
-                        continue;
-
-                    input[writer++] = preInput[i];
-                }
-
-                if (input[0] == '\0')
-                    continue;
-
-                for (int i = writer - 1; i >= 0; i--) {
-                    if (input[i] != ' ')
-                        break;
-
-                    input[i] = '\0';
-                }
-            }
-
-            if (input[0] == '\0')
-                continue;
-
-            const char* commandName = strtok(input, " ");
-            const char* arguments[MAX_ARGUMENTS] = {""}; // TODO: Parse quotes.
-
-            for (int i = 0; i < MAX_ARGUMENTS; i++) {
-                const char* argument = strtok(NULL, " ");
-
-                if (argument == NULL)
-                    break;
-
-                arguments[i] = argument;
-            }
-
-            ExecuteCommand(commandName, arguments);
         }
 
         LOG_TRACE("Client loop ended, shutting down");

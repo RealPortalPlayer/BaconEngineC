@@ -78,7 +78,7 @@ CPP_GUARD_START()
     }
 
     void SetWindowSize(Vector2U newSize) {
-        if (window == NULL || size.x == newSize.x && size.y == newSize.y)
+        if (window == NULL || (size.x == newSize.x && size.y == newSize.y))
             return;
 
         LOG_DEBUG("Changing size\nWindow: %s\nOld Size: (%u, %u)\nNew Size: (%u, %u)", title, size.x, size.y, newSize.x, newSize.y);
@@ -97,7 +97,7 @@ CPP_GUARD_START()
     }
 
     void SetWindowPosition(Vector2U newPosition) {
-        if (window == NULL || position.x == newPosition.x && position.y == newPosition.y)
+        if (window == NULL || (position.x == newPosition.x && position.y == newPosition.y))
             return;
 
         LOG_DEBUG("Changing position\nWindow: %s\nOld Position: (%u, %u)\nNew Position: (%u, %u)", title, position.x, position.y, newPosition.x, newPosition.y);

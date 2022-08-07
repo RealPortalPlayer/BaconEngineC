@@ -22,7 +22,7 @@ CPP_GUARD_START()
             struct {
                 const char* clientName;
                 void* clientBinary;
-                int (*Start)(struct LauncherConfiguration, int, char**);
+                int (*Start)(int, char**);
             };
         };
     } LauncherConfiguration;

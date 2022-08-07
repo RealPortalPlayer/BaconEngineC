@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
 
     LOG_INFO("Ready, starting '%s'", configuration.clientName);
 
-    int returnValue = configuration.Start(configuration, argc, argv);
+    int returnValue = configuration.Start(argc, argv);
 
 #if OS_POSIX_COMPLIANT
     dlclose(configuration.clientBinary);

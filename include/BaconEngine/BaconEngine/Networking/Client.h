@@ -9,17 +9,17 @@
 
 CPP_GUARD_START()
     typedef struct {
-        int id;
+        unsigned int id;
         unsigned long long joinedAt;
         int packetErrors; // How many times they've been kicked for packet related issues.
         unsigned long long lastStillAlivePacket;
     } ConnectedClient;
 
-    int GetClientsSize(void); // Amount of clients connected.
+    int GetClientsAmount(void); // Amount of clients connected.
     ConnectedClient** GetClients(void);
     /**
      * @return Null if not connected.
      */
-    ConnectedClient* GetClient(int id);
-    void KickClient(ConnectedClient* client, const char* reason);
+    ConnectedClient* GetClient(unsigned int id);
+    void KickClient(void/*ConnectedClient* client, const char* reason*/); // Do not run on client side.
 CPP_GUARD_END()
