@@ -6,9 +6,10 @@
 #include <SharedEngineCode/Internal/CppHeader.h>
 
 CPP_GUARD_START()
-    volatile int running;
-    volatile int cheats;
-
+    int IsClientRunning(void);
+    int IsClientCheatsEnabled(void);
     int IsServerModeEnabled(void);
     int IsStrictModeEnabled(void);
+    void StopClientRunning(void);
+    void SetClientCheats(int enable);
 CPP_GUARD_END()

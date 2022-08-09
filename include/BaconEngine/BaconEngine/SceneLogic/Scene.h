@@ -21,7 +21,7 @@ CPP_GUARD_START()
     } Scene;
 
     void CreateScene(Scene* scene, const char* name);
-    void LoadScene(Scene* scene, const char* name);
+    int LoadScene(Scene* scene, const char* name);
     void InsertClientObject(Scene* scene, ClientObject clientObject);
     int DeleteClientObject(Scene* scene, const char* name, int multi);
 CPP_GUARD_END()

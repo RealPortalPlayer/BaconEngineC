@@ -3,6 +3,7 @@
 #include <SharedEngineCode/Internal/CppHeader.h>
 
 #include "BaconEngine/Rendering/Window.h"
+#include "BaconEngine/Rendering/Renderer.h"
 
 CPP_GUARD_START()
     static SDL_Window* window = NULL;
@@ -15,11 +16,29 @@ CPP_GUARD_START()
         if (window != NULL)
             return;
 
+        SDL_WindowFlags windowFlags = SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
+
+        switch (GetCurrentRenderer()) {
+            case RENDERER_TYPE_AUTO:
+                break;
+
+            case RENDERER_TYPE_OPENGL:
+                windowFlags |= SDL_WINDOW_OPENGL;
+                break;
+
+            case RENDERER_TYPE_VULKAN:
+                windowFlags |= SDL_WINDOW_VULKAN;
+                break;
+
+            case RENDERER_TYPE_TEXT:
+                return;
+        }
+
         ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0, "Failed to initialize SDL: %s", SDL_GetError());
         LOG_INFO("Creating window\nTitle: %s\nSize: (%u, %u)", windowTitle, windowSize.x, windowSize.y);
         ASSERT((window = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, (int) windowSize.x,
-                                         (int) windowSize.y, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN)) != NULL, "Failed to create window: %s", SDL_GetError());
-        ASSERT((renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED)) != NULL, "Failed to create renderer: %s", SDL_GetError());
+                                         (int) windowSize.y, windowFlags)) != NULL, "Failed to create window: %s", SDL_GetError());
+        ASSERT((renderer = SDL_CreateRenderer(window, -1, !IsSoftwareRendering() ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE)) != NULL, "Failed to create renderer: %s", SDL_GetError());
 
         title = (char*) windowTitle;
         size = windowSize;

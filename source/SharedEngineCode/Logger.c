@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <pthread.h>
 
 #include "SharedEngineCode/Logger.h"
 #include "SharedEngineCode/ANSICodes.h"
@@ -7,9 +8,13 @@
 CPP_GUARD_START()
     volatile LogLevels currentLogLevel = LOG_LEVEL_INFO;
 
+    pthread_mutex_t loggingLock;
+
     void LogImplementation(int includeHeader, LogLevels logLevel, const char* message, ...) {
         if (currentLogLevel == LOG_LEVEL_NULL || logLevel < currentLogLevel)
             return;
+
+        pthread_mutex_lock(&loggingLock);
 
         va_list arguments;
 
@@ -49,5 +54,6 @@ CPP_GUARD_START()
         vprintf(message, arguments);
         printf("\n");
         va_end(arguments);
+        pthread_mutex_unlock(&loggingLock);
     }
 CPP_GUARD_END()

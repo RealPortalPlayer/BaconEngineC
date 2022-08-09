@@ -1,23 +1,42 @@
 #include <SharedEngineCode/ArgumentHandler.h>
-
+#include <SharedEngineCode/Internal/CppHeader.h>
 #include "BaconEngine/ClientInformation.h"
 
-volatile int running = 1;
+CPP_GUARD_START()
+    int running = 1;
+    int cheats = 0;
 
-int IsServerModeEnabled(void) {
-    static int enabled = -1;
+    int IsClientRunning(void) {
+        return running;
+    }
 
-    if (enabled == -1)
-        enabled = GetArgumentIndex("--server") != -1 || GetArgumentIndex("-s") != -1;
+    int IsClientCheatsEnabled(void) {
+        return cheats;
+    }
 
-    return enabled;
-}
+    int IsServerModeEnabled(void) {
+        static int enabled = -1;
 
-int IsStrictModeEnabled(void) {
-    static int enabled = -1;
+        if (enabled == -1)
+            enabled = GetArgumentIndex("--server") != -1 || GetArgumentIndex("-s") != -1;
 
-    if (enabled == -1)
-        enabled = GetArgumentIndex("--no-strict") == -1 && GetArgumentIndex("-ns") == -1;
+        return enabled;
+    }
 
-    return enabled;
-}
+    int IsStrictModeEnabled(void) {
+        static int enabled = -1;
+
+        if (enabled == -1)
+            enabled = GetArgumentIndex("--no-strict") == -1 && GetArgumentIndex("-ns") == -1;
+
+        return enabled;
+    }
+
+    void StopClientRunning(void) {
+        running = 0;
+    }
+
+    void SetClientCheats(int enable) {
+        cheats = enable;
+    }
+CPP_GUARD_END()

@@ -6,9 +6,6 @@
 #include <SharedEngineCode/ArgumentHandler.h>
 #include <SharedEngineCode/Launcher.h>
 #include <SharedEngineCode/Logger.h>
-#include <SharedEngineCode/ANSICodes.h>
-#include <stdio.h>
-#include <string.h>
 #include <SDL.h>
 #include <SharedEngineCode/Internal/CppHeader.h>
 #include <SharedEngineCode/OperatingSystem.h>
@@ -18,6 +15,8 @@
 #include "Rendering/Window.h"
 #include "Rendering/Renderer.h"
 #include "Debugging/StrictMode.h"
+#include "BaconEngine/Console/Console.h"
+#include "BaconEngine/Rendering/Layer.h"
 
 #if OS_POSIX_COMPLIANT
 #   define EXPOSE_FUNC __attribute__((visibility("default")))
@@ -47,6 +46,7 @@ CPP_GUARD_START()
         //       Doing so could potentially prevent debug and trace logs from showing due to it now being fully initialized yet.
 
         STRICT_CHECK(!alreadyStarted, 1, "Reinitializing the engine is not supported");
+        LOG_TRACE("Entered client code");
 
         alreadyStarted = 1;
 
@@ -57,9 +57,11 @@ CPP_GUARD_START()
             return 1;
         }
 
-        LOG_DEBUG("Registering commands");
+        InitializeLayers();
+        InitializeRenderer();
+        InitializeConsole();
 
-        if (!IsServerModeEnabled()) {
+        if (!IsServerModeEnabled() && GetCurrentRenderer() != RENDERER_TYPE_TEXT) {
             int width = 1080;
             int height = 720;
 
@@ -101,40 +103,40 @@ CPP_GUARD_START()
         ClearScreen();
         SetWindowVisibility(1);
 
-        while (running) {
-            if (!IsServerModeEnabled() && IsWindowStillOpened()) {
-                ClearScreen();
-                {
-                    SDL_Event event;
+        while (IsClientRunning()) {
+            if (!IsWindowStillOpened() && !IsServerModeEnabled() && GetCurrentRenderer() != RENDERER_TYPE_TEXT)
+                break;
 
-                    while (SDL_PollEvent(&event)) {
-                        switch (event.type) {
-                            case SDL_QUIT:
-                                ClientShutdown();
+            if (IsServerModeEnabled() || GetCurrentRenderer() == RENDERER_TYPE_TEXT)
+                continue;
 
-                                running = 0;
-                                break;
-                        }
+            ClearScreen();
+            {
+                SDL_Event event;
+
+                while (SDL_PollEvent(&event)) {
+                    if (LayerOnEvent(event))
+                        continue;
+
+                    switch (event.type) {
+                        case SDL_QUIT:
+                            ClientShutdown();
+                            StopClientRunning();
+                            break;
                     }
                 }
-
-                if (!running)
-                    break;
-
-                SDL_RenderPresent(GetInternalSDLRenderer());
-
-                continue;
             }
 
-            printf(cheats ? ANSI_FOREGROUND_GREEN : ANSI_BRIGHT_FOREGROUND_GREEN);
+            if (!IsClientRunning())
+                break;
 
-            if (cheats)
-                printf("[C] ");
-
-            printf("> " ANSI_RESET);
+            LayerOnUpdate(LAYER_UPDATE_TYPE_BEFORE_RENDERING);
+            SDL_RenderPresent(GetInternalSDLRenderer());
+            LayerOnUpdate(LAYER_UPDATE_TYPE_AFTER_RENDERING);
         }
 
         LOG_TRACE("Client loop ended, shutting down");
+        DestroyLayers();
         DestroyWindow();
 
         return 0;

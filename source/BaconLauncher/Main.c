@@ -33,7 +33,9 @@ int main(int argc, char* argv[]) {
                  "--enable-trace-logs (-etl): Enables tracing logs. This will also enable debug logs, too\n"
                  "--dont-parse <argument> (--): Do not parse argument's beyond this point\n"
                  "--width <width>: Changes the width of the window\n"
-                 "--height <height>: Changes the height of the window");
+                 "--height <height>: Changes the height of the window\n"
+                 "--renderer <renderer>: Changes the default rendering system\n"
+                 "--software: Use software mode to render instead of your GPU");
         return 0;
     }
 
@@ -80,8 +82,12 @@ int main(int argc, char* argv[]) {
     }
 
     LOG_INFO("Ready, starting '%s'", configuration.clientName);
+    LOG_TRACE("Entering client code");
 
     int returnValue = configuration.Start(argc, argv);
+
+    LOG_TRACE("Returned back to launcher");
+    LOG_TRACE("Freeing binaries");
 
 #if OS_POSIX_COMPLIANT
     dlclose(configuration.clientBinary);
