@@ -86,12 +86,12 @@ CPP_GUARD_START()
                SDL_RenderDrawPoint(GetInternalSDLRenderer(), position.x, position.y) == 0;
     }
 
-    int RendererDrawRectangle(Vector2I position, Vector2I size, Color4U color) {
+    int RendererDrawRectangle(Vector2I position, Vector2U size, Color4U color) {
         SDL_Rect rectangle = {
-                .x = position.x,
-                .y = position.y,
-                .w = size.x,
-                .h = size.y
+            position.x,
+            position.y,
+            (int) size.x,
+            (int) size.y
         };
 
         return GetInternalSDLRenderer() != NULL &&
@@ -99,12 +99,12 @@ CPP_GUARD_START()
                SDL_RenderDrawRect(GetInternalSDLRenderer(), &rectangle) == 0;
     }
 
-    int RendererFillRectangle(Vector2I position, Vector2I size, Color4U color) {
+    int RendererFillRectangle(Vector2I position, Vector2U size, Color4U color) {
         SDL_Rect rectangle = {
-                .x = position.x,
-                .y = position.y,
-                .w = size.x,
-                .h = size.y
+            position.x,
+            position.y,
+            (int) size.x,
+            (int) size.y
         };
 
         return GetInternalSDLRenderer() != NULL &&
@@ -112,8 +112,8 @@ CPP_GUARD_START()
                SDL_RenderFillRect(GetInternalSDLRenderer(), &rectangle) == 0;
     }
 
-    int RendererDrawFilledRectangle(Vector2I position, Vector2I size, Color4U borderColor, Color4U fillColor, int borderSize) {
+    int RendererDrawFilledRectangle(Vector2I position, Vector2U size, Color4U borderColor, Color4U fillColor, int borderSize) {
         return RendererDrawRectangle(position, size, borderColor) &&
-               RendererFillRectangle((Vector2I) {position.x + borderSize, position.y + borderSize}, (Vector2I) {size.x - borderSize * 2, size.y - borderSize * 2}, fillColor);
+               RendererFillRectangle((Vector2I) {position.x + borderSize, position.y + borderSize}, (Vector2U) {size.x - borderSize * 2, size.y - borderSize * 2}, fillColor);
     }
 CPP_GUARD_END()

@@ -33,6 +33,8 @@ CPP_GUARD_START()
      * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
      */
     int ArrayPopElement(DynamicArray* array);
+
+    int ArrayRemoveElementAt(DynamicArray* array, unsigned int index);
 CPP_GUARD_END()
 
 #define GET_ELEMENT(type, array, index) ((type*) (array).internalArray[index])

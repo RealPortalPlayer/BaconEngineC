@@ -1,5 +1,6 @@
 #include <SharedEngineCode/Internal/CppHeader.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "BaconEngine/Storage/DynamicArray.h"
 #include "BaconEngine/Debugging/StrictMode.h"
@@ -54,7 +55,7 @@ CPP_GUARD_START()
         array->internalArray[0] = NULL;
 
         if (shift)
-            return 0; // TODO: Shift
+            memmove(array->internalArray, array->internalArray + 1, sizeof(array->internalArray) - array->size);
 
         return 1;
     }
@@ -65,6 +66,17 @@ CPP_GUARD_START()
 
         array->internalArray[--array->used] = NULL;
 
+        return 1;
+    }
+
+    int ArrayRemoveElementAt(DynamicArray* array, unsigned int index) {
+        if (index >= array->used)
+            return 0;
+
+        for (unsigned int windowId = index; windowId < array->used; windowId++)
+            array->internalArray[windowId] = array->internalArray[windowId + 1];
+
+        array->used--;
         return 1;
     }
 CPP_GUARD_END()

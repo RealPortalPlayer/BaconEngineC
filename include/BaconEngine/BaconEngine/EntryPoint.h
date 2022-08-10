@@ -114,7 +114,15 @@ CPP_GUARD_START()
             if (IsServerModeEnabled() || GetCurrentRenderer() == RENDERER_TYPE_TEXT)
                 continue;
 
+            double deltaCurrentTime = SDL_GetTicks();
+            double deltaTime = (deltaCurrentTime - lastTime) / 1000.0f;
+
+            lastTime = deltaCurrentTime;
+
             ClearScreen();
+            LayerOnUpdate(LAYER_UPDATE_TYPE_BEFORE_RENDERING, deltaTime);
+            SDL_RenderPresent(GetInternalSDLRenderer());
+            LayerOnUpdate(LAYER_UPDATE_TYPE_AFTER_RENDERING, deltaTime);
             {
                 SDL_Event event;
 
@@ -130,18 +138,6 @@ CPP_GUARD_START()
                     }
                 }
             }
-
-            if (!IsClientRunning())
-                break;
-
-            double deltaCurrentTime = SDL_GetTicks();
-            double deltaTime = (deltaCurrentTime - lastTime) / 1000.0f;
-
-            lastTime = deltaCurrentTime;
-
-            LayerOnUpdate(LAYER_UPDATE_TYPE_BEFORE_RENDERING, deltaTime);
-            SDL_RenderPresent(GetInternalSDLRenderer());
-            LayerOnUpdate(LAYER_UPDATE_TYPE_AFTER_RENDERING, deltaTime);
         }
 
         LOG_TRACE("Client loop ended, shutting down");

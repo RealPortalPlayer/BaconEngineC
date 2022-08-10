@@ -24,9 +24,9 @@ CPP_GUARD_START()
     Color3U GetClearColor(void);
     int RendererDrawLine(Vector2I firstPoint, Vector2I secondPoint, Color4U color);
     int RendererDrawPoint(Vector2I position, Color4U color);
-    int RendererDrawRectangle(Vector2I position, Vector2I size, Color4U color);
-    int RendererFillRectangle(Vector2I position, Vector2I size, Color4U color);
-    int RendererDrawFilledRectangle(Vector2I position, Vector2I size, Color4U borderColor, Color4U fillColor, int borderSize);
+    int RendererDrawRectangle(Vector2I position, Vector2U size, Color4U color);
+    int RendererFillRectangle(Vector2I position, Vector2U size, Color4U color);
+    int RendererDrawFilledRectangle(Vector2I position, Vector2U size, Color4U borderColor, Color4U fillColor, int borderSize);
 
-#   define RENDERER_DRAW_FILLED_RECTANGLE_SAME_COLOR(position, size, color, borderSize) RendererDrawFilledRectangle(position, size, color, color, borderSize)
+#   define RENDERER_DRAW_FILLED_RECTANGLE_SAME_COLOR(position, size, color, borderSize) RendererDrawFilledRectangle((position), (size), (color), (color), (borderSize))
 CPP_GUARD_END()

@@ -29,6 +29,9 @@ CPP_GUARD_START()
     void InitializeLayers(void);
     void RegisterLayer(const char* name, int enabled, ClientLayerFunctions functions);
     ClientLayer GetLayer(const char* name);
+    int GetLayerAmount(void);
+    int GetAllocatedLayersAmount(void);
+    int GetLayerReallocationAmount(void);
     int ToggleLayer(const char* name, int enable);
     void LayerOnUpdate(LayerUpdateTypes layerUpdateType, double deltaTime);
     int LayerOnEvent(SDL_Event event);

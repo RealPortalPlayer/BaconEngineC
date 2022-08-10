@@ -2,7 +2,6 @@
 #include <BaconEngine/Rendering/Renderer.h>
 #include <BaconEngine/Console/Console.h>
 #include <stdlib.h>
-#include <BaconEngine/Rendering/UI.h>
 
 #include "Layers.h"
 
@@ -23,23 +22,25 @@ void InitializeTestLayers(void) {
     });
 }
 
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
+
 void ColorOnUpdate(LayerUpdateTypes updateType, double deltaTime) {
     if (updateType != LAYER_UPDATE_TYPE_BEFORE_RENDERING)
         return;
 
-    if (down) {
-        color.r += (int)(1000 * deltaTime);
-        color.g += (int)(1000 * deltaTime);
-        color.b += (int)(1000 * deltaTime);
-    } else {
-        color.r -= (int)(1000 * deltaTime);
-        color.g -= (int)(1000 * deltaTime);
-        color.b -= (int)(1000 * deltaTime);
-    }
+    int times = 1;
 
-    color.r = min(255, max(color.r, 0));
-    color.g = min(255, max(color.g, 0));
-    color.b = min(255, max(color.b, 0));
+    if (!down)
+        times = -1;
+
+    color.r += times * (int)(1000 * deltaTime);
+    color.g += times * (int)(1000 * deltaTime);
+    color.b += times * (int)(1000 * deltaTime);
+
+    color.r = MIN(255, MAX(color.r, 0));
+    color.g = MIN(255, MAX(color.g, 0));
+    color.b = MIN(255, MAX(color.b, 0));
 
     SetClearColor((Color3U) {color.r, color.g, color.b});
 }

@@ -5,6 +5,9 @@
 #include "BaconEngine/Console/Console.h"
 #include "BaconEngine/ClientInformation.h"
 #include "BaconEngine/Rendering/Renderer.h"
+#include "BaconEngine/Rendering/UI.h"
+#include "../Rendering/EngineLayers.h"
+#include "BaconEngine/Rendering/Layer.h"
 
 CPP_GUARD_START()
     void HelpCommand(CommandContext context);
@@ -79,7 +82,11 @@ CPP_GUARD_START()
     }
 
     void DebugInfoCommand(void) {
-        LOG_INFO("Commands: %i/%i (%i realloc)", GetCommandAmount(), GetAllocatedCommandsAmount(), GetCommandReallocationAmount());
+        LOG_INFO("Commands: %i/%i (%i realloc)\n"
+                 "Layers: %i/%i (%i realloc)\n"
+                 "UIs: %i/%i (%i realloc, %i rendering%s%s)", GetCommandAmount(), GetAllocatedCommandsAmount(), GetCommandReallocationAmount(),
+                                                            GetLayerAmount(), GetAllocatedLayersAmount(), GetLayerReallocationAmount(),
+                                                            GetUIWindowAmount(), GetAllocatedCommandsAmount(), GetUIWindowReallocationAmount(), GetUIWindowRenderCount(), GetCurrentUIWindow() != NULL ? ", current: " : "", GetCurrentUIWindow() != NULL ? GetCurrentUIWindow()->name : "");
     }
 
     void SayCommand(CommandContext context) {

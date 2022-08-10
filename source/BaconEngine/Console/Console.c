@@ -94,7 +94,7 @@ CPP_GUARD_START()
         char* name = input;
         Command* command = NULL;
 
-        name[strcspn(name, " ")] = '\0';
+//        name[strcspn(name, " ")] = '\0';
 
         if (cachedCommand != NULL && strcmp(cachedCommand->name, name) == 0)
             command = cachedCommand;

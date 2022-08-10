@@ -16,7 +16,7 @@ CPP_GUARD_START()
         if (window != NULL)
             return;
 
-        SDL_WindowFlags windowFlags = SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
+        SDL_WindowFlags windowFlags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
 
         switch (GetCurrentRenderer()) {
             case RENDERER_TYPE_AUTO:
@@ -67,7 +67,12 @@ CPP_GUARD_START()
     }
 
     Vector2U GetWindowSize(void) {
-        return size;
+        int x;
+        int y;
+
+        SDL_GetWindowSize(window, &x, &y);
+
+        return (Vector2U) {(unsigned) x, (unsigned) y};
     }
 
     Vector2U GetWindowPosition(void) {

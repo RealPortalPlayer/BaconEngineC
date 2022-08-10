@@ -22,7 +22,7 @@ CPP_GUARD_START()
     void CreateLauncherConfiguration(LauncherConfiguration* configuration, const char* path) {
         CHDIR(path);
 
-        configuration->clientBinary = GET_BINARY("binary.dll", RTLD_NOW);
+        configuration->clientBinary = GET_BINARY("binary.dylib", RTLD_NOW);
 
         if (configuration->clientBinary == NULL) {
             configuration->code = LAUNCHER_ERROR_CODE_BINARY;

@@ -80,6 +80,18 @@ CPP_GUARD_START()
         return foundLayer->publicLayer;
     }
 
+    int GetLayerAmount(void) {
+        return layerArray.used;
+    }
+
+    int GetAllocatedLayersAmount(void) {
+        return (int) layerArray.size;
+    }
+
+    int GetLayerReallocationAmount(void) {
+        return layerArray.calledRealloc;
+    }
+
     int ToggleLayer(const char* name, int enable) {
         InternalClientLayer* layer = InternalGetLayer(name);
 
