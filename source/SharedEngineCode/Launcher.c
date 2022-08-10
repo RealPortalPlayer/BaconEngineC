@@ -1,37 +1,28 @@
-#include "SharedEngineCode/OperatingSystem.h"
+#include "SharedEngineCode/Launcher.h"
+
+#include "SharedEngineCode/Internal/CppHeader.h"
 
 #if OS_POSIX_COMPLIANT
 #   include <dlfcn.h>
 #   include <unistd.h>
-#elif OS_WINDOWS
-#   include <Windows.h>
-#   include <direct.h>
-#endif
-
-#include "SharedEngineCode/Launcher.h"
-#include "SharedEngineCode/Internal/CppHeader.h"
-
-#if OS_POSIX_COMPLIANT
 #   define CHDIR(dir) chdir(dir)
 #   define GET_BINARY(name, options) dlopen(name, options)
 #   define GET_ADDRESS(binary, name) dlsym(binary, name)
 #   define SET_ERROR() configuration->errorMessage = dlerror()
 #elif OS_WINDOWS
+#   include <Windows.h>
+#   include <direct.h>
 #   define CHDIR(dir) _chdir(dir)
 #   define GET_BINARY(name, options) LoadLibrary(name)
 #   define GET_ADDRESS(binary, name) GetProcAddress(binary, name)
-#   define SET_ERROR() \
-wchar_t errorBuffer[256]; \
-FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), errorBuffer, (sizeof(errorBuffer) / sizeof(wchar_t)), NULL); \
-configuration->errorMessage = (LPSTR) errorBuffer
-
+#   define SET_ERROR() configuration->errorMessage = NULL
 #endif
 
 CPP_GUARD_START()
     void CreateLauncherConfiguration(LauncherConfiguration* configuration, const char* path) {
         CHDIR(path);
 
-        configuration->clientBinary = GET_BINARY("binary.dylib", RTLD_NOW);
+        configuration->clientBinary = GET_BINARY("binary.dll", RTLD_NOW);
 
         if (configuration->clientBinary == NULL) {
             configuration->code = LAUNCHER_ERROR_CODE_BINARY;

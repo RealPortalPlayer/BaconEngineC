@@ -12,12 +12,13 @@ CPP_GUARD_START()
     DynamicArray commandArray;
     Command* lastCommand;
     int duplicateCommand = 0;
+    int consoleInitialized = 0;
 
     Command** GetCommands(void) {
         return (Command**) commandArray.internalArray;
     }
 
-    int GetCommandsAmount(void) {
+    int GetCommandAmount(void) {
         return commandArray.used;
     }
 
@@ -30,12 +31,10 @@ CPP_GUARD_START()
     }
 
     void InitializeConsole(void) {
-        static int initialized = 0;
-
-        STRICT_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized the console");
+        STRICT_CHECK_NO_RETURN_VALUE(!consoleInitialized, "Already initialized the console");
         LOG_INFO("Initializing console");
 
-        initialized = 1;
+        consoleInitialized = 1;
 
         CreateDynamicArray(&commandArray, 100);
         LOG_INFO("Registering engine commands");
@@ -62,12 +61,13 @@ CPP_GUARD_START()
 
         Command* command = malloc(sizeof(Command));
 
+        ASSERT(command != NULL, "Failed to allocate %lu bytes of data for a layer", sizeof(Command));
+
         command->name = name;
         command->description = description;
         command->flags = flags;
         command->Run = Run;
 
-        ASSERT(command != NULL, "Failed to allocate %lu bytes of data for a layer", sizeof(Command));
 
         ArrayPushElement(&commandArray, (void*) command);
 
@@ -91,8 +91,10 @@ CPP_GUARD_START()
         // NOTE: Do not put any logs outside of an if check.
         //       We do not want to trick users into thinking something is part of the command.
         static Command* cachedCommand = NULL;
-        char* name = strtok(input, " ");
+        char* name = input;
         Command* command = NULL;
+
+        name[strcspn(name, " ")] = '\0';
 
         if (cachedCommand != NULL && strcmp(cachedCommand->name, name) == 0)
             command = cachedCommand;
@@ -141,5 +143,13 @@ CPP_GUARD_START()
                 .size = 0
             }
         });
+    }
+
+    void DestroyConsole(void) {
+        STRICT_CHECK_NO_RETURN_VALUE(consoleInitialized, "Console are not initialized");
+
+        for (int i = 0; i < commandArray.used; i++) {
+
+        }
     }
 CPP_GUARD_END()

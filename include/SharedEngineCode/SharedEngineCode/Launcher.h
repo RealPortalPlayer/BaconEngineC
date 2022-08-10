@@ -5,6 +5,7 @@
 
 #include <limits.h>
 
+#include "SharedEngineCode/OperatingSystem.h"
 #include "Internal/CppHeader.h"
 
 CPP_GUARD_START()

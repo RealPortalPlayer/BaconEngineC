@@ -2,7 +2,6 @@
 #include <SharedEngineCode/Logger.h>
 #include <stddef.h>
 #include <SharedEngineCode/Launcher.h>
-#include <SharedEngineCode/OperatingSystem.h>
 
 #if OS_POSIX_COMPLIANT
 #   include <unistd.h>
@@ -67,12 +66,20 @@ int main(int argc, char* argv[]) {
     if (configuration.code != LAUNCHER_ERROR_CODE_NULL) {
         switch (configuration.code) {
             case LAUNCHER_ERROR_CODE_BINARY:
+#if OS_POSIX_COMPLIANT
                 LOG_FATAL("Failed to load the binary: %s", configuration.errorMessage);
+#elif OS_WINDOWS
+                LOG_FATAL("Failed to load the binary: %i", configuration.code);
+#endif
                 return 1;
 
             case LAUNCHER_ERROR_CODE_ENTRY_NULL:
             case LAUNCHER_ERROR_CODE_NAME_NULL:
+#if OS_POSIX_COMPLIANT
                 LOG_FATAL("Failed to get important methods: %s", configuration.errorMessage);
+#elif OS_WINDOWS
+                LOG_FATAL("Failed to get important methods: %i", configuration.code);
+#endif
                 return 1;
 
             default:

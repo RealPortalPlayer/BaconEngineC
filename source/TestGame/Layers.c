@@ -1,19 +1,21 @@
 #include <BaconEngine/Rendering/Layer.h>
 #include <BaconEngine/Rendering/Renderer.h>
 #include <BaconEngine/Console/Console.h>
+#include <stdlib.h>
+#include <BaconEngine/Rendering/UI.h>
 
 #include "Layers.h"
 
 int down = 0;
-Color3U color = {0, 0, 0};
+Color3I color = {0, 0, 0};
 
-void ColorOnUpdate(LayerUpdateTypes updateType);
+void ColorOnUpdate(LayerUpdateTypes updateType, double deltaTime);
 int ColorOnEvent(SDL_Event event);
 int ColorModifierOnEvent(SDL_Event event);
 
 void InitializeTestLayers(void) {
     RegisterLayer("ColorModifier", 1, (ClientLayerFunctions) {
-            .LayerOnEvent = &ColorModifierOnEvent
+        .LayerOnEvent = &ColorModifierOnEvent
     });
     RegisterLayer("Color", 1, (ClientLayerFunctions) {
         .LayerOnUpdate = &ColorOnUpdate,
@@ -21,33 +23,25 @@ void InitializeTestLayers(void) {
     });
 }
 
-void ColorOnUpdate(LayerUpdateTypes updateType) {
+void ColorOnUpdate(LayerUpdateTypes updateType, double deltaTime) {
     if (updateType != LAYER_UPDATE_TYPE_BEFORE_RENDERING)
         return;
 
-    SetClearColor(color);
-
     if (down) {
-        if (color.r != 255)
-            color.r++;
-
-        if (color.g != 255)
-            color.g++;
-
-        if (color.b != 255)
-            color.b++;
-
-        return;
+        color.r += (int)(1000 * deltaTime);
+        color.g += (int)(1000 * deltaTime);
+        color.b += (int)(1000 * deltaTime);
+    } else {
+        color.r -= (int)(1000 * deltaTime);
+        color.g -= (int)(1000 * deltaTime);
+        color.b -= (int)(1000 * deltaTime);
     }
 
-    if (color.r != 0)
-        color.r--;
+    color.r = min(255, max(color.r, 0));
+    color.g = min(255, max(color.g, 0));
+    color.b = min(255, max(color.b, 0));
 
-    if (color.g != 0)
-        color.g--;
-
-    if (color.b != 0)
-        color.b--;
+    SetClearColor((Color3U) {color.r, color.g, color.b});
 }
 
 int ColorOnEvent(SDL_Event event) {

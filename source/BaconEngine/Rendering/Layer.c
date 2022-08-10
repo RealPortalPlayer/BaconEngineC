@@ -1,9 +1,11 @@
 #include <SharedEngineCode/Internal/CppHeader.h>
+#include <string.h>
 
 #include "BaconEngine/Rendering/Layer.h"
 #include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Debugging/Assert.h"
 #include "BaconEngine/Storage/DynamicArray.h"
+#include "EngineLayers.h"
 
 CPP_GUARD_START()
     typedef struct {
@@ -37,7 +39,8 @@ CPP_GUARD_START()
         initialized = 1;
 
         CreateDynamicArray(&layerArray, 100);
-        // TODO: Engine layers.
+        LOG_INFO("Registering engine layers");
+        InitializeEngineLayers();
     }
 
     void RegisterLayer(const char* name, int enabled, ClientLayerFunctions functions) {
@@ -56,7 +59,7 @@ CPP_GUARD_START()
 
         layer->calledStart = 0;
         layer->functions.LayerOnStart = functions.LayerOnStart != NULL ? functions.LayerOnStart : (void (*)(void)) &LayerNoOperation;
-        layer->functions.LayerOnUpdate = functions.LayerOnUpdate != NULL ? functions.LayerOnUpdate : (void (*)(LayerUpdateTypes)) &LayerNoOperation;
+        layer->functions.LayerOnUpdate = functions.LayerOnUpdate != NULL ? functions.LayerOnUpdate : (void (*)(LayerUpdateTypes, double)) &LayerNoOperation;
         layer->functions.LayerOnToggle = functions.LayerOnToggle != NULL ? functions.LayerOnToggle : (void (*)(int)) &LayerNoOperation;
         layer->functions.LayerOnEvent = functions.LayerOnEvent != NULL ? functions.LayerOnEvent : (int (*)(SDL_Event)) &LayerNoOperation;
         layer->functions.LayerOnStop = functions.LayerOnStop != NULL ? functions.LayerOnStop : (void (*)(void)) &LayerNoOperation;
@@ -92,7 +95,7 @@ CPP_GUARD_START()
         return 1;
     }
 
-    void LayerOnUpdate(LayerUpdateTypes layerUpdateType) { // TODO: Make this a little bit more DRY.
+    void LayerOnUpdate(LayerUpdateTypes layerUpdateType, double deltaTime) { // TODO: Make this a little bit more DRY.
         for (int i = 0; i < layerArray.used; i++) {
             InternalClientLayer* layer = GET_ELEMENT(InternalClientLayer, layerArray, i);
 
@@ -105,7 +108,7 @@ CPP_GUARD_START()
                 layer->calledStart = 1;
             }
 
-            layer->functions.LayerOnUpdate(layerUpdateType);
+            layer->functions.LayerOnUpdate(layerUpdateType, deltaTime);
         }
     }
 
@@ -143,7 +146,6 @@ CPP_GUARD_START()
             InternalClientLayer* layer = GET_ELEMENT(InternalClientLayer, layerArray, i);
 
             layer->functions.LayerOnStop();
-
             free(layer);
         }
 

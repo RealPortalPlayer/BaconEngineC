@@ -1,6 +1,6 @@
 project(BaconEngine)
 
-add_library(BaconEngine STATIC Rendering/Window.c Rendering/Renderer.c ClientInformation.c Console/ArgumentManager.c Console/Console.c Console/EngineCommands.c Console/EngineCommands.h SceneLogic/Scene.c Rendering/Layer.c Storage/DynamicArray.c)
+add_library(BaconEngine STATIC Rendering/Window.c Rendering/Renderer.c ClientInformation.c Console/ArgumentManager.c Console/Console.c Console/EngineCommands.c Console/EngineCommands.h SceneLogic/Scene.c Rendering/Layer.c Storage/DynamicArray.c Rendering/UI.c Rendering/EngineLayers.c)
 
 target_include_directories(BaconEngine PUBLIC ../../include/BaconEngine)
 target_link_libraries(BaconEngine LINK_PUBLIC SharedEngineCode SDL2)

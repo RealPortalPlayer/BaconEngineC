@@ -32,6 +32,8 @@ CPP_GUARD_START()
     }
 
     int ArrayUnshiftElement(DynamicArray* array, void* element) {
+        (void) element;
+
         ReallocateArray(array);
 
         return 0; // TODO: Unshift

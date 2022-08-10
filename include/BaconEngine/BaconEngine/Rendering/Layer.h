@@ -20,7 +20,7 @@ CPP_GUARD_START()
 
     typedef struct {
         void (*LayerOnStart)(void);
-        void (*LayerOnUpdate)(LayerUpdateTypes updateType);
+        void (*LayerOnUpdate)(LayerUpdateTypes updateType, double deltaTime);
         void (*LayerOnToggle)(int enabled);
         int (*LayerOnEvent)(SDL_Event event);
         void (*LayerOnStop)(void);
@@ -30,7 +30,7 @@ CPP_GUARD_START()
     void RegisterLayer(const char* name, int enabled, ClientLayerFunctions functions);
     ClientLayer GetLayer(const char* name);
     int ToggleLayer(const char* name, int enable);
-    void LayerOnUpdate(LayerUpdateTypes layerUpdateType);
+    void LayerOnUpdate(LayerUpdateTypes layerUpdateType, double deltaTime);
     int LayerOnEvent(SDL_Event event);
     void DestroyLayers(void);
 CPP_GUARD_END()

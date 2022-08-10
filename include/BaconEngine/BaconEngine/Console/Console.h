@@ -9,11 +9,12 @@
 
 CPP_GUARD_START()
     Command** GetCommands(void);
-    int GetCommandsAmount(void);
+    int GetCommandAmount(void);
     int GetAllocatedCommandsAmount(void);
     int GetCommandReallocationAmount(void);
     void InitializeConsole(void);
     void RegisterCommand(const char* name, const char* description, CommandFlags flags, void (*Run)(CommandContext context));
     void DuplicateCommand(const char* name, const char* description);
     void ExecuteCommand(char* input); // TODO: Client
+    void DestroyConsole(void);
 CPP_GUARD_END()

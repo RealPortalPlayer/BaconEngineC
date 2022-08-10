@@ -17,6 +17,7 @@
 #include "Debugging/StrictMode.h"
 #include "BaconEngine/Console/Console.h"
 #include "BaconEngine/Rendering/Layer.h"
+#include "BaconEngine/Rendering/UI.h"
 
 #if OS_POSIX_COMPLIANT
 #   define EXPOSE_FUNC __attribute__((visibility("default")))
@@ -30,7 +31,7 @@ CPP_GUARD_START()
     EXPOSE_FUNC int ClientSupportsServer(void);
     EXPOSE_FUNC const char* GetClientName(void);
 
-    __attribute__((unused)) EXPOSE_FUNC int StartBaconEngine(int argc, char** argv) {
+    EXPOSE_FUNC int StartBaconEngine(int argc, char** argv) {
         static int alreadyStarted = 0;
 
         addedArgumentsCount = argc;
@@ -58,6 +59,7 @@ CPP_GUARD_START()
         }
 
         InitializeLayers();
+        InitializeUISystem();
         InitializeRenderer();
         InitializeConsole();
 
@@ -103,6 +105,8 @@ CPP_GUARD_START()
         ClearScreen();
         SetWindowVisibility(1);
 
+        double lastTime = SDL_GetTicks();
+
         while (IsClientRunning()) {
             if (!IsWindowStillOpened() && !IsServerModeEnabled() && GetCurrentRenderer() != RENDERER_TYPE_TEXT)
                 break;
@@ -130,9 +134,14 @@ CPP_GUARD_START()
             if (!IsClientRunning())
                 break;
 
-            LayerOnUpdate(LAYER_UPDATE_TYPE_BEFORE_RENDERING);
+            double deltaCurrentTime = SDL_GetTicks();
+            double deltaTime = (deltaCurrentTime - lastTime) / 1000.0f;
+
+            lastTime = deltaCurrentTime;
+
+            LayerOnUpdate(LAYER_UPDATE_TYPE_BEFORE_RENDERING, deltaTime);
             SDL_RenderPresent(GetInternalSDLRenderer());
-            LayerOnUpdate(LAYER_UPDATE_TYPE_AFTER_RENDERING);
+            LayerOnUpdate(LAYER_UPDATE_TYPE_AFTER_RENDERING, deltaTime);
         }
 
         LOG_TRACE("Client loop ended, shutting down");

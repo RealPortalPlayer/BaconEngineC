@@ -1,6 +1,8 @@
 // Purpose: OS specific definitions.
 // Created on: 4/1/22 @ 7:25 PM
 
+#pragma once
+
 #define OS_WINDOWS 0
 #define OS_APPLE 0
 #define OS_POSIX_COMPLIANT 0

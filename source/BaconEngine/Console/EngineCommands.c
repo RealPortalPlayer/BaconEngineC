@@ -79,7 +79,7 @@ CPP_GUARD_START()
     }
 
     void DebugInfoCommand(void) {
-        LOG_INFO("Commands: %i/%i (%i realloc)", GetCommandsAmount(), GetAllocatedCommandsAmount(), GetCommandReallocationAmount());
+        LOG_INFO("Commands: %i/%i (%i realloc)", GetCommandAmount(), GetAllocatedCommandsAmount(), GetCommandReallocationAmount());
     }
 
     void SayCommand(CommandContext context) {

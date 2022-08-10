@@ -1,5 +1,7 @@
 #include <SDL.h>
 #include <SharedEngineCode/Internal/CppHeader.h>
+#include <string.h>
+#include <ctype.h>
 
 #include "BaconEngine/Rendering/Renderer.h"
 #include "BaconEngine/Rendering/Window.h"
@@ -49,12 +51,10 @@ CPP_GUARD_START()
         currentType = RENDERER_TYPE_AUTO;
     }
 
-    void ClearScreen(void) {
-        if (GetInternalSDLRenderer() == NULL)
-            return;
-
-        SDL_SetRenderDrawColor(GetInternalSDLRenderer(), clearColor.r, clearColor.g, clearColor.b, 255);
-        SDL_RenderClear(GetInternalSDLRenderer());
+    int ClearScreen(void) {
+        return GetInternalSDLRenderer() != NULL &&
+               SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) clearColor.r, (Uint8) clearColor.g, (Uint8) clearColor.b, 255) == 0 &&
+               SDL_RenderClear(GetInternalSDLRenderer()) == 0;
     }
 
     RendererTypes GetCurrentRenderer(void) {
@@ -72,5 +72,48 @@ CPP_GUARD_START()
 
     Color3U GetClearColor(void) {
         return clearColor;
+    }
+
+    int RendererDrawLine(Vector2I firstPoint, Vector2I secondPoint, Color4U color) {
+        return GetInternalSDLRenderer() != NULL &&
+               SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
+               SDL_RenderDrawLine(GetInternalSDLRenderer(), firstPoint.x, firstPoint.y, secondPoint.x, secondPoint.y) == 0;
+    }
+
+    int RendererDrawPoint(Vector2I position, Color4U color) {
+        return GetInternalSDLRenderer() != NULL &&
+               SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
+               SDL_RenderDrawPoint(GetInternalSDLRenderer(), position.x, position.y) == 0;
+    }
+
+    int RendererDrawRectangle(Vector2I position, Vector2I size, Color4U color) {
+        SDL_Rect rectangle = {
+                .x = position.x,
+                .y = position.y,
+                .w = size.x,
+                .h = size.y
+        };
+
+        return GetInternalSDLRenderer() != NULL &&
+               SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
+               SDL_RenderDrawRect(GetInternalSDLRenderer(), &rectangle) == 0;
+    }
+
+    int RendererFillRectangle(Vector2I position, Vector2I size, Color4U color) {
+        SDL_Rect rectangle = {
+                .x = position.x,
+                .y = position.y,
+                .w = size.x,
+                .h = size.y
+        };
+
+        return GetInternalSDLRenderer() != NULL &&
+               SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
+               SDL_RenderFillRect(GetInternalSDLRenderer(), &rectangle) == 0;
+    }
+
+    int RendererDrawFilledRectangle(Vector2I position, Vector2I size, Color4U borderColor, Color4U fillColor, int borderSize) {
+        return RendererDrawRectangle(position, size, borderColor) &&
+               RendererFillRectangle((Vector2I) {position.x + borderSize, position.y + borderSize}, (Vector2I) {size.x - borderSize * 2, size.y - borderSize * 2}, fillColor);
     }
 CPP_GUARD_END()
