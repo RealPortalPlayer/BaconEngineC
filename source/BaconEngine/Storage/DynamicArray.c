@@ -32,15 +32,14 @@ CPP_GUARD_START()
         return 1;
     }
 
-    int ArrayUnshiftElement(DynamicArray* array, void* element) {
+    int ArrayAddElementToFirst(DynamicArray* array, void* element) {
+        ReallocateArray(array);
         (void) element;
 
-        ReallocateArray(array);
-
-        return 0; // TODO: Unshift
+        return 0;
     }
 
-    int ArrayPushElement(DynamicArray* array, void* element) {
+    int ArrayAddElementToLast(DynamicArray* array, void* element) {
         ReallocateArray(array);
 
         array->internalArray[array->used++] = element;
@@ -48,19 +47,19 @@ CPP_GUARD_START()
         return 1;
     }
 
-    int ArrayShiftElement(DynamicArray* array, int shift) {
+    int ArrayRemoveFirstElement(DynamicArray* array, int shift) {
         if (array->used == 0)
             return 0;
 
-        array->internalArray[0] = NULL;
+        if (!shift) {
+            array->internalArray[0] = NULL;
+            return 1;
+        }
 
-        if (shift)
-            memmove(array->internalArray, array->internalArray + 1, sizeof(array->internalArray) - array->size);
-
-        return 1;
+        return ArrayRemoveElementAt(array, 0);
     }
 
-    int ArrayPopElement(DynamicArray* array) {
+    int ArrayRemoveLastElement(DynamicArray* array) {
         if (array->used == 0)
             return 0;
 
@@ -70,10 +69,12 @@ CPP_GUARD_START()
     }
 
     int ArrayRemoveElementAt(DynamicArray* array, unsigned int index) {
-        if (index >= array->used)
+        if ((int) index >= array->used)
             return 0;
 
-        for (unsigned int windowId = index; windowId < array->used; windowId++)
+        ReallocateArray(array);
+
+        for (unsigned int windowId = index; (int) windowId < array->used; windowId++)
             array->internalArray[windowId] = array->internalArray[windowId + 1];
 
         array->used--;

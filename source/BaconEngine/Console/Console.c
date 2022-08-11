@@ -69,7 +69,7 @@ CPP_GUARD_START()
         command->Run = Run;
 
 
-        ArrayPushElement(&commandArray, (void*) command);
+        ArrayAddElementToLast(&commandArray, (void *) command);
 
         lastCommand = command;
     }

@@ -5,19 +5,30 @@
 #include "BaconEngine/Storage/DynamicArray.h"
 #include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Debugging/Assert.h"
+#include "EngineUIs.h"
+#include "BaconEngine/Rendering/Window.h"
 
 CPP_GUARD_START()
     DynamicArray uiArray;
     UIWindow* currentWindow = NULL;
+    TTF_Font* windowFont;
 
     void InitializeUISystem(void) {
         static int initialized = 0;
 
+        if (GetInternalSDLRenderer() == NULL)
+            return;
+
         STRICT_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized UI system.");
+        LOG_INFO("Initializing UI");
 
         initialized = 1;
 
         CreateDynamicArray(&uiArray, 50);
+        LOG_INFO("Registering engine UIs");
+        InitializeEngineUIs();
+
+        STRICT_CHECK_NO_RETURN_VALUE((windowFont = TTF_OpenFont("arial.ttf", 15)) != NULL, "Failed to get window font: %s", SDL_GetError()); // FIXME: Find a royalty free font!
     }
 
     void RegisterUIWindow(const char* name, Vector2I position, Vector2U size, UIWindowFlags flags) {
@@ -39,32 +50,34 @@ CPP_GUARD_START()
         window->size = size;
         window->flags = flags;
 
-        if ((flags & UI_WINDOW_FLAG_MAXIMIZED) != 0)
+        if (currentWindow == NULL || (currentWindow->flags & UI_WINDOW_FLAG_MAXIMIZED) == 0)
             currentWindow = window;
 
-        ArrayPushElement(&uiArray, (void*) window);
+        ArrayAddElementToLast(&uiArray, (void *) window);
     }
 
-    int DeleteWindow(const char* name) {
-        for (unsigned int windowId = 0; windowId < uiArray.used; windowId++) {
+    int CloseUIWindow(const char* name) {
+        for (unsigned int windowId = 0; (int) windowId < uiArray.used; windowId++) {
             UIWindow* window = GET_ELEMENT(UIWindow, uiArray, windowId);
 
             if (strcmp(window->name, name) != 0)
                 continue;
 
-            return DeleteWindowAt(windowId);
+            return CloseUIWindowAt(windowId);
         }
 
         return 0;
     }
 
-    int DeleteWindowAt(unsigned int index) {
-        if (index >= uiArray.used)
+    int CloseUIWindowAt(unsigned int index) {
+        if ((int) index >= uiArray.used || (GetUIWindows()[index]->flags & UI_WINDOW_FLAG_CLOSED) != 0)
             return 0;
 
-        free(uiArray.internalArray[index]);
+        if (GetCurrentUIWindow() == currentWindow)
+            currentWindow = NULL;
 
-        return ArrayRemoveElementAt(&uiArray, index);
+        GetUIWindows()[index]->flags |= UI_WINDOW_FLAG_CLOSED;
+        return 1;
     }
 
     UIWindow** GetUIWindows(void) {
@@ -89,5 +102,9 @@ CPP_GUARD_START()
 
     UIWindow* GetCurrentUIWindow(void) {
         return currentWindow;
+    }
+
+    TTF_Font* GetUIWindowFont(void) {
+        return windowFont;
     }
 CPP_GUARD_END()

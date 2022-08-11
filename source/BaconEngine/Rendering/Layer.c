@@ -64,7 +64,7 @@ CPP_GUARD_START()
         layer->functions.LayerOnEvent = functions.LayerOnEvent != NULL ? functions.LayerOnEvent : (int (*)(SDL_Event)) &LayerNoOperation;
         layer->functions.LayerOnStop = functions.LayerOnStop != NULL ? functions.LayerOnStop : (void (*)(void)) &LayerNoOperation;
 
-        ArrayPushElement(&layerArray, (void*) layer);
+        ArrayAddElementToLast(&layerArray, (void *) layer);
     }
 
     ClientLayer GetLayer(const char* name) {

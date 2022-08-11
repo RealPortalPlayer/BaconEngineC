@@ -84,9 +84,9 @@ CPP_GUARD_START()
     void DebugInfoCommand(void) {
         LOG_INFO("Commands: %i/%i (%i realloc)\n"
                  "Layers: %i/%i (%i realloc)\n"
-                 "UIs: %i/%i (%i realloc, %i rendering%s%s)", GetCommandAmount(), GetAllocatedCommandsAmount(), GetCommandReallocationAmount(),
-                                                            GetLayerAmount(), GetAllocatedLayersAmount(), GetLayerReallocationAmount(),
-                                                            GetUIWindowAmount(), GetAllocatedCommandsAmount(), GetUIWindowReallocationAmount(), GetUIWindowRenderCount(), GetCurrentUIWindow() != NULL ? ", current: " : "", GetCurrentUIWindow() != NULL ? GetCurrentUIWindow()->name : "");
+                 "UIs: %i/%i (%i realloc, %i rendering, %i total render calls%s%s)", GetCommandAmount(), GetAllocatedCommandsAmount(), GetCommandReallocationAmount(),
+                                                                                     GetLayerAmount(), GetAllocatedLayersAmount(), GetLayerReallocationAmount(),
+                                                                                     GetUIWindowAmount(), GetAllocatedUIWindowAmount(), GetUIWindowReallocationAmount(), GetUIWindowRenderCount(), GetUIWindowTotalRenderCallCount(), GetCurrentUIWindow() != NULL ? ", current: " : "", GetCurrentUIWindow() != NULL ? GetCurrentUIWindow()->name : "");
     }
 
     void SayCommand(CommandContext context) {

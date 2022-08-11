@@ -14,26 +14,22 @@ CPP_GUARD_START()
     } DynamicArray;
 
     int CreateDynamicArray(DynamicArray* array, size_t size);
-    int ArrayUnshiftElement(DynamicArray* array, void* element); // Add element to the beginning
-    int ArrayPushElement(DynamicArray* array, void* element); // Add element to the end
+    int ArrayAddElementToFirst(DynamicArray* array, void* element);
+    int ArrayAddElementToLast(DynamicArray* array, void* element);
 
     /**
-     * Remove the first element.
-     * @param array
-     * @param shift - Should we shift all the elements to fill that spot?
-     * @return If it was successful.
      * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
      */
-    int ArrayShiftElement(DynamicArray* array, int shift);
+    int ArrayRemoveFirstElement(DynamicArray* array, int shift);
 
     /**
-     * Remove the last element.
-     * @param array
-     * @return If it was successful.
      * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
      */
-    int ArrayPopElement(DynamicArray* array);
+    int ArrayRemoveLastElement(DynamicArray* array);
 
+    /**
+     * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
+     */
     int ArrayRemoveElementAt(DynamicArray* array, unsigned int index);
 CPP_GUARD_END()
 

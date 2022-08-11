@@ -8,6 +8,7 @@ set(CMAKE_SHARED_LIBRARY_PREFIX "")
 message(STATUS "Adding dependencies.")
 
 add_subdirectory(dependencies/SDL)
+add_subdirectory(dependencies/SDL_ttf)
 
 message(STATUS "Adding meta projects.")
 

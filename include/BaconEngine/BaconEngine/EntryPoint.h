@@ -18,6 +18,7 @@
 #include "BaconEngine/Console/Console.h"
 #include "BaconEngine/Rendering/Layer.h"
 #include "BaconEngine/Rendering/UI.h"
+#include "SDL_ttf.h"
 
 #if OS_POSIX_COMPLIANT
 #   define EXPOSE_FUNC __attribute__((visibility("default")))
@@ -58,10 +59,7 @@ CPP_GUARD_START()
             return 1;
         }
 
-        InitializeLayers();
-        InitializeUISystem();
         InitializeRenderer();
-        InitializeConsole();
 
         if (!IsServerModeEnabled() && GetCurrentRenderer() != RENDERER_TYPE_TEXT) {
             int width = 1080;
@@ -98,9 +96,13 @@ CPP_GUARD_START()
                 }
             }
 
+            ASSERT(TTF_Init() == 0, "Failed to initialize SDL TTF: %s", SDL_GetError());
+            InitializeLayers();
             InitializeWindow(GetClientName(), (Vector2U) {width, height});
         }
 
+        InitializeUISystem();
+        InitializeConsole();
         ASSERT(ClientStart(argc, argv) == 0, "Client start returned non-zero");
         ClearScreen();
         SetWindowVisibility(1);
@@ -143,6 +145,8 @@ CPP_GUARD_START()
         LOG_TRACE("Client loop ended, shutting down");
         DestroyLayers();
         DestroyWindow();
+        TTF_Quit();
+        SDL_Quit();
 
         return 0;
     }

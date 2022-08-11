@@ -33,19 +33,27 @@ CPP_GUARD_START()
             }
 
             if (strcmp(value, "opengl") == 0) {
+                LOG_DEBUG("Using OpenGL renderer");
+
                 currentType = RENDERER_TYPE_OPENGL;
                 return;
             }
 
             if (strcmp(value, "vulkan") == 0) {
+                LOG_DEBUG("Using Vulkan renderer");
+
                 currentType = RENDERER_TYPE_VULKAN;
                 return;
             }
 
             if (strcmp(value, "text") == 0) {
+                LOG_DEBUG("Using no renderer");
+
                 currentType = RENDERER_TYPE_TEXT;
                 return;
             }
+
+            LOG_ERROR("Unknown renderer type: %s", value);
         }
 
         currentType = RENDERER_TYPE_AUTO;

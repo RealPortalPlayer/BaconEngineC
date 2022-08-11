@@ -1,6 +1,7 @@
 #include <SharedEngineCode/Logger.h>
 #include <BaconEngine/Debugging/Assert.h>
 #include <SharedEngineCode/Internal/CppHeader.h>
+#include <SDL_ttf.h>
 
 #include "BaconEngine/Rendering/Window.h"
 #include "BaconEngine/Rendering/Renderer.h"
@@ -34,7 +35,9 @@ CPP_GUARD_START()
                 return;
         }
 
-        ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0, "Failed to initialize SDL: %s", SDL_GetError());
+        if (!SDL_WasInit(SDL_INIT_VIDEO))
+            ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0, "Failed to initialize SDL: %s", SDL_GetError());
+
         LOG_INFO("Creating window\nTitle: %s\nSize: (%u, %u)", windowTitle, windowSize.x, windowSize.y);
         ASSERT((window = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, (int) windowSize.x,
                                          (int) windowSize.y, windowFlags)) != NULL, "Failed to create window: %s", SDL_GetError());
