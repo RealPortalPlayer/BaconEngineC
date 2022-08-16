@@ -4,6 +4,7 @@
 #pragma once
 
 #include <SharedEngineCode/Internal/CppHeader.h>
+#include <stddef.h>
 
 CPP_GUARD_START()
     typedef struct {
@@ -11,27 +12,27 @@ CPP_GUARD_START()
         int used;
         size_t size;
         int calledRealloc;
-    } DynamicArray;
+    } BE_DynamicArray;
 
-    int CreateDynamicArray(DynamicArray* array, size_t size);
-    int ArrayAddElementToFirst(DynamicArray* array, void* element);
-    int ArrayAddElementToLast(DynamicArray* array, void* element);
-
-    /**
-     * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
-     */
-    int ArrayRemoveFirstElement(DynamicArray* array, int shift);
+    int BE_CreateDynamicArray(BE_DynamicArray* array, size_t size);
+    int BE_ArrayAddElementToFirst(BE_DynamicArray* array, void* element);
+    int BE_ArrayAddElementToLast(BE_DynamicArray* array, void* element);
 
     /**
      * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
      */
-    int ArrayRemoveLastElement(DynamicArray* array);
+    int BE_ArrayRemoveFirstElement(BE_DynamicArray* array, int shift);
 
     /**
      * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
      */
-    int ArrayRemoveElementAt(DynamicArray* array, unsigned int index);
+    int BE_ArrayRemoveLastElement(BE_DynamicArray* array);
+
+    /**
+     * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
+     */
+    int BE_ArrayRemoveElementAt(BE_DynamicArray* array, unsigned int index);
 CPP_GUARD_END()
 
-#define GET_ELEMENT(type, array, index) ((type*) (array).internalArray[index])
-#define GET_ELEMENT_PTR(type, array, index) ((type*) (array)->internalArray[index])
+#define BE_ARRAY_GET_ELEMENT(type, array, index) ((type*) (array).internalArray[index])
+#define BE_ARRAY_GET_ELEMENT_PTR(type, array, index) ((type*) (array)->internalArray[index])

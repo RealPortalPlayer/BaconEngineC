@@ -21,9 +21,9 @@ CPP_GUARD_START()
         return strcmp(tempValue, "false") == 0 ? 1 : 0;
     }
 
-    int GetArgumentInt(ArgumentsDictionary arguments, const char* name, int defaultValue) {
+    int BE_GetArgumentInt(ArgumentsDictionary arguments, const char* name, int defaultValue) {
         if (arguments.size != 0) {
-            char* value = (char*) GetArgumentString(arguments, name, "");
+            char* value = (char*) BE_GetArgumentString(arguments, name, "");
             {
                 int parsedValue = ArgumentEqualsTrueORFalse(value);
 
@@ -41,13 +41,13 @@ CPP_GUARD_START()
         return defaultValue;
     }
 
-    int GetArgumentBoolean(ArgumentsDictionary arguments, const char* name, int defaultValue) {
-        return GetArgumentInt(arguments, name, defaultValue) >= 1;
+    int BE_GetArgumentBoolean(ArgumentsDictionary arguments, const char* name, int defaultValue) {
+        return BE_GetArgumentInt(arguments, name, defaultValue) >= 1;
     }
 
-    float GetArgumentFloat(ArgumentsDictionary arguments, const char* name, float defaultValue) {
+    float BE_GetArgumentFloat(ArgumentsDictionary arguments, const char* name, float defaultValue) {
         if (arguments.size != 0) {
-            char* value = (char*) GetArgumentString(arguments, name, "");
+            char* value = (char*) BE_GetArgumentString(arguments, name, "");
             {
                 int parsedValue = ArgumentEqualsTrueORFalse(value);
 
@@ -65,7 +65,7 @@ CPP_GUARD_START()
         return defaultValue;
     }
 
-    const char* GetArgumentString(ArgumentsDictionary arguments, const char* name, const char* defaultValue) {
+    const char* BE_GetArgumentString(ArgumentsDictionary arguments, const char* name, const char* defaultValue) {
         if (arguments.size != 0) {
             for (int i = 0; i < (int) arguments.size; i++) {
                 if (strcmp(arguments.keys[i], name) != 0)

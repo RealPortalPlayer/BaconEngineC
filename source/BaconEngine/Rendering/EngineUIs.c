@@ -8,10 +8,11 @@ CPP_GUARD_START()
     void InitializeEngineUIs(void) {
         static int initialized = 0;
 
-        ASSERT(!initialized, "Engine UIs are already initialized");
+        BE_ASSERT(!initialized, "Engine UIs are already initialized");
 
         initialized = 1;
 
-        RegisterUIWindow("Console", (Vector2I) {5, 5}, (Vector2U) {300, 350}, UI_WINDOW_FLAG_NO_MAXIMIZE);
+        BE_RegisterUIWindow("Console", (BE_Vector2I) {5, 5}, (BE_Vector2U) {300, 350}, BE_UI_WINDOW_FLAG_NO_MAXIMIZE);
+        BE_FinishRegisteringUIWindow();
     }
 CPP_GUARD_END()

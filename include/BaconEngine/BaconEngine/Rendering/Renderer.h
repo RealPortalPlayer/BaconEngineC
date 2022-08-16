@@ -7,26 +7,30 @@
 
 #include "BaconEngine/Math/Color.h"
 #include "BaconEngine/Math/Vector.h"
+#include "BaconEngine/SDLSupport.h"
 
 CPP_GUARD_START()
     typedef enum {
-        RENDERER_TYPE_AUTO,
-        RENDERER_TYPE_OPENGL,
-        RENDERER_TYPE_VULKAN,
-        RENDERER_TYPE_TEXT
-    } RendererTypes;
+        BE_RENDERER_TYPE_AUTO,
+        BE_RENDERER_TYPE_OPENGL,
+        BE_RENDERER_TYPE_VULKAN,
+        BE_RENDERER_TYPE_TEXT
+    } BE_RendererTypes;
 
-    void SetClearColor(Color3U color);
-    void InitializeRenderer(void);
-    int ClearScreen(void);
-    RendererTypes GetCurrentRenderer(void);
-    int IsSoftwareRendering(void);
-    Color3U GetClearColor(void);
-    int RendererDrawLine(Vector2I firstPoint, Vector2I secondPoint, Color4U color);
-    int RendererDrawPoint(Vector2I position, Color4U color);
-    int RendererDrawRectangle(Vector2I position, Vector2U size, Color4U color);
-    int RendererFillRectangle(Vector2I position, Vector2U size, Color4U color);
-    int RendererDrawFilledRectangle(Vector2I position, Vector2U size, Color4U borderColor, Color4U fillColor, int borderSize);
-
-#   define RENDERER_DRAW_FILLED_RECTANGLE_SAME_COLOR(position, size, color, borderSize) RendererDrawFilledRectangle((position), (size), (color), (color), (borderSize))
+    void BE_SetClearColor(BE_Color3U color);
+    void BE_InitializeRenderer(void);
+    int BE_ClearScreen(void);
+    int BE_GetRendererCalls(void);
+    BE_RendererTypes BE_GetCurrentRenderer(void);
+    int BE_IsSoftwareRendering(void);
+    BE_Color3U BE_GetClearColor(void);
+    BE_Vector2U BE_GetRendererFontSize(TTF_Font* font, const char* text);
+    BE_Vector2I BE_GetCenterPosition(BE_Vector2I rectanglePosition, BE_Vector2U rectangleSize, BE_Vector2U objectSize);
+    int BE_RendererDrawLine(BE_Vector2I firstPoint, BE_Vector2I secondPoint, BE_Color4U color);
+    int BE_RendererDrawPoint(BE_Vector2I position, BE_Color4U color);
+    int BE_RendererDrawRectangle(BE_Vector2I position, BE_Vector2U size, BE_Color4U color);
+    int BE_RendererFillRectangle(BE_Vector2I position, BE_Vector2U size, BE_Color4U color);
+    int BE_RendererDrawBorderedRectangle(BE_Vector2I position, BE_Vector2U size, BE_Color4U borderColor, BE_Color4U fillColor, int borderPadding);
 CPP_GUARD_END()
+
+#define BE_RENDERER_DRAW_FILLED_RECTANGLE_SAME_COLOR(position, size, color, borderSize) RendererDrawFilledRectangle((position), (size), (color), (color), (borderSize))

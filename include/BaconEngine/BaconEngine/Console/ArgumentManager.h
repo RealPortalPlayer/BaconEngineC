@@ -13,8 +13,8 @@ CPP_GUARD_START()
         size_t size;
     } ArgumentsDictionary;
 
-    int GetArgumentInt(ArgumentsDictionary arguments, const char* name, int defaultValue);
-    int GetArgumentBoolean(ArgumentsDictionary arguments, const char* name, int defaultValue);
-    float GetArgumentFloat(ArgumentsDictionary arguments, const char* name, float defaultValue);
-    const char* GetArgumentString(ArgumentsDictionary arguments, const char* name, const char* defaultValue);
+    int BE_GetArgumentInt(ArgumentsDictionary arguments, const char* name, int defaultValue);
+    int BE_GetArgumentBoolean(ArgumentsDictionary arguments, const char* name, int defaultValue);
+    float BE_GetArgumentFloat(ArgumentsDictionary arguments, const char* name, float defaultValue);
+    const char* BE_GetArgumentString(ArgumentsDictionary arguments, const char* name, const char* defaultValue);
 CPP_GUARD_END()

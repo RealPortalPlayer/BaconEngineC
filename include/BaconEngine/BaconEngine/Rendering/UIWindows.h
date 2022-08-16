@@ -22,16 +22,16 @@ CPP_GUARD_START()
         const char* normalButton1;
         const char* normalButton2;
         const char* normalButton3;
-    } UIMessageBoxChoices;
+    } BE_UIMessageBoxChoices;
     // TODO: Button color.
 
     typedef enum {
-        UI_MESSAGE_BOX_FLAG_NULL,
-        UI_MESSAGE_BOX_FLAG_NOT_MOVABLE,
-        UI_MESSAGE_BOX_FLAG_NO_TITLE_BAR = (1 << 2),
-        UI_MESSAGE_BOX_FLAG_NO_BORDER = (1 << 4),
-        UI_MESSAGE_BOX_FLAG_NO_MINIMIZE = (1 << 8)
-    } UIMessageBoxFlags;
+        BE_UI_MESSAGE_BOX_FLAG_NULL,
+        BE_UI_MESSAGE_BOX_FLAG_NOT_MOVABLE,
+        BE_UI_MESSAGE_BOX_FLAG_NO_TITLE_BAR = (1 << 2),
+        BE_UI_MESSAGE_BOX_FLAG_NO_BORDER = (1 << 4),
+        BE_UI_MESSAGE_BOX_FLAG_NO_MINIMIZE = (1 << 8)
+    } BE_UIMessageBoxFlags;
 
-    void RegisterUIMessageBox(const char* name, const char* description, Vector2I position, UIMessageBoxFlags flags, UIMessageBoxChoices choices);
+    void BE_RegisterUIMessageBox(const char* name, const char* description, BE_Vector2I position, BE_UIMessageBoxFlags flags, BE_UIMessageBoxChoices choices);
 CPP_GUARD_END()

@@ -9,23 +9,23 @@
 
 CPP_GUARD_START()
     typedef enum {
-        LOG_LEVEL_NULL,
-        LOG_LEVEL_TRACE,
-        LOG_LEVEL_DEBUG,
-        LOG_LEVEL_INFO,
-        LOG_LEVEL_WARN,
-        LOG_LEVEL_ERROR,
-        LOG_LEVEL_FATAL
-    } LogLevels;
+        SEC_LOG_LEVEL_NULL,
+        SEC_LOG_LEVEL_TRACE,
+        SEC_LOG_LEVEL_DEBUG,
+        SEC_LOG_LEVEL_INFO,
+        SEC_LOG_LEVEL_WARN,
+        SEC_LOG_LEVEL_ERROR,
+        SEC_LOG_LEVEL_FATAL
+    } SEC_LogLevels;
 
-    volatile LogLevels currentLogLevel;
-
-    void LogImplementation(int includeHeader, LogLevels logLevel, const char* message, ...);
+    SEC_LogLevels SEC_GetLogLevel(void);
+    void SEC_SetLogLevel(SEC_LogLevels logLevel);
+    void SEC_LogImplementation(int includeHeader, SEC_LogLevels logLevel, const char* message, ...);
 CPP_GUARD_END()
 
-#define LOG_TRACE(...) LogImplementation(1, LOG_LEVEL_TRACE, __VA_ARGS__)
-#define LOG_DEBUG(...) LogImplementation(1, LOG_LEVEL_DEBUG, __VA_ARGS__)
-#define LOG_INFO(...) LogImplementation(1, LOG_LEVEL_INFO, __VA_ARGS__)
-#define LOG_WARN(...) LogImplementation(1, LOG_LEVEL_WARN, __VA_ARGS__)
-#define LOG_ERROR(...) LogImplementation(1, LOG_LEVEL_ERROR, __VA_ARGS__)
-#define LOG_FATAL(...) LogImplementation(1, LOG_LEVEL_FATAL, __VA_ARGS__)
+#define SEC_LOG_TRACE(...) SEC_LogImplementation(1, SEC_LOG_LEVEL_TRACE, __VA_ARGS__)
+#define SEC_LOG_DEBUG(...) SEC_LogImplementation(1, SEC_LOG_LEVEL_DEBUG, __VA_ARGS__)
+#define SEC_LOG_INFO(...) SEC_LogImplementation(1, SEC_LOG_LEVEL_INFO, __VA_ARGS__)
+#define SEC_LOG_WARN(...) SEC_LogImplementation(1, SEC_LOG_LEVEL_WARN, __VA_ARGS__)
+#define SEC_LOG_ERROR(...) SEC_LogImplementation(1, SEC_LOG_LEVEL_ERROR, __VA_ARGS__)
+#define SEC_LOG_FATAL(...) SEC_LogImplementation(1, SEC_LOG_LEVEL_FATAL, __VA_ARGS__)

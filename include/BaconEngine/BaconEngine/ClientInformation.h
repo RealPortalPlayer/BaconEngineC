@@ -6,10 +6,10 @@
 #include <SharedEngineCode/Internal/CppHeader.h>
 
 CPP_GUARD_START()
-    int IsClientRunning(void);
-    int IsClientCheatsEnabled(void);
-    int IsServerModeEnabled(void);
-    int IsStrictModeEnabled(void);
-    void StopClientRunning(void);
-    void SetClientCheats(int enable);
+    int BE_IsClientRunning(void);
+    int BE_IsClientCheatsEnabled(void);
+    int BE_IsServerModeEnabled(void);
+    int BE_IsStrictModeEnabled(void);
+    void BE_StopClientRunning(void);
+    void BE_SetClientCheats(int enable);
 CPP_GUARD_END()

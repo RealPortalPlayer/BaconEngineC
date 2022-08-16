@@ -3,33 +3,33 @@
 
 #pragma once
 
-#define OS_WINDOWS 0
-#define OS_APPLE 0
-#define OS_POSIX_COMPLIANT 0
-#define OS_IPHONE_SIMULATOR 0
-#define OS_MAC_CATALYST 0
-#define OS_IPHONE 0
-#define OS_MAC 0
-#define OS_APPLE_UNKNOWN 0
-#define OS_UNKNOWN 0
-#define OS_LINUX 0
-#define OS_UNIX 0
+#define SEC_OS_WINDOWS 0
+#define SEC_OS_APPLE 0
+#define SEC_OS_POSIX_COMPLIANT 0
+#define SEC_OS_IPHONE_SIMULATOR 0
+#define SEC_OS_MAC_CATALYST 0
+#define SEC_OS_IPHONE 0
+#define SEC_OS_MAC 0
+#define SEC_OS_APPLE_UNKNOWN 0
+#define SEC_OS_UNKNOWN 0
+#define SEC_OS_LINUX 0
+#define SEC_OS_UNIX 0
 
 #if defined(WIN32)
 #   undef OS_WINDOWS
 #   define OS_WINDOWS 1
 #elif defined(__APPLE__)
 #   include <TargetConditionals.h>
-#   undef OS_APPLE
-#   undef OS_POSIX_COMPLIANT
-#   undef OS_IPHONE_SIMULATOR
-#   undef OS_MAC_CATALYST
-#   undef OS_IPHONE
-#   undef OS_MAC
-#   undef OS_APPLE_UNKNOWN
-#   undef OS_UNKNOWN
-#   define OS_APPLE 1
-#   define OS_POSIX_COMPLIANT 1
+#   undef SEC_OS_APPLE
+#   undef SEC_OS_POSIX_COMPLIANT
+#   undef SEC_OS_IPHONE_SIMULATOR
+#   undef SEC_OS_MAC_CATALYST
+#   undef SEC_OS_IPHONE
+#   undef SEC_OS_MAC
+#   undef SEC_OS_APPLE_UNKNOWN
+#   undef SEC_OS_UNKNOWN
+#   define SEC_OS_APPLE 1
+#   define SEC_OS_POSIX_COMPLIANT 1
 #   if TARGET_IPHONE_SIMULATOR
 #       define OS_IPHONE_SIMULATOR 1
 #   elif TARGET_OS_MACCATALYST
@@ -37,7 +37,7 @@
 #   elif TARGET_OS_IPHONE
 #       define OS_IPHONE 1
 #   elif TARGET_OS_MAC
-#       define OS_MAC 1
+#       define SEC_OS_MAC 1
 #   else
 #       define OS_APPLE_UNKNOWN 1
 #       define OS_UNKNOWN 1

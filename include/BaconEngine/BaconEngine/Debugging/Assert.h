@@ -5,13 +5,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define ASSERT(check, ...) \
+#define BE_ASSERT(check, ...) \
 do {                       \
-    LOG_TRACE("Assert checking: %s", #check); \
+    SEC_LOG_TRACE("Assert checking: %s", #check); \
     if (!(check)) {        \
-        LOG_FATAL("Assertion Failed\nCode: %s", #check); \
+        SEC_LOG_FATAL("Assertion Failed\nCode: %s", #check); \
         printf("Message: "); \
-        LogImplementation(0, LOG_LEVEL_FATAL, __VA_ARGS__); \
+        SEC_LogImplementation(0, SEC_LOG_LEVEL_FATAL, __VA_ARGS__); \
         abort();           \
     }                      \
 } while (0)
+
+#define BE_ASSERT_MALLOC(destination, size, forWhat) \
+destination = malloc(size);                       \
+BE_ASSERT(destination != NULL, "Failed to allocate %lu bytes of data for %s", size, forWhat)
+
+#define BE_ASSERT_REALLOC(destination, size, forWhat) \
+destination = realloc(destination, size);          \
+BE_ASSERT(destination != NULL, "Failed to reallocate %lu bytes of data for %s", size, forWhat)

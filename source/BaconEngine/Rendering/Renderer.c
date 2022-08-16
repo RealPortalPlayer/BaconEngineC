@@ -1,4 +1,3 @@
-#include <SDL.h>
 #include <SharedEngineCode/Internal/CppHeader.h>
 #include <string.h>
 #include <ctype.h>
@@ -8,19 +7,21 @@
 #include "BaconEngine/Debugging/StrictMode.h"
 
 CPP_GUARD_START()
-    Color3U clearColor = {0, 0, 0};
-    RendererTypes currentType;
+    BE_Color3U clearColor = {0, 0, 0};
+    BE_RendererTypes currentType;
+    int renderCalls = 0;
 
-    void SetClearColor(Color3U color) {
+    void BE_SetClearColor(BE_Color3U color) {
         clearColor = color;
     }
 
-    void InitializeRenderer(void) {
+    void BE_InitializeRenderer(void) {
+#ifndef BACON_ENGINE_DISABLE_SDL
         static int initialized = 0;
 
-        STRICT_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized renderer");
+        BE_STRICT_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized renderer");
 
-        char* value = (char*) GetArgumentValue("--renderer");
+        char* value = (char*) SEC_GetArgumentValue("--renderer");
 
         if (value != NULL) {
             {
@@ -33,68 +34,134 @@ CPP_GUARD_START()
             }
 
             if (strcmp(value, "opengl") == 0) {
-                LOG_DEBUG("Using OpenGL renderer");
+                SEC_LOG_DEBUG("Using OpenGL renderer");
 
-                currentType = RENDERER_TYPE_OPENGL;
+                currentType = BE_RENDERER_TYPE_OPENGL;
                 return;
             }
 
             if (strcmp(value, "vulkan") == 0) {
-                LOG_DEBUG("Using Vulkan renderer");
+                SEC_LOG_DEBUG("Using Vulkan renderer");
 
-                currentType = RENDERER_TYPE_VULKAN;
+                currentType = BE_RENDERER_TYPE_VULKAN;
                 return;
             }
 
             if (strcmp(value, "text") == 0) {
-                LOG_DEBUG("Using no renderer");
+                SEC_LOG_DEBUG("Using no renderer");
 
-                currentType = RENDERER_TYPE_TEXT;
+                currentType = BE_RENDERER_TYPE_TEXT;
                 return;
             }
 
-            LOG_ERROR("Unknown renderer type: %s", value);
+            SEC_LOG_ERROR("Unknown renderer type: %s", value);
         }
 
-        currentType = RENDERER_TYPE_AUTO;
+        currentType = BE_RENDERER_TYPE_AUTO;
+#else
+        SEC_LOG_INFO("SDL has been disabled, forcing text mode");
+
+        currentType = BE_RENDERER_TYPE_TEXT;
+#endif
     }
 
-    int ClearScreen(void) {
+    int BE_ClearScreen(void) {
+#ifndef BACON_ENGINE_DISABLE_SDL
+        renderCalls = 0;
+
         return GetInternalSDLRenderer() != NULL &&
                SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) clearColor.r, (Uint8) clearColor.g, (Uint8) clearColor.b, 255) == 0 &&
                SDL_RenderClear(GetInternalSDLRenderer()) == 0;
+#else
+        return 0;
+#endif
     }
 
-    RendererTypes GetCurrentRenderer(void) {
+    int BE_GetRendererCalls(void) {
+        return renderCalls;
+    }
+
+    BE_RendererTypes BE_GetCurrentRenderer(void) {
         return currentType;
     }
 
-    int IsSoftwareRendering(void) {
+    int BE_IsSoftwareRendering(void) {
         static int software = -1;
 
         if (software == -1)
-            software = GetArgumentIndex("--software") > -1;
+            software = SEC_GetArgumentIndex("--software") > -1;
 
         return software;
     }
 
-    Color3U GetClearColor(void) {
+    BE_Color3U BE_GetClearColor(void) {
         return clearColor;
     }
 
-    int RendererDrawLine(Vector2I firstPoint, Vector2I secondPoint, Color4U color) {
-        return GetInternalSDLRenderer() != NULL &&
-               SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
+    BE_Vector2U BE_GetRendererFontSize(TTF_Font* font, const char* text) {
+        BE_Vector2U size = (BE_Vector2U) {5, 5};
+
+#ifndef BACON_ENGINE_DISABLE_SDL_TTF
+        if (font != NULL) {
+            BE_Vector2U textSize = {0, 0};
+
+            TTF_SizeText(font, text, (int*) &textSize.x, (int*) &textSize.y);
+
+            size.x += textSize.x + 5;
+            size.y += textSize.y + 5;
+        }
+#endif
+
+        return size;
+    }
+
+    BE_Vector2I BE_GetCenterPosition(BE_Vector2I rectanglePosition, BE_Vector2U rectangleSize, BE_Vector2U objectSize) {
+        return (BE_Vector2I) {
+            rectanglePosition.x + (int) rectangleSize.x / 2 - (int) objectSize.x / 2,
+            rectanglePosition.y + (int) rectangleSize.y / 2 - (int) objectSize.y / 2
+        };
+    }
+
+    int BE_RendererDrawLine(BE_Vector2I firstPoint, BE_Vector2I secondPoint, BE_Color4U color) {
+        if (GetInternalSDLRenderer() == NULL)
+            return 0;
+
+#ifndef BACON_ENGINE_DISABLE_SDL
+        renderCalls++;
+
+        if (color.a != 255)
+            SDL_SetRenderDrawBlendMode(GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
+
+        return SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
                SDL_RenderDrawLine(GetInternalSDLRenderer(), firstPoint.x, firstPoint.y, secondPoint.x, secondPoint.y) == 0;
+#else
+        return 0;
+#endif
     }
 
-    int RendererDrawPoint(Vector2I position, Color4U color) {
-        return GetInternalSDLRenderer() != NULL &&
-               SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
+    int BE_RendererDrawPoint(BE_Vector2I position, BE_Color4U color) {
+        if (GetInternalSDLRenderer() == NULL)
+            return 0;
+
+#ifndef BACON_ENGINE_DISABLE_SDL
+        renderCalls++;
+
+        if (color.a != 255)
+            SDL_SetRenderDrawBlendMode(GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
+
+        return SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
                SDL_RenderDrawPoint(GetInternalSDLRenderer(), position.x, position.y) == 0;
+#else
+        return 0;
+#endif
     }
 
-    int RendererDrawRectangle(Vector2I position, Vector2U size, Color4U color) {
+    int BE_RendererDrawRectangle(BE_Vector2I position, BE_Vector2U size, BE_Color4U color) {
+        if (GetInternalSDLRenderer() == NULL)
+            return 0;
+
+#ifndef BACON_ENGINE_DISABLE_SDL
+
         SDL_Rect rectangle = {
             position.x,
             position.y,
@@ -102,12 +169,23 @@ CPP_GUARD_START()
             (int) size.y
         };
 
-        return GetInternalSDLRenderer() != NULL &&
-               SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
+        renderCalls++;
+
+        if (color.a != 255)
+            SDL_SetRenderDrawBlendMode(GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
+
+        return SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
                SDL_RenderDrawRect(GetInternalSDLRenderer(), &rectangle) == 0;
+#else
+        return 0;
+#endif
     }
 
-    int RendererFillRectangle(Vector2I position, Vector2U size, Color4U color) {
+    int BE_RendererFillRectangle(BE_Vector2I position, BE_Vector2U size, BE_Color4U color) {
+        if (GetInternalSDLRenderer() == NULL)
+            return 0;
+
+#ifndef BACON_ENGINE_DISABLE_SDL
         SDL_Rect rectangle = {
             position.x,
             position.y,
@@ -115,13 +193,22 @@ CPP_GUARD_START()
             (int) size.y
         };
 
-        return GetInternalSDLRenderer() != NULL &&
-               SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
+        renderCalls++;
+
+        if (color.a != 255)
+            SDL_SetRenderDrawBlendMode(GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
+
+        return SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
                SDL_RenderFillRect(GetInternalSDLRenderer(), &rectangle) == 0;
+#else
+        return 0;
+#endif
     }
 
-    int RendererDrawFilledRectangle(Vector2I position, Vector2U size, Color4U borderColor, Color4U fillColor, int borderSize) {
-        return RendererDrawRectangle(position, size, borderColor) &&
-               RendererFillRectangle((Vector2I) {position.x + borderSize, position.y + borderSize}, (Vector2U) {size.x - borderSize * 2, size.y - borderSize * 2}, fillColor);
+    int BE_RendererDrawBorderedRectangle(BE_Vector2I position, BE_Vector2U size, BE_Color4U borderColor, BE_Color4U fillColor, int borderPadding) {
+        return BE_RendererDrawRectangle((BE_Vector2I) {position.x - borderPadding, position.y - borderPadding},
+                                        (BE_Vector2U) {size.x + borderPadding * 2, size.y + borderPadding * 2},
+                                        borderColor) &&
+                BE_RendererFillRectangle(position, size, fillColor);
     }
 CPP_GUARD_END()

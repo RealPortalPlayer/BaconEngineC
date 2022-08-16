@@ -1,0 +1,88 @@
+// Purpose: Every supported keyboard key-code, and their char representation.
+// Created on: 8/15/22 @ 1:59 PM
+
+#pragma once
+
+#include <SharedEngineCode/Internal/CppHeader.h>
+
+#include "BaconEngine/SDLSupport.h"
+
+CPP_GUARD_START()
+    typedef enum {
+        BE_KEY_CODE_NULL = 0, BE_KEY_CODE_A = 4, BE_KEY_CODE_B,
+        BE_KEY_CODE_C,        BE_KEY_CODE_D,     BE_KEY_CODE_E,
+        BE_KEY_CODE_F,        BE_KEY_CODE_G,     BE_KEY_CODE_H,
+        BE_KEY_CODE_I,        BE_KEY_CODE_J,     BE_KEY_CODE_K,
+        BE_KEY_CODE_L,        BE_KEY_CODE_M,     BE_KEY_CODE_N,
+        BE_KEY_CODE_O,        BE_KEY_CODE_P,     BE_KEY_CODE_Q,
+        BE_KEY_CODE_R,        BE_KEY_CODE_S,     BE_KEY_CODE_T,
+        BE_KEY_CODE_U,        BE_KEY_CODE_V,     BE_KEY_CODE_W,
+        BE_KEY_CODE_X,        BE_KEY_CODE_Y,     BE_KEY_CODE_Z,
+
+        BE_KEY_CODE_ONE,     BE_KEY_CODE_TWO,    BE_KEY_CODE_THREE,
+        BE_KEY_CODE_FOUR,    BE_KEY_CODE_FIVE,   BE_KEY_CODE_SIX,
+        BE_KEY_CODE_SEVEN,   BE_KEY_CODE_EIGHT,  BE_KEY_CODE_NINE,
+        BE_KEY_CODE_ZERO,
+
+        BE_KEY_CODE_RETURN, BE_KEY_CODE_ESCAPE, BE_KEY_CODE_BACKSPACE,
+        BE_KEY_CODE_TAB,    BE_KEY_CODE_SPACE,
+
+        BE_KEY_CODE_MINUS,         BE_KEY_CODE_EQUALS,    BE_KEY_CODE_LEFT_BRACKET,
+        BE_KEY_CODE_RIGHT_BRACKET, BE_KEY_CODE_BACKSLASH, BE_KEY_CODE_SEMICOLON = 51,
+        BE_KEY_CODE_APOSTROPHE,    BE_KEY_CODE_TILDA,     BE_KEY_CODE_COMMA,
+        BE_KEY_CODE_PERIOD,        BE_KEY_CODE_SLASH,
+
+        BE_KEY_CODE_CAPSLOCK,
+
+        BE_KEY_CODE_F1,  BE_KEY_CODE_F2,  BE_KEY_CODE_F3,
+        BE_KEY_CODE_F4,  BE_KEY_CODE_F5,  BE_KEY_CODE_F6,
+        BE_KEY_CODE_F7,  BE_KEY_CODE_F8,  BE_KEY_CODE_F9,
+        BE_KEY_CODE_F10, BE_KEY_CODE_F11, BE_KEY_CODE_F12,
+
+        BE_KEY_CODE_PRINT_SCREEN, BE_KEY_CODE_SCROLL_LOCK, BE_KEY_CODE_PAUSE,
+        BE_KEY_CODE_INSERT,       BE_KEY_CODE_HOME,        BE_KEY_CODE_PAGE_UP,
+        BE_KEY_CODE_DELETE,       BE_KEY_CODE_END,         BE_KEY_CODE_PAGE_DOWN,
+        BE_KEY_CODE_RIGHT,        BE_KEY_CODE_LEFT,        BE_KEY_CODE_DOWN,
+        BE_KEY_CODE_UP,
+
+        BE_KEY_CODE_NUM_LOCK,
+
+        BE_KEY_CODE_KP_DIVIDE, BE_KEY_CODE_KP_MULTIPLY, BE_KEY_CODE_KP_MINUS,
+        BE_KEY_CODE_KP_PLUS,   BE_KEY_CODE_KP_ENTER,    BE_KEY_CODE_KP_ONE,
+        BE_KEY_CODE_KP_TWO,    BE_KEY_CODE_KP_THREE,    BE_KEY_CODE_KP_FOUR,
+        BE_KEY_CODE_KP_FIVE,   BE_KEY_CODE_KP_SIX,      BE_KEY_CODE_KP_SEVEN,
+        BE_KEY_CODE_KP_EIGHT,  BE_KEY_CODE_KP_NINE,     BE_KEY_CODE_KP_ZERO,
+        BE_KEY_CODE_KP_PERIOD,
+
+        BE_KEY_CODE_MENU = 101,
+
+        BE_KEY_CODE_KP_EQUAL = 103,
+
+        BE_KEY_CODE_F13, BE_KEY_CODE_F14, BE_KEY_CODE_F15,
+        BE_KEY_CODE_F16, BE_KEY_CODE_F17, BE_KEY_CODE_F18,
+        BE_KEY_CODE_F19, BE_KEY_CODE_F20, BE_KEY_CODE_F21,
+        BE_KEY_CODE_F22, BE_KEY_CODE_F23, BE_KEY_CODE_F24,
+
+        BE_KEY_CODE_LCTRL = 224, BE_KEY_CODE_LSHFIT, BE_KEY_CODE_LALT,
+        BE_KEY_CODE_LWINDOWS,    BE_KEY_CODE_RCTRL,  BE_KEY_CODE_RSHIFT,
+        BE_KEY_CODE_RALT,        BE_KEY_CODE_RWINDOWS,
+
+        BE_KEY_CODE_SIZE,
+
+        BE_KEY_CODE_LCOMMAND = BE_KEY_CODE_LWINDOWS, BE_KEY_CODE_RCOMMAND = BE_KEY_CODE_RWINDOWS,
+        BE_KEY_CODE_LOPTION = BE_KEY_CODE_LALT,      BE_KEY_CODE_ROPTION = BE_KEY_CODE_RALT,
+
+        BE_KEY_CODE_ENTER = BE_KEY_CODE_RETURN,
+
+        BE_KEY_CODE_KP_SLASH = BE_KEY_CODE_KP_DIVIDE
+    } BE_KeyCodes;
+
+    void BE_SetKeyDown(BE_KeyCodes keyCode, int down);
+    void BE_SetKeyPressed(BE_KeyCodes keyCode, int pressed);
+    char BE_ConvertKeyCodeToChar(BE_KeyCodes keyCode);
+    int BE_IsKeyDown(BE_KeyCodes keyCode);
+    int BE_IsKeyPressed(BE_KeyCodes keyCode);
+    int BE_IsKeyUp(BE_KeyCodes keyCode);
+    BE_KeyCodes BE_SDLToEngineKeyCode(SDL_Scancode keyCode);
+    int BE_IsEngineKeyCodeValid(BE_KeyCodes keyCode);
+CPP_GUARD_END()

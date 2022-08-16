@@ -8,5 +8,4 @@
 CPP_GUARD_START()
     void InitializeEngineLayers(void);
     int GetUIWindowRenderCount(void);
-    int GetUIWindowTotalRenderCallCount(void);
 CPP_GUARD_END()

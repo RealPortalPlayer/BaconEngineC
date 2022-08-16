@@ -1,71 +1,90 @@
 #include <SharedEngineCode/ArgumentHandler.h>
 #include <SharedEngineCode/Logger.h>
-#include <stddef.h>
 #include <SharedEngineCode/Launcher.h>
 
-#if OS_POSIX_COMPLIANT
+#if SEC_OS_POSIX_COMPLIANT
 #   include <unistd.h>
-#   include <dlfcn.h>
-#elif OS_WINDOWS
+#elif SEC_OS_WINDOWS
 #   include <Windows.h>
 #endif
 
-int main(int argc, char* argv[]) {
-    addedArgumentsCount = argc;
-    argumentVector = argv;
+#ifdef BACON_ENGINE_LAUNCHER
+char* BE_GetClientName(void);
+int BE_StartBaconEngine(int argc, char** argv);
+#else
+#   include <stddef.h>
+#   if SEC_OS_POSIX_COMPLIANT
+#       include <dlfcn.h>
+#   endif
+#endif
 
-    if (GetArgumentIndex("--enable-debug-logs") != -1 || GetArgumentIndex("-edl") != -1)
-        currentLogLevel = LOG_LEVEL_DEBUG;
+#ifdef BACON_ENGINE_LAUNCHER
+int CallLauncherMain(int argc, char** argv) {
+#else
+int main(int argc, char** argv) {
+#endif
+    SEC_InitializeArgumentHandler(argc, argv);
 
-    if (GetArgumentIndex("--enable-trace-logs") != -1 || GetArgumentIndex("-etl") != -1)
-        currentLogLevel = LOG_LEVEL_TRACE;
+    if (SEC_GetArgumentIndex("--enable-debug-logs") != -1 || SEC_GetArgumentIndex("-edl") != -1)
+        SEC_SetLogLevel(SEC_LOG_LEVEL_DEBUG);
 
-    LOG_TRACE("Built: %s", __TIMESTAMP__);
+    if (SEC_GetArgumentIndex("--enable-trace-logs") != -1 || SEC_GetArgumentIndex("-etl") != -1)
+        SEC_SetLogLevel(SEC_LOG_LEVEL_TRACE);
 
-    if (GetArgumentIndex("--help") != -1) {
-        LOG_INFO("Arguments:\n"
+    SEC_LOG_TRACE("Built: %s", __TIMESTAMP__);
+
+    if (SEC_GetArgumentIndex("--help") != -1) {
+        SEC_LOG_INFO("Arguments:\n"
                  "--help: Shows information about each argument\n"
+#ifndef BACON_ENGINE_LAUNCHER
                  "--client <path> (-c): Specifies what client you want to run\n"
+#endif
                  "--server (-s): Starts the client as a server instance\n"
                  "--no-strict (-ns): Don't crash the client when an API error occurs.\n"
                  "--enable-debug-logs (-edl): Enables debugging logs\n"
                  "--enable-trace-logs (-etl): Enables tracing logs. This will also enable debug logs, too\n"
                  "--dont-parse <argument> (--): Do not parse argument's beyond this point\n"
+#ifndef BACON_ENGINE_DISABLE_SDL
                  "--width <width>: Changes the width of the window\n"
                  "--height <height>: Changes the height of the window\n"
                  "--renderer <renderer>: Changes the default rendering system\n"
-                 "--software: Use software mode to render instead of your GPU");
+                 "--software: Use software mode to render instead of your GPU"
+#endif
+);
         return 0;
     }
 
     // TODO: OS_WINDOWS
-#if OS_POSIX_COMPLIANT
+#if SEC_OS_POSIX_COMPLIANT
     if (getuid() == 0)
-        LOG_WARN("You're running as root! If a client says you require to be root, then it's probably a virus");
+        SEC_LOG_WARN("You're running as root! If a client says you require to be root, then it's probably a virus");
 #endif
 
-    const char* clientPath = GetArgumentValue("--client");
+#ifndef BACON_ENGINE_LAUNCHER
+    const char* clientPath = SEC_GetArgumentValue("--client");
 
     if (clientPath == NULL)
-        clientPath = GetArgumentValue("-c");
+        clientPath = SEC_GetArgumentValue("-c");
 
     if (clientPath == NULL) {
-        LOG_WARN("You didn't specify what client you wanted to open, defaulting to 'Client'");
+        SEC_LOG_WARN("You didn't specify what client you wanted to open, defaulting to 'Client'");
 
         clientPath = "./Client";
     }
+#endif
 
-    LOG_INFO("Getting configuration information");
+    SEC_LOG_INFO("Getting configuration information");
 
-    LauncherConfiguration configuration = {
-        .code = LAUNCHER_ERROR_CODE_NULL
+#ifndef BACON_ENGINE_LAUNCHER
+    SEC_LauncherConfiguration configuration = {
+        .code = SEC_LAUNCHER_ERROR_CODE_NULL
     };
 
-    CreateLauncherConfiguration(&configuration, clientPath);
+    SEC_CreateLauncherConfiguration(&configuration, clientPath);
 
-    if (configuration.code != LAUNCHER_ERROR_CODE_NULL) {
+    if (configuration.code != SEC_LAUNCHER_ERROR_CODE_NULL) {
         switch (configuration.code) {
-            case LAUNCHER_ERROR_CODE_BINARY:
+            case SEC_LAUNCHER_ERROR_CODE_BINARY:
 #if OS_POSIX_COMPLIANT
                 LOG_FATAL("Failed to load the binary: %s", configuration.errorMessage);
 #elif OS_WINDOWS
@@ -73,35 +92,45 @@ int main(int argc, char* argv[]) {
 #endif
                 return 1;
 
-            case LAUNCHER_ERROR_CODE_ENTRY_NULL:
-            case LAUNCHER_ERROR_CODE_NAME_NULL:
-#if OS_POSIX_COMPLIANT
-                LOG_FATAL("Failed to get important methods: %s", configuration.errorMessage);
-#elif OS_WINDOWS
-                LOG_FATAL("Failed to get important methods: %i", configuration.code);
+            case SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL:
+            case SEC_LAUNCHER_ERROR_CODE_NAME_NULL:
+#if SEC_OS_POSIX_COMPLIANT
+                SEC_LOG_FATAL("Failed to get important methods: %s", configuration.errorMessage);
+#elif SEC_OS_WINDOWS
+                SEC_LOG_FATAL("Failed to get important methods: %i", configuration.code);
 #endif
                 return 1;
 
             default:
-                LOG_FATAL("Unknown error: %i", configuration.code);
+                SEC_LOG_FATAL("Unknown error: %i", configuration.code);
                 return 1;
         }
     }
 
-    LOG_INFO("Ready, starting '%s'", configuration.clientName);
-    LOG_TRACE("Entering client code");
+    SEC_LOG_INFO("Ready, starting '%s'", configuration.clientName);
+    SEC_LOG_TRACE("Entering client code");
 
     int returnValue = configuration.Start(argc, argv);
 
-    LOG_TRACE("Returned back to launcher");
-    LOG_TRACE("Freeing binaries");
+    SEC_LOG_TRACE("Returned back to launcher");
+#else
+    SEC_LOG_INFO("Skipping, due to this being a standalone launcher");
+    SEC_LOG_INFO("Ready, starting '%s'", BE_GetClientName());
 
-#if OS_POSIX_COMPLIANT
-    dlclose(configuration.clientBinary);
-#elif OS_WINDOWS
-    FreeLibrary(configuration.clientBinary);
+    int returnValue = BE_StartBaconEngine(argc, argv);
 #endif
-    LOG_INFO("Goodbye");
+
+#ifndef BACON_ENGINE_LAUNCHER
+    SEC_LOG_TRACE("Freeing binaries");
+
+#   if SEC_OS_POSIX_COMPLIANT
+    dlclose(configuration.clientBinary);
+#   elif SEC_OS_WINDOWS
+    FreeLibrary(configuration.clientBinary);
+#   endif
+#endif
+
+    SEC_LOG_INFO("Goodbye");
 
     return returnValue;
 }

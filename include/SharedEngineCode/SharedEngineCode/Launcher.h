@@ -10,14 +10,14 @@
 
 CPP_GUARD_START()
     typedef enum {
-        LAUNCHER_ERROR_CODE_NULL, // No error.
-        LAUNCHER_ERROR_CODE_BINARY, // Errored while opening binary file.
-        LAUNCHER_ERROR_CODE_NAME_NULL, // Errored attempting to load the name method.
-        LAUNCHER_ERROR_CODE_ENTRY_NULL // Errored attempting to load the entry point.
-    } LauncherErrorCodes;
+        SEC_LAUNCHER_ERROR_CODE_NULL, // No error.
+        SEC_LAUNCHER_ERROR_CODE_BINARY, // Errored while opening binary file.
+        SEC_LAUNCHER_ERROR_CODE_NAME_NULL, // Errored attempting to load the name method.
+        SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL // Errored attempting to load the entry point.
+    } SEC_LauncherErrorCodes;
 
-    typedef struct LauncherConfiguration {
-        LauncherErrorCodes code;
+    typedef struct SEC_LauncherConfiguration {
+        SEC_LauncherErrorCodes code;
         union {
             const char* errorMessage; // The message from something like dlopen.
             struct {
@@ -26,10 +26,10 @@ CPP_GUARD_START()
                 int (*Start)(int, char**);
             };
         };
-    } LauncherConfiguration;
+    } SEC_LauncherConfiguration;
 
     /**
     * @return The initialized configuration file. NULL if malloc fails.
     */
-    void CreateLauncherConfiguration(LauncherConfiguration* configuration, const char* path);
+    void SEC_CreateLauncherConfiguration(SEC_LauncherConfiguration* configuration, const char* path);
 CPP_GUARD_END()

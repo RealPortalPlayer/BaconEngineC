@@ -1,4 +1,4 @@
-project(BaconLauncher)
+project(BaconLauncher C)
 
 add_executable(BaconLauncher Main.c)
 

@@ -8,17 +8,31 @@ add_library(BaconEngine STATIC
         Console/Console.c
         Console/EngineCommands.c
         Console/EngineCommands.h
-        SceneLogic/Scene.c
         Rendering/Layer.c
         Storage/DynamicArray.c
         Rendering/UI.c
         Rendering/EngineLayers.c
         Rendering/EngineUIs.c
         Rendering/UIWindows.c
-        Rendering/UIElements.c)
+        Rendering/UIElements.c
+        Input/Keyboard.c
+        Storage/DynamicDictionary.c
+        Event.c)
+
+if(NOT DISABLE_SDL)
+    set(BACON_ENGINE_LIBRARIES SDL2)
+else()
+    target_compile_definitions(BaconEngine PUBLIC BACON_ENGINE_DISABLE_SDL)
+endif()
+
+if (NOT DISABLE_SDL AND NOT DISABLE_SDL_TTF)
+    set(BACON_ENGINE_LIBRARIES ${BACON_ENGINE_LIBRARIES} SDL2_ttf)
+else()
+    target_compile_definitions(BaconEngine PUBLIC BACON_ENGINE_DISABLE_SDL_TTF)
+endif()
 
 target_include_directories(BaconEngine PUBLIC ../../include/BaconEngine)
-target_link_libraries(BaconEngine LINK_PUBLIC SharedEngineCode SDL2 SDL2_ttf)
+target_link_libraries(BaconEngine LINK_PUBLIC SharedEngineCode ${BACON_ENGINE_LIBRARIES})
 
 if(MSVC)
     target_compile_options(BaconEngine PRIVATE /W4 /WX)

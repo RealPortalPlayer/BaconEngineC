@@ -9,21 +9,21 @@
 
 CPP_GUARD_START()
     typedef enum {
-        COMMAND_FLAG_NULL,
-        COMMAND_FLAG_CHEATS_ONLY,
-        COMMAND_FLAG_SERVER_ONLY = (1 << 1),
-        COMMAND_FLAG_CLIENT_ONLY = (1 << 2)
-    } CommandFlags;
+        BE_COMMAND_FLAG_NULL,
+        BE_COMMAND_FLAG_CHEATS_ONLY,
+        BE_COMMAND_FLAG_SERVER_ONLY = (1 << 1),
+        BE_COMMAND_FLAG_CLIENT_ONLY = (1 << 2)
+    } BE_CommandFlags;
 
     typedef struct { // TODO: Client
         const char** userArguments;
         ArgumentsDictionary arguments;
-    } CommandContext;
+    } BE_CommandContext;
 
     typedef struct {
         const char* name;
         const char* description;
-        CommandFlags flags;
-        void (*Run)(CommandContext context);
-    } Command;
+        BE_CommandFlags flags;
+        void (*Run)(BE_CommandContext context);
+    } BE_Command;
 CPP_GUARD_END()

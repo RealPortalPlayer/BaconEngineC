@@ -9,44 +9,44 @@
 #include "BaconEngine/Storage/DynamicArray.h"
 
 CPP_GUARD_START()
-    DynamicArray commandArray;
-    Command* lastCommand;
+    BE_DynamicArray commandArray;
+    BE_Command* lastCommand;
     int duplicateCommand = 0;
     int consoleInitialized = 0;
 
-    Command** GetCommands(void) {
-        return (Command**) commandArray.internalArray;
+    BE_Command** GetCommands(void) {
+        return (BE_Command**) commandArray.internalArray;
     }
 
-    int GetCommandAmount(void) {
+    int BE_GetCommandAmount(void) {
         return commandArray.used;
     }
 
-    int GetAllocatedCommandsAmount(void) {
+    int BE_GetAllocatedCommandsAmount(void) {
         return (int) commandArray.size;
     }
 
-    int GetCommandReallocationAmount(void) {
+    int BE_GetCommandReallocationAmount(void) {
         return commandArray.calledRealloc;
     }
 
-    void InitializeConsole(void) {
-        STRICT_CHECK_NO_RETURN_VALUE(!consoleInitialized, "Already initialized the console");
-        LOG_INFO("Initializing console");
+    void BE_InitializeConsole(void) {
+        BE_STRICT_CHECK_NO_RETURN_VALUE(!consoleInitialized, "Already initialized the console");
+        SEC_LOG_INFO("Initializing console");
 
         consoleInitialized = 1;
 
-        CreateDynamicArray(&commandArray, 100);
-        LOG_INFO("Registering engine commands");
+        BE_CreateDynamicArray(&commandArray, 100);
+        SEC_LOG_INFO("Registering engine commands");
         InitializeEngineCommands();
     }
 
-    void RegisterCommand(const char* name, const char* description, CommandFlags flags, void (*Run)(CommandContext context)) {
+    void BE_RegisterCommand(const char* name, const char* description, BE_CommandFlags flags, void (*Run)(BE_CommandContext context)) {
         for (int i = 0; i < (int) commandArray.used; i++)
-            STRICT_CHECK_NO_RETURN_VALUE(strcmp(GET_ELEMENT(Command, commandArray, i)->name, name) != 0, "The command '%s' is already registered", name);
+            BE_STRICT_CHECK_NO_RETURN_VALUE(strcmp(BE_ARRAY_GET_ELEMENT(BE_Command, commandArray, i)->name, name) != 0, "The command '%s' is already registered", name);
 
         if (!duplicateCommand)
-            LOG_TRACE("Registering command\n"
+            SEC_LOG_TRACE("Registering command\n"
                       "Name: %s\n"
                       "Description: %s\n"
                       "Flags: %i\n"
@@ -54,14 +54,14 @@ CPP_GUARD_START()
 
         duplicateCommand = 0;
 
-        STRICT_CHECK_NO_RETURN_VALUE((flags & COMMAND_FLAG_SERVER_ONLY) == 0 || (flags & COMMAND_FLAG_CLIENT_ONLY) == 0,
-                                     "Invalid command flags, cannot be both for server and client only");
-        STRICT_CHECK_NO_RETURN_VALUE((flags & COMMAND_FLAG_CHEATS_ONLY) == 0 || (flags & COMMAND_FLAG_CLIENT_ONLY) == 0,
-                                     "Invalid command flags, the client cannot run any cheat commands");
+        BE_STRICT_CHECK_NO_RETURN_VALUE((flags & BE_COMMAND_FLAG_SERVER_ONLY) == 0 || (flags & BE_COMMAND_FLAG_CLIENT_ONLY) == 0,
+                                        "Invalid command flags, cannot be both for server and client only");
+        BE_STRICT_CHECK_NO_RETURN_VALUE((flags & BE_COMMAND_FLAG_CHEATS_ONLY) == 0 || (flags & BE_COMMAND_FLAG_CLIENT_ONLY) == 0,
+                                        "Invalid command flags, the client cannot run any cheat commands");
 
-        Command* command = malloc(sizeof(Command));
+        BE_Command* command;
 
-        ASSERT(command != NULL, "Failed to allocate %lu bytes of data for a layer", sizeof(Command));
+        BE_ASSERT_MALLOC(command, sizeof(BE_Command), "a command");
 
         command->name = name;
         command->description = description;
@@ -69,14 +69,14 @@ CPP_GUARD_START()
         command->Run = Run;
 
 
-        ArrayAddElementToLast(&commandArray, (void *) command);
+        BE_ArrayAddElementToLast(&commandArray, (void *) command);
 
         lastCommand = command;
     }
 
-    void DuplicateCommand(const char* name, const char* description) {
-        ASSERT(commandArray.used != 0, "There is no command to duplicate");
-        LOG_TRACE("Duplicating command\n"
+    void BE_DuplicateCommand(const char* name, const char* description) {
+        BE_ASSERT(commandArray.used != 0, "There is no command to duplicate");
+        SEC_LOG_TRACE("Duplicating command\n"
                   "Original name: %s\n"
                   "Original description: %s\n"
                   "New name: %s\n"
@@ -84,15 +84,16 @@ CPP_GUARD_START()
 
         duplicateCommand = 1;
 
-        RegisterCommand(name, description != NULL ? description : lastCommand->description, lastCommand->flags, lastCommand->Run);
+        BE_RegisterCommand(name, description != NULL ? description : lastCommand->description, lastCommand->flags,
+                           lastCommand->Run);
     }
 
-    void ExecuteCommand(char* input) { // TODO: Client
+    void BE_ExecuteCommand(char* input) { // TODO: Client
         // NOTE: Do not put any logs outside of an if check.
         //       We do not want to trick users into thinking something is part of the command.
-        static Command* cachedCommand = NULL;
+        static BE_Command* cachedCommand = NULL;
         char* name = input;
-        Command* command = NULL;
+        BE_Command* command = NULL;
 
 //        name[strcspn(name, " ")] = '\0';
 
@@ -101,42 +102,42 @@ CPP_GUARD_START()
 
         if (command == NULL) {
             for (int i = 0; i < (int) commandArray.used; i++) { // TODO: Find a way to replace a for loop with index.
-                if (strcmp(GET_ELEMENT(Command, commandArray, i)->name, name) != 0)
+                if (strcmp(BE_ARRAY_GET_ELEMENT(BE_Command, commandArray, i)->name, name) != 0)
                     continue;
 
-                command = GET_ELEMENT(Command, commandArray, i);
+                command = BE_ARRAY_GET_ELEMENT(BE_Command, commandArray, i);
                 break;
             }
         }
 
         if (command == NULL) { // TODO: Tell the client.
-            LOG_ERROR("'%s' is not a valid command", name);
+            SEC_LOG_ERROR("'%s' is not a valid command", name);
             return;
         }
 
         cachedCommand = command;
 
-        if ((command->flags & COMMAND_FLAG_SERVER_ONLY) != 0) {
+        if ((command->flags & BE_COMMAND_FLAG_SERVER_ONLY) != 0) {
             // TODO: Kick client.
 
-            if (!IsServerModeEnabled()) {
-                LOG_ERROR("This command can only be ran by the server");
+            if (!BE_IsServerModeEnabled()) {
+                SEC_LOG_ERROR("This command can only be ran by the server");
                 return;
             }
         }
 
-        if ((command->flags & COMMAND_FLAG_CLIENT_ONLY) != 0 && IsServerModeEnabled()) {
-            LOG_ERROR("This command can only be ran by a client"); // TODO: Kick client if the client is the one who ran it.
+        if ((command->flags & BE_COMMAND_FLAG_CLIENT_ONLY) != 0 && BE_IsServerModeEnabled()) {
+            SEC_LOG_ERROR("This command can only be ran by a client"); // TODO: Kick client if the client is the one who ran it.
             return;
         }
 
-        if ((command->flags & COMMAND_FLAG_CHEATS_ONLY) != 0 && !IsClientCheatsEnabled()) {
+        if ((command->flags & BE_COMMAND_FLAG_CHEATS_ONLY) != 0 && !BE_IsClientCheatsEnabled()) {
             // TODO: Tell client.
-            LOG_ERROR("This command requires cheats to be enabled");
+            SEC_LOG_ERROR("This command requires cheats to be enabled");
             return;
         }
 
-        command->Run((CommandContext) {
+        command->Run((BE_CommandContext) {
             .arguments = {
                 .keys = NULL,
                 .values = NULL,
@@ -145,8 +146,8 @@ CPP_GUARD_START()
         });
     }
 
-    void DestroyConsole(void) {
-        STRICT_CHECK_NO_RETURN_VALUE(consoleInitialized, "Console are not initialized");
+    void BE_DestroyConsole(void) {
+        BE_STRICT_CHECK_NO_RETURN_VALUE(consoleInitialized, "Console are not initialized");
 
         for (int i = 0; i < commandArray.used; i++) {
 
