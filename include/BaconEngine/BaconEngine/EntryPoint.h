@@ -2,7 +2,7 @@
 // Created on: 3/29/22 @ 12:33 AM
 
 #ifdef BACON_ENGINE_INCLUDED_ENTRY_POINT
-#   error "You cannot include the entry point more than once."
+#   error You cannot include the entry point more than once.
 #endif
 
 #define BACON_ENGINE_INCLUDED_ENTRY_POINT
@@ -12,12 +12,13 @@
 #include <SharedEngineCode/Logger.h>
 #include <SharedEngineCode/Internal/CppHeader.h>
 #include <SharedEngineCode/OperatingSystem.h>
+#include <string.h>
+#include <SharedEngineCode/Debugging/Assert.h>
+#include <SharedEngineCode/Debugging/StrictMode.h>
 
-#include "Debugging/Assert.h"
 #include "ClientInformation.h"
 #include "Rendering/Window.h"
 #include "Rendering/Renderer.h"
-#include "Debugging/StrictMode.h"
 #include "Console/Console.h"
 #include "Rendering/Layer.h"
 #include "Rendering/UI.h"
@@ -61,9 +62,10 @@ CPP_GUARD_START()
             SEC_SetLogLevel(SEC_LOG_LEVEL_TRACE);
 
         // NOTE: Avoid putting log statements, or anything that uses the logging library before this line.
-        //       Doing so could potentially prevent debug and trace logs from showing due to it now being fully initialized yet.
+        //       Doing so could potentially prevent debug and trace logs from showing due to it now being fully layerInitialized yet.
 
-        BE_STRICT_CHECK(!alreadyStarted, 1, "Reinitializing the engine is not supported");
+        printf("\n");
+        SEC_STRICT_CHECK(!alreadyStarted, 1, "Reinitializing the engine is not supported");
         SEC_LOG_TRACE("Entered client code");
 
         alreadyStarted = 1;
@@ -89,7 +91,7 @@ CPP_GUARD_START()
                     char* error;
                     int parsedWith = (int) strtol(preParsedWidth, &error, 0);
 
-                    if (error != NULL) {
+                    if (error != NULL && strlen(error) != 0) {
                         SEC_LOG_ERROR("Invalid width was supplied, ignoring...");
 
                         parsedWith = 1080;
@@ -102,7 +104,7 @@ CPP_GUARD_START()
                     char* error;
                     int parsedHeight = (int) strtol(preParsedHeight, &error, 0);
 
-                    if (error != NULL) {
+                    if (error != NULL && strlen(error) != 0) {
                         SEC_LOG_ERROR("Invalid height was supplied, ignoring...");
 
                         parsedHeight = 720;
@@ -113,25 +115,27 @@ CPP_GUARD_START()
             }
 
 #ifndef BACON_ENGINE_DISABLE_SDL_TTF
-            BE_ASSERT(TTF_Init() == 0, "Failed to initialize SDL TTF: %s", SDL_GetError());
+            SEC_ASSERT(TTF_Init() == 0, "Failed to initialize SDL TTF: %s", SDL_GetError());
 #endif
 
             BE_InitializeLayers();
-            InitializeWindow(BE_GetClientName(), (BE_Vector2U) {width, height});
+            BE_InitializeWindow(BE_GetClientName(), (BE_Vector2U) {(unsigned) width, (unsigned) height});
         }
 
         BE_InitializeUISystem();
         BE_InitializeConsole();
-        BE_ASSERT(BE_ClientStart(argc, argv) == 0, "Client start returned non-zero");
+        SEC_ASSERT(BE_ClientStart(argc, argv) == 0, "Client start returned non-zero");
         BE_ClearScreen();
-        SetWindowVisibility(1);
+        BE_SetWindowVisibility(1);
 
 #ifndef BACON_ENGINE_DISABLE_SDL
         double lastTime = SDL_GetTicks();
 #endif
 
+        BE_ExecuteCommand("debuginfo");
+
         while (BE_IsClientRunning()) {
-            if (!IsWindowStillOpened() && !BE_IsServerModeEnabled() && BE_GetCurrentRenderer() != BE_RENDERER_TYPE_TEXT)
+            if (!BE_IsWindowStillOpened() && !BE_IsServerModeEnabled() && BE_GetCurrentRenderer() != BE_RENDERER_TYPE_TEXT)
                 break;
 
             if (BE_IsServerModeEnabled() || BE_GetCurrentRenderer() == BE_RENDERER_TYPE_TEXT)
@@ -145,7 +149,7 @@ CPP_GUARD_START()
 
             BE_ClearScreen();
             BE_LayerOnUpdate(LAYER_UPDATE_TYPE_BEFORE_RENDERING, deltaTime);
-            SDL_RenderPresent(GetInternalSDLRenderer());
+            SDL_RenderPresent(BE_GetInternalSDLRenderer());
             BE_LayerOnUpdate(LAYER_UPDATE_TYPE_AFTER_RENDERING, deltaTime);
 
             {
@@ -172,7 +176,9 @@ CPP_GUARD_START()
 
         SEC_LOG_TRACE("Client loop ended, shutting down");
         BE_DestroyLayers();
-        DestroyWindow();
+        BE_DestroyUIWindows();
+        BE_DestroyConsole();
+        BE_DestroyWindow();
 
 #ifndef BACON_ENGINE_DISABLE_SDL_TTF
         TTF_Quit();

@@ -48,8 +48,10 @@ int main(int argc, char** argv) {
                  "--width <width>: Changes the width of the window\n"
                  "--height <height>: Changes the height of the window\n"
                  "--renderer <renderer>: Changes the default rendering system\n"
-                 "--software: Use software mode to render instead of your GPU"
+                 "--software: Use software mode to render instead of your GPU\n"
+                 "--monitor <id>: Create the window on a different display"
 #endif
+                "--disable-ansi-coloring (-dac): Don't use ANSI colors to the console, use when your console doesn't support them"
 );
         return 0;
     }

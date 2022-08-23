@@ -1,10 +1,9 @@
 #include <SharedEngineCode/Internal/CppHeader.h>
-#include <string.h>
+#include <SharedEngineCode/Debugging/StrictMode.h>
+#include <SharedEngineCode/Debugging/Assert.h>
+#include <SharedEngineCode/Storage/DynamicArray.h>
 
 #include "BaconEngine/Rendering/Layer.h"
-#include "BaconEngine/Debugging/StrictMode.h"
-#include "BaconEngine/Debugging/Assert.h"
-#include "BaconEngine/Storage/DynamicArray.h"
 #include "EngineLayers.h"
 
 CPP_GUARD_START()
@@ -14,8 +13,8 @@ CPP_GUARD_START()
         int calledStart;
     } InternalClientLayer;
 
-    BE_DynamicArray layerArray;
-    int initialized = 0;
+    SEC_DynamicArray layerArray;
+    int layerInitialized = 0;
 
     int LayerNoOperation(void) {
         return 0;
@@ -23,7 +22,7 @@ CPP_GUARD_START()
 
     InternalClientLayer* InternalGetLayer(const char* name) {
         for (int i = 0; i < (int) layerArray.used; i++) {
-            if (strcmp(BE_ARRAY_GET_ELEMENT(InternalClientLayer, layerArray, i)->publicLayer.name, name) != 0)
+            if (strcmp(SEC_ARRAY_GET_ELEMENT(InternalClientLayer, layerArray, i)->publicLayer.name, name) != 0)
                 continue;
 
             return layerArray.internalArray[i];
@@ -33,23 +32,23 @@ CPP_GUARD_START()
     }
 
     void BE_InitializeLayers(void) {
-        BE_STRICT_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized the layer stack");
+        SEC_STRICT_CHECK_NO_RETURN_VALUE(!layerInitialized, "Already layerInitialized the layer stack");
         SEC_LOG_INFO("Initializing layer stack");
 
-        initialized = 1;
+        layerInitialized = 1;
 
-        BE_CreateDynamicArray(&layerArray, 100);
+        SEC_CreateDynamicArray(&layerArray, 100);
         SEC_LOG_INFO("Registering engine layers");
         InitializeEngineLayers();
     }
 
     void BE_RegisterLayer(const char* name, int enabled, BE_ClientLayerFunctions functions) {
         for (int i = 0; i < (int) layerArray.used; i++)
-            BE_STRICT_CHECK_NO_RETURN_VALUE(strcmp(BE_ARRAY_GET_ELEMENT(InternalClientLayer, layerArray, i)->publicLayer.name, name) != 0, "The layer '%s' is already registered", name);
+            SEC_STRICT_CHECK_NO_RETURN_VALUE(strcmp(SEC_ARRAY_GET_ELEMENT(InternalClientLayer, layerArray, i)->publicLayer.name, name) != 0, "The layer '%s' is already registered", name);
 
         InternalClientLayer* layer;
 
-        BE_ASSERT_MALLOC(layer, sizeof(InternalClientLayer), "a layer");
+        SEC_ASSERT_MALLOC(layer, sizeof(InternalClientLayer), "a layer");
 
         layer->publicLayer = (BE_ClientLayer) {
             .valid = 1,
@@ -63,11 +62,11 @@ CPP_GUARD_START()
         layer->functions.LayerOnEvent = functions.LayerOnEvent != NULL ? functions.LayerOnEvent : (int (*)(BE_Event)) &LayerNoOperation;
         layer->functions.LayerOnStop = functions.LayerOnStop != NULL ? functions.LayerOnStop : (void (*)(void)) &LayerNoOperation;
 
-        BE_ArrayAddElementToLast(&layerArray, (void *) layer);
+        SEC_ArrayAddElementToLast(&layerArray, (void *) layer);
     }
 
     BE_ClientLayer BE_GetLayer(const char* name) {
-        BE_STRICT_CHECK(initialized, (BE_ClientLayer) {.valid=0}, "Layers are not initialized");
+        SEC_STRICT_CHECK(layerInitialized, (BE_ClientLayer) {.valid=0}, "Layers are not layerInitialized");
 
         InternalClientLayer* foundLayer = InternalGetLayer(name);
 
@@ -108,7 +107,7 @@ CPP_GUARD_START()
 
     void BE_LayerOnUpdate(BE_LayerUpdateTypes layerUpdateType, double deltaTime) { // TODO: Make this a little bit more DRY.
         for (int i = 0; i < layerArray.used; i++) {
-            InternalClientLayer* layer = BE_ARRAY_GET_ELEMENT(InternalClientLayer, layerArray, i);
+            InternalClientLayer* layer = SEC_ARRAY_GET_ELEMENT(InternalClientLayer, layerArray, i);
 
             if (!layer->publicLayer.enabled)
                 continue;
@@ -126,7 +125,7 @@ CPP_GUARD_START()
 
         if (BE_ConvertSDLToEngineEvent(&event, sdlEvent)) {
             for (int i = 0; i < layerArray.used; i++) {
-                InternalClientLayer* layer = BE_ARRAY_GET_ELEMENT(InternalClientLayer, layerArray, i);
+                InternalClientLayer* layer = SEC_ARRAY_GET_ELEMENT(InternalClientLayer, layerArray, i);
 
                 if (!layer->publicLayer.enabled)
                     continue;
@@ -151,18 +150,20 @@ CPP_GUARD_START()
     }
 
     void BE_DestroyLayers(void) {
-        BE_STRICT_CHECK_NO_RETURN_VALUE(initialized, "Layers are already destroyed");
+        SEC_STRICT_CHECK_NO_RETURN_VALUE(layerInitialized, "Layers are already destroyed");
         SEC_LOG_INFO("Destroying layer stack");
 
-        initialized = 0;
+        layerInitialized = 0;
 
         for (int i = 0; i < layerArray.used; i++) {
-            InternalClientLayer* layer = BE_ARRAY_GET_ELEMENT(InternalClientLayer, layerArray, i);
+            InternalClientLayer* layer = SEC_ARRAY_GET_ELEMENT(InternalClientLayer, layerArray, i);
 
             layer->functions.LayerOnStop();
+            BE_RemoveAllocatedEngineMemory(sizeof(BE_ClientLayer));
             free(layer);
         }
 
+        BE_RemoveAllocatedEngineMemory(sizeof(void*) * layerArray.size);
         free(layerArray.internalArray);
     }
 CPP_GUARD_END()

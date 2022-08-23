@@ -4,9 +4,9 @@
 #pragma once
 
 #include <SharedEngineCode/Internal/CppHeader.h>
+#include "SharedEngineCode/Storage/DynamicArray.h"
 
 #include "BaconEngine/Math/Vector.h"
-#include "BaconEngine/Storage/DynamicArray.h"
 #include "UIElements.h"
 #include "BaconEngine/SDLSupport.h"
 
@@ -33,7 +33,7 @@ CPP_GUARD_START()
         BE_Vector2I position;
         BE_Vector2U size;
         BE_UIWindowFlags flags;
-        BE_DynamicArray elements;
+        SEC_DynamicArray elements;
     } BE_UIWindow;
 
     void BE_InitializeUISystem(void);
@@ -51,6 +51,7 @@ CPP_GUARD_START()
     void BE_SetCurrentUIWindow(BE_UIWindow* window);
     BE_UIWindow* BE_GetCurrentUIWindow(void);
     TTF_Font* BE_GetUIWindowFont(void);
+    void BE_DestroyUIWindows(void);
 CPP_GUARD_END()
 
 #define BE_UI_WINDOW_RENDERER_DRAW_RECTANGLE_SAME_COLOR(uiWindow, position, size, color, borderSize) UIWindowRendererDrawRectangle((uiWindow), (position), (size), (color), (color), (borderSize))

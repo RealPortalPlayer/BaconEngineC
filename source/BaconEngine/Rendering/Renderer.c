@@ -1,10 +1,10 @@
 #include <SharedEngineCode/Internal/CppHeader.h>
-#include <string.h>
 #include <ctype.h>
+#include <SharedEngineCode/Debugging/StrictMode.h>
+#include <string.h>
 
 #include "BaconEngine/Rendering/Renderer.h"
 #include "BaconEngine/Rendering/Window.h"
-#include "BaconEngine/Debugging/StrictMode.h"
 
 CPP_GUARD_START()
     BE_Color3U clearColor = {0, 0, 0};
@@ -19,7 +19,7 @@ CPP_GUARD_START()
 #ifndef BACON_ENGINE_DISABLE_SDL
         static int initialized = 0;
 
-        BE_STRICT_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized renderer");
+        SEC_STRICT_CHECK_NO_RETURN_VALUE(!initialized, "Already layerInitialized renderer");
 
         char* value = (char*) SEC_GetArgumentValue("--renderer");
 
@@ -69,9 +69,9 @@ CPP_GUARD_START()
 #ifndef BACON_ENGINE_DISABLE_SDL
         renderCalls = 0;
 
-        return GetInternalSDLRenderer() != NULL &&
-               SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) clearColor.r, (Uint8) clearColor.g, (Uint8) clearColor.b, 255) == 0 &&
-               SDL_RenderClear(GetInternalSDLRenderer()) == 0;
+        return BE_GetInternalSDLRenderer() != NULL &&
+               SDL_SetRenderDrawColor(BE_GetInternalSDLRenderer(), (Uint8) clearColor.r, (Uint8) clearColor.g, (Uint8) clearColor.b, 255) == 0 &&
+               SDL_RenderClear(BE_GetInternalSDLRenderer()) == 0;
 #else
         return 0;
 #endif
@@ -99,6 +99,9 @@ CPP_GUARD_START()
     }
 
     BE_Vector2U BE_GetRendererFontSize(TTF_Font* font, const char* text) {
+        (void) font;
+        (void) text;
+
         BE_Vector2U size = (BE_Vector2U) {5, 5};
 
 #ifndef BACON_ENGINE_DISABLE_SDL_TTF
@@ -123,41 +126,52 @@ CPP_GUARD_START()
     }
 
     int BE_RendererDrawLine(BE_Vector2I firstPoint, BE_Vector2I secondPoint, BE_Color4U color) {
-        if (GetInternalSDLRenderer() == NULL)
+        (void) firstPoint;
+        (void) secondPoint;
+        (void) color;
+
+        if (BE_GetInternalSDLRenderer() == NULL)
             return 0;
 
 #ifndef BACON_ENGINE_DISABLE_SDL
         renderCalls++;
 
         if (color.a != 255)
-            SDL_SetRenderDrawBlendMode(GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
+            SDL_SetRenderDrawBlendMode(BE_GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
 
-        return SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
-               SDL_RenderDrawLine(GetInternalSDLRenderer(), firstPoint.x, firstPoint.y, secondPoint.x, secondPoint.y) == 0;
+        return SDL_SetRenderDrawColor(BE_GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
+               SDL_RenderDrawLine(BE_GetInternalSDLRenderer(), firstPoint.x, firstPoint.y, secondPoint.x, secondPoint.y) == 0;
 #else
         return 0;
 #endif
     }
 
     int BE_RendererDrawPoint(BE_Vector2I position, BE_Color4U color) {
-        if (GetInternalSDLRenderer() == NULL)
+        (void) position;
+        (void) color;
+
+        if (BE_GetInternalSDLRenderer() == NULL)
             return 0;
 
 #ifndef BACON_ENGINE_DISABLE_SDL
         renderCalls++;
 
         if (color.a != 255)
-            SDL_SetRenderDrawBlendMode(GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
+            SDL_SetRenderDrawBlendMode(BE_GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
 
-        return SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
-               SDL_RenderDrawPoint(GetInternalSDLRenderer(), position.x, position.y) == 0;
+        return SDL_SetRenderDrawColor(BE_GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
+               SDL_RenderDrawPoint(BE_GetInternalSDLRenderer(), position.x, position.y) == 0;
 #else
         return 0;
 #endif
     }
 
     int BE_RendererDrawRectangle(BE_Vector2I position, BE_Vector2U size, BE_Color4U color) {
-        if (GetInternalSDLRenderer() == NULL)
+        (void) position;
+        (void) size;
+        (void) color;
+
+        if (BE_GetInternalSDLRenderer() == NULL)
             return 0;
 
 #ifndef BACON_ENGINE_DISABLE_SDL
@@ -172,17 +186,21 @@ CPP_GUARD_START()
         renderCalls++;
 
         if (color.a != 255)
-            SDL_SetRenderDrawBlendMode(GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
+            SDL_SetRenderDrawBlendMode(BE_GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
 
-        return SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
-               SDL_RenderDrawRect(GetInternalSDLRenderer(), &rectangle) == 0;
+        return SDL_SetRenderDrawColor(BE_GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
+               SDL_RenderDrawRect(BE_GetInternalSDLRenderer(), &rectangle) == 0;
 #else
         return 0;
 #endif
     }
 
     int BE_RendererFillRectangle(BE_Vector2I position, BE_Vector2U size, BE_Color4U color) {
-        if (GetInternalSDLRenderer() == NULL)
+        (void) position;
+        (void) size;
+        (void) color;
+
+        if (BE_GetInternalSDLRenderer() == NULL)
             return 0;
 
 #ifndef BACON_ENGINE_DISABLE_SDL
@@ -196,10 +214,10 @@ CPP_GUARD_START()
         renderCalls++;
 
         if (color.a != 255)
-            SDL_SetRenderDrawBlendMode(GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
+            SDL_SetRenderDrawBlendMode(BE_GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
 
-        return SDL_SetRenderDrawColor(GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
-               SDL_RenderFillRect(GetInternalSDLRenderer(), &rectangle) == 0;
+        return SDL_SetRenderDrawColor(BE_GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
+               SDL_RenderFillRect(BE_GetInternalSDLRenderer(), &rectangle) == 0;
 #else
         return 0;
 #endif

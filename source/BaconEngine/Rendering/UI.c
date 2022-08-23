@@ -1,33 +1,31 @@
 #include <SharedEngineCode/Internal/CppHeader.h>
 #include <string.h>
-#include <zlib.h>
+#include <SharedEngineCode/Debugging/StrictMode.h>
+#include <SharedEngineCode/Debugging/Assert.h>
 
 #include "BaconEngine/Rendering/UI.h"
-#include "BaconEngine/Debugging/StrictMode.h"
-#include "BaconEngine/Debugging/Assert.h"
 #include "EngineUIs.h"
 #include "BaconEngine/Rendering/Window.h"
 #include "BaconEngine/Rendering/Renderer.h"
 #include "BaconEngine/Rendering/Layer.h"
 
 CPP_GUARD_START()
-    BE_DynamicArray uiArray;
+    int uiInitialized = 0;
+    SEC_DynamicArray uiArray;
     BE_UIWindow* currentWindow = NULL;
     TTF_Font* windowFont;
     BE_UIWindow* registeringWindow = NULL;
 
     void BE_InitializeUISystem(void) {
-        static int initialized = 0;
-
-        if (GetInternalSDLRenderer() == NULL)
+        if (BE_GetInternalSDLRenderer() == NULL)
             return;
 
-        BE_STRICT_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized UI system.");
+        SEC_STRICT_CHECK_NO_RETURN_VALUE(!uiInitialized, "Already layerInitialized UI system.");
         SEC_LOG_INFO("Initializing UI");
 
-        initialized = 1;
+        uiInitialized = 1;
 
-        BE_CreateDynamicArray(&uiArray, 50);
+        SEC_CreateDynamicArray(&uiArray, 50);
         SEC_LOG_INFO("Registering engine UIs");
         InitializeEngineUIs();
 
@@ -36,22 +34,22 @@ CPP_GUARD_START()
     }
 
     void BE_RegisterUIWindow(const char* name, BE_Vector2I position, BE_Vector2U size, BE_UIWindowFlags flags) {
-        BE_STRICT_CHECK_NO_RETURN_VALUE(registeringWindow == NULL, "You're already registering another window");
+        SEC_STRICT_CHECK_NO_RETURN_VALUE(registeringWindow == NULL, "You're already registering another window");
 
         for (int i = 0; i < uiArray.used; i++)
-            BE_STRICT_CHECK_NO_RETURN_VALUE(strcmp(BE_ARRAY_GET_ELEMENT(BE_UIWindow, uiArray, i)->name, name) != 0, "The window '%s' is already registered, to have more than window with the same name, append one with \"###\" with anything else");
+            SEC_STRICT_CHECK_NO_RETURN_VALUE(strcmp(SEC_ARRAY_GET_ELEMENT(BE_UIWindow, uiArray, i)->name, name) != 0, "The window '%s' is already registered, to have more than window with the same name, append one with \"###\" with anything else");
 
         BE_UIWindow* window;
 
-        BE_ASSERT_MALLOC(window, sizeof(BE_UIWindow), "a UI window");
-        BE_STRICT_CHECK_NO_RETURN_VALUE((flags & BE_UI_WINDOW_FLAG_NO_TITLE_BAR) == 0 || (flags & BE_UI_WINDOW_FLAG_MINIMIZED) == 0,
-                                        "Invalid flags, minimized only works on windows with a title bar");
-        BE_STRICT_CHECK_NO_RETURN_VALUE(currentWindow == NULL || (flags & BE_UI_WINDOW_FLAG_MAXIMIZED) == 0,
-                                        "Invalid flags, only one window can be maximized");
+        SEC_ASSERT_MALLOC(window, sizeof(BE_UIWindow), "a UI window");
+        SEC_STRICT_CHECK_NO_RETURN_VALUE((flags & BE_UI_WINDOW_FLAG_NO_TITLE_BAR) == 0 || (flags & BE_UI_WINDOW_FLAG_MINIMIZED) == 0,
+                                         "Invalid flags, minimized only works on windows with a title bar");
+        SEC_STRICT_CHECK_NO_RETURN_VALUE(currentWindow == NULL || (flags & BE_UI_WINDOW_FLAG_MAXIMIZED) == 0,
+                                         "Invalid flags, only one window can be maximized");
 
         char* parsedName;
 
-        BE_ASSERT_MALLOC(parsedName, sizeof(char) * strlen(name) + 1, "UI window name");
+        SEC_ASSERT_MALLOC(parsedName, sizeof(char) * strlen(name) + 1, "UI window name");
         memcpy(parsedName, name, strlen(name));
         {
             char* parsing = strstr(parsedName, "###");
@@ -66,31 +64,30 @@ CPP_GUARD_START()
         window->size = size;
         window->flags = flags;
 
-        BE_CreateDynamicArray(&window->elements, 100);
+        SEC_CreateDynamicArray(&window->elements, 100);
 
         registeringWindow = window;
     }
 
     void BE_RegisterUIElement(BE_UIElement* element) {
-        BE_STRICT_CHECK_NO_RETURN_VALUE(registeringWindow != NULL, "There is no window to finish");
-
-        BE_ArrayAddElementToLast(&registeringWindow->elements, element);
+        SEC_STRICT_CHECK_NO_RETURN_VALUE(registeringWindow != NULL, "There is no window to finish");
+        SEC_ArrayAddElementToLast(&registeringWindow->elements, element);
     }
 
     void BE_FinishRegisteringUIWindow(void) {
-        BE_STRICT_CHECK_NO_RETURN_VALUE(registeringWindow != NULL, "There is no window to finish");
+        SEC_STRICT_CHECK_NO_RETURN_VALUE(registeringWindow != NULL, "There is no window to finish");
 
         if (currentWindow == NULL || (currentWindow->flags & BE_UI_WINDOW_FLAG_MAXIMIZED) == 0)
             currentWindow = registeringWindow;
 
-        BE_ArrayAddElementToLast(&uiArray, registeringWindow);
+        SEC_ArrayAddElementToLast(&uiArray, registeringWindow);
 
         registeringWindow = NULL;
     }
 
     int BE_CloseUIWindow(const char* name) {
         for (unsigned int windowId = 0; (int) windowId < uiArray.used; windowId++) {
-            BE_UIWindow* window = BE_ARRAY_GET_ELEMENT(BE_UIWindow, uiArray, windowId);
+            BE_UIWindow* window = SEC_ARRAY_GET_ELEMENT(BE_UIWindow, uiArray, windowId);
 
             if (strcmp(window->name, name) != 0)
                 continue;
@@ -150,5 +147,22 @@ CPP_GUARD_START()
 
     TTF_Font* BE_GetUIWindowFont(void) {
         return windowFont;
+    }
+
+    void BE_DestroyUIWindows(void) {
+        SEC_STRICT_CHECK_NO_RETURN_VALUE(uiInitialized, "UI Windows are already destroyed");
+        SEC_LOG_INFO("Destroying UI Windows");
+
+        uiInitialized = 0;
+
+        for (int i = 0; i < uiArray.used; i++) {
+            BE_UIWindow* layer = SEC_ARRAY_GET_ELEMENT(BE_UIWindow, uiArray, i);
+
+            BE_RemoveAllocatedEngineMemory(sizeof(BE_UIWindow));
+            free(layer);
+        }
+
+        BE_RemoveAllocatedEngineMemory(sizeof(void*) * uiArray.size);
+        free(uiArray.internalArray);
     }
 CPP_GUARD_END()

@@ -29,7 +29,7 @@ CPP_GUARD_START()
     } SEC_LauncherConfiguration;
 
     /**
-    * @return The initialized configuration file. NULL if malloc fails.
+    * @return The layerInitialized configuration file. NULL if malloc fails.
     */
     void SEC_CreateLauncherConfiguration(SEC_LauncherConfiguration* configuration, const char* path);
 CPP_GUARD_END()

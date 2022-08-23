@@ -9,14 +9,12 @@ add_library(BaconEngine STATIC
         Console/EngineCommands.c
         Console/EngineCommands.h
         Rendering/Layer.c
-        Storage/DynamicArray.c
         Rendering/UI.c
         Rendering/EngineLayers.c
         Rendering/EngineUIs.c
         Rendering/UIWindows.c
         Rendering/UIElements.c
         Input/Keyboard.c
-        Storage/DynamicDictionary.c
         Event.c)
 
 if(NOT DISABLE_SDL)

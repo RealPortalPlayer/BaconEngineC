@@ -1,9 +1,8 @@
 #include <SharedEngineCode/Internal/CppHeader.h>
+#include <SharedEngineCode/Debugging/Assert.h>
 
 #include "BaconEngine/Rendering/UIElements.h"
 #include "BaconEngine/Rendering/UI.h"
-#include "BaconEngine/Rendering/Window.h"
-#include "BaconEngine/Debugging/Assert.h"
 #include "BaconEngine/Rendering/Renderer.h"
 
 CPP_GUARD_START()
@@ -12,6 +11,8 @@ CPP_GUARD_START()
     }
 
     void LabelOnRender(BE_UIElement* this, BE_UIWindow* uiWindow, double deltaTime) {
+        (void) this;
+        (void) uiWindow;
         (void) deltaTime;
 
         if (BE_GetUIWindowFont() == NULL)
@@ -49,17 +50,13 @@ CPP_GUARD_START()
     }
 
     int ButtonOnEvent(BE_UIElement* this, BE_UIWindow* uiWindow, BE_Event event) {
-#ifndef BACON_ENGINE_DISABLE_SDL
         if (!BE_IsUserTargetingElement(this, *uiWindow) || !this->enabled || this->variables.any1 == NULL || event.type != BE_EVENT_TYPE_MOUSE_BUTTON_DOWN || event.unionVariables.mouse.unionVariables.unionVariables.button.which != BE_MOUSE_BUTTON_TYPE_LEFT)
             return 0;
 
         printf("Clicked!\n");
 
-        ((void (*)(void)) this->variables.any1)();
+        this->variables.func1((BE_UIElementPublicVariables) {.any1 = NULL});
         return 1;
-#else
-        return 0;
-#endif
     }
 
     void BoxOnRender(BE_UIElement* this, BE_UIWindow* uiWindow, double deltaTime) {
@@ -69,10 +66,17 @@ CPP_GUARD_START()
     }
 
     BE_UIElement* BE_CreateUIElement(BE_Vector2I position, BE_Vector2U size, BE_Color4U color, int enabled, UIElementFunctions functions, BE_UIElementPublicVariables variables) {
+        (void) position;
+        (void) size;
+        (void) color;
+        (void) enabled;
+        (void) functions;
+        (void) variables;
+
 #ifndef BACON_ENGINE_DISABLE_SDL
         BE_UIElement* element;
 
-        BE_ASSERT_MALLOC(element, sizeof(BE_UIElement), "a UI element");
+        SEC_ASSERT_MALLOC(element, sizeof(BE_UIElement), "a UI element");
 
         element->position = position;
         element->size = size;
@@ -119,11 +123,15 @@ CPP_GUARD_START()
                 .UIElementOnEvent = &ButtonOnEvent
         }, (BE_UIElementPublicVariables) {
                 .str1 = (char *) contents,
-                .any1 = (void *) UIButtonOnClick
+                .func1 = (void* (*)(struct BE_UIElementPublicVariables variables)) UIButtonOnClick
         });
     }
 
     BE_UIElement* BE_CreateUIInputBox(const char* input, const char* placeholder, BE_Vector2I position, BE_Vector2I size) {
+        (void)input;
+        (void)placeholder;
+        (void)position;
+        (void)size;
         return NULL;
     }
 
@@ -136,6 +144,9 @@ CPP_GUARD_START()
     }
 
     int BE_IsUserTargetingElement(BE_UIElement* element, BE_UIWindow uiWindow) {
+        (void) element;
+        (void) uiWindow;
+
 #ifndef BACON_ENGINE_DISABLE_SDL
         SDL_Point mousePosition = {0, 0};
         BE_Vector2I uiPosition = BE_GetUIElementPosition(element, uiWindow);

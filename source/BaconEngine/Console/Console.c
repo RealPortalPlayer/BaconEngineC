@@ -1,15 +1,16 @@
 #include <SharedEngineCode/Internal/CppHeader.h>
 #include <stddef.h>
 #include <string.h>
+#include <SharedEngineCode/Debugging/StrictMode.h>
+#include <SharedEngineCode/Debugging/Assert.h>
+#include <SharedEngineCode/Storage/DynamicArray.h>
+
 
 #include "BaconEngine/Console/Console.h"
-#include "BaconEngine/Debugging/StrictMode.h"
-#include "BaconEngine/Debugging/Assert.h"
 #include "EngineCommands.h"
-#include "BaconEngine/Storage/DynamicArray.h"
 
 CPP_GUARD_START()
-    BE_DynamicArray commandArray;
+    SEC_DynamicArray commandArray;
     BE_Command* lastCommand;
     int duplicateCommand = 0;
     int consoleInitialized = 0;
@@ -31,19 +32,19 @@ CPP_GUARD_START()
     }
 
     void BE_InitializeConsole(void) {
-        BE_STRICT_CHECK_NO_RETURN_VALUE(!consoleInitialized, "Already initialized the console");
+        SEC_STRICT_CHECK_NO_RETURN_VALUE(!consoleInitialized, "Already layerInitialized the console");
         SEC_LOG_INFO("Initializing console");
 
         consoleInitialized = 1;
 
-        BE_CreateDynamicArray(&commandArray, 100);
+        SEC_CreateDynamicArray(&commandArray, 100);
         SEC_LOG_INFO("Registering engine commands");
         InitializeEngineCommands();
     }
 
     void BE_RegisterCommand(const char* name, const char* description, BE_CommandFlags flags, void (*Run)(BE_CommandContext context)) {
         for (int i = 0; i < (int) commandArray.used; i++)
-            BE_STRICT_CHECK_NO_RETURN_VALUE(strcmp(BE_ARRAY_GET_ELEMENT(BE_Command, commandArray, i)->name, name) != 0, "The command '%s' is already registered", name);
+            SEC_STRICT_CHECK_NO_RETURN_VALUE(strcmp(SEC_ARRAY_GET_ELEMENT(BE_Command, commandArray, i)->name, name) != 0, "The command '%s' is already registered", name);
 
         if (!duplicateCommand)
             SEC_LOG_TRACE("Registering command\n"
@@ -54,14 +55,14 @@ CPP_GUARD_START()
 
         duplicateCommand = 0;
 
-        BE_STRICT_CHECK_NO_RETURN_VALUE((flags & BE_COMMAND_FLAG_SERVER_ONLY) == 0 || (flags & BE_COMMAND_FLAG_CLIENT_ONLY) == 0,
-                                        "Invalid command flags, cannot be both for server and client only");
-        BE_STRICT_CHECK_NO_RETURN_VALUE((flags & BE_COMMAND_FLAG_CHEATS_ONLY) == 0 || (flags & BE_COMMAND_FLAG_CLIENT_ONLY) == 0,
-                                        "Invalid command flags, the client cannot run any cheat commands");
+        SEC_STRICT_CHECK_NO_RETURN_VALUE((flags & BE_COMMAND_FLAG_SERVER_ONLY) == 0 || (flags & BE_COMMAND_FLAG_CLIENT_ONLY) == 0,
+                                         "Invalid command flags, cannot be both for server and client only");
+        SEC_STRICT_CHECK_NO_RETURN_VALUE((flags & BE_COMMAND_FLAG_CHEATS_ONLY) == 0 || (flags & BE_COMMAND_FLAG_CLIENT_ONLY) == 0,
+                                         "Invalid command flags, the client cannot run any cheat commands");
 
         BE_Command* command;
 
-        BE_ASSERT_MALLOC(command, sizeof(BE_Command), "a command");
+        SEC_ASSERT_MALLOC(command, sizeof(BE_Command), "a command");
 
         command->name = name;
         command->description = description;
@@ -69,13 +70,13 @@ CPP_GUARD_START()
         command->Run = Run;
 
 
-        BE_ArrayAddElementToLast(&commandArray, (void *) command);
+        SEC_ArrayAddElementToLast(&commandArray, (void *) command);
 
         lastCommand = command;
     }
 
     void BE_DuplicateCommand(const char* name, const char* description) {
-        BE_ASSERT(commandArray.used != 0, "There is no command to duplicate");
+        SEC_ASSERT(commandArray.used != 0, "There is no command to duplicate");
         SEC_LOG_TRACE("Duplicating command\n"
                   "Original name: %s\n"
                   "Original description: %s\n"
@@ -102,10 +103,10 @@ CPP_GUARD_START()
 
         if (command == NULL) {
             for (int i = 0; i < (int) commandArray.used; i++) { // TODO: Find a way to replace a for loop with index.
-                if (strcmp(BE_ARRAY_GET_ELEMENT(BE_Command, commandArray, i)->name, name) != 0)
+                if (strcmp(SEC_ARRAY_GET_ELEMENT(BE_Command, commandArray, i)->name, name) != 0)
                     continue;
 
-                command = BE_ARRAY_GET_ELEMENT(BE_Command, commandArray, i);
+                command = SEC_ARRAY_GET_ELEMENT(BE_Command, commandArray, i);
                 break;
             }
         }
@@ -147,10 +148,19 @@ CPP_GUARD_START()
     }
 
     void BE_DestroyConsole(void) {
-        BE_STRICT_CHECK_NO_RETURN_VALUE(consoleInitialized, "Console are not initialized");
+        SEC_STRICT_CHECK_NO_RETURN_VALUE(consoleInitialized, "Console are not layerInitialized");
+        SEC_LOG_INFO("Destroying console");
+
+        consoleInitialized = 0;
 
         for (int i = 0; i < commandArray.used; i++) {
+            BE_Command* command = SEC_ARRAY_GET_ELEMENT(BE_Command, commandArray, i);
 
+            BE_RemoveAllocatedEngineMemory(sizeof(BE_Command));
+            free(command);
         }
+
+        BE_RemoveAllocatedEngineMemory(sizeof(void*) * commandArray.size);
+        free(commandArray.internalArray);
     }
 CPP_GUARD_END()

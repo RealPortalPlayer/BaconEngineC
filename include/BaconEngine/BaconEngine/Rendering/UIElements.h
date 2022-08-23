@@ -4,10 +4,10 @@
 #pragma once
 
 #include <SharedEngineCode/Internal/CppHeader.h>
+#include <SharedEngineCode/Storage/DynamicArray.h>
 
 #include "BaconEngine/Math/Vector.h"
 #include "BaconEngine/Math/Color.h"
-#include "BaconEngine/Storage/DynamicArray.h"
 #include "BaconEngine/SDLSupport.h"
 #include "BaconEngine/Event.h"
 
@@ -21,9 +21,12 @@ CPP_GUARD_START()
     } UIElementFunctions;
 
     // NOTE: This is utterly fucking stupid.
-    typedef struct {
+    typedef struct BE_UIElementPublicVariables {
         void* any1; void* any2; void* any3; void* any4; void* any5;
         void* any6; void* any7; void* any8; void* any9; void* any10;
+
+        void* (*func1)(struct BE_UIElementPublicVariables variables); void* (*func2)(struct BE_UIElementPublicVariables variables); void* (*func3)(struct BE_UIElementPublicVariables variables); void* (*func4)(struct BE_UIElementPublicVariables variables); void* (*func5)(struct BE_UIElementPublicVariables variables);
+        void* (*func6)(struct BE_UIElementPublicVariables variables); void* (*func7)(struct BE_UIElementPublicVariables variables); void* (*func8)(struct BE_UIElementPublicVariables variables); void* (*func9)(struct BE_UIElementPublicVariables variables); void* (*func10)(struct BE_UIElementPublicVariables variables);
         
         char* str1; char* str2; char* str3; char* str4; char* str5;
         char* str6; char* str7; char* str8; char* str9; char* str10;
@@ -209,7 +212,7 @@ CPP_GUARD_START()
         BE_Color4U color;
         int enabled;
         int canContainElements;
-        BE_DynamicArray internalElements;
+        SEC_DynamicArray internalElements;
         UIElementFunctions functions;
         BE_UIElementPublicVariables variables;
     } BE_UIElement;

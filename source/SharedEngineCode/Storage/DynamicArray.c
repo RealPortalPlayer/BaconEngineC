@@ -1,13 +1,13 @@
-#include <SharedEngineCode/Internal/CppHeader.h>
+#include "SharedEngineCode/Internal/CppHeader.h"
 #include <stdlib.h>
 #include <string.h>
 
-#include "BaconEngine/Storage/DynamicArray.h"
-#include "BaconEngine/Debugging/StrictMode.h"
-#include "BaconEngine/Debugging/Assert.h"
+#include "SharedEngineCode/Storage/DynamicArray.h"
+#include "SharedEngineCode/Debugging/StrictMode.h"
+#include "SharedEngineCode/Debugging/Assert.h"
 
 CPP_GUARD_START()
-    void ReallocateArray(BE_DynamicArray* array) {
+    void ReallocateArray(SEC_DynamicArray* array) {
         if (array->size != array->used)
             return;
 
@@ -16,12 +16,12 @@ CPP_GUARD_START()
         array->size *= 2;
         array->calledRealloc++;
 
-        BE_ASSERT_REALLOC(array->internalArray, sizeof(void*) * array->size, "a dynamic array");
+        SEC_ASSERT_REALLOC(array->internalArray, sizeof(void*) * (array->size / 2), sizeof(void*) * array->size, "a dynamic array");
     }
 
-    int BE_CreateDynamicArray(BE_DynamicArray* array, size_t size) {
-        BE_STRICT_CHECK(size != 0, 0, "Invalid size");
-        BE_ASSERT_MALLOC(array->internalArray, sizeof(void*) * size, "a dynamic array");
+    int SEC_CreateDynamicArray(SEC_DynamicArray* array, size_t size) {
+        SEC_STRICT_CHECK(size != 0, 0, "Invalid size");
+        SEC_ASSERT_MALLOC(array->internalArray, sizeof(void*) * size, "a dynamic array");
 
         array->used = 0;
         array->size = size;
@@ -29,14 +29,14 @@ CPP_GUARD_START()
         return 1;
     }
 
-    int BE_ArrayAddElementToFirst(BE_DynamicArray* array, void* element) {
+    int SEC_ArrayAddElementToFirst(SEC_DynamicArray* array, void* element) {
         ReallocateArray(array);
         (void) element;
 
         return 0;
     }
 
-    int BE_ArrayAddElementToLast(BE_DynamicArray* array, void* element) {
+    int SEC_ArrayAddElementToLast(SEC_DynamicArray* array, void* element) {
         ReallocateArray(array);
 
         array->internalArray[array->used++] = element;
@@ -44,7 +44,7 @@ CPP_GUARD_START()
         return 1;
     }
 
-    int BE_ArrayRemoveFirstElement(BE_DynamicArray* array, int shift) {
+    int SEC_ArrayRemoveFirstElement(SEC_DynamicArray* array, int shift) {
         if (array->used == 0)
             return 0;
 
@@ -53,10 +53,10 @@ CPP_GUARD_START()
             return 1;
         }
 
-        return BE_ArrayRemoveElementAt(array, 0);
+        return SEC_ArrayRemoveElementAt(array, 0);
     }
 
-    int BE_ArrayRemoveLastElement(BE_DynamicArray* array) {
+    int SEC_ArrayRemoveLastElement(SEC_DynamicArray* array) {
         if (array->used == 0)
             return 0;
 
@@ -65,7 +65,7 @@ CPP_GUARD_START()
         return 1;
     }
 
-    int BE_ArrayRemoveElementAt(BE_DynamicArray* array, unsigned int index) {
+    int SEC_ArrayRemoveElementAt(SEC_DynamicArray* array, unsigned int index) {
         if ((int) index >= array->used)
             return 0;
 

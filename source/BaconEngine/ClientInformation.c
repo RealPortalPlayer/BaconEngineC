@@ -1,11 +1,33 @@
 #include <SharedEngineCode/ArgumentHandler.h>
 #include <SharedEngineCode/Internal/CppHeader.h>
+#include <SharedEngineCode/Logger.h>
 
 #include "BaconEngine/ClientInformation.h"
 
 CPP_GUARD_START()
     int running = 1;
     int cheats = 0;
+    unsigned allocatedEngineMemory = 0;
+
+
+    unsigned BE_GetAllocatedEngineMemory(void) {
+        return allocatedEngineMemory;
+    }
+
+    void BE_AddAllocatedEngineMemory(unsigned size) {
+        SEC_LOG_TRACE("Allocated %u bytes of memory", size);
+
+        allocatedEngineMemory += size;
+    }
+
+    void BE_RemoveAllocatedEngineMemory(unsigned size) {
+        if (allocatedEngineMemory == 0 || allocatedEngineMemory < size)
+            return;
+
+        SEC_LOG_TRACE("Deallocated %u bytes of memory", size);
+
+        allocatedEngineMemory -= size;
+    }
 
     int BE_IsClientRunning(void) {
         return running;

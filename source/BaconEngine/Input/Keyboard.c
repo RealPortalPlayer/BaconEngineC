@@ -79,6 +79,7 @@ CPP_GUARD_START()
     }
 
     BE_KeyCodes BE_SDLToEngineKeyCode(SDL_Scancode keyCode) {
+        (void) keyCode;
 #ifndef BACON_ENGINE_DISABLE_SDL
         return keyCode != SDL_SCANCODE_NONUSHASH && keyCode != SDL_SCANCODE_NONUSBACKSLASH && keyCode != SDL_SCANCODE_POWER &&
                BE_IsEngineKeyCodeValid((BE_KeyCodes) keyCode) ? (BE_KeyCodes) keyCode : BE_KEY_CODE_NULL;

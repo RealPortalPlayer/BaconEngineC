@@ -1,14 +1,14 @@
 #include <SharedEngineCode/Internal/CppHeader.h>
+#include <SharedEngineCode/Debugging/Assert.h>
 
 #include "EngineUIs.h"
-#include "BaconEngine/Debugging/Assert.h"
 #include "BaconEngine/Rendering/UI.h"
 
 CPP_GUARD_START()
     void InitializeEngineUIs(void) {
         static int initialized = 0;
 
-        BE_ASSERT(!initialized, "Engine UIs are already initialized");
+        SEC_ASSERT(!initialized, "Engine UIs are already layerInitialized");
 
         initialized = 1;
 

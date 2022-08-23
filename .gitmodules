@@ -1,9 +1,9 @@
-[submodule "dependencies/SDL"]
-	path = dependencies/SDL
+[submodule "dependencies/BaconEngine/SDL"]
+	path = dependencies/BaconEngine/SDL
 	url = https://github.com/libsdl-org/SDL.git
-[submodule "dependencies/SDL_ttf"]
-	path = dependencies/SDL_ttf
+[submodule "dependencies/BaconEngine/SDL_ttf"]
+	path = dependencies/BaconEngine/SDL_ttf
 	url = https://github.com/libsdl-org/SDL_ttf
-[submodule "dependencies/zlib"]
-	path = dependencies/zlib
+[submodule "dependencies/BaconEngine/zlib"]
+	path = dependencies/BaconEngine/zlib
 	url = https://github.com/madler/zlib

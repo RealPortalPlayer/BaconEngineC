@@ -6,6 +6,9 @@
 #include <SharedEngineCode/Internal/CppHeader.h>
 
 CPP_GUARD_START()
+    unsigned BE_GetAllocatedEngineMemory(void);
+    void BE_AddAllocatedEngineMemory(unsigned size);
+    void BE_RemoveAllocatedEngineMemory(unsigned size);
     int BE_IsClientRunning(void);
     int BE_IsClientCheatsEnabled(void);
     int BE_IsServerModeEnabled(void);

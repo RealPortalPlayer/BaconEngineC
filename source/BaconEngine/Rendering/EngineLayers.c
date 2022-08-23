@@ -1,7 +1,7 @@
 #include <SharedEngineCode/Internal/CppHeader.h>
+#include <SharedEngineCode/Debugging/Assert.h>
 
 #include "EngineLayers.h"
-#include "BaconEngine/Debugging/Assert.h"
 #include "BaconEngine/Rendering/Layer.h"
 #include "BaconEngine/Rendering/UI.h"
 #include "BaconEngine/Rendering/Renderer.h"
@@ -24,7 +24,7 @@ CPP_GUARD_START()
 #ifndef BACON_ENGINE_DISABLE_SDL
         static int initialized = 0;
 
-        BE_ASSERT(!initialized, "Engine layers are already initialized");
+        SEC_ASSERT(!initialized, "Engine layers are already layerInitialized");
 
         initialized = 1;
 
@@ -59,16 +59,23 @@ CPP_GUARD_START()
 #   define INACTIVE_MAXIMIZE_BUTTON_COLORS (BE_Color4U) {78,185,99,175}
 
     void RenderUIWindow(BE_UIWindow* uiWindow) { // TODO: Cut out unnecessary code.
-        BE_Vector2U windowSize = GetWindowSize();
+        BE_Vector2U windowSize = BE_GetWindowSize();
 
         if ((uiWindow->flags & BE_UI_WINDOW_FLAG_MAXIMIZED) == 0) {
             if (uiWindow->position.x <= 0)
                 uiWindow->position.x = 0;
 
-            int offset = 0;
+            int offset;
+            unsigned height = uiWindow->size.y;
 
             if ((uiWindow->flags & BE_UI_WINDOW_FLAG_NO_BORDER) == 0)
                 offset = 5;
+            else
+                offset = 16;
+
+
+            if ((uiWindow->flags & BE_UI_WINDOW_FLAG_MINIMIZED) != 0)
+                height = 20 - offset;
 
             if (uiWindow->position.x + offset + uiWindow->size.x >= windowSize.x)
                 uiWindow->position.x -= uiWindow->position.x + offset + (int) uiWindow->size.x - (int) windowSize.x;
@@ -76,7 +83,6 @@ CPP_GUARD_START()
             if (uiWindow->position.y <= 0)
                 uiWindow->position.y = 0;
 
-            offset = 16;
 
             if ((uiWindow->flags & BE_UI_WINDOW_FLAG_NO_BORDER) == 0)
                 offset += 5;
@@ -84,8 +90,8 @@ CPP_GUARD_START()
             if ((uiWindow->flags & BE_UI_WINDOW_FLAG_NO_TITLE_BAR) == 0)
                 offset += 5;
 
-            if (uiWindow->position.y + offset + uiWindow->size.y >= windowSize.y)
-                uiWindow->position.y -= uiWindow->position.y + offset + (int) uiWindow->size.y - (int) windowSize.y;
+            if (uiWindow->position.y + offset + height >= windowSize.y)
+                uiWindow->position.y -= uiWindow->position.y + offset + (int) height - (int) windowSize.y;
         }
 
         BE_Vector2I uiPosition = uiWindow->position;
@@ -146,6 +152,8 @@ CPP_GUARD_START()
 
             int titleBarButtons = 0;
 
+            (void) titleBarButtons;
+
             if ((uiWindow->flags & BE_UI_WINDOW_FLAG_NO_CLOSE) == 0 || (uiWindow->flags & BE_UI_WINDOW_FLAG_NO_MINIMIZE) == 0 || (uiWindow->flags & BE_UI_WINDOW_FLAG_NO_MAXIMIZE) == 0)
                 titleBarButtons++;
 
@@ -172,7 +180,7 @@ CPP_GUARD_START()
 
                     BE_Vector2I centered = BE_GetCenterPosition((BE_Vector2I) {positionX, uiPosition.y}, uiSize, (BE_Vector2U) {titleMessageSurface->w, titleMessageSurface->h});
 
-                    if (uiSize.x + 2 + (18 * titleBarButtons) > titleMessageSurface->w)
+                    if (uiSize.x + 2 + (18 * titleBarButtons) > (unsigned) titleMessageSurface->w)
                         SDL_RenderCopy(GetInternalSDLRenderer(), titleMessageTexture, NULL, &(SDL_Rect){centered.x, uiPosition.y + 1, (int) titleMessageSurface->w, (int) titleMessageSurface->h});
 
                     SDL_DestroyTexture(titleMessageTexture);
@@ -329,7 +337,7 @@ CPP_GUARD_START()
 
         if ((uiWindow->flags & BE_UI_WINDOW_FLAG_MAXIMIZED) != 0) {
             uiPosition = (BE_Vector2I){0, 0};
-            uiSize = GetWindowSize();
+            uiSize = BE_GetWindowSize();
             uiPosition.x = 5;
             uiPosition.y = 5;
             uiSize.x -= 15;
@@ -445,7 +453,7 @@ CPP_GUARD_START()
             }
         }
 
-        return (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP || event.type == SDL_MOUSEWHEEL || event.type == SDL_MOUSEMOTION) && SDL_PointInRect(&(SDL_Point) {mousePosition.x, mousePosition.y}, &(SDL_Rect) {uiPosition.x, uiPosition.y, (int) uiSize.x, (int) uiSize.y});
+        return (event.type == BE_EVENT_TYPE_MOUSE_BUTTON_DOWN || event.type == BE_EVENT_TYPE_MOUSE_BUTTON_UP || event.type == BE_EVENT_TYPE_MOUSE_WHEEL || event.type == BE_EVENT_TYPE_MOUSE_MOVED) && SDL_PointInRect(&(SDL_Point) {mousePosition.x, mousePosition.y}, &(SDL_Rect) {uiPosition.x, uiPosition.y, (int) uiSize.x, (int) uiSize.y});
     }
 
     void UIManagerOnStop(void) {

@@ -1,14 +1,14 @@
 // Purpose: Does some strict checking.
 // Created on: 7/29/22 @ 3:42 PM
 
-#include <SharedEngineCode/ArgumentHandler.h>
-#include <SharedEngineCode/Logger.h>
+#include "SharedEngineCode/ArgumentHandler.h"
+#include "SharedEngineCode/Logger.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "BaconEngine/ClientInformation.h"
 
-#define BE_STRICT_CHECK(check, returnValue, ...) \
+#define SEC_STRICT_CHECK(check, returnValue, ...) \
 do {                                             \
         SEC_LOG_TRACE("Strict Mode checking: %s", #check); \
         if (!(check)) {                          \
@@ -25,4 +25,4 @@ do {                                             \
                 return returnValue;              \
         }                                        \
 } while (0)
-#define BE_STRICT_CHECK_NO_RETURN_VALUE(check, ...) BE_STRICT_CHECK(check, , __VA_ARGS__)
+#define SEC_STRICT_CHECK_NO_RETURN_VALUE(check, ...) SEC_STRICT_CHECK(check, , __VA_ARGS__)

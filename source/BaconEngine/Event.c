@@ -4,6 +4,9 @@
 
 CPP_GUARD_START()
     int BE_ConvertSDLToEngineEvent(BE_Event* engineEvent, SDL_Event sdlEvent) {
+        (void) engineEvent;
+        (void) sdlEvent;
+
 #ifndef BACON_ENGINE_DISABLE_SDL
         if ((sdlEvent.type >= 257 && sdlEvent.type < 512) || sdlEvent.type > 1027)
             return 0;
