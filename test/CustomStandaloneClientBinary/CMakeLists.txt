@@ -1,0 +1,5 @@
+project(CustomStandaloneClientBinary C)
+
+add_executable(CustomStandaloneClientBinary Entry.c)
+
+target_link_libraries(CustomStandaloneClientBinary LINK_PRIVATE BaconEngine)

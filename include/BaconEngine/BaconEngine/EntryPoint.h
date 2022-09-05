@@ -11,10 +11,12 @@
 #include <SharedEngineCode/Launcher.h>
 #include <SharedEngineCode/Logger.h>
 #include <SharedEngineCode/Internal/CppHeader.h>
-#include <SharedEngineCode/OperatingSystem.h>
+#include <SharedEngineCode/Internal/OperatingSystem.h>
 #include <string.h>
 #include <SharedEngineCode/Debugging/Assert.h>
 #include <SharedEngineCode/Debugging/StrictMode.h>
+#include <unistd.h>
+#include <SharedEngineCode/ANSI.h>
 
 #include "ClientInformation.h"
 #include "Rendering/Window.h"
@@ -27,16 +29,16 @@
 #include "Event.h"
 
 #ifndef BACON_ENGINE_LAUNCHER
-#   if SEC_OS_POSIX_COMPLIANT
-#       define EXPOSE_FUNC __attribute__((visibility("default")))
-#   elif SEC_OS_WINDOWS
+#   if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
+#       define BE_ENTRYPOINT_EXPOSE_FUNC __attribute__((visibility("default")))
+#   elif SEC_OPERATINGSYSTEM_WINDOWS
 #       define EXPOSE_FUNC __declspec(dllexport)
 #   endif
 #else
 #   define EXPOSE_FUNC
 #endif
 
-CPP_GUARD_START()
+SEC_CPP_GUARD_START()
 #ifdef BACON_ENGINE_LAUNCHER
     int CallLauncherMain(int argc, char** argv);
 
@@ -45,54 +47,50 @@ CPP_GUARD_START()
     }
 #endif
 
-    int BE_ClientStart(int argc, char** argv);
-    int BE_ClientShutdown(void);
-    EXPOSE_FUNC int BE_ClientSupportsServer(void);
-    EXPOSE_FUNC const char* BE_GetClientName(void);
+    int BE_EntryPoint_ClientStart(int argc, char** argv);
+    int BE_EntryPoint_ClientShutdown(void);
+    BE_ENTRYPOINT_EXPOSE_FUNC int BE_EntryPoint_ClientSupportsServer(void);
+    BE_ENTRYPOINT_EXPOSE_FUNC const char* BE_EntryPoint_GetClientName(void);
+    void BE_EntryPoint_SignalDetected(int signal);
 
-    EXPOSE_FUNC int BE_StartBaconEngine(int argc, char** argv) {
+    BE_ENTRYPOINT_EXPOSE_FUNC int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
         static int alreadyStarted = 0;
 
-        SEC_InitializeArgumentHandler(argc, argv);
+        SEC_ArgumentHandler_Initialize(argc, argv);
 
-        if (SEC_GetArgumentIndex("--enable-debug-logs") != -1 || SEC_GetArgumentIndex("-edl") != -1)
-            SEC_SetLogLevel(SEC_LOG_LEVEL_DEBUG);
+        if (!SEC_Logger_AlreadySentFistLog())
+            printf("\n");
 
-        if (SEC_GetArgumentIndex("--enable-trace-logs") != -1 || SEC_GetArgumentIndex("-etl") != -1)
-            SEC_SetLogLevel(SEC_LOG_LEVEL_TRACE);
-
-        // NOTE: Avoid putting log statements, or anything that uses the logging library before this line.
-        //       Doing so could potentially prevent debug and trace logs from showing due to it now being fully layerInitialized yet.
-
-        printf("\n");
-        SEC_STRICT_CHECK(!alreadyStarted, 1, "Reinitializing the engine is not supported");
-        SEC_LOG_TRACE("Entered client code");
+        SEC_STRICTMODE_CHECK(!alreadyStarted, 1, "Reinitializing the engine is not supported");
+        SEC_LOGGER_TRACE("Entered client code");
 
         alreadyStarted = 1;
 
-        SEC_LOG_INFO("Starting BaconEngine");
+        SEC_LOGGER_INFO("Starting BaconEngine");
 
-        if (BE_IsServerModeEnabled() && !BE_ClientSupportsServer()) {
-            SEC_LOG_FATAL("This client does not support servers");
+        if (BE_ClientInformation_IsServerModeEnabled() && !BE_EntryPoint_ClientSupportsServer()) {
+            SEC_LOGGER_FATAL("This client does not support servers");
             return 1;
         }
 
-        BE_InitializeRenderer();
+        SEC_LOGGER_DEBUG("Registering signals");
+        signal(SIGSEGV, BE_EntryPoint_SignalDetected);
+        BE_Renderer_Initialize();
 
-        if (!BE_IsServerModeEnabled() && BE_GetCurrentRenderer() != BE_RENDERER_TYPE_TEXT) {
+        if (!BE_ClientInformation_IsServerModeEnabled() && BE_Renderer_GetCurrentType() != BE_RENDERER_TYPE_TEXT) {
             int width = 1080;
             int height = 720;
 
             {
-                const char* preParsedWidth = SEC_GetArgumentValue("--width");
-                const char* preParsedHeight = SEC_GetArgumentValue("--height");
+                const char* preParsedWidth = SEC_ArgumentHandler_GetValue("--width");
+                const char* preParsedHeight = SEC_ArgumentHandler_GetValue("--height");
 
                 if (preParsedWidth != NULL) {
                     char* error;
                     int parsedWith = (int) strtol(preParsedWidth, &error, 0);
 
                     if (error != NULL && strlen(error) != 0) {
-                        SEC_LOG_ERROR("Invalid width was supplied, ignoring...");
+                        SEC_LOGGER_ERROR("Invalid width was supplied, ignoring...");
 
                         parsedWith = 1080;
                     }
@@ -105,7 +103,7 @@ CPP_GUARD_START()
                     int parsedHeight = (int) strtol(preParsedHeight, &error, 0);
 
                     if (error != NULL && strlen(error) != 0) {
-                        SEC_LOG_ERROR("Invalid height was supplied, ignoring...");
+                        SEC_LOGGER_ERROR("Invalid height was supplied, ignoring...");
 
                         parsedHeight = 720;
                     }
@@ -118,27 +116,28 @@ CPP_GUARD_START()
             SEC_ASSERT(TTF_Init() == 0, "Failed to initialize SDL TTF: %s", SDL_GetError());
 #endif
 
-            BE_InitializeLayers();
-            BE_InitializeWindow(BE_GetClientName(), (BE_Vector2U) {(unsigned) width, (unsigned) height});
+            BE_Layer_InitializeLayers();
+            BE_Window_Initialize(BE_EntryPoint_GetClientName(), BE_VECTOR_CREATE(2U, (unsigned) width, (unsigned) height));
         }
 
-        BE_InitializeUISystem();
-        BE_InitializeConsole();
-        SEC_ASSERT(BE_ClientStart(argc, argv) == 0, "Client start returned non-zero");
-        BE_ClearScreen();
-        BE_SetWindowVisibility(1);
+        BE_UI_InitializeUIs();
+        BE_Console_Initialize();
+        SEC_ASSERT(BE_EntryPoint_ClientStart(argc, argv) == 0, "Client start returned non-zero");
+        BE_Renderer_ClearScreen();
+        BE_Window_SetVisibility(1);
 
 #ifndef BACON_ENGINE_DISABLE_SDL
         double lastTime = SDL_GetTicks();
 #endif
 
-        BE_ExecuteCommand("debuginfo");
+        BE_Console_ExecuteCommand("debuginfo");
 
-        while (BE_IsClientRunning()) {
-            if (!BE_IsWindowStillOpened() && !BE_IsServerModeEnabled() && BE_GetCurrentRenderer() != BE_RENDERER_TYPE_TEXT)
+        while (BE_ClientInformation_IsRunning()) {
+            if (!BE_Window_IsStillOpened() && !BE_ClientInformation_IsServerModeEnabled() &&
+                BE_Renderer_GetCurrentType() != BE_RENDERER_TYPE_TEXT)
                 break;
 
-            if (BE_IsServerModeEnabled() || BE_GetCurrentRenderer() == BE_RENDERER_TYPE_TEXT)
+            if (BE_ClientInformation_IsServerModeEnabled() || BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT)
                 continue;
 
 #ifndef BACON_ENGINE_DISABLE_SDL
@@ -147,26 +146,26 @@ CPP_GUARD_START()
 
             lastTime = deltaCurrentTime;
 
-            BE_ClearScreen();
-            BE_LayerOnUpdate(LAYER_UPDATE_TYPE_BEFORE_RENDERING, deltaTime);
-            SDL_RenderPresent(BE_GetInternalSDLRenderer());
-            BE_LayerOnUpdate(LAYER_UPDATE_TYPE_AFTER_RENDERING, deltaTime);
+            BE_Renderer_ClearScreen();
+            BE_Layer_OnUpdate(LAYER_UPDATE_TYPE_BEFORE_RENDERING, deltaTime);
+            SDL_RenderPresent(BE_Window_GetInternalSDLRenderer());
+            BE_Layer_OnUpdate(LAYER_UPDATE_TYPE_AFTER_RENDERING, deltaTime);
 
             {
                 SDL_Event event;
 
                 while (SDL_PollEvent(&event)) {
-                    if (BE_LayerOnEvent(event))
+                    if (BE_Layer_OnEvent(event))
                         continue;
 
                     switch (event.type) {
                         case SDL_QUIT:
-                            BE_ClientShutdown();
-                            BE_StopClientRunning();
+                            BE_EntryPoint_ClientShutdown();
+                            BE_ClientInformation_StopRunning();
                             break;
 
                         case SDL_KEYDOWN:
-                            BE_SetKeyDown(BE_SDLToEngineKeyCode(event.key.keysym.scancode), 1);
+                            BE_Keyboard_SetKeyDown(BE_Keyboard_SDLToEngineKeyCode(event.key.keysym.scancode), 1);
                             break;
                     }
                 }
@@ -174,11 +173,11 @@ CPP_GUARD_START()
 #endif
         }
 
-        SEC_LOG_TRACE("Client loop ended, shutting down");
-        BE_DestroyLayers();
-        BE_DestroyUIWindows();
-        BE_DestroyConsole();
-        BE_DestroyWindow();
+        SEC_LOGGER_TRACE("Client loop ended, shutting down");
+        BE_Layer_DestroyLayers();
+        BE_UI_DestroyWindows();
+        BE_Console_Destroy();
+        BE_Window_Destroy();
 
 #ifndef BACON_ENGINE_DISABLE_SDL_TTF
         TTF_Quit();
@@ -188,6 +187,46 @@ CPP_GUARD_START()
         SDL_Quit();
 #endif
 
+        if (SEC_EngineMemory_GetAllocated() > 0)
+            SEC_LOGGER_WARN("Potential memory leak detected! %u megabytes (%u bytes) of data is still being used by the engine", SEC_EngineMemory_GetAllocated() / 1000000, SEC_EngineMemory_GetAllocated());
+
         return 0;
     }
-CPP_GUARD_END()
+
+    void BE_EntryPoint_SignalDetected(int signal) {
+        // NOTE: Do NOT use printf, SEC_LOG_TYPE, or family inside this function.
+        //       None of those functions are signal-safe.
+
+        if (signal == SIGSEGV) {
+            static int antiDoubleSegfault = 0;
+
+            SEC_Logger_SetLogLevel(SEC_LOGGER_LOG_LEVEL_NULL);
+
+            if (SEC_Logger_GetLogLevel() <= SEC_LOGGER_LOG_LEVEL_FATAL && !antiDoubleSegfault) {
+                antiDoubleSegfault = 1;
+
+                write(STDOUT_FILENO, "\n", 1);
+
+                if (SEC_ANSI_IsEnabled()) {
+                    write(STDOUT_FILENO, SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_BOLD), 4);
+                    write(STDOUT_FILENO, SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_FOREGROUND_RED), 7);
+                }
+
+                write(STDOUT_FILENO, "[FTL] ", 6);
+
+                if (SEC_ANSI_IsEnabled())
+                    write(STDOUT_FILENO, SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_RESET), 3);
+
+                write(STDOUT_FILENO, "A segmentation fault was detected\n"
+                                     "This means something tried to access bad memory (for example, tried to dereference a null pointer)\n"
+                                     "If you're a user, then your only option is to report it to the developers\n"
+                                     "If you're a developer, then you should start debugging your code\n"
+                                     "If you suspect this is a problem with the engine, then please report it to us\n"
+                                     "Users should avoid this client until further notice, as segmentation faults could be a sign of a lurking (and potentially dangerous) vulnerability\n"
+                                     "Forcing a crash due to the program being in a unstable state\n", 558);
+            }
+
+            abort();
+        }
+    }
+SEC_CPP_GUARD_END()

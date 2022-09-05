@@ -2,8 +2,8 @@
 
 #include "BaconEngine/Event.h"
 
-CPP_GUARD_START()
-    int BE_ConvertSDLToEngineEvent(BE_Event* engineEvent, SDL_Event sdlEvent) {
+SEC_CPP_GUARD_START()
+    int BE_Event_ConvertSDLToEngineEvent(BE_Event* engineEvent, SDL_Event sdlEvent) {
         (void) engineEvent;
         (void) sdlEvent;
 
@@ -19,13 +19,13 @@ CPP_GUARD_START()
             case SDL_KEYDOWN:
             case SDL_KEYUP:
             {
-                BE_KeyCodes keyCode = BE_SDLToEngineKeyCode(sdlEvent.key.keysym.scancode);
+                BE_Keyboard_KeyCodes keyCode = BE_Keyboard_SDLToEngineKeyCode(sdlEvent.key.keysym.scancode);
 
-                if (keyCode == BE_KEY_CODE_NULL)
+                if (keyCode == BE_KEYBOARD_KEY_CODE_NULL)
                     return 0;
 
                 engineEvent->type = sdlEvent.type == SDL_KEYDOWN ? BE_EVENT_TYPE_KEYBOARD_KEY_DOWN : BE_EVENT_TYPE_KEYBOARD_KEY_UP;
-                engineEvent->unionVariables = (BE_EventUnionVariables) {
+                engineEvent->unionVariables = (BE_Event_UnionVariables) {
                     .keyboard = {keyCode, sdlEvent.key.repeat}
                 };
             }
@@ -33,7 +33,7 @@ CPP_GUARD_START()
 
             case SDL_TEXTEDITING:
                 engineEvent->type =BE_EVENT_TYPE_INPUT_BOX_TEXT_EDITING;
-                engineEvent->unionVariables = (BE_EventUnionVariables) {
+                engineEvent->unionVariables = (BE_Event_UnionVariables) {
                     .inputBox = {
                         sdlEvent.edit.text,
                         {{sdlEvent.edit.start, sdlEvent.edit.length}}
@@ -43,14 +43,14 @@ CPP_GUARD_START()
 
             case SDL_TEXTINPUT:
                 engineEvent->type = BE_EVENT_TYPE_INPUT_BOX_TEXT_INPUT;
-                engineEvent->unionVariables = (BE_EventUnionVariables) {
+                engineEvent->unionVariables = (BE_Event_UnionVariables) {
                     .inputBox = {sdlEvent.text.text}
                 };
                 return 1;
 
             case SDL_MOUSEMOTION:
                 engineEvent->type = BE_EVENT_TYPE_MOUSE_MOVED;
-                engineEvent->unionVariables = (BE_EventUnionVariables) {
+                engineEvent->unionVariables = (BE_Event_UnionVariables) {
                     .mouse = {
                         {
                             {
@@ -69,7 +69,7 @@ CPP_GUARD_START()
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
                 engineEvent->type = sdlEvent.type == SDL_MOUSEBUTTONDOWN ? BE_EVENT_TYPE_MOUSE_BUTTON_DOWN : BE_EVENT_TYPE_MOUSE_BUTTON_UP;
-                engineEvent->unionVariables = (BE_EventUnionVariables) {
+                engineEvent->unionVariables = (BE_Event_UnionVariables) {
                     .mouse = {
                         {
                             {
@@ -87,7 +87,7 @@ CPP_GUARD_START()
 
             case SDL_MOUSEWHEEL:
                 engineEvent->type = BE_EVENT_TYPE_MOUSE_WHEEL;
-                engineEvent->unionVariables = (BE_EventUnionVariables) {
+                engineEvent->unionVariables = (BE_Event_UnionVariables) {
                     .mouse = {
                         {
                                 .wheel = {
@@ -110,14 +110,14 @@ CPP_GUARD_START()
 
             case SDL_WINDOWEVENT_MOVED:
                 engineEvent->type = BE_EVENT_TYPE_WINDOW_MOVED;
-                engineEvent->unionVariables = (BE_EventUnionVariables) {
+                engineEvent->unionVariables = (BE_Event_UnionVariables) {
                     .window = {{{sdlEvent.window.data1, sdlEvent.window.data2}}}
                 };
                 return 1;
 
             case SDL_WINDOWEVENT_RESIZED:
                 engineEvent->type = BE_EVENT_TYPE_WINDOW_RESIZED;
-                engineEvent->unionVariables = (BE_EventUnionVariables) {
+                engineEvent->unionVariables = (BE_Event_UnionVariables) {
                     .window = {
                             {
                                 .newSize = {sdlEvent.window.data1, sdlEvent.window.data2}
@@ -165,4 +165,4 @@ CPP_GUARD_START()
         return 0;
 #endif
     }
-CPP_GUARD_END()
+SEC_CPP_GUARD_END()

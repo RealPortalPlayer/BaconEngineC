@@ -5,6 +5,6 @@
 
 #include <SharedEngineCode/Internal/CppHeader.h>
 
-CPP_GUARD_START()
+SEC_CPP_GUARD_START()
     void InitializeEngineCommands(void);
-CPP_GUARD_END()
+SEC_CPP_GUARD_END()

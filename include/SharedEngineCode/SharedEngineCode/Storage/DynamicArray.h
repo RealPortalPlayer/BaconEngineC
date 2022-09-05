@@ -6,33 +6,36 @@
 #include "SharedEngineCode/Internal/CppHeader.h"
 #include <stddef.h>
 
-CPP_GUARD_START()
+SEC_CPP_GUARD_START()
     typedef struct {
         void** internalArray;
         int used;
         size_t size;
         int calledRealloc;
+        int frozen;
     } SEC_DynamicArray;
 
-    int SEC_CreateDynamicArray(SEC_DynamicArray* array, size_t size);
-    int SEC_ArrayAddElementToFirst(SEC_DynamicArray* array, void* element);
-    int SEC_ArrayAddElementToLast(SEC_DynamicArray* array, void* element);
+    int SEC_DynamicArray_Create(SEC_DynamicArray* array, size_t size);
+    int SEC_DynamicArray_AddElementToStart(SEC_DynamicArray* array, void* element);
+    int SEC_DynamicArray_AddElementToLast(SEC_DynamicArray* array, void* element);
 
     /**
      * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
      */
-    int SEC_ArrayRemoveFirstElement(SEC_DynamicArray* array, int shift);
+    int SEC_DynamicArray_RemoveFirstElement(SEC_DynamicArray* array, int shift);
 
     /**
      * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
      */
-    int SEC_ArrayRemoveLastElement(SEC_DynamicArray* array);
+    int SEC_DynamicArray_RemoveLastElement(SEC_DynamicArray* array);
 
     /**
      * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
      */
-    int SEC_ArrayRemoveElementAt(SEC_DynamicArray* array, unsigned int index);
-CPP_GUARD_END()
+    int SEC_DynamicArray_RemoveElementAt(SEC_DynamicArray* array, unsigned int index);
 
-#define SEC_ARRAY_GET_ELEMENT(type, array, index) ((type*) (array).internalArray[index])
-#define SEC_ARRAY_GET_ELEMENT_PTR(type, array, index) ((type*) (array)->internalArray[index])
+    void SEC_DynamicArray_Shrink(SEC_DynamicArray* array);
+SEC_CPP_GUARD_END()
+
+#define SEC_DYNAMICARRAY_GET_ELEMENT(type, array, index) ((type*) (array).internalArray[index])
+#define SEC_DYNAMICARRAY_GET_ELEMENT_PTR(type, array, index) ((type*) (array)->internalArray[index])

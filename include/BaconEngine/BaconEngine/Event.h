@@ -10,7 +10,7 @@
 #include "BaconEngine/Input/Keyboard.h"
 #include "BaconEngine/Input/Mouse.h"
 
-CPP_GUARD_START()
+SEC_CPP_GUARD_START()
     typedef enum {
         BE_EVENT_TYPE_CLIENT_QUIT,
         BE_EVENT_TYPE_KEYBOARD_KEY_DOWN,
@@ -33,35 +33,35 @@ CPP_GUARD_START()
         BE_EVENT_TYPE_WINDOW_FOCUS_GAINED,
         BE_EVENT_TYPE_WINDOW_FOCUS_LOST,
         BE_EVENT_TYPE_WINDOW_CLOSE
-    } BE_EventType;
+    } BE_Event_Type;
 
     typedef union {
         struct {
             union {
-                BE_Vector2I newPosition;
-                BE_Vector2I newSize;
+                BE_Vector_2I newPosition;
+                BE_Vector_2I newSize;
             } unionVariables;
         } window;
         struct {
-            BE_KeyCodes key;
+            BE_Keyboard_KeyCodes key;
             unsigned repeat;
         } keyboard;
         struct {
             union {
                 struct {
-                    BE_Vector2I position;
+                    BE_Vector_2I position;
                     union {
                         struct {
-                            BE_Vector2I relativePosition;
+                            BE_Vector_2I relativePosition;
                         } movement;
                         struct {
-                            BE_MouseButtonType which;
+                            BE_Mouse_ButtonType which;
                         } button;
                     } unionVariables;
                 };
                 struct {
-                    BE_Vector2I scrollAmount;
-                    BE_Vector2F preciseScrollAmount;
+                    BE_Vector_2I scrollAmount;
+                    BE_Vector_2F preciseScrollAmount;
                     int flipped;
                 } wheel;
             } unionVariables;
@@ -75,12 +75,12 @@ CPP_GUARD_START()
                 } editing;
             } unionVariables;
         } inputBox;
-    } BE_EventUnionVariables;
+    } BE_Event_UnionVariables;
 
     typedef struct {
-        BE_EventType type;
-        BE_EventUnionVariables unionVariables;
+        BE_Event_Type type;
+        BE_Event_UnionVariables unionVariables;
     } BE_Event;
 
-    int BE_ConvertSDLToEngineEvent(BE_Event* engineEvent, SDL_Event sdlEvent);
-CPP_GUARD_END()
+    int BE_Event_ConvertSDLToEngineEvent(BE_Event* engineEvent, SDL_Event sdlEvent);
+SEC_CPP_GUARD_END()

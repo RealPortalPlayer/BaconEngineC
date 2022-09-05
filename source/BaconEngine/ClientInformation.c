@@ -4,62 +4,41 @@
 
 #include "BaconEngine/ClientInformation.h"
 
-CPP_GUARD_START()
+SEC_CPP_GUARD_START()
     int running = 1;
     int cheats = 0;
-    unsigned allocatedEngineMemory = 0;
 
-
-    unsigned BE_GetAllocatedEngineMemory(void) {
-        return allocatedEngineMemory;
-    }
-
-    void BE_AddAllocatedEngineMemory(unsigned size) {
-        SEC_LOG_TRACE("Allocated %u bytes of memory", size);
-
-        allocatedEngineMemory += size;
-    }
-
-    void BE_RemoveAllocatedEngineMemory(unsigned size) {
-        if (allocatedEngineMemory == 0 || allocatedEngineMemory < size)
-            return;
-
-        SEC_LOG_TRACE("Deallocated %u bytes of memory", size);
-
-        allocatedEngineMemory -= size;
-    }
-
-    int BE_IsClientRunning(void) {
+    int BE_ClientInformation_IsRunning(void) {
         return running;
     }
 
-    int BE_IsClientCheatsEnabled(void) {
+    int BE_ClientInformation_IsCheatsEnabled(void) {
         return cheats;
     }
 
-    int BE_IsServerModeEnabled(void) {
+    int BE_ClientInformation_IsServerModeEnabled(void) {
         static int enabled = -1;
 
         if (enabled == -1)
-            enabled = SEC_GetArgumentIndex("--server") != -1 || SEC_GetArgumentIndex("-s") != -1;
+            enabled = SEC_ArgumentHandler_GetIndex("--server") != -1 || SEC_ArgumentHandler_GetIndex("-s") != -1;
 
         return enabled;
     }
 
-    int BE_IsStrictModeEnabled(void) {
+    int BE_ClientInformation_IsStrictModeEnabled(void) {
         static int enabled = -1;
 
         if (enabled == -1)
-            enabled = SEC_GetArgumentIndex("--no-strict") == -1 && SEC_GetArgumentIndex("-ns") == -1;
+            enabled = SEC_ArgumentHandler_GetIndex("--no-strict") == -1 && SEC_ArgumentHandler_GetIndex("-ns") == -1;
 
         return enabled;
     }
 
-    void BE_StopClientRunning(void) {
+    void BE_ClientInformation_StopRunning(void) {
         running = 0;
     }
 
-    void BE_SetClientCheats(int enable) {
+    void BE_ClientInformation_SetCheats(int enable) {
         cheats = enable;
     }
-CPP_GUARD_END()
+SEC_CPP_GUARD_END()

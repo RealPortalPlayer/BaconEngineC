@@ -4,15 +4,15 @@
 #include "EngineUIs.h"
 #include "BaconEngine/Rendering/UI.h"
 
-CPP_GUARD_START()
+SEC_CPP_GUARD_START()
     void InitializeEngineUIs(void) {
         static int initialized = 0;
 
-        SEC_ASSERT(!initialized, "Engine UIs are already layerInitialized");
+        SEC_ASSERT(!initialized, "Engine UIs are already initialized");
 
         initialized = 1;
 
-        BE_RegisterUIWindow("Console", (BE_Vector2I) {5, 5}, (BE_Vector2U) {300, 350}, BE_UI_WINDOW_FLAG_NO_MAXIMIZE);
-        BE_FinishRegisteringUIWindow();
+        BE_UI_RegisterWindow("Console", (BE_Vector_2I) {5, 5}, (BE_Vector_2U) {300, 350}, BE_UI_WINDOW_FLAG_NO_MAXIMIZE);
+        BE_UI_FinishRegisteringWindow();
     }
-CPP_GUARD_END()
+SEC_CPP_GUARD_END()

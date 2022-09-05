@@ -3,24 +3,24 @@
 #include "SharedEngineCode/ArgumentHandler.h"
 #include "SharedEngineCode/Internal/CppHeader.h"
 
-CPP_GUARD_START()
+SEC_CPP_GUARD_START()
     int addedArgumentsCount;
     char** argumentVector;
 
-    void SEC_InitializeArgumentHandler(int argc, char** argv) {
+    void SEC_ArgumentHandler_Initialize(int argc, char** argv) {
         addedArgumentsCount = argc;
         argumentVector = argv;
     }
 
-    int SEC_GetArgumentCount(void) {
+    int SEC_ArgumentHandler_GetCount(void) {
         return addedArgumentsCount;
     }
 
-    char** SEC_GetArgumentVector(void) {
+    char** SEC_ArgumentHandler_GetVector(void) {
         return argumentVector;
     }
 
-    static int GetArgumentIndexImplementation(const char* argument) {
+    int GetArgumentIndexImplementation(const char* argument) {
         if (addedArgumentsCount == 1)
             return -1;
 
@@ -34,19 +34,24 @@ CPP_GUARD_START()
         return -1;
     }
 
-    int SEC_GetArgumentIndex(const char* argument) {
-        int dontParse = GetArgumentIndexImplementation("--dont-parse");
-        int index = GetArgumentIndexImplementation(argument);
+    int SEC_ArgumentHandler_GetIndex(const char* argument) {
+        static int dontParse = -2;
 
-        if (dontParse == -1)
-            dontParse = GetArgumentIndexImplementation("--");
+        if (dontParse == -2) {
+            dontParse = GetArgumentIndexImplementation("--dont-parse");
+
+            if (dontParse == -1)
+                dontParse = GetArgumentIndexImplementation("--");
+        }
+
+        int index = GetArgumentIndexImplementation(argument);
 
         return dontParse == -1 || index < dontParse ? index : -1;
     }
 
-    const char* SEC_GetArgumentValue(const char* argument) {
-        int index = SEC_GetArgumentIndex(argument);
+    const char* SEC_ArgumentHandler_GetValue(const char* argument) {
+        int index = SEC_ArgumentHandler_GetIndex(argument);
 
         return index != -1 && index != addedArgumentsCount - 1 ? argumentVector[index + 1] : NULL;
     }
-CPP_GUARD_END()
+SEC_CPP_GUARD_END()

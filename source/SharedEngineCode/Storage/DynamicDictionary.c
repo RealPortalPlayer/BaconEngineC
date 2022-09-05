@@ -1,57 +1,84 @@
-#include "SharedEngineCode/Internal/CppHeader.h"
 #include <string.h>
 
 #include "SharedEngineCode/Storage/DynamicDictionary.h"
 #include "SharedEngineCode/Debugging/StrictMode.h"
 #include "SharedEngineCode/Debugging/Assert.h"
+#include "SharedEngineCode/Internal/CppHeader.h"
 
-CPP_GUARD_START()
-    int SEC_CreateDynamicDictionary(SEC_DynamicDictionary* dictionary, size_t size) {
-        SEC_STRICT_CHECK(size != 0, 0, "Invalid size");
+SEC_CPP_GUARD_START()
+    int UpdateFrozenState(SEC_DynamicDictionary* dictionary) {
+        dictionary->frozen = dictionary->frozen || dictionary->keys.frozen || dictionary->values.frozen;
+        dictionary->keys.frozen = 0;
+        dictionary->values.frozen = 0;
+        return dictionary->frozen;
+    }
 
-        SEC_CreateDynamicArray(&dictionary->keys, size);
-        SEC_CreateDynamicArray(&dictionary->values, size);
+    int SEC_DynamicDictionary_Create(SEC_DynamicDictionary* dictionary, size_t size) {
+        SEC_STRICTMODE_CHECK(size != 0, 0, "Invalid size");
+        SEC_DynamicArray_Create(&dictionary->keys, size);
+        SEC_DynamicArray_Create(&dictionary->values, size);
         return 1;
     }
 
-    int SEC_DictionaryAddElementToFirst(SEC_DynamicDictionary* dictionary, void* key, void* value) {
-        return SEC_ArrayAddElementToFirst(&dictionary->keys, key) &&
-               SEC_ArrayAddElementToFirst(&dictionary->values, value);
+    int SEC_DynamicDictionary_AddElementToStart(SEC_DynamicDictionary* dictionary, void* key, void* value) {
+        if (UpdateFrozenState(dictionary))
+            return 0;
+
+        return SEC_DynamicArray_AddElementToStart(&dictionary->keys, key) &&
+               SEC_DynamicArray_AddElementToStart(&dictionary->values, value);
     }
 
-    int SEC_DictionaryAddElementToLast(SEC_DynamicDictionary* dictionary, void* key, void* value) {
-        return SEC_ArrayAddElementToLast(&dictionary->keys, key) &&
-               SEC_ArrayAddElementToLast(&dictionary->keys, value);
+    int SEC_DynamicDictionary_AddElementToLast(SEC_DynamicDictionary* dictionary, void* key, void* value) {
+        if (UpdateFrozenState(dictionary))
+            return 0;
+
+        return SEC_DynamicArray_AddElementToLast(&dictionary->keys, key) &&
+               SEC_DynamicArray_AddElementToLast(&dictionary->keys, value);
     }
 
-    int SEC_DictionaryRemoveFirstElement(SEC_DynamicDictionary* dictionary, int shift) {
-        return SEC_ArrayRemoveFirstElement(&dictionary->keys, shift) &&
-               SEC_ArrayRemoveFirstElement(&dictionary->values, shift);
+    int SEC_DynamicDictionary_RemoveFirstElement(SEC_DynamicDictionary* dictionary, int shift) {
+        if (UpdateFrozenState(dictionary))
+            return 0;
+
+        return SEC_DynamicArray_RemoveFirstElement(&dictionary->keys, shift) &&
+               SEC_DynamicArray_RemoveFirstElement(&dictionary->values, shift);
     }
 
     int SEC_DictionaryRemoveLastElement(SEC_DynamicDictionary* dictionary) {
-        return SEC_ArrayRemoveLastElement(&dictionary->keys) &&
-               SEC_ArrayRemoveLastElement(&dictionary->values);
+        if (UpdateFrozenState(dictionary))
+            return 0;
+
+        return SEC_DynamicArray_RemoveLastElement(&dictionary->keys) &&
+               SEC_DynamicArray_RemoveLastElement(&dictionary->values);
     }
 
-    int SEC_DictionaryRemoveElementAt(SEC_DynamicDictionary* dictionary, unsigned int index) {
-        return SEC_ArrayRemoveElementAt(&dictionary->keys, index) &&
-               SEC_ArrayRemoveElementAt(&dictionary->values, index);
+    int SEC_DynamicDictionary_RemoveElementAt(SEC_DynamicDictionary* dictionary, unsigned int index) {
+        if (UpdateFrozenState(dictionary))
+            return 0;
+
+        return SEC_DynamicArray_RemoveElementAt(&dictionary->keys, index) &&
+               SEC_DynamicArray_RemoveElementAt(&dictionary->values, index);
     }
 
-    int SEC_DictionaryRemoveElementViaKey(SEC_DynamicDictionary* dictionary, void* key, size_t elementSize) {
-        int index = SEC_GetElementIndexFromKey(*dictionary, key, elementSize);
+    int SEC_DynamicDictionary_RemoveElementViaKey(SEC_DynamicDictionary* dictionary, void* key, size_t elementSize) {
+        if (UpdateFrozenState(dictionary))
+            return 0;
 
-        return index != -1 ? SEC_DictionaryRemoveElementAt(dictionary, index) : 0;
+        int index = SEC_DynamicDictionary_GetElementIndexFromKey(*dictionary, key, elementSize);
+
+        return index != -1 ? SEC_DynamicDictionary_RemoveElementAt(dictionary, index) : 0;
     }
 
-    int SEC_DictionaryRemoveElementViaValue(SEC_DynamicDictionary* dictionary, void* value, size_t elementSize) {
-        int index = SEC_GetElementIndexFromValue(*dictionary, value, elementSize);
+    int SEC_DynamicDictionary_RemoveElementViaValue(SEC_DynamicDictionary* dictionary, void* value, size_t elementSize) {
+        if (UpdateFrozenState(dictionary))
+            return 0;
 
-        return index != -1 ? SEC_DictionaryRemoveElementAt(dictionary, index) : 0;
+        int index = SEC_DynamicDictionary_GetElementIndexFromValue(*dictionary, value, elementSize);
+
+        return index != -1 ? SEC_DynamicDictionary_RemoveElementAt(dictionary, index) : 0;
     }
 
-    int SEC_GetElementIndexFromKey(SEC_DynamicDictionary dictionary, void* key, size_t elementSize) {
+    int SEC_DynamicDictionary_GetElementIndexFromKey(SEC_DynamicDictionary dictionary, void* key, size_t elementSize) {
         for (int index = 0; index < dictionary.keys.used; index++) {
             if (dictionary.keys.internalArray[index] == NULL || memcmp(dictionary.keys.internalArray[index], key, elementSize) != 0)
                 continue;
@@ -62,7 +89,7 @@ CPP_GUARD_START()
         return -1;
     }
 
-    int SEC_GetElementIndexFromValue(SEC_DynamicDictionary dictionary, void* value, size_t elementSize) {
+    int SEC_DynamicDictionary_GetElementIndexFromValue(SEC_DynamicDictionary dictionary, void* value, size_t elementSize) {
         for (int index = 0; index < dictionary.keys.used; index++) {
             if (dictionary.keys.internalArray[index] == NULL || memcmp(dictionary.keys.internalArray[index], value, elementSize) != 0)
                 continue;
@@ -73,34 +100,43 @@ CPP_GUARD_START()
         return -1;
     }
 
-
-    void* SEC_GetElementViaValue(SEC_DynamicDictionary dictionary, void* key, size_t elementSize) {
-        int index = SEC_GetElementIndexFromKey(dictionary, key, elementSize);
+    void* SEC_DynamicDictionary_GetElementViaValue(SEC_DynamicDictionary dictionary, void* key, size_t elementSize) {
+        int index = SEC_DynamicDictionary_GetElementIndexFromKey(dictionary, key, elementSize);
 
         return index != -1 ? dictionary.values.internalArray[index] : NULL;
     }
 
-    void* SEC_GetElementViaKey(SEC_DynamicDictionary dictionary, void* value, size_t elementSize) {
-        int index = SEC_GetElementIndexFromValue(dictionary, value, elementSize);
+    void* SEC_DynamicDictionary_GetElementViaKey(SEC_DynamicDictionary dictionary, void* value, size_t elementSize) {
+        int index = SEC_DynamicDictionary_GetElementIndexFromValue(dictionary, value, elementSize);
 
         return index != -1 ? dictionary.keys.internalArray[index] : NULL;
     }
 
-    void SEC_GetElementsViaKey(SEC_DynamicDictionary dictionary, SEC_DynamicDictionary* results, void* key, size_t elementSize) {
+    void SEC_DynamicDictionary_GetElementsViaKey(SEC_DynamicDictionary dictionary, SEC_DynamicDictionary* results, void* key, size_t elementSize) {
         for (int index = 0; index < dictionary.keys.used; index++) {
             if (dictionary.keys.internalArray[index] == NULL || memcmp(dictionary.keys.internalArray[index], key, elementSize) != 0)
                 continue;
 
-            SEC_DictionaryAddElementToLast(results, key, dictionary.values.internalArray[index]);
+            SEC_DynamicDictionary_AddElementToLast(results, key, dictionary.values.internalArray[index]);
         }
     }
 
-    void SEC_GetElementsViaValue(SEC_DynamicDictionary dictionary, SEC_DynamicDictionary* results, void* value, size_t elementSize) {
+    void SEC_DynamicDictionary_GetElementsViaValue(SEC_DynamicDictionary dictionary, SEC_DynamicDictionary* results, void* value, size_t elementSize) {
         for (int index = 0; index < dictionary.keys.used; index++) {
             if (dictionary.keys.internalArray[index] == NULL || memcmp(dictionary.keys.internalArray[index], value, elementSize) != 0)
                 continue;
 
-            SEC_DictionaryAddElementToLast(results, dictionary.keys.internalArray[index], value);
+            SEC_DynamicDictionary_AddElementToLast(results, dictionary.keys.internalArray[index], value);
         }
     }
-CPP_GUARD_END()
+
+    void SEC_DynamicDictionary_Shrink(SEC_DynamicDictionary* dictionary) {
+        if (UpdateFrozenState(dictionary))
+            return;
+
+        SEC_LOGGER_TRACE("Shrinking dictionary, this is expensive");
+
+        SEC_DynamicArray_Shrink(&dictionary->keys);
+        SEC_DynamicArray_Shrink(&dictionary->values);
+    }
+SEC_CPP_GUARD_END()

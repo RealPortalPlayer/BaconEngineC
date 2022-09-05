@@ -5,19 +5,19 @@
 
 #include <limits.h>
 
-#include "SharedEngineCode/OperatingSystem.h"
+#include "SharedEngineCode/Internal/OperatingSystem.h"
 #include "Internal/CppHeader.h"
 
-CPP_GUARD_START()
+SEC_CPP_GUARD_START()
     typedef enum {
         SEC_LAUNCHER_ERROR_CODE_NULL, // No error.
         SEC_LAUNCHER_ERROR_CODE_BINARY, // Errored while opening binary file.
         SEC_LAUNCHER_ERROR_CODE_NAME_NULL, // Errored attempting to load the name method.
         SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL // Errored attempting to load the entry point.
-    } SEC_LauncherErrorCodes;
+    } SEC_Launcher_ErrorCodes;
 
-    typedef struct SEC_LauncherConfiguration {
-        SEC_LauncherErrorCodes code;
+    typedef struct SEC_Launcher_Configuration {
+        SEC_Launcher_ErrorCodes code;
         union {
             const char* errorMessage; // The message from something like dlopen.
             struct {
@@ -26,10 +26,11 @@ CPP_GUARD_START()
                 int (*Start)(int, char**);
             };
         };
-    } SEC_LauncherConfiguration;
+    } SEC_Launcher_Configuration;
 
     /**
-    * @return The layerInitialized configuration file. NULL if malloc fails.
+    * @return The initialized configuration file. NULL if malloc fails.
     */
-    void SEC_CreateLauncherConfiguration(SEC_LauncherConfiguration* configuration, const char* path);
-CPP_GUARD_END()
+    void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration, const char* path);
+    const char* SEC_Launcher_GetDefaultHelpList(void);
+SEC_CPP_GUARD_END()

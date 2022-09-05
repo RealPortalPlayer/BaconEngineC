@@ -12,8 +12,8 @@ add_library(BaconEngine STATIC
         Rendering/UI.c
         Rendering/EngineLayers.c
         Rendering/EngineUIs.c
-        Rendering/UIWindows.c
-        Rendering/UIElements.c
+        Rendering/UIWindow.c
+        Rendering/UIElement.c
         Input/Keyboard.c
         Event.c)
 

@@ -8,7 +8,7 @@
 #include "BaconEngine/Math/Vector.h"
 #include "UI.h"
 
-CPP_GUARD_START()
+SEC_CPP_GUARD_START()
     /**
      * @note
      * Special buttons are buttons that do the main action (i.e. delete a file)
@@ -22,16 +22,16 @@ CPP_GUARD_START()
         const char* normalButton1;
         const char* normalButton2;
         const char* normalButton3;
-    } BE_UIMessageBoxChoices;
+    } BE_UIWindow_MessageBoxChoices;
     // TODO: Button color.
 
     typedef enum {
-        BE_UI_MESSAGE_BOX_FLAG_NULL,
-        BE_UI_MESSAGE_BOX_FLAG_NOT_MOVABLE,
-        BE_UI_MESSAGE_BOX_FLAG_NO_TITLE_BAR = (1 << 2),
-        BE_UI_MESSAGE_BOX_FLAG_NO_BORDER = (1 << 4),
-        BE_UI_MESSAGE_BOX_FLAG_NO_MINIMIZE = (1 << 8)
-    } BE_UIMessageBoxFlags;
+        BE_UIWINDOW_UI_MESSAGE_BOX_FLAG_NULL,
+        BE_UIWINDOW_MESSAGE_BOX_FLAG_NOT_MOVABLE,
+        BE_UIWINDOW_MESSAGE_BOX_FLAG_NO_TITLE_BAR = (1 << 2),
+        BE_UIWINDOW_MESSAGE_BOX_FLAG_NO_BORDER = (1 << 4),
+        BE_UIWINDOW_MESSAGE_BOX_FLAG_NO_MINIMIZE = (1 << 8)
+    } BE_UIWindow_MessageBoxFlags;
 
-    void BE_RegisterUIMessageBox(const char* name, const char* description, BE_Vector2I position, BE_UIMessageBoxFlags flags, BE_UIMessageBoxChoices choices);
-CPP_GUARD_END()
+    void BE_UIWindow_RegisterMessageBox(const char* name, const char* description, BE_Vector_2I position, BE_UIWindow_MessageBoxFlags flags, BE_UIWindow_MessageBoxChoices choices);
+SEC_CPP_GUARD_END()

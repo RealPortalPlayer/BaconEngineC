@@ -7,25 +7,26 @@
 
 #include "Internal/CppHeader.h"
 
-CPP_GUARD_START()
+SEC_CPP_GUARD_START()
     typedef enum {
-        SEC_LOG_LEVEL_NULL,
-        SEC_LOG_LEVEL_TRACE,
-        SEC_LOG_LEVEL_DEBUG,
-        SEC_LOG_LEVEL_INFO,
-        SEC_LOG_LEVEL_WARN,
-        SEC_LOG_LEVEL_ERROR,
-        SEC_LOG_LEVEL_FATAL
-    } SEC_LogLevels;
+        SEC_LOGGER_LOG_LEVEL_NULL,
+        SEC_LOGGER_LOG_LEVEL_TRACE,
+        SEC_LOGGER_LOG_LEVEL_DEBUG,
+        SEC_LOGGER_LOG_LEVEL_INFO,
+        SEC_LOGGER_LOG_LEVEL_WARN,
+        SEC_LOGGER_LOG_LEVEL_ERROR,
+        SEC_LOGGER_LOG_LEVEL_FATAL
+    } SEC_Logger_LogLevels;
 
-    SEC_LogLevels SEC_GetLogLevel(void);
-    void SEC_SetLogLevel(SEC_LogLevels logLevel);
-    void SEC_LogImplementation(int includeHeader, SEC_LogLevels logLevel, const char* message, ...);
-CPP_GUARD_END()
+    SEC_Logger_LogLevels SEC_Logger_GetLogLevel(void);
+    void SEC_Logger_SetLogLevel(SEC_Logger_LogLevels logLevel);
+    void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLevel, const char* message, ...);
+    int SEC_Logger_AlreadySentFistLog(void);
+SEC_CPP_GUARD_END()
 
-#define SEC_LOG_TRACE(...) SEC_LogImplementation(1, SEC_LOG_LEVEL_TRACE, __VA_ARGS__)
-#define SEC_LOG_DEBUG(...) SEC_LogImplementation(1, SEC_LOG_LEVEL_DEBUG, __VA_ARGS__)
-#define SEC_LOG_INFO(...) SEC_LogImplementation(1, SEC_LOG_LEVEL_INFO, __VA_ARGS__)
-#define SEC_LOG_WARN(...) SEC_LogImplementation(1, SEC_LOG_LEVEL_WARN, __VA_ARGS__)
-#define SEC_LOG_ERROR(...) SEC_LogImplementation(1, SEC_LOG_LEVEL_ERROR, __VA_ARGS__)
-#define SEC_LOG_FATAL(...) SEC_LogImplementation(1, SEC_LOG_LEVEL_FATAL, __VA_ARGS__)
+#define SEC_LOGGER_TRACE(...) SEC_Logger_LogImplementation(1, SEC_LOGGER_LOG_LEVEL_TRACE, __VA_ARGS__)
+#define SEC_LOGGER_DEBUG(...) SEC_Logger_LogImplementation(1, SEC_LOGGER_LOG_LEVEL_DEBUG, __VA_ARGS__)
+#define SEC_LOGGER_INFO(...) SEC_Logger_LogImplementation(1, SEC_LOGGER_LOG_LEVEL_INFO, __VA_ARGS__)
+#define SEC_LOGGER_WARN(...) SEC_Logger_LogImplementation(1, SEC_LOGGER_LOG_LEVEL_WARN, __VA_ARGS__)
+#define SEC_LOGGER_ERROR(...) SEC_Logger_LogImplementation(1, SEC_LOGGER_LOG_LEVEL_ERROR, __VA_ARGS__)
+#define SEC_LOGGER_FATAL(...) SEC_Logger_LogImplementation(1, SEC_LOGGER_LOG_LEVEL_FATAL, __VA_ARGS__)

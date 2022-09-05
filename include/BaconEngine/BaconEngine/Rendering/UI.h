@@ -7,10 +7,10 @@
 #include "SharedEngineCode/Storage/DynamicArray.h"
 
 #include "BaconEngine/Math/Vector.h"
-#include "UIElements.h"
+#include "UIElement.h"
 #include "BaconEngine/SDLSupport.h"
 
-CPP_GUARD_START()
+SEC_CPP_GUARD_START()
     typedef enum {
         BE_UI_WINDOW_FLAG_NULL,
         BE_UI_WINDOW_FLAG_NOT_MOVABLE,
@@ -25,33 +25,33 @@ CPP_GUARD_START()
         BE_UI_WINDOW_FLAG_NO_BORDER = (1 << 10),
         BE_UI_WINDOW_FLAG_INVISIBLE_WINDOW = (1 << 11) | BE_UI_WINDOW_FLAG_NO_TITLE_BAR,
         BE_UI_WINDOW_FLAG_NO_TITLE_BAR_BUTTONS = BE_UI_WINDOW_FLAG_NO_CLOSE | BE_UI_WINDOW_FLAG_NO_MINIMIZE | BE_UI_WINDOW_FLAG_NO_MAXIMIZE
-    } BE_UIWindowFlags;
+    } BE_UI_WindowFlags;
 
-    typedef struct BE_UIWindow {
+    typedef struct BE_UI_Window {
         const char* name;
         const char* originalName;
-        BE_Vector2I position;
-        BE_Vector2U size;
-        BE_UIWindowFlags flags;
+        BE_Vector_2I position;
+        BE_Vector_2U size;
+        BE_UI_WindowFlags flags;
         SEC_DynamicArray elements;
-    } BE_UIWindow;
+    } BE_UI_Window;
 
-    void BE_InitializeUISystem(void);
-    void BE_RegisterUIWindow(const char* name, BE_Vector2I position, BE_Vector2U size, BE_UIWindowFlags flags);
-    void BE_RegisterUIElement(BE_UIElement* element);
-    void BE_FinishRegisteringUIWindow(void);
-    int BE_CloseUIWindow(const char* name);
-    int BE_CloseUIWindowAt(unsigned int index);
-    int BE_ToggleUIRendering(int enable);
-    void UIWindowRendererDrawRectangle(BE_UIWindow* window, BE_Vector2I position, BE_Vector2U size, BE_Color4U borderColor, BE_Color4U fillColor, int borderPadding);
-    BE_UIWindow** BE_GetUIWindows(void);
-    int BE_GetUIWindowAmount(void);
-    int BE_GetAllocatedUIWindowAmount(void);
-    int BE_GetUIWindowReallocationAmount(void);
-    void BE_SetCurrentUIWindow(BE_UIWindow* window);
-    BE_UIWindow* BE_GetCurrentUIWindow(void);
-    TTF_Font* BE_GetUIWindowFont(void);
-    void BE_DestroyUIWindows(void);
-CPP_GUARD_END()
+    void BE_UI_InitializeUIs(void);
+    void BE_UI_RegisterWindow(const char* name, BE_Vector_2I position, BE_Vector_2U size, BE_UI_WindowFlags flags);
+    void BE_UI_RegisterElement(BE_UIElement* element);
+    void BE_UI_FinishRegisteringWindow(void);
+    int BE_UI_CloseWindow(const char* name);
+    int BE_UI_CloseWindowAt(unsigned int index);
+    int BE_UI_ToggleWindowRendering(int enable);
+    void BE_UI_WindowRendererDrawRectangle(BE_UI_Window* window, BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U borderColor, BE_Color_4U fillColor, int borderPadding);
+    BE_UI_Window** BE_UI_GetWindows(void);
+    int BE_UI_GetWindowAmount(void);
+    int BE_UI_GetAllocatedWindowAmount(void);
+    int BE_UI_GetWindowReallocationAmount(void);
+    void BE_UI_SetCurrentWindow(BE_UI_Window* window);
+    BE_UI_Window* BE_UI_GetCurrentWindow(void);
+    TTF_Font* BE_UI_GetWindowFont(void);
+    void BE_UI_DestroyWindows(void);
+SEC_CPP_GUARD_END()
 
-#define BE_UI_WINDOW_RENDERER_DRAW_RECTANGLE_SAME_COLOR(uiWindow, position, size, color, borderSize) UIWindowRendererDrawRectangle((uiWindow), (position), (size), (color), (color), (borderSize))
+#define BE_UI_WINDOW_RENDERER_DRAW_RECTANGLE_SAME_COLOR(uiWindow, position, size, color, borderSize) BE_UI_WindowRendererDrawRectangle((uiWindow), (position), (size), (color), (color), (borderSize))

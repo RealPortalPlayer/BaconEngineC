@@ -7,6 +7,9 @@
 #   include <SDL.h>
 #   include <SDL_events.h>
 #else
+#   include <SharedEngineCode/Internal/CppHeader.h>
+
+SEC_CPP_GUARD_START()
     typedef struct {
         void* placeholder;
     } SDL_Event;
@@ -22,12 +25,15 @@
     typedef struct {
         void* placeholder;
     } SDL_Scancode;
+SEC_CPP_GUARD_END()
 #endif
 
 #ifndef BACON_ENGINE_DISABLE_SDL_TTF
 #   include <SDL_ttf.h>
 #else
+SEC_CPP_GUARD_START()
     typedef struct {
         void* placeholder;
     } TTF_Font;
+SEC_CPP_GUARD_END()
 #endif

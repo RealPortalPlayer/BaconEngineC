@@ -9,43 +9,43 @@
 #include "BaconEngine/Rendering/Renderer.h"
 #include "BaconEngine/Rendering/Layer.h"
 
-CPP_GUARD_START()
+SEC_CPP_GUARD_START()
     int uiInitialized = 0;
     SEC_DynamicArray uiArray;
-    BE_UIWindow* currentWindow = NULL;
+    BE_UI_Window* currentWindow = NULL;
     TTF_Font* windowFont;
-    BE_UIWindow* registeringWindow = NULL;
+    BE_UI_Window* registeringWindow = NULL;
 
-    void BE_InitializeUISystem(void) {
-        if (BE_GetInternalSDLRenderer() == NULL)
+    void BE_UI_InitializeUIs(void) {
+        if (BE_Window_GetInternalSDLRenderer() == NULL)
             return;
 
-        SEC_STRICT_CHECK_NO_RETURN_VALUE(!uiInitialized, "Already layerInitialized UI system.");
-        SEC_LOG_INFO("Initializing UI");
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!uiInitialized, "Already initialized UI system.");
+        SEC_LOGGER_INFO("Initializing UI");
 
         uiInitialized = 1;
 
-        SEC_CreateDynamicArray(&uiArray, 50);
-        SEC_LOG_INFO("Registering engine UIs");
+        SEC_DynamicArray_Create(&uiArray, 50);
+        SEC_LOGGER_INFO("Registering engine UIs");
         InitializeEngineUIs();
 
 //        STRICT_CHECK_NO_RETURN_VALUE((fontMemory = SDL_RWFromConstMem(file->contents, strlen((const char*) file->contents))) != NULL, "Failed to get window font: %s", SDL_GetError());
 //        STRICT_CHECK_NO_RETURN_VALUE((windowFont = TTF_OpenFontRW(fontMemory, 1, 15)) != NULL, "Failed to get window font: %s", SDL_GetError()); // FIXME: Find a royalty free font!
     }
 
-    void BE_RegisterUIWindow(const char* name, BE_Vector2I position, BE_Vector2U size, BE_UIWindowFlags flags) {
-        SEC_STRICT_CHECK_NO_RETURN_VALUE(registeringWindow == NULL, "You're already registering another window");
+    void BE_UI_RegisterWindow(const char* name, BE_Vector_2I position, BE_Vector_2U size, BE_UI_WindowFlags flags) {
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(registeringWindow == NULL, "You're already registering another window");
 
         for (int i = 0; i < uiArray.used; i++)
-            SEC_STRICT_CHECK_NO_RETURN_VALUE(strcmp(SEC_ARRAY_GET_ELEMENT(BE_UIWindow, uiArray, i)->name, name) != 0, "The window '%s' is already registered, to have more than window with the same name, append one with \"###\" with anything else");
+            SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(strcmp(SEC_DYNAMICARRAY_GET_ELEMENT(BE_UI_Window, uiArray, i)->name, name) != 0, "The window '%s' is already registered, to have more than window with the same name, append one with \"###\" with anything else");
 
-        BE_UIWindow* window;
+        BE_UI_Window* window;
 
-        SEC_ASSERT_MALLOC(window, sizeof(BE_UIWindow), "a UI window");
-        SEC_STRICT_CHECK_NO_RETURN_VALUE((flags & BE_UI_WINDOW_FLAG_NO_TITLE_BAR) == 0 || (flags & BE_UI_WINDOW_FLAG_MINIMIZED) == 0,
-                                         "Invalid flags, minimized only works on windows with a title bar");
-        SEC_STRICT_CHECK_NO_RETURN_VALUE(currentWindow == NULL || (flags & BE_UI_WINDOW_FLAG_MAXIMIZED) == 0,
-                                         "Invalid flags, only one window can be maximized");
+        SEC_ASSERT_MALLOC(window, sizeof(BE_UI_Window), "a UI window");
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE((flags & BE_UI_WINDOW_FLAG_NO_TITLE_BAR) == 0 || (flags & BE_UI_WINDOW_FLAG_MINIMIZED) == 0,
+                                             "Invalid flags, minimized only works on windows with a title bar");
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(currentWindow == NULL || (flags & BE_UI_WINDOW_FLAG_MAXIMIZED) == 0,
+                                             "Invalid flags, only one window can be maximized");
 
         char* parsedName;
 
@@ -64,105 +64,105 @@ CPP_GUARD_START()
         window->size = size;
         window->flags = flags;
 
-        SEC_CreateDynamicArray(&window->elements, 100);
+        SEC_DynamicArray_Create(&window->elements, 100);
 
         registeringWindow = window;
     }
 
-    void BE_RegisterUIElement(BE_UIElement* element) {
-        SEC_STRICT_CHECK_NO_RETURN_VALUE(registeringWindow != NULL, "There is no window to finish");
-        SEC_ArrayAddElementToLast(&registeringWindow->elements, element);
+    void BE_UI_RegisterElement(BE_UIElement* element) {
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(registeringWindow != NULL, "There is no window to finish");
+        SEC_DynamicArray_AddElementToLast(&registeringWindow->elements, element);
     }
 
-    void BE_FinishRegisteringUIWindow(void) {
-        SEC_STRICT_CHECK_NO_RETURN_VALUE(registeringWindow != NULL, "There is no window to finish");
+    void BE_UI_FinishRegisteringWindow(void) {
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(registeringWindow != NULL, "There is no window to finish");
 
         if (currentWindow == NULL || (currentWindow->flags & BE_UI_WINDOW_FLAG_MAXIMIZED) == 0)
             currentWindow = registeringWindow;
 
-        SEC_ArrayAddElementToLast(&uiArray, registeringWindow);
+        SEC_DynamicArray_AddElementToLast(&uiArray, registeringWindow);
 
         registeringWindow = NULL;
     }
 
-    int BE_CloseUIWindow(const char* name) {
+    int BE_UI_CloseWindow(const char* name) {
         for (unsigned int windowId = 0; (int) windowId < uiArray.used; windowId++) {
-            BE_UIWindow* window = SEC_ARRAY_GET_ELEMENT(BE_UIWindow, uiArray, windowId);
+            BE_UI_Window* window = SEC_DYNAMICARRAY_GET_ELEMENT(BE_UI_Window, uiArray, windowId);
 
             if (strcmp(window->name, name) != 0)
                 continue;
 
-            return BE_CloseUIWindowAt(windowId);
+            return BE_UI_CloseWindowAt(windowId);
         }
 
         return 0;
     }
 
-    int BE_CloseUIWindowAt(unsigned int index) {
-        if ((int) index >= uiArray.used || (BE_GetUIWindows()[index]->flags & BE_UI_WINDOW_FLAG_CLOSED) != 0)
+    int BE_UI_CloseWindowAt(unsigned int index) {
+        if ((int) index >= uiArray.used || (BE_UI_GetWindows()[index]->flags & BE_UI_WINDOW_FLAG_CLOSED) != 0)
             return 0;
 
-        if (BE_GetCurrentUIWindow() == currentWindow)
+        if (BE_UI_GetCurrentWindow() == currentWindow)
             currentWindow = NULL;
 
-        BE_GetUIWindows()[index]->flags |= BE_UI_WINDOW_FLAG_CLOSED;
+        BE_UI_GetWindows()[index]->flags |= BE_UI_WINDOW_FLAG_CLOSED;
         return 1;
     }
 
-    int BE_ToggleUIRendering(int enable) {
-        return BE_ToggleLayer("UIManager", enable);
+    int BE_UI_ToggleWindowRendering(int enable) {
+        return BE_Layer_Toggle("UIManager", enable);
     }
 
-    void UIWindowRendererDrawRectangle(BE_UIWindow* window, BE_Vector2I position, BE_Vector2U size, BE_Color4U borderColor, BE_Color4U fillColor, int borderPadding) {
+    void BE_UI_WindowRendererDrawRectangle(BE_UI_Window* window, BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U borderColor, BE_Color_4U fillColor, int borderPadding) {
         if ((window->flags & BE_UI_WINDOW_FLAG_NO_BORDER) != 0)
-            BE_RendererFillRectangle((BE_Vector2I) {position.x - 1, position.y - 1},
-                                     (BE_Vector2U) {size.x + borderPadding, size.y + borderPadding}, fillColor);
+            BE_Renderer_FillRectangle((BE_Vector_2I) {position.x - 1, position.y - 1},
+                                      (BE_Vector_2U) {size.x + borderPadding, size.y + borderPadding}, fillColor);
         else
-            BE_RendererDrawBorderedRectangle(position, size, borderColor, fillColor, borderPadding);
+            BE_Renderer_DrawBorderedRectangle(position, size, borderColor, fillColor, borderPadding);
     }
 
-    BE_UIWindow** BE_GetUIWindows(void) {
-        return (BE_UIWindow**) uiArray.internalArray;
+    BE_UI_Window** BE_UI_GetWindows(void) {
+        return (BE_UI_Window**) uiArray.internalArray;
     }
 
-    int BE_GetUIWindowAmount(void) {
+    int BE_UI_GetWindowAmount(void) {
         return uiArray.used;
     }
 
-    int BE_GetAllocatedUIWindowAmount(void) {
+    int BE_UI_GetAllocatedWindowAmount(void) {
         return (int) uiArray.size;
     }
 
-    int BE_GetUIWindowReallocationAmount(void) {
+    int BE_UI_GetWindowReallocationAmount(void) {
         return uiArray.calledRealloc;
     }
 
-    void BE_SetCurrentUIWindow(BE_UIWindow* window) {
+    void BE_UI_SetCurrentWindow(BE_UI_Window* window) {
         currentWindow = window;
     }
 
-    BE_UIWindow* BE_GetCurrentUIWindow(void) {
+    BE_UI_Window* BE_UI_GetCurrentWindow(void) {
         return currentWindow;
     }
 
-    TTF_Font* BE_GetUIWindowFont(void) {
+    TTF_Font* BE_UI_GetWindowFont(void) {
         return windowFont;
     }
 
-    void BE_DestroyUIWindows(void) {
-        SEC_STRICT_CHECK_NO_RETURN_VALUE(uiInitialized, "UI Windows are already destroyed");
-        SEC_LOG_INFO("Destroying UI Windows");
+    void BE_UI_DestroyWindows(void) {
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(uiInitialized, "UI Windows are already destroyed");
+        SEC_LOGGER_INFO("Destroying UI Windows");
 
         uiInitialized = 0;
 
         for (int i = 0; i < uiArray.used; i++) {
-            BE_UIWindow* layer = SEC_ARRAY_GET_ELEMENT(BE_UIWindow, uiArray, i);
+            BE_UI_Window* layer = SEC_DYNAMICARRAY_GET_ELEMENT(BE_UI_Window, uiArray, i);
 
-            BE_RemoveAllocatedEngineMemory(sizeof(BE_UIWindow));
+            SEC_EngineMemory_RemoveAllocated(sizeof(BE_UI_Window));
             free(layer);
         }
 
-        BE_RemoveAllocatedEngineMemory(sizeof(void*) * uiArray.size);
+        SEC_EngineMemory_RemoveAllocated(sizeof(void *) * uiArray.size);
         free(uiArray.internalArray);
     }
-CPP_GUARD_END()
+SEC_CPP_GUARD_END()

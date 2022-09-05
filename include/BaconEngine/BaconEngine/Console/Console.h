@@ -7,14 +7,14 @@
 
 #include "Command.h"
 
-CPP_GUARD_START()
-    BE_Command** GetCommands(void);
-    int BE_GetCommandAmount(void);
-    int BE_GetAllocatedCommandsAmount(void);
-    int BE_GetCommandReallocationAmount(void);
-    void BE_InitializeConsole(void);
-    void BE_RegisterCommand(const char* name, const char* description, BE_CommandFlags flags, void (*Run)(BE_CommandContext context));
-    void BE_DuplicateCommand(const char* name, const char* description);
-    void BE_ExecuteCommand(char* input); // TODO: Client
-    void BE_DestroyConsole(void);
-CPP_GUARD_END()
+SEC_CPP_GUARD_START()
+    BE_Command** BE_Console_GetCommands(void);
+    int BE_Console_GetCommandAmount(void);
+    int BE_Console_GetAllocatedCommandsAmount(void);
+    int BE_Console_GetCommandReallocationAmount(void);
+    void BE_Console_Initialize(void);
+    void BE_Console_RegisterCommand(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context));
+    void BE_Console_DuplicateCommand(const char* name, const char* description);
+    void BE_Console_ExecuteCommand(char* input); // TODO: Client
+    void BE_Console_Destroy(void);
+SEC_CPP_GUARD_END()

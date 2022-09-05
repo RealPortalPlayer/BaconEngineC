@@ -5,8 +5,8 @@
 
 #include "BaconEngine/Console/ArgumentManager.h"
 
-CPP_GUARD_START()
-    int ArgumentEqualsTrueORFalse(char* value) {
+SEC_CPP_GUARD_START()
+    int ArgumentEqualsStringBoolean(char* value) {
         char* tempValue = (char*) value;
         {
             int i = 0;
@@ -21,11 +21,11 @@ CPP_GUARD_START()
         return strcmp(tempValue, "false") == 0 ? 1 : 0;
     }
 
-    int BE_GetArgumentInt(ArgumentsDictionary arguments, const char* name, int defaultValue) {
-        if (arguments.size != 0) {
-            char* value = (char*) BE_GetArgumentString(arguments, name, "");
+    int BE_ArgumentHandler_GetInt(SEC_DynamicDictionary arguments, const char* name, int defaultValue) {
+        if (arguments.keys.size != 0) {
+            char* value = (char*) BE_ArgumentHandler_GetString(arguments, name, "");
             {
-                int parsedValue = ArgumentEqualsTrueORFalse(value);
+                int parsedValue = ArgumentEqualsStringBoolean(value);
 
                 if (parsedValue != 0)
                     return parsedValue == 2;
@@ -41,15 +41,15 @@ CPP_GUARD_START()
         return defaultValue;
     }
 
-    int BE_GetArgumentBoolean(ArgumentsDictionary arguments, const char* name, int defaultValue) {
-        return BE_GetArgumentInt(arguments, name, defaultValue) >= 1;
+    int BE_ArgumentHandler_GetBoolean(SEC_DynamicDictionary arguments, const char* name, int defaultValue) {
+        return BE_ArgumentHandler_GetInt(arguments, name, defaultValue) >= 1;
     }
 
-    float BE_GetArgumentFloat(ArgumentsDictionary arguments, const char* name, float defaultValue) {
-        if (arguments.size != 0) {
-            char* value = (char*) BE_GetArgumentString(arguments, name, "");
+    float BE_ArgumentHandler_GetFloat(SEC_DynamicDictionary arguments, const char* name, float defaultValue) {
+        if (arguments.keys.size != 0) {
+            char* value = (char*) BE_ArgumentHandler_GetString(arguments, name, "");
             {
-                int parsedValue = ArgumentEqualsTrueORFalse(value);
+                int parsedValue = ArgumentEqualsStringBoolean(value);
 
                 if (parsedValue != 0)
                     return (float)(parsedValue == 2);
@@ -65,16 +65,9 @@ CPP_GUARD_START()
         return defaultValue;
     }
 
-    const char* BE_GetArgumentString(ArgumentsDictionary arguments, const char* name, const char* defaultValue) {
-        if (arguments.size != 0) {
-            for (int i = 0; i < (int) arguments.size; i++) {
-                if (strcmp(arguments.keys[i], name) != 0)
-                    continue;
+    const char* BE_ArgumentHandler_GetString(SEC_DynamicDictionary arguments, const char* name, const char* defaultValue) {
+        const char* value = SEC_DynamicDictionary_GetElementViaKey(arguments, (void*) name, sizeof(char) * strlen(name) + 1);
 
-                return arguments.values[i];
-            }
-        }
-
-        return defaultValue;
+        return value != NULL ? value : defaultValue;
     }
-CPP_GUARD_END()
+SEC_CPP_GUARD_END()

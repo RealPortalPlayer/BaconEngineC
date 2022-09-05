@@ -2,8 +2,8 @@
 
 #include "BaconEngine/Input/Keyboard.h"
 
-CPP_GUARD_START()
-    char keyCodesCharArray[BE_KEY_CODE_SIZE] = {
+SEC_CPP_GUARD_START()
+    char keyCodesCharArray[BE_KEYBOARD_KEY_CODE_SIZE] = {
         1, 1, 1, 1, // NULL PLACEHOLDER PLACEHOLDER PLACEHOLDER
         'A', 'B', 'C', 'D', 'E', 'F', 'G',
         'H', 'I', 'J', 'K', 'L', 'M', 'N',
@@ -45,50 +45,50 @@ CPP_GUARD_START()
         0, 0 // RIGHT_ALT RIGHT_WINDOWS
     };
 
-    int keysDown[BE_KEY_CODE_SIZE] = {0};
-    int keysPressed[BE_KEY_CODE_SIZE] = {0};
+    int keysDown[BE_KEYBOARD_KEY_CODE_SIZE] = {0};
+    int keysPressed[BE_KEYBOARD_KEY_CODE_SIZE] = {0};
 
-    void BE_SetKeyDown(BE_KeyCodes keyCode, int down) {
-        if (!BE_IsEngineKeyCodeValid(keyCode))
+    void BE_Keyboard_SetKeyDown(BE_Keyboard_KeyCodes keyCode, int down) {
+        if (!BE_Keyboard_IsEngineKeyCodeValid(keyCode))
             return;
 
         keysDown[keyCode] = down;
     }
 
-    void BE_SetKeyPressed(BE_KeyCodes keyCode, int pressed) {
-        if (!BE_IsEngineKeyCodeValid(keyCode))
+    void BE_Keyboard_SetKeyPressed(BE_Keyboard_KeyCodes keyCode, int pressed) {
+        if (!BE_Keyboard_IsEngineKeyCodeValid(keyCode))
             return;
 
         keysPressed[keyCode] = pressed;
     }
 
-    char BE_ConvertKeyCodeToChar(BE_KeyCodes keyCode) {
-        return (char) (BE_IsEngineKeyCodeValid(keyCode) ? keyCodesCharArray[keyCode] : 0);
+    char BE_Keyboard_ConvertKeyCodeToChar(BE_Keyboard_KeyCodes keyCode) {
+        return (char) (BE_Keyboard_IsEngineKeyCodeValid(keyCode) ? keyCodesCharArray[keyCode] : 0);
     }
 
-    int BE_IsKeyDown(BE_KeyCodes keyCode) {
-        return BE_IsEngineKeyCodeValid(keyCode) && keysDown[keyCode];
+    int BE_Keyboard_IsKeyDown(BE_Keyboard_KeyCodes keyCode) {
+        return BE_Keyboard_IsEngineKeyCodeValid(keyCode) && keysDown[keyCode];
     }
 
-    int BE_IsKeyPressed(BE_KeyCodes keyCode) {
-        return BE_IsEngineKeyCodeValid(keyCode) && keysPressed[keyCode];
+    int BE_Keyboard_IsKeyPressed(BE_Keyboard_KeyCodes keyCode) {
+        return BE_Keyboard_IsEngineKeyCodeValid(keyCode) && keysPressed[keyCode];
     }
 
-    int BE_IsKeyUp(BE_KeyCodes keyCode) {
-        return BE_IsEngineKeyCodeValid(keyCode) && !keysDown[keyCode] && !keysPressed[keyCode];
+    int BE_Keyboard_IsKeyUp(BE_Keyboard_KeyCodes keyCode) {
+        return BE_Keyboard_IsEngineKeyCodeValid(keyCode) && !keysDown[keyCode] && !keysPressed[keyCode];
     }
 
-    BE_KeyCodes BE_SDLToEngineKeyCode(SDL_Scancode keyCode) {
+    BE_Keyboard_KeyCodes BE_Keyboard_SDLToEngineKeyCode(SDL_Scancode keyCode) {
         (void) keyCode;
 #ifndef BACON_ENGINE_DISABLE_SDL
         return keyCode != SDL_SCANCODE_NONUSHASH && keyCode != SDL_SCANCODE_NONUSBACKSLASH && keyCode != SDL_SCANCODE_POWER &&
-               BE_IsEngineKeyCodeValid((BE_KeyCodes) keyCode) ? (BE_KeyCodes) keyCode : BE_KEY_CODE_NULL;
+                       BE_Keyboard_IsEngineKeyCodeValid((BE_Keyboard_KeyCodes) keyCode) ? (BE_Keyboard_KeyCodes) keyCode : BE_KEYBOARD_KEY_CODE_NULL;
 #else
         return BE_KEY_CODE_NULL;
 #endif
     }
 
-    int BE_IsEngineKeyCodeValid(BE_KeyCodes keyCode) {
-        return keyCode < BE_KEY_CODE_SIZE && ((int) keyCodesCharArray[keyCode]) != 1;
+    int BE_Keyboard_IsEngineKeyCodeValid(BE_Keyboard_KeyCodes keyCode) {
+        return keyCode < BE_KEYBOARD_KEY_CODE_SIZE && ((int) keyCodesCharArray[keyCode]) != 1;
     }
-CPP_GUARD_END()
+SEC_CPP_GUARD_END()

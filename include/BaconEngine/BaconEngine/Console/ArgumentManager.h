@@ -5,16 +5,11 @@
 
 #include <SharedEngineCode/Internal/CppHeader.h>
 #include <stddef.h>
+#include <SharedEngineCode/Storage/DynamicDictionary.h>
 
-CPP_GUARD_START()
-    typedef struct {
-        const char** keys;
-        const char** values;
-        size_t size;
-    } ArgumentsDictionary;
-
-    int BE_GetArgumentInt(ArgumentsDictionary arguments, const char* name, int defaultValue);
-    int BE_GetArgumentBoolean(ArgumentsDictionary arguments, const char* name, int defaultValue);
-    float BE_GetArgumentFloat(ArgumentsDictionary arguments, const char* name, float defaultValue);
-    const char* BE_GetArgumentString(ArgumentsDictionary arguments, const char* name, const char* defaultValue);
-CPP_GUARD_END()
+SEC_CPP_GUARD_START()
+    int BE_ArgumentHandler_GetInt(SEC_DynamicDictionary arguments, const char* name, int defaultValue);
+    int BE_ArgumentHandler_GetBoolean(SEC_DynamicDictionary arguments, const char* name, int defaultValue);
+    float BE_ArgumentHandler_GetFloat(SEC_DynamicDictionary arguments, const char* name, float defaultValue);
+    const char* BE_ArgumentHandler_GetString(SEC_DynamicDictionary arguments, const char* name, const char* defaultValue);
+SEC_CPP_GUARD_END()

@@ -8,22 +8,22 @@
 #include "BaconEngine/Math/Vector.h"
 #include "BaconEngine/SDLSupport.h"
 
-CPP_GUARD_START()
-    void BE_InitializeWindow(const char* windowTitle, BE_Vector2U windowSize);
-    void BE_DestroyWindow(void);
-    SDL_Window* BE_GetInternalSDLWindow(void);
-    SDL_Renderer* BE_GetInternalSDLRenderer(void);
-    const char* BE_GetWindowTitle(void);
-    BE_Vector2U BE_GetWindowSize(void);
-    BE_Vector2U BE_GetWindowPosition(void);
-    int BE_IsWindowVisible(void);
-    int BE_IsWindowStillOpened(void);
-    void BE_SetWindowTitle(const char* newTitle);
-    void BE_SetWindowSize(BE_Vector2U newSize);
-    void BE_SetWindowWidth(unsigned newWidth);
-    void BE_SetWindowHeight(unsigned newHeight);
-    void BE_SetWindowPosition(BE_Vector2U newPosition);
-    void BE_SetWindowXPosition(unsigned int newX);
-    void BE_SetWindowYPosition(unsigned int newY);
-    void BE_SetWindowVisibility(int visible);
-CPP_GUARD_END()
+SEC_CPP_GUARD_START()
+    void BE_Window_Initialize(const char* windowTitle, BE_Vector_2U windowSize);
+    void BE_Window_Destroy(void);
+    SDL_Window* BE_Window_GetInternalSDLWindow(void);
+    SDL_Renderer* BE_Window_GetInternalSDLRenderer(void);
+    const char* BE_Window_GetTitle(void);
+    BE_Vector_2U BE_Window_GetSize(void);
+    BE_Vector_2U BE_Window_GetPosition(void);
+    int BE_Window_IsVisible(void);
+    int BE_Window_IsStillOpened(void);
+    void BE_Window_SetTitle(const char* newTitle);
+    void BE_Window_SetSize(BE_Vector_2U newSize);
+    void BE_Window_SetWidth(unsigned newWidth);
+    void BE_Window_SetHeight(unsigned newHeight);
+    void BE_Window_SetPosition(BE_Vector_2U newPosition);
+    void BE_Window_SetXPosition(unsigned int newX);
+    void BE_Window_SetYPosition(unsigned int newY);
+    void BE_Window_SetVisibility(int visible);
+SEC_CPP_GUARD_END()

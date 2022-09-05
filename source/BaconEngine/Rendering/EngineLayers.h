@@ -5,7 +5,7 @@
 
 #include <SharedEngineCode/Internal/CppHeader.h>
 
-CPP_GUARD_START()
+SEC_CPP_GUARD_START()
     void InitializeEngineLayers(void);
     int GetUIWindowRenderCount(void);
-CPP_GUARD_END()
+SEC_CPP_GUARD_END()
