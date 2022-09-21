@@ -2,8 +2,8 @@
 // Created on: 7/29/22 @ 2:36 PM
 
 #ifdef __cplusplus
-#   define CPP_GUARD_START() extern "C" {
-#   define CPP_GUARD_END() };
+#   define SEC_CPP_GUARD_START() extern "C" {
+#   define SEC_CPP_GUARD_END() };
 #else
 #   define SEC_CPP_GUARD_START()
 #   define SEC_CPP_GUARD_END()

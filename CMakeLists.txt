@@ -5,27 +5,29 @@ option(DISABLE_SDL "Don't include SDL." OFF)
 option(DISABLE_SDL_TTF "Don't include SDL TTF." OFF)
 
 set(CMAKE_C_STANDARD 17)
+set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
 option(BE_DISABLE_OFFICIAL_PROJECTS "Don't compile any of the official projects" OFF)
 option(BE_DISABLE_TEST_PROJECTS "Don't compile any of the test projects" OFF)
+option(BE_DISABLE_OPENGL "Don't compile with OpenGL" OFF)
+option(BE_DISABLE_METAL "Don't compile with Metal, does nothing for non-Apple operating systems" OFF)
 
-message(STATUS "Adding dependencies.")
+message(STATUS "Adding dependencies")
 
-if(NOT DISABLE_SDL)
-    add_subdirectory(dependencies/BaconEngine/SDL)
-else()
-    message(STATUS "Ignoring SDL.")
+if(NOT BE_DISABLE_OPENGL)
+    find_package(OpenGL REQUIRED)
+    set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    add_subdirectory(dependencies/glfw)
+    add_subdirectory(dependencies/glad)
 endif()
 
-if(NOT DISABLE_SDL AND NOT DISABLE_SDL_TTF)
-    add_subdirectory(dependencies/BaconEngine/SDL_ttf)
-else()
-    message(STATUS "Ignoring SDL TTF.")
+if(NOT BE_DISABLE_METAL AND APPLE) # TODO: Metal
+#    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
 endif()
-
-add_subdirectory(dependencies/BaconEngine/zlib)
 
 message(STATUS "Adding meta projects.")
 

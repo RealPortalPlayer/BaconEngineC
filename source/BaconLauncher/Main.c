@@ -2,10 +2,11 @@
 #include <SharedEngineCode/Logger.h>
 #include <SharedEngineCode/Launcher.h>
 #include <stddef.h>
+#include <SharedEngineCode/BuiltInArguments.h>
+#include <SharedEngineCode/OSUser.h>
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <dlfcn.h>
-#   include <unistd.h>
 #elif SEC_OPERATINGSYSTEM_WINDOWS
 #   include <Windows.h>
 #endif
@@ -15,21 +16,18 @@ int main(int argc, char** argv) {
 
     SEC_LOGGER_TRACE("Built: %s", __TIMESTAMP__);
 
-    if (SEC_ArgumentHandler_GetIndex("--help") != -1) {
+    if (SEC_ArgumentHandler_GetIndex(SEC_BUILTINARGUMENTS_HELP, 0) != -1) {
         SEC_LOGGER_INFO("Arguments:\n%s", SEC_Launcher_GetDefaultHelpList());
         return 0;
     }
 
-    // TODO: OS_WINDOWS
-#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
-    if (getuid() == 0)
+    if (SEC_OSUser_IsAdmin())
         SEC_LOGGER_WARN("You're running as root! If a client says you require to be root, then it's probably a virus");
-#endif
 
-    const char* clientPath = SEC_ArgumentHandler_GetValue("--client");
+    const char* clientPath = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_CLIENT, 0);
 
     if (clientPath == NULL)
-        clientPath = SEC_ArgumentHandler_GetValue("-c");
+        clientPath = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_CLIENT_SHORT, 0);
 
     if (clientPath == NULL) {
         SEC_LOGGER_WARN("You didn't specify what client you wanted to open, defaulting to 'Client'");
@@ -45,7 +43,7 @@ int main(int argc, char** argv) {
 
     SEC_Launcher_CreateConfiguration(&configuration, clientPath);
 
-    if (configuration.code != SEC_LAUNCHER_ERROR_CODE_NULL) {
+    if (configuration.code != SEC_LAUNCHER_ERROR_CODE_NULL) { // TODO: Parse Windows error code into string.
         switch (configuration.code) {
             case SEC_LAUNCHER_ERROR_CODE_BINARY:
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT

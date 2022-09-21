@@ -9,19 +9,18 @@
 
 SEC_CPP_GUARD_START()
     typedef enum {
-        SEC_LOGGER_LOG_LEVEL_NULL,
-        SEC_LOGGER_LOG_LEVEL_TRACE,
-        SEC_LOGGER_LOG_LEVEL_DEBUG,
-        SEC_LOGGER_LOG_LEVEL_INFO,
-        SEC_LOGGER_LOG_LEVEL_WARN,
+        SEC_LOGGER_LOG_LEVEL_FATAL,
         SEC_LOGGER_LOG_LEVEL_ERROR,
-        SEC_LOGGER_LOG_LEVEL_FATAL
+        SEC_LOGGER_LOG_LEVEL_WARN,
+        SEC_LOGGER_LOG_LEVEL_INFO,
+        SEC_LOGGER_LOG_LEVEL_DEBUG,
+        SEC_LOGGER_LOG_LEVEL_TRACE,
+        SEC_LOGGER_LOG_LEVEL_NULL
     } SEC_Logger_LogLevels;
 
     SEC_Logger_LogLevels SEC_Logger_GetLogLevel(void);
     void SEC_Logger_SetLogLevel(SEC_Logger_LogLevels logLevel);
     void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLevel, const char* message, ...);
-    int SEC_Logger_AlreadySentFistLog(void);
 SEC_CPP_GUARD_END()
 
 #define SEC_LOGGER_TRACE(...) SEC_Logger_LogImplementation(1, SEC_LOGGER_LOG_LEVEL_TRACE, __VA_ARGS__)

@@ -5,6 +5,8 @@
 
 #include <SharedEngineCode/Internal/CppHeader.h>
 
+#include "BaconEngine/Storage/DynamicArray.h"
+
 SEC_CPP_GUARD_START()
-    void InitializeEngineUIs(void);
+    void BE_EngineUIs_Initialize(void);
 SEC_CPP_GUARD_END()

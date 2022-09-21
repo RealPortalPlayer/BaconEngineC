@@ -1,6 +1,7 @@
 #include "SharedEngineCode/Launcher.h"
 
 #include "SharedEngineCode/Internal/CppHeader.h"
+#include "SharedEngineCode/BuiltInArguments.h"
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <dlfcn.h>
@@ -46,7 +47,7 @@ SEC_CPP_GUARD_START()
             configuration->clientName = name();
         }
 
-        configuration->Start = (int (*)(int, char**)) GET_ADDRESS(configuration->clientBinary, "BE_EntryPoint_StartBaconEngine");
+        configuration->Start = (int (*)(int, char**)) GET_ADDRESS(configuration->clientBinary, "BE_EntryPoint_InitializeDynamicLibrary");
 
         if (configuration->Start == NULL) {
             configuration->code = SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL;
@@ -58,23 +59,25 @@ SEC_CPP_GUARD_START()
     }
 
     const char* SEC_Launcher_GetDefaultHelpList(void) {
-        return "--help: Shows information about each argument\n"
+        return SEC_BUILTINARGUMENTS_HELP ": Shows information about each argument\n"
 #ifndef BACON_ENGINE_LAUNCHER
-               "--client <path> (-c): Specifies what client you want to run\n"
+               SEC_BUILTINARGUMENTS_CLIENT " <path> (" SEC_BUILTINARGUMENTS_CLIENT_SHORT "): Specifies what client you want to run\n"
 #endif
-               "--server (-s): Starts the client as a server instance\n"
-               "--no-strict (-ns): Don't crash the client when an API error occurs.\n"
-               "--dont-parse <argument> (--): Do not parse argument's beyond this point\n"
+               SEC_BUILTINARGUMENTS_SERVER " (" SEC_BUILTINARGUMENTS_SERVER_SHORT "): Starts the client as a server instance\n"
+               SEC_BUILTINARGUMENTS_NO_STRICT " (" SEC_BUILTINARGUMENTS_NO_STRICT_SHORT "): Don't crash the client when an API error occurs.\n"
+               SEC_BUILTINARGUMENTS_DONT_PARSE " <argument>: Do not parse argument's beyond this point\n"
 #ifndef BACON_ENGINE_DISABLE_SDL
-               "--width <width>: Changes the width of the window\n"
-               "--height <height>: Changes the height of the window\n"
-               "--renderer <opengl/vulkan/text>: Changes the default rendering system\n"
-               "--software: Use your CPU to render instead of your GPU\n"
-               "--monitor <id>: Create the window on a different display\n"
+               SEC_BUILTINARGUMENTS_WIDTH " <width>: Changes the width of the window\n"
+               SEC_BUILTINARGUMENTS_HEIGHT " <height>: Changes the height of the window\n"
+               SEC_BUILTINARGUMENTS_RENDERER " <opengl/vulkan/text>: Changes the default rendering system\n"
+               SEC_BUILTINARGUMENTS_SOFTWARE ": Use your CPU to render instead of your GPU\n"
+               SEC_BUILTINARGUMENTS_MONITOR " <id>: Create the window on a different display\n"
 #endif
-               "--disable-ansi-coloring (-dac): Disable log colors\n"
-               "--dont-compress-dupe-logs (-dcdl): Don't compress logs, that are duplications of the last one, into one line\n"
-               "--log-level <null/trace/trc/debug/dbg/warn/wrn/error/err/fatal/ftl> (-ll): Sets the current log level\n"
-               "--dont-change-log-levels (-dcll): Prevent the client from changing the log level";
+               SEC_BUILTINARGUMENTS_DISABLE_ANSI_COLORING " (" SEC_BUILTINARGUMENTS_DISABLE_ANSI_COLORING_SHORT "): Disable log colors\n"
+               SEC_BUILTINARGUMENTS_LOG_LEVEL " <null/trace/trc/debug/dbg/warn/wrn/error/err/fatal/ftl> (" SEC_BUILTINARGUMENTS_LOG_LEVEL_SHORT "): Sets the current log level\n"
+               SEC_BUILTINARGUMENTS_DONT_CHANGE_LOG_LEVELS " (" SEC_BUILTINARGUMENTS_DONT_CHANGE_LOG_LEVELS_SHORT "): Prevent the client from changing the log level\n"
+               SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING " (" SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING_SHORT "): Don't render the UI\n"
+               SEC_BUILTINARGUMENTS_EXIT " <code>: Exit the engine after initializing\n"
+               SEC_BUILTINARGUMENTS_CONSOLE ": Start with the console opened";
     }
 SEC_CPP_GUARD_END()

@@ -1,13 +1,14 @@
 #include <SharedEngineCode/Internal/CppHeader.h>
-#include <SharedEngineCode/Debugging/Assert.h>
 
+#include "BaconEngine/Debugging/Assert.h"
 #include "EngineCommands.h"
 #include "BaconEngine/Console/Console.h"
 #include "BaconEngine/Rendering/Renderer.h"
-#include "BaconEngine/Rendering/UI.h"
 #include "../Rendering/EngineLayers.h"
 #include "BaconEngine/Rendering/Layer.h"
 #include "BaconEngine/ClientInformation.h"
+#include "BaconEngine/EngineMemoryInformation.h"
+#include "BaconEngine/Rendering/UI.h"
 
 SEC_CPP_GUARD_START()
     void HelpCommand(BE_Command_Context context);
@@ -25,7 +26,7 @@ SEC_CPP_GUARD_START()
     void InitializeEngineCommands(void) {
         static int initialized = 0;
 
-        SEC_ASSERT(!initialized, "Engine commands are already initialized");
+        BE_ASSERT(!initialized, "Engine commands are already initialized");
 
         initialized = 1;
 
@@ -56,7 +57,7 @@ SEC_CPP_GUARD_START()
     void HelpCommand(BE_Command_Context context) {
         (void) context;
         // TODO: Concat strings together.
-        SEC_ASSERT(0, "This function has not been implemented, yet");
+        BE_ASSERT(0, "This function has not been implemented, yet");
     }
 
     void CheatsCommand(BE_Command_Context context) {
@@ -87,35 +88,42 @@ SEC_CPP_GUARD_START()
     }
 
     void DebugInfoCommand(void) {
-        SEC_LOGGER_INFO("Commands: %i/%i (%i realloc)\n"
-                        "Layers: %i/%i (%i realloc)\n"
-                        "UIs: %i/%i (%i realloc, %i rendered%s%s)\n"
+        BE_EngineMemory_MemoryInformation memoryInformation = BE_EngineMemory_GetMemoryInformation();
+
+        SEC_LOGGER_INFO("Command: %i/%i (%i realloc)\n"
+                        "UI: %i rendered (%i/%i, %i realloc)\n"
+                        "Layer: %i/%i (%i realloc)\n"
                         "Renderer: %i calls\n"
-                        "Memory: %u megabytes (%u bytes) allocated by the engine", BE_Console_GetCommandAmount(),
-                        BE_Console_GetAllocatedCommandsAmount(),
-                        BE_Console_GetCommandReallocationAmount(),
+                        "Engine Memory: %lu bytes\n"
+                        "    Command: %lu allocated, %lu bytes\n"
+                        "    UI: %lu allocated, %lu bytes\n"
+                        "    DynamicArray: %lu allocated, %lu bytes\n"
+                        "    Layer: %lu allocated, %lu bytes",
+                        BE_Console_GetCommandAmount(), BE_Console_GetAllocatedCommandsAmount(), BE_Console_GetCommandReallocationAmount(),
+                        BE_EngineLayers_GetUIWindowRenderCount(), BE_UI_GetWindowAmount(), BE_UI_GetAllocatedWindowsAmount(), BE_UI_GetWindowReallocationAmount(),
                         BE_Layer_GetAmount(), BE_Layer_GetAllocatedLayersAmount(), BE_Layer_GetLayersReallocationAmount(),
-                        BE_UI_GetWindowAmount(), BE_UI_GetAllocatedWindowAmount(), BE_UI_GetWindowReallocationAmount(), GetUIWindowRenderCount(),
-                        BE_UI_GetCurrentWindow() != NULL ? ", current: " : "",
-                        BE_UI_GetCurrentWindow() != NULL ? BE_UI_GetCurrentWindow()->name : "",
                         BE_Renderer_GetCalls(),
-                        SEC_EngineMemory_GetAllocated() / 1000000, SEC_EngineMemory_GetAllocated());
+                        BE_EngineMemory_GetAllocatedBytes(),
+                        memoryInformation.command.allocatedAmount, memoryInformation.command.allocatedBytes,
+                        memoryInformation.ui.allocatedAmount, memoryInformation.ui.allocatedBytes,
+                        memoryInformation.dynamicArray.allocatedAmount, memoryInformation.dynamicArray.allocatedBytes,
+                        memoryInformation.layer.allocatedAmount, memoryInformation.layer.allocatedBytes);
     }
 
     void SayCommand(BE_Command_Context context) {
         (void) context;
         // TODO: Broadcast to everyone.
-        SEC_ASSERT(0, "This function has not been implemented, yet");
+        BE_ASSERT(0, "This function has not been implemented, yet");
     }
 
     void DisconnectCommand(BE_Command_Context context) {
         (void) context;
-        SEC_ASSERT(0, "This function has not been implemented, yet");
+        BE_ASSERT(0, "This function has not been implemented, yet");
     }
 
     void ConnectCommand(BE_Command_Context context) {
         (void) context;
-        SEC_ASSERT(0, "This function has not been implemented, yet");
+        BE_ASSERT(0, "This function has not been implemented, yet");
     }
 
     void WhatAmICommand(void) {
@@ -134,16 +142,16 @@ SEC_CPP_GUARD_START()
 
     void KickCommand(BE_Command_Context context) {
         (void) context;
-        SEC_ASSERT(0, "This function has not been implemented, yet");
+        BE_ASSERT(0, "This function has not been implemented, yet");
     }
 
     void BanCommand(BE_Command_Context context) {
         (void) context;
-        SEC_ASSERT(0, "This function has not been implemented, yet");
+        BE_ASSERT(0, "This function has not been implemented, yet");
     }
 
     void SudoCommand(BE_Command_Context context) {
         (void) context;
-        SEC_ASSERT(0, "This function has not been implemented, yet");
+        BE_ASSERT(0, "This function has not been implemented, yet");
     }
 SEC_CPP_GUARD_END()

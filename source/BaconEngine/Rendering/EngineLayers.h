@@ -5,7 +5,9 @@
 
 #include <SharedEngineCode/Internal/CppHeader.h>
 
+#include "BaconEngine/Storage/DynamicArray.h"
+
 SEC_CPP_GUARD_START()
-    void InitializeEngineLayers(void);
-    int GetUIWindowRenderCount(void);
+    void BE_EngineLayers_Initialize(void);
+    int BE_EngineLayers_GetUIWindowRenderCount(void);
 SEC_CPP_GUARD_END()

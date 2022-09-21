@@ -1,5 +1,18 @@
 project(BaconEngine)
 
+if(NOT BE_DISABLE_OPENGL)
+    set(BE_SOURCE_FILES
+            Rendering/OpenGL/OpenGL.c
+            Rendering/OpenGL/OpenGL.h
+            Rendering/OpenGL/OpenGLWindow.h
+            Rendering/OpenGL/OpenGLWindow.c
+            Rendering/OpenGL/OpenGLRenderer.c
+            Rendering/OpenGL/OpenGLRenderer.h)
+endif()
+
+if(NOT BE_DISABLE_METAL AND APPLE)
+endif()
+
 add_library(BaconEngine STATIC
         Rendering/Window.c
         Rendering/Renderer.c
@@ -9,28 +22,38 @@ add_library(BaconEngine STATIC
         Console/EngineCommands.c
         Console/EngineCommands.h
         Rendering/Layer.c
-        Rendering/UI.c
         Rendering/EngineLayers.c
         Rendering/EngineUIs.c
-        Rendering/UIWindow.c
-        Rendering/UIElement.c
         Input/Keyboard.c
-        Event.c)
+        EngineMemory.h
+        EngineMemory.c
+        Storage/DynamicArray.c
+        Storage/DynamicDictionary.c
+        I18N.c
+        Input/Mouse.c
+        Rendering/UI.c
+        Rendering/PrivateUI.h
+        EntryPoint.c
+        Rendering/SpecificRendererFunctions.h
+        Rendering/SpecificRendererFunctions.c
+        ${BE_SOURCE_FILES}
+        Rendering/TextMode/TextMode.c
+        Rendering/TextMode/TextMode.h
+        Rendering/TextMode/TextModeWindow.c
+        Rendering/TextMode/TextModeWindow.h)
 
-if(NOT DISABLE_SDL)
-    set(BACON_ENGINE_LIBRARIES SDL2)
+if(NOT BE_DISABLE_OPENGL)
+    set(BE_LIBRARIES glfw OpenGL::GL)
 else()
-    target_compile_definitions(BaconEngine PUBLIC BACON_ENGINE_DISABLE_SDL)
+    target_compile_definitions(BaconEngine PUBLIC BE_DISABLE_OPENGL)
 endif()
 
-if (NOT DISABLE_SDL AND NOT DISABLE_SDL_TTF)
-    set(BACON_ENGINE_LIBRARIES ${BACON_ENGINE_LIBRARIES} SDL2_ttf)
-else()
-    target_compile_definitions(BaconEngine PUBLIC BACON_ENGINE_DISABLE_SDL_TTF)
+if(BE_DISABLE_METAL OR NOT APPLE)
+    target_compile_definitions(BaconEngine PUBLIC BE_DISABLE_METAL)
 endif()
 
 target_include_directories(BaconEngine PUBLIC ../../include/BaconEngine)
-target_link_libraries(BaconEngine LINK_PUBLIC SharedEngineCode ${BACON_ENGINE_LIBRARIES})
+target_link_libraries(BaconEngine LINK_PUBLIC SharedEngineCode ${BE_LIBRARIES} glad)
 
 if(MSVC)
     target_compile_options(BaconEngine PRIVATE /W4 /WX)

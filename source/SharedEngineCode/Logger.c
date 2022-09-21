@@ -7,13 +7,11 @@
 #include "SharedEngineCode/ANSI.h"
 #include "SharedEngineCode/Internal/CppHeader.h"
 #include "SharedEngineCode/ArgumentHandler.h"
+#include "SharedEngineCode/BuiltInArguments.h"
+#include "SharedEngineCode/StringExtension.h"
 
 SEC_CPP_GUARD_START()
-    SEC_Logger_LogLevels currentLogLevel = SEC_LOGGER_LOG_LEVEL_INFO;
-    const char* lastMessage;
-    SEC_Logger_LogLevels lastLogLevel;
-    int sentAmount = 1;
-    int firstLog = 1;
+    SEC_Logger_LogLevels currentLogLevel = SEC_LOGGER_LOG_LEVEL_TRACE;
 
     SEC_Logger_LogLevels SEC_Logger_GetLogLevel(void) {
         return currentLogLevel;
@@ -23,8 +21,7 @@ SEC_CPP_GUARD_START()
         static int dontChangeLogLevels = -1;
 
         if (dontChangeLogLevels == -1)
-            dontChangeLogLevels = SEC_ArgumentHandler_GetIndex("--dont-change-log-levels") != -1 ||
-                    SEC_ArgumentHandler_GetIndex("-dcll") != -1;
+            dontChangeLogLevels = SEC_ArgumentHandler_GetIndexWithShort(SEC_BUILTINARGUMENTS_DONT_CHANGE_LOG_LEVELS, SEC_BUILTINARGUMENTS_DONT_CHANGE_LOG_LEVELS_SHORT, 0, NULL, NULL);
 
         if (dontChangeLogLevels)
             return;
@@ -38,42 +35,33 @@ SEC_CPP_GUARD_START()
             static int initialized = 0;
 
             if (!initialized) {
-                char* specifiedLogLevel = (char*) SEC_ArgumentHandler_GetValue("--log-level");
+                char* specifiedLogLevel;
 
-                if (specifiedLogLevel == NULL)
-                    specifiedLogLevel = (char*) SEC_ArgumentHandler_GetValue("-ll");
+                SEC_ArgumentHandler_GetValueWithShort(SEC_BUILTINARGUMENTS_LOG_LEVEL, SEC_BUILTINARGUMENTS_LOG_LEVEL_SHORT, 0, &specifiedLogLevel, &specifiedLogLevel);
 
-                if (specifiedLogLevel != NULL) {
-                    for (int i = 0; i < strlen(specifiedLogLevel); i++)
-                        specifiedLogLevel[i] = (char) tolower(specifiedLogLevel[i]);
-
-                    if (strcmp(specifiedLogLevel, "null") == 0)
-                        currentLogLevel = SEC_LOGGER_LOG_LEVEL_NULL;
-                    else if (strcmp(specifiedLogLevel, "trace") == 0 || strcmp(specifiedLogLevel, "trc") == 0)
-                        currentLogLevel = SEC_LOGGER_LOG_LEVEL_TRACE;
-                    else if (strcmp(specifiedLogLevel, "debug") == 0 || strcmp(specifiedLogLevel, "dbg") == 0)
-                        currentLogLevel = SEC_LOGGER_LOG_LEVEL_DEBUG;
-                    else if (strcmp(specifiedLogLevel, "warn") == 0 || strcmp(specifiedLogLevel, "wrn") == 0)
-                        currentLogLevel = SEC_LOGGER_LOG_LEVEL_WARN;
-                    else if (strcmp(specifiedLogLevel, "error") == 0 || strcmp(specifiedLogLevel, "err") == 0)
-                        currentLogLevel = SEC_LOGGER_LOG_LEVEL_ERROR;
-                    else if (strcmp(specifiedLogLevel, "fatal") == 0 || strcmp(specifiedLogLevel, "ftl") == 0)
-                        currentLogLevel = SEC_LOGGER_LOG_LEVEL_FATAL;
-                }
+//                if (specifiedLogLevel != NULL) {
+//                    if (SEC_StringExtension_CompareCaseless(specifiedLogLevel, "null")) // TODO: Tell the user if they specify a invalid log level.
+//                        currentLogLevel = SEC_LOGGER_LOG_LEVEL_NULL;
+//                    else if (SEC_StringExtension_CompareCaseless(specifiedLogLevel, "trace") || SEC_StringExtension_CompareCaseless(specifiedLogLevel, "trc"))
+//                        currentLogLevel = SEC_LOGGER_LOG_LEVEL_TRACE;
+//                    else if (SEC_StringExtension_CompareCaseless(specifiedLogLevel, "debug") || SEC_StringExtension_CompareCaseless(specifiedLogLevel, "dbg"))
+//                        currentLogLevel = SEC_LOGGER_LOG_LEVEL_DEBUG;
+//                    else if (SEC_StringExtension_CompareCaseless(specifiedLogLevel, "warn") || SEC_StringExtension_CompareCaseless(specifiedLogLevel, "wrn"))
+//                        currentLogLevel = SEC_LOGGER_LOG_LEVEL_WARN;
+//                    else if (SEC_StringExtension_CompareCaseless(specifiedLogLevel, "error") || SEC_StringExtension_CompareCaseless(specifiedLogLevel, "err"))
+//                        currentLogLevel = SEC_LOGGER_LOG_LEVEL_ERROR;
+//                    else if (SEC_StringExtension_CompareCaseless(specifiedLogLevel, "fatal") || SEC_StringExtension_CompareCaseless(specifiedLogLevel, "ftl"))
+//                        currentLogLevel = SEC_LOGGER_LOG_LEVEL_FATAL;
+//                }
 
                 initialized = 1;
             }
         }
 
-        if (currentLogLevel == SEC_LOGGER_LOG_LEVEL_NULL || logLevel < currentLogLevel)
+        if (currentLogLevel == SEC_LOGGER_LOG_LEVEL_NULL || logLevel > currentLogLevel)
             return;
 
         static int antiRecursiveLog = 0;
-        static int compressDupeLogs = -1;
-
-        if (compressDupeLogs == -1)
-            compressDupeLogs = SEC_ArgumentHandler_GetIndex("--dont-compress-dupe-logs") == -1 &&
-                    SEC_ArgumentHandler_GetIndex("-dcdl") == -1;
 
         if (antiRecursiveLog) {
             printf("Recursive log detected, this is 100%% a bug with the engine\n"
@@ -84,45 +72,6 @@ SEC_CPP_GUARD_START()
         }
 
         antiRecursiveLog = 1;
-
-        va_list arguments;
-
-        va_start(arguments, message);
-
-        int size = vsnprintf(NULL, 0, message, arguments) + 1;
-
-        va_end(arguments);
-        va_start(arguments, message);
-
-        // NOTE: Do NOT replace this with SEC_ASSERT_MALLOC, or SEC_ASSERT. They both call this function!!!
-
-        char* buffer = malloc(sizeof(char) * size);
-
-        if (buffer == NULL) {
-            printf("Internal malloc failed, failed to allocate %lu bytes of memory\n", sizeof(char) * size);
-            abort();
-        }
-
-        vsnprintf(buffer, size, message, arguments);
-
-        if (compressDupeLogs) {
-            if (lastMessage == NULL || strcmp(lastMessage, buffer) != 0 || logLevel != lastLogLevel) {
-                lastMessage = buffer;
-                lastLogLevel = logLevel;
-                sentAmount = 1;
-            } else {
-                sentAmount++;
-
-                free(buffer);
-
-                buffer = (char*) lastMessage;
-            }
-        }
-
-        if (!firstLog)
-            printf(sentAmount > 1 && compressDupeLogs ? "\r" : "\n");
-
-        firstLog = 0;
 
         if (includeHeader)
             switch (logLevel) {
@@ -156,20 +105,14 @@ SEC_CPP_GUARD_START()
                     break;
             }
 
+        va_list arguments;
+
+        va_start(arguments, message);
         printf("%s", SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_RESET));
-        printf("%s", buffer);
+        vprintf(message, arguments);
+        printf("\n");
         va_end(arguments);
 
-        if (sentAmount > 1 && compressDupeLogs) {
-            printf(" %s(x%i)%s", SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_BRIGHT_FOREGROUND_BLACK), sentAmount,
-                   SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_RESET));
-            fflush(stdout);
-        }
-
         antiRecursiveLog = 0;
-    }
-
-    int SEC_Logger_AlreadySentFistLog(void) {
-        return !firstLog;
     }
 SEC_CPP_GUARD_END()

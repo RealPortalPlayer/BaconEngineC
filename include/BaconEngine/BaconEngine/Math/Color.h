@@ -7,147 +7,41 @@
 
 SEC_CPP_GUARD_START()
     typedef struct {
-        short r;
-        short g;
-        short b;
-    } BE_Color_3S; // Short: [-32,767, 32,767]
-
-    typedef struct {
-        unsigned short r;
-        unsigned short g;
-        unsigned short b;
-    } BE_Color_3US; // Unsigned Short: [0, 65,535]
-
-    typedef struct {
         int r;
         int g;
         int b;
-    } BE_Color_3I; // Int: [-32,767, 32,767]
+    } BE_Color_3I, BE_Colour_3I; // Int
 
     typedef struct {
         unsigned r;
         unsigned g;
         unsigned b;
-    } BE_Color_3U; // Unsigned Int: [0, 65,535]
-
-    typedef struct {
-        long r;
-        long g;
-        long b;
-    } BE_Color_3L; // Long: [-2,147,483,647, 2,147,483,647]
-
-    typedef struct {
-        unsigned long r;
-        unsigned long g;
-        unsigned long b;
-    } BE_Color_3UL; // Unsigned Long: [0, 4,294,967,295]
-
-    typedef struct {
-        long long r;
-        long long g;
-        long long b;
-    } BE_Color_3LL; // Long Long: [-9,233,372,036,854,775,807, 9,223,372,036,854,775,807]
-
-    typedef struct {
-        unsigned long long r;
-        unsigned long long g;
-        unsigned long long b;
-    } BE_Color_3ULL; // Unsigned Long Long: [0, 18,446,744,073,709,551,615]
+    } BE_Color_3U, BE_Colour_3U; // Unsigned Int
 
     typedef struct {
         float r;
         float g;
         float b;
-    } BE_Color_3F; // Float
-
-    typedef struct {
-        double r;
-        double g;
-        double b;
-    } BE_Color_3D; // Double
-
-    typedef struct {
-        long double r;
-        long double g;
-        long double b;
-    } BE_Color_3LD; // Long Double
-
-    typedef struct {
-        short r;
-        short g;
-        short b;
-        short a;
-    } BE_Color_4S; // Short: [-32,767, 32,767]
-
-    typedef struct {
-        unsigned short r;
-        unsigned short g;
-        unsigned short b;
-        unsigned short a;
-    } BE_Color_4US; // Unsigned Short: [0, 65,535]
+    } BE_Color_3F, BE_Colour_3F; // Float
 
     typedef struct {
         int r;
         int g;
         int b;
         int a;
-    } BE_Color_4I; // Int: [-32,767, 32,767]
+    } BE_Color_4I, BE_Colour_4I; // Int
 
     typedef struct {
         unsigned r;
         unsigned g;
         unsigned b;
         unsigned a;
-    } BE_Color_4U; // Unsigned Int: [0, 65,535]
-
-    typedef struct {
-        long r;
-        long g;
-        long b;
-        long a;
-    } BE_Color_4L; // Long: [-2,147,483,647, 2,147,483,647]
-
-    typedef struct {
-        unsigned long r;
-        unsigned long g;
-        unsigned long b;
-        unsigned long a;
-    } BE_Color_4UL; // Unsigned Long: [0, 4,294,967,295]
-
-    typedef struct {
-        long long r;
-        long long g;
-        long long b;
-        long long a;
-    } BE_Color_4LL; // Long Long: [-9,233,372,036,854,775,807, 9,223,372,036,854,775,807]
-
-    typedef struct {
-        unsigned long long r;
-        unsigned long long g;
-        unsigned long long b;
-        unsigned long long a;
-    } BE_Color_4ULL; // Unsigned Long Long: [0, 18,446,744,073,709,551,615]
+    } BE_Color_4U, BE_Colour_4U; // Unsigned Int
 
     typedef struct {
         float r;
         float g;
         float b;
         float a;
-    } BE_Color_4F; // Float
-
-    typedef struct {
-        double r;
-        double g;
-        double b;
-        double a;
-    } BE_Color_4D; // Double
-
-    typedef struct {
-        long double r;
-        long double g;
-        long double b;
-        long double a;
-    } BE_Color_4LD; // Long Double
+    } BE_Color_4F, BE_Colour_4F; // Float
 SEC_CPP_GUARD_END()
-
-#define BE_COLOR_CREATE(type, ...) (BE_Color_ ## type) {__VA_ARGS__}

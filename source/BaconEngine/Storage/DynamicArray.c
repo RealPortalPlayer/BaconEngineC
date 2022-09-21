@@ -1,13 +1,14 @@
-#include "SharedEngineCode/Internal/CppHeader.h"
+#include <SharedEngineCode/Internal/CppHeader.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "SharedEngineCode/Storage/DynamicArray.h"
-#include "SharedEngineCode/Debugging/StrictMode.h"
-#include "SharedEngineCode/Debugging/Assert.h"
+#include "BaconEngine/Debugging/StrictMode.h"
+#include "BaconEngine/Debugging/Assert.h"
+#include "BaconEngine/Storage/DynamicArray.h"
+#include "../EngineMemory.h"
 
 SEC_CPP_GUARD_START()
-    void ReallocateArray(SEC_DynamicArray* array) {
+    void ReallocateArray(BE_DynamicArray* array) {
         if (array->size != array->used)
             return;
 
@@ -16,30 +17,30 @@ SEC_CPP_GUARD_START()
         array->size *= 2;
         array->calledRealloc++;
 
-        SEC_ASSERT_REALLOC(array->internalArray, sizeof(void*) * (array->size / 2), sizeof(void*) * array->size, "a dynamic array");
+        BE_EngineMemory_ReallocateMemory(array->internalArray, sizeof(void*) * (array->size / 2), sizeof(void*) * array->size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
     }
 
-    int SEC_DynamicArray_Create(SEC_DynamicArray* array, size_t size) {
-        SEC_STRICTMODE_CHECK(size != 0, 0, "Invalid size");
-        SEC_ASSERT_MALLOC(array->internalArray, sizeof(void*) * size, "a dynamic array");
+    int BE_DynamicArray_Create(BE_DynamicArray* array, size_t size) {
+        BE_STRICTMODE_CHECK(size != 0, 0, "Invalid size");
 
+        array->internalArray = BE_EngineMemory_AllocateMemory(sizeof(void*) * size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
         array->used = 0;
         array->size = size;
 
         return 1;
     }
 
-    int SEC_DynamicArray_AddElementToStart(SEC_DynamicArray* array, void* element) {
+    int BE_DynamicArray_AddElementToStart(BE_DynamicArray* array, void* element) {
         if (array->frozen)
             return 0;
 
         ReallocateArray(array);
-        (void) element;
+        (void) element; // TODO: Add element.
 
         return 0;
     }
 
-    int SEC_DynamicArray_AddElementToLast(SEC_DynamicArray* array, void* element) {
+    int BE_DynamicArray_AddElementToLast(BE_DynamicArray* array, void* element) {
         if (array->frozen)
             return 0;
 
@@ -50,7 +51,7 @@ SEC_CPP_GUARD_START()
         return 1;
     }
 
-    int SEC_DynamicArray_RemoveFirstElement(SEC_DynamicArray* array, int shift) {
+    int BE_DynamicArray_RemoveFirstElement(BE_DynamicArray* array, int shift) {
         if (array->used == 0 || array->frozen)
             return 0;
 
@@ -59,10 +60,10 @@ SEC_CPP_GUARD_START()
             return 1;
         }
 
-        return SEC_DynamicArray_RemoveElementAt(array, 0);
+        return BE_DynamicArray_RemoveElementAt(array, 0);
     }
 
-    int SEC_DynamicArray_RemoveLastElement(SEC_DynamicArray* array) {
+    int BE_DynamicArray_RemoveLastElement(BE_DynamicArray* array) {
         if (array->used == 0 || array->frozen)
             return 0;
 
@@ -71,7 +72,7 @@ SEC_CPP_GUARD_START()
         return 1;
     }
 
-    int SEC_DynamicArray_RemoveElementAt(SEC_DynamicArray* array, unsigned int index) {
+    int BE_DynamicArray_RemoveElementAt(BE_DynamicArray* array, unsigned int index) {
         if ((int) index >= array->used || array->frozen)
             return 0;
 
@@ -84,11 +85,11 @@ SEC_CPP_GUARD_START()
         return 1;
     }
 
-    void SEC_DynamicArray_Shrink(SEC_DynamicArray* array) {
+    void BE_DynamicArray_Shrink(BE_DynamicArray* array) {
         if (array->size == 0 || array->size == array->used || array->frozen)
             return;
 
         SEC_LOGGER_TRACE("Shrinking array, this is expensive");
-        SEC_ASSERT_REALLOC(array->internalArray, array->size, (array->size = array->used), "a shrunken array"); // TODO: Is this even needed?
+        BE_EngineMemory_ReallocateMemory(array->internalArray, array->size, (array->size = array->used), BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
     }
 SEC_CPP_GUARD_END()

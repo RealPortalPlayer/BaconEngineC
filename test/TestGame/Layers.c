@@ -2,7 +2,6 @@
 #include <BaconEngine/Rendering/Renderer.h>
 #include <BaconEngine/Console/Console.h>
 #include <stdlib.h>
-#include <BaconEngine/Rendering/UI.h>
 
 #include "Layers.h"
 
@@ -30,8 +29,8 @@ void InitializeTestLayers(void) {
 int enabled = 1;
 
 int UIOnEvent(BE_Event event) {
-    if (event.type == BE_EVENT_TYPE_KEYBOARD_KEY_DOWN && event.unionVariables.keyboard.key == BE_KEYBOARD_KEY_CODE_A) {
-        BE_UI_ToggleWindowRendering((enabled = !enabled));
+    if (event.type == BE_EVENT_TYPE_KEYBOARD_KEY_DOWN && event.keyboard.key == BE_KEYBOARD_KEY_CODE_A) {
+//        BE_UI_ToggleWindowRendering((enabled = !enabled));
         return 1;
     }
 
@@ -42,7 +41,7 @@ int UIOnEvent(BE_Event event) {
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
 void ColorOnUpdate(BE_Layer_UpdateTypes updateType, double deltaTime) {
-    if (updateType != LAYER_UPDATE_TYPE_BEFORE_RENDERING)
+    if (updateType != BE_LAYER_UPDATE_TYPE_BEFORE_RENDERING)
         return;
 
     int times = 1;
@@ -65,10 +64,10 @@ int ColorOnEvent(BE_Event event) {
 #ifndef BACON_ENGINE_DISABLE_SDL
     switch (event.type) {
         case BE_EVENT_TYPE_KEYBOARD_KEY_UP:
-            if (event.unionVariables.keyboard.key == BE_KEYBOARD_KEY_CODE_R ||
-                event.unionVariables.keyboard.key == BE_KEYBOARD_KEY_CODE_T ||
-                event.unionVariables.keyboard.key == BE_KEYBOARD_KEY_CODE_Y ||
-                event.unionVariables.keyboard.key == BE_KEYBOARD_KEY_CODE_D)
+            if (event.keyboard.key == BE_KEYBOARD_KEY_CODE_R ||
+                event.keyboard.key == BE_KEYBOARD_KEY_CODE_T ||
+                event.keyboard.key == BE_KEYBOARD_KEY_CODE_Y ||
+                event.keyboard.key == BE_KEYBOARD_KEY_CODE_D)
                 return 0;
 
             down = 0;
@@ -87,23 +86,23 @@ int ColorOnEvent(BE_Event event) {
 }
 
 int ColorModifierOnEvent(BE_Event event) {
-    if (event.type == BE_EVENT_TYPE_KEYBOARD_KEY_UP && event.unionVariables.keyboard.key == BE_KEYBOARD_KEY_CODE_R)
+    if (event.type == BE_EVENT_TYPE_KEYBOARD_KEY_UP && event.keyboard.key == BE_KEYBOARD_KEY_CODE_R)
         return 1;
 
     if (event.type == BE_EVENT_TYPE_KEYBOARD_KEY_DOWN) {
-        if (event.unionVariables.keyboard.key == BE_KEYBOARD_KEY_CODE_R) {
+        if (event.keyboard.key == BE_KEYBOARD_KEY_CODE_R) {
             BE_Layer_Toggle("Color", 0);
 
             return 1;
         }
 
-        if (event.unionVariables.keyboard.key == BE_KEYBOARD_KEY_CODE_T) {
+        if (event.keyboard.key == BE_KEYBOARD_KEY_CODE_T) {
             BE_Layer_Toggle("Color", 1);
 
             return 1;
         }
 
-        if (event.unionVariables.keyboard.key == BE_KEYBOARD_KEY_CODE_Y) {
+        if (event.keyboard.key == BE_KEYBOARD_KEY_CODE_Y) {
             color.r = rand() % 255;
             color.g = rand() % 255;
             color.b = rand() % 255;
@@ -111,7 +110,7 @@ int ColorModifierOnEvent(BE_Event event) {
             return 1;
         }
 
-        if (event.unionVariables.keyboard.key == BE_KEYBOARD_KEY_CODE_D) {
+        if (event.keyboard.key == BE_KEYBOARD_KEY_CODE_D) {
             BE_Console_ExecuteCommand("debuginfo");
             return 1;
         }

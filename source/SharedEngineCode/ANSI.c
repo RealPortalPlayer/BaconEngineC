@@ -1,6 +1,8 @@
+#include <stddef.h>
 #include "SharedEngineCode/Internal/CppHeader.h"
 #include "SharedEngineCode/ANSI.h"
 #include "SharedEngineCode/ArgumentHandler.h"
+#include "SharedEngineCode/BuiltInArguments.h"
 
 SEC_CPP_GUARD_START()
     const char* ansiCodesCharArray[SEC_ANSI_CODE_SIZE] = {
@@ -19,8 +21,7 @@ SEC_CPP_GUARD_START()
         static int enabled = -1;
 
         if (enabled == -1)
-            enabled = SEC_ArgumentHandler_GetIndex("--disable-ansi-coloring") == -1 &&
-                    SEC_ArgumentHandler_GetIndex("-dac") == -1;
+            enabled = !SEC_ArgumentHandler_GetIndexWithShort(SEC_BUILTINARGUMENTS_DISABLE_ANSI_COLORING, SEC_BUILTINARGUMENTS_DISABLE_ANSI_COLORING_SHORT, 0, NULL, NULL);
 
         return enabled;
     }

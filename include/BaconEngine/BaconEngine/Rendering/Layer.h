@@ -5,19 +5,17 @@
 
 #include <SharedEngineCode/Internal/CppHeader.h>
 
-#include "BaconEngine/SDLSupport.h"
 #include "BaconEngine/Event.h"
 
 SEC_CPP_GUARD_START()
     typedef struct {
         int valid;
-        int enabled;
         const char* name;
     } BE_Layer;
 
     typedef enum {
-        LAYER_UPDATE_TYPE_BEFORE_RENDERING,
-        LAYER_UPDATE_TYPE_AFTER_RENDERING
+        BE_LAYER_UPDATE_TYPE_BEFORE_RENDERING,
+        BE_LAYER_UPDATE_TYPE_AFTER_RENDERING
     } BE_Layer_UpdateTypes;
 
     typedef struct {
@@ -36,6 +34,7 @@ SEC_CPP_GUARD_START()
     int BE_Layer_GetLayersReallocationAmount(void);
     int BE_Layer_Toggle(const char* name, int enable);
     void BE_Layer_OnUpdate(BE_Layer_UpdateTypes updateTypes, double deltaTime);
-    int BE_Layer_OnEvent(SDL_Event sdlEvent);
+    int BE_Layer_OnEvent(BE_Event event);
+    int BE_Layer_IsToggled(const char* name);
     void BE_Layer_DestroyLayers(void);
 SEC_CPP_GUARD_END()

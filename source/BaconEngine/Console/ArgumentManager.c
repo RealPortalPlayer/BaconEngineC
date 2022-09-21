@@ -21,7 +21,7 @@ SEC_CPP_GUARD_START()
         return strcmp(tempValue, "false") == 0 ? 1 : 0;
     }
 
-    int BE_ArgumentHandler_GetInt(SEC_DynamicDictionary arguments, const char* name, int defaultValue) {
+    int BE_ArgumentHandler_GetInt(BE_DynamicDictionary arguments, const char* name, int defaultValue) {
         if (arguments.keys.size != 0) {
             char* value = (char*) BE_ArgumentHandler_GetString(arguments, name, "");
             {
@@ -41,11 +41,11 @@ SEC_CPP_GUARD_START()
         return defaultValue;
     }
 
-    int BE_ArgumentHandler_GetBoolean(SEC_DynamicDictionary arguments, const char* name, int defaultValue) {
+    int BE_ArgumentHandler_GetBoolean(BE_DynamicDictionary arguments, const char* name, int defaultValue) {
         return BE_ArgumentHandler_GetInt(arguments, name, defaultValue) >= 1;
     }
 
-    float BE_ArgumentHandler_GetFloat(SEC_DynamicDictionary arguments, const char* name, float defaultValue) {
+    float BE_ArgumentHandler_GetFloat(BE_DynamicDictionary arguments, const char* name, float defaultValue) {
         if (arguments.keys.size != 0) {
             char* value = (char*) BE_ArgumentHandler_GetString(arguments, name, "");
             {
@@ -65,8 +65,8 @@ SEC_CPP_GUARD_START()
         return defaultValue;
     }
 
-    const char* BE_ArgumentHandler_GetString(SEC_DynamicDictionary arguments, const char* name, const char* defaultValue) {
-        const char* value = SEC_DynamicDictionary_GetElementViaKey(arguments, (void*) name, sizeof(char) * strlen(name) + 1);
+    const char* BE_ArgumentHandler_GetString(BE_DynamicDictionary arguments, const char* name, const char* defaultValue) {
+        const char* value = BE_DynamicDictionary_GetElementViaKey(arguments, (void*) name, sizeof(char) * strlen(name) + 1);
 
         return value != NULL ? value : defaultValue;
     }

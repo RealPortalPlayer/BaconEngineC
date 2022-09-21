@@ -1,4 +1,8 @@
 #include <BaconEngine/EntryPoint.h>
+#include <SharedEngineCode/Logger.h>
+#include <SharedEngineCode/ArgumentHandler.h>
+#include <SharedEngineCode/BuiltInArguments.h>
+#include <BaconEngine/Console/Console.h>
 
 #include "Layers.h"
 
@@ -6,22 +10,16 @@ void TestCommand(void) {
     SEC_LOGGER_INFO("Hello, World!");
 }
 
-void ButtonOnClickEvent(void) {
-
-}
-
 int BE_EntryPoint_ClientStart(int argc, char** argv) {
     (void) argc;
     (void) argv;
 
-    BE_UI_RegisterWindow("Hello, World!", (BE_Vector_2I) {100, 100}, (BE_Vector_2U) {200, 70},
-                         BE_UI_WINDOW_FLAG_INVISIBLE_WINDOW);
-    {
-        BE_UI_RegisterElement(
-                BE_UIElement_CreateBox((BE_Vector_2I) {0, 0}, (BE_Vector_2U) {100, 50},
-                                       (BE_Color_4U) {255, 255, 255, 255}));
-    }
-    BE_UI_FinishRegisteringWindow();
+    int index1;
+    int index2;
+
+    if (SEC_ArgumentHandler_GetIndexWithShort(SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING_SHORT, SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING_SHORT, 1, &index1, &index2))
+        SEC_LOGGER_INFO("DUR: %i %i", index1, index2);
+
     InitializeTestLayers();
     BE_Console_RegisterCommand("test", "Tests the command handler.", BE_COMMAND_FLAG_NULL,
                                (void (*)(BE_Command_Context)) &TestCommand);

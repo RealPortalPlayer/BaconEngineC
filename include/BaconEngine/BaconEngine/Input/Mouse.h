@@ -14,15 +14,6 @@ SEC_CPP_GUARD_START()
         BE_MOUSE_BUTTON_TYPE_FORTH
     } BE_Mouse_ButtonType;
 
-    // TODO: BE_Mouse_IsDown, BE_Mouse_IsUp, BE_Mouse_IsPressed, BE_Mouse_WasDown
-    //       Frame 1:  1                0              1                   0
-    //       Frame 2:  0                0              0                   1
-    //       Frame 3:  0                1              0                   0
-    //       Frame 4:  1                0              1                   0
-    //       Frame 5:  0                0              1                   0
-    //       Frame 6:  0                0              1                   0
-    //       Frame 7:  1                0              1                   0
-    //       Frame 8:  1                0              1                   0
-    //       Frame 9:  0                0              0                   1
-    //       Frame 10: 0                1              0                   0
+    void BE_Mouse_SetButtonDown(BE_Mouse_ButtonType button, int down);
+    int BE_Mouse_IsButtonDown(BE_Mouse_ButtonType button);
 SEC_CPP_GUARD_END()

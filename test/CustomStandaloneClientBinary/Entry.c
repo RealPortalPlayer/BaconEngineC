@@ -1,9 +1,10 @@
 #include <BaconEngine/EntryPoint.h>
+#include <stdio.h>
 
 int main(int argc, char** argv) {
     printf("Hello, World!\n");
     printf("This is a custom launcher\n");
-    printf("Launching engine");
+    printf("Launching engine\n");
     BE_EntryPoint_StartBaconEngine(argc, argv);
 }
 

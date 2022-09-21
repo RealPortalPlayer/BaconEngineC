@@ -1,4 +1,2 @@
 /build/
-/dependencies/SDL/
-/dependencies/SDL_ttf/
-/dependencies/zlib/
+/dependencies/*

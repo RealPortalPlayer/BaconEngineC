@@ -7,14 +7,14 @@ int BE_EntryPoint_ClientStart(int argc, char** argv) {
     return 0;
 }
 
-int BE_EntryPoint_ClientShutdown(void) {
+int BE_EntryPoint_ClientShutdown() {
     return 0;
 }
 
-int BE_EntryPoint_ClientSupportsServer(void) {
+int BE_EntryPoint_ClientSupportsServer() {
     return 1;
 }
 
-const char* BE_EntryPoint_GetClientName(void) {
+const char* BE_EntryPoint_GetClientName() {
     return "Test C++";
 }

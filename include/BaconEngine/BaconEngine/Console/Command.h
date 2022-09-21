@@ -4,8 +4,8 @@
 #pragma once
 
 #include <SharedEngineCode/Internal/CppHeader.h>
-#include <SharedEngineCode/Storage/DynamicDictionary.h>
 
+#include "BaconEngine/Storage/DynamicDictionary.h"
 #include "ArgumentManager.h"
 
 SEC_CPP_GUARD_START()
@@ -18,7 +18,7 @@ SEC_CPP_GUARD_START()
 
     typedef struct { // TODO: Client
         const char** userArguments;
-        SEC_DynamicDictionary arguments;
+        BE_DynamicDictionary arguments;
     } BE_Command_Context;
 
     typedef struct {

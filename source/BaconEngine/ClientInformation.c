@@ -1,6 +1,8 @@
 #include <SharedEngineCode/ArgumentHandler.h>
 #include <SharedEngineCode/Internal/CppHeader.h>
 #include <SharedEngineCode/Logger.h>
+#include <SharedEngineCode/BuiltInArguments.h>
+#include <stddef.h>
 
 #include "BaconEngine/ClientInformation.h"
 
@@ -20,7 +22,7 @@ SEC_CPP_GUARD_START()
         static int enabled = -1;
 
         if (enabled == -1)
-            enabled = SEC_ArgumentHandler_GetIndex("--server") != -1 || SEC_ArgumentHandler_GetIndex("-s") != -1;
+            enabled = SEC_ArgumentHandler_GetIndexWithShort(SEC_BUILTINARGUMENTS_SERVER, SEC_BUILTINARGUMENTS_SERVER_SHORT, 0, NULL, NULL);
 
         return enabled;
     }
@@ -29,12 +31,17 @@ SEC_CPP_GUARD_START()
         static int enabled = -1;
 
         if (enabled == -1)
-            enabled = SEC_ArgumentHandler_GetIndex("--no-strict") == -1 && SEC_ArgumentHandler_GetIndex("-ns") == -1;
+            enabled = !SEC_ArgumentHandler_GetIndexWithShort(SEC_BUILTINARGUMENTS_NO_STRICT, SEC_BUILTINARGUMENTS_NO_STRICT_SHORT, 0, NULL, NULL);
 
         return enabled;
     }
 
     void BE_ClientInformation_StopRunning(void) {
+        if (!running) {
+            SEC_LOGGER_WARN("Client is already stopping");
+            return;
+        }
+
         running = 0;
     }
 

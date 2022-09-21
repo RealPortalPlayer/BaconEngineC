@@ -15,6 +15,6 @@ SEC_CPP_GUARD_START()
     void BE_Console_Initialize(void);
     void BE_Console_RegisterCommand(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context));
     void BE_Console_DuplicateCommand(const char* name, const char* description);
-    void BE_Console_ExecuteCommand(char* input); // TODO: Client
+    void BE_Console_ExecuteCommand(const char* input); // TODO: Client
     void BE_Console_Destroy(void);
 SEC_CPP_GUARD_END()
