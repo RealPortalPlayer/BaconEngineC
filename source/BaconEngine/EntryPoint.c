@@ -10,6 +10,8 @@
 #elif SEC_OPERATINGSYSTEM_WINDOWS
 #   include <signal.h>
 #   include <io.h>
+#   define STDOUT_FILENO _fileno(stdout)
+#   define write _write // HACK: This is a stupid idea, but it's the only way to make MSVC shut up.
 #endif
 
 #include "BaconEngine/Debugging/Assert.h"

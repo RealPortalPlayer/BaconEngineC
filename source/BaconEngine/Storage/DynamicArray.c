@@ -9,7 +9,7 @@
 
 SEC_CPP_GUARD_START()
     void ReallocateArray(BE_DynamicArray* array) {
-        if (array->size != array->used)
+        if (array->size != (size_t) array->used)
             return;
 
         SEC_LOGGER_TRACE("Ran out of free space, expanding array\nThis is expensive, so you should try avoiding it");
@@ -86,7 +86,7 @@ SEC_CPP_GUARD_START()
     }
 
     void BE_DynamicArray_Shrink(BE_DynamicArray* array) {
-        if (array->size == 0 || array->size == array->used || array->frozen)
+        if (array->size == 0 || array->size == (size_t) array->used || array->frozen)
             return;
 
         SEC_LOGGER_TRACE("Shrinking array, this is expensive");

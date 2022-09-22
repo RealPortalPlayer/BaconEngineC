@@ -99,6 +99,8 @@ SEC_CPP_GUARD_START()
     }
 
     void BE_EngineLayers_UIRendering_OnUpdate(BE_Layer_UpdateTypes updateType, double deltaTime) {
+        (void) deltaTime;
+
         if (updateType != BE_LAYER_UPDATE_TYPE_BEFORE_RENDERING)
             return;
 
@@ -133,7 +135,7 @@ SEC_CPP_GUARD_START()
                 if (BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_MINIMIZED))
                     height = 22;
 
-                if (uiWindow->position.y + height + 1 > windowSize.y)
+                if (uiWindow->position.y + height + 1 > (int) windowSize.y)
                     uiWindow->position.y -= uiWindow->position.y + 1 + (int) (height - windowSize.y);
             }
 

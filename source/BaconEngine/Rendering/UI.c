@@ -16,7 +16,7 @@ SEC_CPP_GUARD_START()
     BE_DynamicArray renderOrder;
 
     BE_PrivateUI_Window* BE_UI_GetWindowFromId(unsigned windowId) {
-        BE_STRICTMODE_CHECK(uiWindows.used > windowId, NULL, "Invalid UI window ID");
+        BE_STRICTMODE_CHECK(uiWindows.used > (int) windowId, NULL, "Invalid UI window ID");
         return BE_DYNAMICARRAY_GET_ELEMENT(BE_PrivateUI_Window, uiWindows, windowId);
     }
 

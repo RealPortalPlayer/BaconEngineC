@@ -3,7 +3,7 @@
 #include "BaconEngine/Input/Mouse.h"
 
 SEC_CPP_GUARD_START()
-    int mouseButtonDown[5] = {0};
+    int mouseButtonDown[5] = {0}; // TODO: Replace with renderer specific function
 
     void BE_Mouse_SetButtonDown(BE_Mouse_ButtonType button, int down) {
         if (button >= 5)

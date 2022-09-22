@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
                 SEC_LOGGER_FATAL("Failed to load the binary: %s", configuration.errorMessage);
 #elif SEC_OPERATINGSYSTEM_WINDOWS
-                SEC_LOG_FATAL("Failed to load the binary: %i", configuration.code);
+                SEC_LOGGER_FATAL("Failed to load the binary: %i", configuration.code);
 #endif
                 return 1;
 
@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
                 SEC_LOGGER_FATAL("Failed to get important methods: %s", configuration.errorMessage);
 #elif SEC_OPERATINGSYSTEM_WINDOWS
-                SEC_LOG_FATAL("Failed to get important methods: %i", configuration.code);
+                SEC_LOGGER_FATAL("Failed to get important methods: %i", configuration.code);
 #endif
                 return 1;
 

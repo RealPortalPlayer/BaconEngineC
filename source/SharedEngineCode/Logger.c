@@ -11,7 +11,7 @@
 #include "SharedEngineCode/StringExtension.h"
 
 SEC_CPP_GUARD_START()
-    SEC_Logger_LogLevels currentLogLevel = SEC_LOGGER_LOG_LEVEL_TRACE;
+    SEC_Logger_LogLevels currentLogLevel = SEC_LOGGER_LOG_LEVEL_INFO;
 
     SEC_Logger_LogLevels SEC_Logger_GetLogLevel(void) {
         return currentLogLevel;

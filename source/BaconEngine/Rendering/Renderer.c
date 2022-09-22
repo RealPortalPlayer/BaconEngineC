@@ -13,7 +13,6 @@
 #   include "OpenGL/OpenGL.h"
 #endif
 
-
 #include "TextMode/TextMode.h"
 
 SEC_CPP_GUARD_START()
@@ -202,6 +201,8 @@ SEC_CPP_GUARD_START()
     }
 
     void BE_Renderer_DrawBorderedRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U borderColor, BE_Color_4U fillColor, int borderPadding) {
+        (void) borderColor;
+        (void) borderPadding; // TODO: Padding.
         BE_Renderer_DrawRectangle(position, size, fillColor);
 //        return 0;
 //        return BE_Renderer_DrawRectangle((BE_Vector_2I) {position.x - borderPadding, position.y - borderPadding},

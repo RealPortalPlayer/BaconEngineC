@@ -23,6 +23,7 @@ SEC_CPP_GUARD_START()
     unsigned vertexArrayObjects;
 
     void BE_OpenGLRenderer_CompileShaders(void) {
+#if 0
         unsigned vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
         SEC_LOGGER_DEBUG("Compiling shaders");
@@ -82,6 +83,7 @@ SEC_CPP_GUARD_START()
         glDeleteShader(fragmentShader);
         glGenVertexArrays(1, &vertexArrayObjects);
         glGenBuffers(1, &vertexBufferObjects);
+#endif
     }
 
     void BE_OpenGLRenderer_ClearScreen(void) {
@@ -102,5 +104,9 @@ SEC_CPP_GUARD_START()
     }
 
     void BE_OpenGLRenderer_DrawFilledRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U color) {
+        (void) position;
+        (void) size;
+        (void) color;
+        // TODO: Implementation.
     }
 SEC_CPP_GUARD_END()

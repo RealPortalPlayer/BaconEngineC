@@ -73,7 +73,7 @@ SEC_CPP_GUARD_START()
     }
 
     void BE_Window_SetWidth(unsigned newWidth) {
-        BE_Window_SetSize((BE_Vector_2U) {newWidth, BE_Window_GetSize().y});
+		BE_Window_SetSize((BE_Vector_2U) {newWidth, BE_Window_GetSize().y});
     }
 
     void BE_Window_SetHeight(unsigned newHeight) {

@@ -1,6 +1,7 @@
 #include <SharedEngineCode/Internal/CppHeader.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <SharedEngineCode/Internal/OperatingSystem.h>
 
 #include "OpenGLWindow.h"
 #include "BaconEngine/Debugging/Assert.h"
@@ -201,6 +202,9 @@ SEC_CPP_GUARD_START()
     }
 
     void BE_OpenGLWindow_MouseButtonEvent(GLFWwindow* theWindow, int button, int action, int mods) {
+        (void) theWindow;
+        (void) mods;
+
         double x;
         double y;
 
@@ -218,6 +222,8 @@ SEC_CPP_GUARD_START()
     }
 
     void BE_OpenGLWindow_CursorPositionMovedEvent(GLFWwindow* theWindow, double x, double y) {
+        (void) theWindow;
+
         BE_Layer_OnEvent((BE_Event) {
             .type = BE_EVENT_TYPE_MOUSE_MOVED,
             .mouse = {
@@ -227,12 +233,16 @@ SEC_CPP_GUARD_START()
     }
 
     void BE_OpenGLWindow_CursorEnterEvent(GLFWwindow* theWindow, int entered) {
+        (void) theWindow;
+
         BE_Layer_OnEvent((BE_Event) {
             .type = entered ? BE_EVENT_TYPE_MOUSE_ENTER : BE_EVENT_TYPE_MOUSE_LEAVE
         });
     }
 
     void BE_OpenGLWindow_ScrollEvent(GLFWwindow* theWindow, double x, double y) {
+        (void) theWindow;
+
         double xPos;
         double yPos;
 
@@ -249,24 +259,32 @@ SEC_CPP_GUARD_START()
     }
 
     void BE_OpenGLWindow_FocusEvent(GLFWwindow* theWindow, int focused) {
+        (void) theWindow;
+
         BE_Layer_OnEvent((BE_Event) {
             .type = focused ? BE_EVENT_TYPE_WINDOW_FOCUS_GAINED : BE_EVENT_TYPE_WINDOW_FOCUS_LOST
         });
     }
 
     void BE_OpenGLWindow_CloseEvent(GLFWwindow* theWindow) {
+        (void) theWindow;
+
         BE_Layer_OnEvent((BE_Event) {
             .type = BE_EVENT_TYPE_WINDOW_CLOSE
         });
     }
 
     void BE_OpenGLWindow_MaximizeEvent(GLFWwindow* theWindow, int maximized) {
+        (void) theWindow;
+
         BE_Layer_OnEvent((BE_Event) {
             .type = maximized ? BE_EVENT_TYPE_WINDOW_MAXIMIZED : BE_EVENT_TYPE_WINDOW_RESTORED
         });
     }
 
     void BE_OpenGLWindow_MovedEvent(GLFWwindow* theWindow, int x, int y) {
+        (void) theWindow;
+
         BE_Layer_OnEvent((BE_Event) {
             .type = BE_EVENT_TYPE_WINDOW_MOVED,
             .window = {
@@ -276,6 +294,8 @@ SEC_CPP_GUARD_START()
     }
 
     void BE_OpenGLWindow_ResizedEvent(GLFWwindow* theWindow, int width, int height) {
+        (void) theWindow;
+
         glViewport(0, 0, width, height);
         BE_Layer_OnEvent((BE_Event) {
             .type = BE_EVENT_TYPE_WINDOW_RESIZED,
@@ -286,11 +306,19 @@ SEC_CPP_GUARD_START()
     }
 
     void BE_OpenGLWindow_Create(const char* title, BE_Vector_2U size, int monitor) {
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // Required on Mac
-        BE_ASSERT(window = glfwCreateWindow(size.x, size.y, title, NULL, NULL), "Failed to create GLFW window");
+        (void) monitor;
+
+        //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+       // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#if SEC_OPERATINGSYSTEM_MAC // TODO: Should this apply for other Apple operating systems, for example, iOS?
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
+        window = glfwCreateWindow(size.x, size.y, title, NULL, NULL);
+
+        BE_ASSERT(window != NULL, "Failed to create GLFW window");
         glfwMakeContextCurrent(window);
         glfwSetKeyCallback(window, &BE_OpenGLWindow_KeyEvent);
         glfwSetMouseButtonCallback(window, &BE_OpenGLWindow_MouseButtonEvent);
@@ -317,7 +345,7 @@ SEC_CPP_GUARD_START()
         unsigned width;
         unsigned height;
 
-        glfwGetWindowSize(window, (int*) &width, (int*) &height);
+        glfwGetWindowSize(window, (int*) &width, (int*) &height); // FIXME: Converting a unsigned pointer to a int pointer is undefined behaviour.
 
         return (BE_Vector_2U) {width, height};
     }
