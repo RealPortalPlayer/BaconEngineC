@@ -1,213 +1,223 @@
-#include <SharedEngineCode/Internal/CppHeader.h>
-#include <ctype.h>
+#include <SharedEngineCode/Internal/CppSupport.h>
 #include <string.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <SharedEngineCode/StringExtension.h>
 
 #include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Rendering/Renderer.h"
-#include "BaconEngine/Rendering/Window.h"
 #include "SpecificRendererFunctions.h"
 
 #ifndef BE_DISABLE_OPENGL
-#   include "OpenGL/OpenGL.h"
+#   include "../Platform/OpenGL/OpenGL.h"
 #endif
 
-#include "TextMode/TextMode.h"
+#include "../Platform/TextMode/TextMode.h"
 
-SEC_CPP_GUARD_START()
-    BE_Renderer_Types currentType;
-    int renderCalls = 0;
+SEC_CPP_SUPPORT_GUARD_START()
+BE_Renderer_Types currentType;
+int renderCalls = 0;
 
-    void BE_Renderer_SetClearColor(BE_Color_3U color) {
-        BE_SpecificRendererFunctions_Get().rendererFunctions.SetClearColor(color);
-    }
+void BE_Renderer_SetClearColor(BE_Color_3U color) {
+    BE_SpecificRendererFunctions_Get().rendererFunctions.SetClearColor(color);
+}
 
-    void BE_Renderer_Initialize(void) {
-        static int initialized = 0;
+void BE_Renderer_Initialize(void) {
+    static int initialized = 0;
 
-        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized rendererFunctions");
+    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized rendererFunctions");
 
-        char* value = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_RENDERER, 0);
+    char* value = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_RENDERER, 0);
 
-        if (value != NULL) {
-            if (SEC_StringExtension_CompareCaseless(value, "opengl")) {
+    if (value != NULL) {
+        if (SEC_StringExtension_CompareCaseless(value, "opengl")) {
 #ifndef BE_DISABLE_OPENGL
-                SEC_LOGGER_DEBUG("Using OpenGL rendererFunctions");
+            SEC_LOGGER_DEBUG("Using OpenGL rendererFunctions");
 
-                currentType = BE_RENDERER_TYPE_OPENGL;
+            currentType = BE_RENDERER_TYPE_OPENGL;
 
-                BE_OpenGL_Initialize();
+            BE_OpenGL_Initialize();
 #else
-                SEC_LOGGER_DEBUG("OpenGL has been disabled, defaulting to text mode");
+            SEC_LOGGER_DEBUG("OpenGL has been disabled, defaulting to text mode");
 
-                currentType = BE_RENDERER_TYPE_TEXT;
+            currentType = BE_RENDERER_TYPE_TEXT;
 
-                BE_TextMode_Initialize();
-#endif
-                return;
-            }
-
-            if (SEC_StringExtension_CompareCaseless(value, "vulkan")) {
-                SEC_LOGGER_DEBUG("Using Vulkan rendererFunctions");
-
-                currentType = BE_RENDERER_TYPE_VULKAN;
-
-                BE_TextMode_Initialize();
-                return;
-            }
-
-            if (SEC_StringExtension_CompareCaseless(value, "text")) {
-                SEC_LOGGER_DEBUG("Using no rendererFunctions");
-
-                currentType = BE_RENDERER_TYPE_TEXT;
-
-                BE_TextMode_Initialize();
-                return;
-            }
-
-            SEC_LOGGER_ERROR("Unknown rendererFunctions type: %s", value);
             BE_TextMode_Initialize();
+#endif
+            return;
         }
 
-        currentType = BE_RENDERER_TYPE_AUTO;
-
-        BE_TextMode_Initialize();
-    }
-
-    void BE_Renderer_ClearScreen(void) {
-        BE_SpecificRendererFunctions_Get().rendererFunctions.ClearScreen();
-    }
-
-    int BE_Renderer_GetCalls(void) {
-        return renderCalls;
-    }
-
-    BE_Renderer_Types BE_Renderer_GetCurrentType(void) {
-        return currentType;
-    }
-
-    int BE_Renderer_IsSoftwareMode(void) {
-        static int software = -1;
-
-        if (software == -1)
-            software = SEC_ArgumentHandler_GetIndex(SEC_BUILTINARGUMENTS_SOFTWARE, 0) != -1;
-
-        return software;
-    }
-
-    BE_Color_3U BE_Renderer_GetClearColor(void) {
-        return BE_SpecificRendererFunctions_Get().rendererFunctions.GetClearColor();
-    }
-
-//    BE_Vector_2U BE_Renderer_GetFontSize(TTF_Font* font, const char* text) {
-//        (void) font;
-//        (void) text;
+        // TODO: Vulkan, Metal, and DirectX
+//      if (SEC_StringExtension_CompareCaseless(value, "vulkan")) {
+//          SEC_LOGGER_DEBUG("Using Vulkan rendererFunctions");
 //
-//        BE_Vector_2U size = (BE_Vector_2U) {5, 5};
+//          currentType = BE_RENDERER_TYPE_VULKAN;
+//
+//          BE_TextMode_Initialize();
+//          return;
+//      }
+
+        if (SEC_StringExtension_CompareCaseless(value, "text")) {
+            SEC_LOGGER_DEBUG("Using no renderer");
+
+            currentType = BE_RENDERER_TYPE_TEXT;
+
+            BE_TextMode_Initialize();
+            return;
+        }
+
+        SEC_LOGGER_ERROR("Unknown renderer type: %s", value);
+    } else
+        SEC_LOGGER_DEBUG("No renderer specified, choosing the best renderer for your platform");
+
+    // TODO: This can get very complicated, think of a better way later.
+    // TODO: Can only do Windows when DirectX is implemented.
+    // TODO: Can only do MacOS when DirectX is implemented.
+    // TODO: Can only do Linux when Vulkan is implemented.
+
+#ifndef BE_DISABLE_OPENGL
+    currentType = BE_RENDERER_TYPE_OPENGL;
+
+    BE_OpenGL_Initialize();
+#else
+    currentType = BE_RENDERER_TYPE_TEXT;
+
+    BE_TextMode_Initialize();
+#endif
+}
+
+void BE_Renderer_ClearScreen(void) {
+    BE_SpecificRendererFunctions_Get().rendererFunctions.ClearScreen();
+}
+
+int BE_Renderer_GetCalls(void) {
+    return renderCalls;
+}
+
+BE_Renderer_Types BE_Renderer_GetCurrentType(void) {
+    return currentType;
+}
+
+int BE_Renderer_IsSoftwareMode(void) {
+    static int software = -1;
+
+    if (software == -1)
+        software = SEC_ArgumentHandler_GetIndex(SEC_BUILTINARGUMENTS_SOFTWARE, 0) != -1;
+
+    return software;
+}
+
+BE_Color_3U BE_Renderer_GetClearColor(void) {
+    return BE_SpecificRendererFunctions_Get().rendererFunctions.GetClearColor();
+}
+
+//BE_Vector_2U BE_Renderer_GetFontSize(TTF_Font* font, const char* text) {
+//  (void) font;
+//  (void) text;
+//
+//  BE_Vector_2U size = (BE_Vector_2U) {5, 5};
 //
 //#ifndef BACON_ENGINE_DISABLE_SDL_TTF
-//        if (font != NULL) {
-//            BE_Vector_2U textSize = {0, 0};
+//  if (font != NULL) {
+//      BE_Vector_2U textSize = {0, 0};
 //
-//            TTF_SizeText(font, text, (int*) &textSize.x, (int*) &textSize.y);
+//      TTF_SizeText(font, text, (int*) &textSize.x, (int*) &textSize.y);
 //
-//            size.x += textSize.x + 5;
-//            size.y += textSize.y + 5;
-//        }
+//      size.x += textSize.x + 5;
+//      size.y += textSize.y + 5;
+//  }
 //#endif
 //
-//        return size;
-//    }
+//  return size;
+//}
 
-    BE_Vector_2I BE_Renderer_GetCenterPosition(BE_Vector_2I rectanglePosition, BE_Vector_2U rectangleSize, BE_Vector_2U objectSize) {
-        return (BE_Vector_2I) {
-            rectanglePosition.x + (int) rectangleSize.x / 2 - (int) objectSize.x / 2,
-            rectanglePosition.y + (int) rectangleSize.y / 2 - (int) objectSize.y / 2
-        };
-    }
+BE_Vector_2I BE_Renderer_GetCenterPosition(BE_Vector_2I rectanglePosition, BE_Vector_2U rectangleSize, BE_Vector_2U objectSize) {
+    return (BE_Vector_2I) {
+        rectanglePosition.x + (int) rectangleSize.x / 2 - (int) objectSize.x / 2,
+        rectanglePosition.y + (int) rectangleSize.y / 2 - (int) objectSize.y / 2
+    };
+}
 
-    void BE_Renderer_DrawLine(BE_Vector_2I firstPoint, BE_Vector_2I secondPoint, BE_Color_4U color) {
-        (void) firstPoint;
-        (void) secondPoint;
-        (void) color;
+void BE_Renderer_DrawLine(BE_Vector_2I firstPoint, BE_Vector_2I secondPoint, BE_Color_4U color) {
+    (void) firstPoint;
+    (void) secondPoint;
+    (void) color;
 
-//        if (BE_Window_GetInternalSDLRenderer() == NULL)
-//            return 0;
+//  if (BE_Window_GetInternalSDLRenderer() == NULL)
+//      return 0;
 //
 //#ifndef BACON_ENGINE_DISABLE_SDL
-//        renderCalls++;
+//  renderCalls++;
 //
-//        if (color.a != 255)
-//            SDL_SetRenderDrawBlendMode(BE_Window_GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
+//  if (color.a != 255)
+//      SDL_SetRenderDrawBlendMode(BE_Window_GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
 //
-//        return SDL_SetRenderDrawColor(BE_Window_GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
-//               SDL_RenderDrawLine(BE_Window_GetInternalSDLRenderer(), firstPoint.x, firstPoint.y, secondPoint.x, secondPoint.y) == 0;
+//  return SDL_SetRenderDrawColor(BE_Window_GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
+//         SDL_RenderDrawLine(BE_Window_GetInternalSDLRenderer(), firstPoint.x, firstPoint.y, secondPoint.x, secondPoint.y) == 0;
 //#else
-//        return 0;
+//  return 0;
 //#endif
     }
 
-    void BE_Renderer_DrawPoint(BE_Vector_2I position, BE_Color_4U color) {
-        (void) position;
-        (void) color;
+void BE_Renderer_DrawPoint(BE_Vector_2I position, BE_Color_4U color) {
+    (void) position;
+    (void) color;
 
-//        if (BE_Window_GetInternalSDLRenderer() == NULL)
-//            return 0;
+//  if (BE_Window_GetInternalSDLRenderer() == NULL)
+//      return 0;
 //
 //#ifndef BACON_ENGINE_DISABLE_SDL
-//        renderCalls++;
+//  renderCalls++;
 //
-//        if (color.a != 255)
-//            SDL_SetRenderDrawBlendMode(BE_Window_GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
+//  if (color.a != 255)
+//      SDL_SetRenderDrawBlendMode(BE_Window_GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
 //
-//        return SDL_SetRenderDrawColor(BE_Window_GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
-//               SDL_RenderDrawPoint(BE_Window_GetInternalSDLRenderer(), position.x, position.y) == 0;
+//  return SDL_SetRenderDrawColor(BE_Window_GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
+//         SDL_RenderDrawPoint(BE_Window_GetInternalSDLRenderer(), position.x, position.y) == 0;
 //#else
-//        return 0;
+//  return 0;
 //#endif
-    }
+}
 
-    void BE_Renderer_DrawRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U color) {
-        BE_SpecificRendererFunctions_Get().rendererFunctions.DrawFilledRectangle(position, size, color);
-    }
+void BE_Renderer_DrawRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U color) {
+    BE_SpecificRendererFunctions_Get().rendererFunctions.DrawFilledRectangle(position, size, color);
+}
 
-    void BE_Renderer_FillRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U color) {
-        (void) position;
-        (void) size;
-        (void) color;
+void BE_Renderer_FillRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U color) {
+    (void) position;
+    (void) size;
+    (void) color;
 
-//        if (BE_Window_GetInternalSDLRenderer() == NULL)
-//            return 0;
+//  if (BE_Window_GetInternalSDLRenderer() == NULL)
+//      return 0;
 //
 //#ifndef BACON_ENGINE_DISABLE_SDL
-//        SDL_Rect rectangle = {
-//            position.x,
-//            position.y,
-//            (int) size.x,
-//            (int) size.y
-//        };
+//  SDL_Rect rectangle = {
+//      position.x,
+//      position.y,
+//      (int) size.x,
+//      (int) size.y
+//  };
 //
-//        renderCalls++;
+//  renderCalls++;
 //
-//        if (color.a != 255)
-//            SDL_SetRenderDrawBlendMode(BE_Window_GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
+//  if (color.a != 255)
+//      SDL_SetRenderDrawBlendMode(BE_Window_GetInternalSDLRenderer(), SDL_BLENDMODE_BLEND);
 //
-//        return SDL_SetRenderDrawColor(BE_Window_GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
-//               SDL_RenderFillRect(BE_Window_GetInternalSDLRenderer(), &rectangle) == 0;
+//  return SDL_SetRenderDrawColor(BE_Window_GetInternalSDLRenderer(), (Uint8) color.r, (Uint8) color.g, (Uint8) color.b, (Uint8) color.a) == 0 &&
+//         SDL_RenderFillRect(BE_Window_GetInternalSDLRenderer(), &rectangle) == 0;
 //#else
-//        return 0;
+//  return 0;
 //#endif
-    }
+}
 
-    void BE_Renderer_DrawBorderedRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U borderColor, BE_Color_4U fillColor, int borderPadding) {
-        (void) borderColor;
-        (void) borderPadding; // TODO: Padding.
-        BE_Renderer_DrawRectangle(position, size, fillColor);
-//        return 0;
-//        return BE_Renderer_DrawRectangle((BE_Vector_2I) {position.x - borderPadding, position.y - borderPadding},
-//                                         (BE_Vector_2U) {size.x + borderPadding * 2, size.y + borderPadding * 2},
-//                                         borderColor) &&
-//                BE_Renderer_FillRectangle(position, size, fillColor);
+void BE_Renderer_DrawBorderedRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U borderColor, BE_Color_4U fillColor, int borderPadding) {
+    (void) borderColor;
+    (void) borderPadding; // TODO: Padding.
+    BE_Renderer_DrawRectangle(position, size, fillColor);
+//  return 0;
+//  return BE_Renderer_DrawRectangle((BE_Vector_2I) {position.x - borderPadding, position.y - borderPadding},
+//                                   (BE_Vector_2U) {size.x + borderPadding * 2, size.y + borderPadding * 2},
+//                                   borderColor) &&
+//         BE_Renderer_FillRectangle(position, size, fillColor);
     }
-SEC_CPP_GUARD_END()
+SEC_CPP_SUPPORT_GUARD_END()

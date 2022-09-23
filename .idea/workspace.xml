@@ -1,10 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="CMakePresetLoader">{
   &quot;useNewFormat&quot;: true
 }</component>
   <component name="CMakeReloadState">
     <option name="reloaded" value="true" />
+  </component>
+  <component name="CMakeRunConfigurationManager">
+    <generated>
+      <config projectName="BaconEngine" targetName="BaconEditor" />
+      <config projectName="BaconEngine" targetName="uninstall" />
+      <config projectName="BaconEngine" targetName="glfw" />
+      <config projectName="BaconEngine" targetName="CustomStandaloneClientBinary" />
+      <config projectName="BaconEngine" targetName="StandaloneClientBinary" />
+      <config projectName="BaconEngine" targetName="SharedEngineCode" />
+      <config projectName="BaconEngine" targetName="TestClientCPP" />
+      <config projectName="BaconEngine" targetName="BaconLauncher" />
+      <config projectName="BaconEngine" targetName="BaconEngine" />
+      <config projectName="BaconEngine" targetName="BaconEngineLauncher" />
+      <config projectName="BaconEngine" targetName="BaconLauncherUI" />
+      <config projectName="BaconEngine" targetName="glad" />
+      <config projectName="BaconEngine" targetName="update_mappings" />
+      <config projectName="BaconEngine" targetName="TestGame" />
+    </generated>
   </component>
   <component name="CMakeSettings">
     <configurations>
@@ -13,21 +34,80 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89d20441-8f26-473d-8175-08c4ea0d1359" name="Changes" comment="">
+    <list default="true" id="89d20441-8f26-473d-8175-08c4ea0d1359" name="Changes" comment="Dumping SDL&#10;Added a way to get argument index and value for both argument and shorthand version&#10;Moved Assert and StrictMode back to the engine&#10;Added bitwise support macros&#10;Added a header file full of preprocessor defines for the names of each argument, and their shorthand version&#10;Added Colour spelling&#10;Removed a lot of (potentially) unneeded Vector/Color structs&#10;Added memory management&#10;Fixed incorrect CPP guard name&#10;Moved DynamicArray and DynamicDictionary back to the engine&#10;Added I18N system&#10;Added GLFW&#10;Simplified keycodes lookup table&#10;Added missing initialized checks&#10;Removed every `unionVariable` name from the event structure&#10;Added internal API to make adding platform dependent renderer APIs a lot easier&#10;Tried to add functions to extend string functionality, may not be required&#10;Finally closed the gap between text mode and non-text mode by making text mode follow that new internal render API&#10;Rewrote the UI system&#10;Seperated EntryPoint to its own c file.">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dependencies/glfw" beforeDir="false" afterPath="$PROJECT_DIR$/dependencies/glfw" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/glfw/src/mappings.h" beforeDir="false" afterPath="$PROJECT_DIR$/dependencies/glfw/src/mappings.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documentation/BaconEngine/Engine Layers.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/ClientInformation.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/ClientInformation.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Console/ArgumentManager.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Console/ArgumentManager.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Console/Command.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Console/Command.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Console/Console.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Console/Console.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/EngineMemoryInformation.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/EngineMemoryInformation.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/EntryPoint.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/EntryPoint.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Event.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Event.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/I18N.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/I18N.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Input/Keyboard.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Input/Keyboard.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Input/Mouse.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Input/Mouse.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Math/Color.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Math/Color.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Math/Vector.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Math/Vector.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/Layer.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/Layer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/Renderer.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/Renderer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/UI.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/UI.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/Window.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/Window.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Storage/DynamicArray.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Storage/DynamicArray.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Storage/DynamicDictionary.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Storage/DynamicDictionary.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/ANSI.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/ANSI.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/ArgumentHandler.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/ArgumentHandler.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/Internal/CppHeader.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/Internal/CppSupport.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/Launcher.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/Launcher.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/Logger.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/Logger.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/OSUser.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/OSUser.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/StringExtension.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/StringExtension.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/ClientInformation.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/ClientInformation.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Console/ArgumentManager.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Console/ArgumentManager.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Console/Console.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Console/Console.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Console/EngineCommands.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Console/EngineCommands.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Console/EngineCommands.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Console/EngineCommands.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/EngineMemory.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/EngineMemory.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/EngineMemory.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/EngineMemory.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/EntryPoint.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/EntryPoint.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/I18N.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/I18N.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Input/Keyboard.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Input/Keyboard.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/Input/Mouse.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Input/Mouse.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/EngineLayers.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/EngineLayers.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/OpenGL/OpenGLRenderer.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/OpenGL/OpenGLRenderer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/OpenGL/OpenGLWindow.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/OpenGL/OpenGLWindow.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/EngineLayers.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/EngineLayers.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/EngineUIs.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/EngineUIs.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/EngineUIs.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/EngineUIs.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/Layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/Layer.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/OpenGL/OpenGL.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/OpenGL/OpenGL.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/OpenGL/OpenGLRenderer.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/OpenGL/OpenGLRenderer.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/OpenGL/OpenGLWindow.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/OpenGL/OpenGLWindow.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/PrivateUI.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/PrivateUI.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/PrivateWindow.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/PrivateWindow.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/Renderer.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/Renderer.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/SpecificRendererFunctions.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/SpecificRendererFunctions.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/SpecificRendererFunctions.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/SpecificRendererFunctions.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/TextMode/TextMode.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/TextMode/TextMode.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/TextMode/TextModeWindow.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/TextMode/TextModeWindow.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/UI.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/UI.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/Window.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/Window.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/Storage/DynamicArray.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Storage/DynamicArray.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconLauncher/Main.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconLauncher/Main.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Storage/DynamicDictionary.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Storage/DynamicDictionary.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconEngineLauncher/Main.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngineLauncher/Main.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/SharedEngineCode/ANSI.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/SharedEngineCode/ANSI.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/SharedEngineCode/ArgumentHandler.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/SharedEngineCode/ArgumentHandler.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/SharedEngineCode/Launcher.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/SharedEngineCode/Launcher.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/SharedEngineCode/Logger.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/SharedEngineCode/Logger.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/SharedEngineCode/OSUser.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/SharedEngineCode/OSUser.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/SharedEngineCode/StringExtension.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/SharedEngineCode/StringExtension.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,10 +117,27 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/dependencies/glfw/src/context.c" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/Renderer.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/StringExtension.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/source/BaconEngine/Console/Console.c" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGL.c" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGLRenderer.c" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGLRenderer.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/source/BaconEngine/Rendering/Renderer.c" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/source/BaconEngine/Storage/DynamicArray.c" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/source/SharedEngineCode/StringExtension.c" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="ProjectId" id="2F83YY3DW5ZqpFeL9INGq1JXnb7" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -53,10 +150,109 @@
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/PortalPlayer/Downloads/BaconEngineC/CMakeLists.txt&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;CPPToolchains&quot;
+    &quot;last_opened_file_path&quot;: &quot;/home/portalplayer/Downloads/BaconEngineC/CMakeLists.txt&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;structure.view.defaults.are.configured&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/source/BaconEngine/Platform" />
+    </key>
+  </component>
+  <component name="RunManager" selected="CMake Application.TestGame">
+    <configuration name="BaconEditor" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="BaconEditor" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BaconEngine" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="BaconEngine" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BaconEngineLauncher" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="BaconEngineLauncher" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BaconLauncher" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="BaconLauncher" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="BaconEngine" RUN_TARGET_NAME="BaconLauncher">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BaconLauncherUI" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="BaconLauncherUI" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="BaconEngine" RUN_TARGET_NAME="BaconLauncherUI">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CustomStandaloneClientBinary" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="CustomStandaloneClientBinary" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="BaconEngine" RUN_TARGET_NAME="CustomStandaloneClientBinary">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SharedEngineCode" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="SharedEngineCode" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="StandaloneClientBinary" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="StandaloneClientBinary" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="BaconEngine" RUN_TARGET_NAME="StandaloneClientBinary">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestClientCPP" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="TestClientCPP" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestGame" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-c ../../test/TestGame --log-level trace" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="TestGame" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="BaconEngine" RUN_TARGET_NAME="BaconLauncher">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="glad" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="glad" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="glfw" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="glfw" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="uninstall" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="uninstall" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="update_mappings" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="update_mappings" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.glad" />
+      <item itemvalue="CMake Application.uninstall" />
+      <item itemvalue="CMake Application.glfw" />
+      <item itemvalue="CMake Application.update_mappings" />
+      <item itemvalue="CMake Application.BaconEditor" />
+      <item itemvalue="CMake Application.BaconEngine" />
+      <item itemvalue="CMake Application.BaconEngineLauncher" />
+      <item itemvalue="CMake Application.BaconLauncher" />
+      <item itemvalue="CMake Application.BaconLauncherUI" />
+      <item itemvalue="CMake Application.SharedEngineCode" />
+      <item itemvalue="CMake Application.CustomStandaloneClientBinary" />
+      <item itemvalue="CMake Application.StandaloneClientBinary" />
+      <item itemvalue="CMake Application.TestClientCPP" />
+      <item itemvalue="CMake Application.TestGame" />
+    </list>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -67,8 +263,14 @@
       <updated>1663859949104</updated>
       <workItem from="1663859997057" duration="81000" />
       <workItem from="1663861147126" duration="16000" />
+      <workItem from="1663882971001" duration="5741000" />
+      <workItem from="1663964692424" duration="8000" />
+      <workItem from="1663966018363" duration="5000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -80,5 +282,20 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/SharedEngineCode/Logger.c</url>
+          <line>39</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

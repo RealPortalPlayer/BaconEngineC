@@ -3,7 +3,9 @@
 #include <SharedEngineCode/Launcher.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <SharedEngineCode/OSUser.h>
+#include <SharedEngineCode/Internal/CppSupport.h>
 
+SEC_CPP_SUPPORT_GUARD_START()
 int BE_EntryPoint_StartBaconEngine(int, char**);
 const char* BE_EntryPoint_GetClientName(void);
 
@@ -27,3 +29,4 @@ int CallLauncherMain(int argc, char** argv) {
 
     return returnValue;
 }
+SEC_CPP_SUPPORT_GUARD_END()

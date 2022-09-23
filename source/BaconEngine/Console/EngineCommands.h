@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppHeader.h>
+#include <SharedEngineCode/Internal/CppSupport.h>
 
-SEC_CPP_GUARD_START()
-    void InitializeEngineCommands(void);
-SEC_CPP_GUARD_END()
+SEC_CPP_SUPPORT_GUARD_START()
+void InitializeEngineCommands(void);
+SEC_CPP_SUPPORT_GUARD_END()

@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppHeader.h>
+#include <SharedEngineCode/Internal/CppSupport.h>
 #include <stdio.h>
 
 // TODO: Variables.
 
-SEC_CPP_GUARD_START()
-    const char* BE_I18N_Translate(FILE* languageFile, const char* key);
-SEC_CPP_GUARD_END()
+SEC_CPP_SUPPORT_GUARD_START()
+const char* BE_I18N_Translate(FILE* languageFile, const char* key);
+SEC_CPP_SUPPORT_GUARD_END()

@@ -2,12 +2,12 @@ project(BaconEngine)
 
 if(NOT BE_DISABLE_OPENGL)
     set(BE_SOURCE_FILES
-            Rendering/OpenGL/OpenGL.c
-            Rendering/OpenGL/OpenGL.h
-            Rendering/OpenGL/OpenGLWindow.h
-            Rendering/OpenGL/OpenGLWindow.c
-            Rendering/OpenGL/OpenGLRenderer.c
-            Rendering/OpenGL/OpenGLRenderer.h)
+            Platform/OpenGL/OpenGL.c
+            Platform/OpenGL/OpenGL.h
+            Platform/OpenGL/OpenGLWindow.h
+            Platform/OpenGL/OpenGLWindow.c
+            Platform/OpenGL/OpenGLRenderer.c
+            Platform/OpenGL/OpenGLRenderer.h)
 endif()
 
 if(NOT BE_DISABLE_METAL AND APPLE)
@@ -37,10 +37,10 @@ add_library(BaconEngine STATIC
         Rendering/SpecificRendererFunctions.h
         Rendering/SpecificRendererFunctions.c
         ${BE_SOURCE_FILES}
-        Rendering/TextMode/TextMode.c
-        Rendering/TextMode/TextMode.h
-        Rendering/TextMode/TextModeWindow.c
-        Rendering/TextMode/TextModeWindow.h)
+        Platform/TextMode/TextMode.c
+        Platform/TextMode/TextMode.h
+        Platform/TextMode/TextModeWindow.c
+        Platform/TextMode/TextModeWindow.h)
 
 if(NOT BE_DISABLE_OPENGL)
     set(BE_LIBRARIES glfw OpenGL::GL)

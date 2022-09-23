@@ -1,39 +1,35 @@
 #include <ctype.h>
 #include <stddef.h>
 
-#include "SharedEngineCode/Internal/CppHeader.h"
+#include "SharedEngineCode/Internal/CppSupport.h"
 #include "SharedEngineCode/StringExtension.h"
 
-SEC_CPP_GUARD_START()
-    int SEC_StringExtension_CompareCaseless(const char* string1, const char* string2) {
-        if (string1 == string2)
-            return 1;
+SEC_CPP_SUPPORT_GUARD_START()
+int SEC_StringExtension_CompareCaseless(const char* string1, const char* string2) {
+    if (string1 == string2)
+        return 0;
 
-        while ((*string1 != '\0' && *string2 != '\0') && tolower(*string1) == tolower(*string2)) {
-            string1++;
-            string2++;
-        }
-
-        return tolower(*string1) == tolower(*string2);
+    while (*string1 != '\0' && (tolower(*string1) == tolower(*string2))) {
+        string1++;
+        string2++;
     }
 
-    void SEC_StringExtension_ToLowerString(char* string) {
-        if (string == NULL)
-            return;
+    return tolower(*(const unsigned char*) string1) - tolower(*(const unsigned char*) string2);
+}
 
-        while (*string != '\0') {
-            *string = (char) tolower(*string);
-            string++;
-        }
-    }
+void SEC_StringExtension_ToLowerString(char* string) {
+    if (string == NULL)
+        return;
 
-    void SEC_StringExtension_ToUpperString(char* string) {
-        if (string == NULL)
-            return;
+    for (int i = 0; string[i] != '\0'; i++)
+        string[i] = (char) tolower(string[i]);
+}
 
-        while (*string != '\0') {
-            *string = (char) toupper(*string);
-            string++;
-        }
-    }
-SEC_CPP_GUARD_END()
+void SEC_StringExtension_ToUpperString(char* string) {
+    if (string == NULL)
+        return;
+
+    for (int i = 0; string[i] != '\0'; i++)
+        string[i] = (char) toupper(string[i]);
+}
+SEC_CPP_SUPPORT_GUARD_END()

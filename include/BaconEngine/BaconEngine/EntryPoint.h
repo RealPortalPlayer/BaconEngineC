@@ -1,7 +1,7 @@
 // Purpose: The entry point for the game engine.
 // Created on: 3/29/22 @ 12:33 AM
 
-#include <SharedEngineCode/Internal/CppHeader.h>
+#include <SharedEngineCode/Internal/CppSupport.h>
 #include <SharedEngineCode/Internal/OperatingSystem.h>
 
 #ifdef BACON_ENGINE_INCLUDED_ENTRY_POINT
@@ -20,22 +20,22 @@
 #   define BE_ENTRYPOINT_EXPOSE_FUNC
 #endif
 
-SEC_CPP_GUARD_START()
+SEC_CPP_SUPPORT_GUARD_START()
 #ifdef BACON_ENGINE_LAUNCHER
-    int CallLauncherMain(int argc, char** argv);
+int CallLauncherMain(int argc, char** argv);
 
-    int main(int argc, char** argv) {
-        return CallLauncherMain(argc, argv);
-    }
+int main(int argc, char** argv) {
+    return CallLauncherMain(argc, argv);
+}
 #endif
 
-    int BE_EntryPoint_ClientStart(int argc, char** argv);
-    int BE_EntryPoint_ClientShutdown(void);
-    BE_ENTRYPOINT_EXPOSE_FUNC int BE_EntryPoint_ClientSupportsServer(void);
-    BE_ENTRYPOINT_EXPOSE_FUNC const char* BE_EntryPoint_GetClientName(void);
-    int BE_EntryPoint_StartBaconEngine(int argc, char** argv);
+int BE_EntryPoint_ClientStart(int argc, char** argv);
+int BE_EntryPoint_ClientShutdown(void);
+BE_ENTRYPOINT_EXPOSE_FUNC int BE_EntryPoint_ClientSupportsServer(void);
+BE_ENTRYPOINT_EXPOSE_FUNC const char* BE_EntryPoint_GetClientName(void);
+int BE_EntryPoint_StartBaconEngine(int argc, char** argv);
 
-    BE_ENTRYPOINT_EXPOSE_FUNC int BE_EntryPoint_InitializeDynamicLibrary(int argc, char** argv) {
-        return BE_EntryPoint_StartBaconEngine(argc, argv);
-    }
-SEC_CPP_GUARD_END()
+BE_ENTRYPOINT_EXPOSE_FUNC int BE_EntryPoint_InitializeDynamicLibrary(int argc, char** argv) {
+    return BE_EntryPoint_StartBaconEngine(argc, argv);
+}
+SEC_CPP_SUPPORT_GUARD_END()
