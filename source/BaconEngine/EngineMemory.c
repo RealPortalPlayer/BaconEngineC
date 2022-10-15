@@ -2,7 +2,12 @@
 #include "EngineMemory.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-BE_EngineMemory_MemoryInformation beEngineMemoryInformation;
+BE_EngineMemory_MemoryInformation beEngineMemoryInformation = {
+        {0, 0},
+        {0, 0},
+        {0, 0},
+        {0, 0}
+};
 
 BE_EngineMemory_MemoryInformation BE_EngineMemory_GetMemoryInformation(void) {
     return beEngineMemoryInformation;

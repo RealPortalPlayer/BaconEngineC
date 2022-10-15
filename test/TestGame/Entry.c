@@ -21,8 +21,8 @@ int BE_EntryPoint_ClientStart(int argc, char** argv) {
 //        SEC_LOGGER_INFO("DUR: %i %i", index1, index2);
 
     InitializeTestLayers();
-    BE_Console_RegisterCommand("test", "Tests the command handler.", BE_COMMAND_FLAG_NULL,
-                               (void (*)(BE_Command_Context)) &TestCommand);
+    BE_Command_Register("test", "Tests the command handler.", BE_COMMAND_FLAG_NULL,
+                        (void (*)(BE_Command_Context)) &TestCommand);
 
     return 0;
 }

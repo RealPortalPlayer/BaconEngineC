@@ -28,7 +28,8 @@ void SEC_Logger_SetLogLevel(SEC_Logger_LogLevels logLevel) {
 }
 
 // FIXME: This function is the opposite of thread safe. We need to fix that before making this engine multi-threaded.
-// TODO: Use stderr for errors/fatal.
+// TODO: Replace the booleans with a flag enum.
+
 void SEC_Logger_LogImplementation(int includeHeader, int includeNewLine, SEC_Logger_LogLevels logLevel, const char* message, ...) {
     {
         static int initialized = 0;
@@ -82,8 +83,6 @@ void SEC_Logger_LogImplementation(int includeHeader, int includeNewLine, SEC_Log
 
     antiRecursiveLog = 1;
 
-    FILE* output = stdout;
-
     if (includeHeader)
         switch (logLevel) {
             case SEC_LOGGER_LOG_LEVEL_TRACE:
@@ -103,14 +102,10 @@ void SEC_Logger_LogImplementation(int includeHeader, int includeNewLine, SEC_Log
                 break;
 
             case SEC_LOGGER_LOG_LEVEL_ERROR:
-                output = stderr;
-
                 fprintf(stderr, "%s[ERR] ", SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_BRIGHT_FOREGROUND_RED));
                 break;
 
             case SEC_LOGGER_LOG_LEVEL_FATAL:
-                output = stderr;
-
                 fprintf(stderr, "%s%s[FTL] ", SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_BOLD),
                         SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_FOREGROUND_RED));
                 break;
@@ -119,6 +114,11 @@ void SEC_Logger_LogImplementation(int includeHeader, int includeNewLine, SEC_Log
                 printf("[UNK] ");
                 break;
         }
+
+    FILE* output = stdout;
+
+    if (logLevel == SEC_LOGGER_LOG_LEVEL_ERROR || logLevel == SEC_LOGGER_LOG_LEVEL_FATAL)
+        output = stderr;
 
     va_list arguments;
 

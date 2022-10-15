@@ -44,79 +44,23 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89d20441-8f26-473d-8175-08c4ea0d1359" name="Changes" comment="Dumping SDL&#10;Added a way to get argument index and value for both argument and shorthand version&#10;Moved Assert and StrictMode back to the engine&#10;Added bitwise support macros&#10;Added a header file full of preprocessor defines for the names of each argument, and their shorthand version&#10;Added Colour spelling&#10;Removed a lot of (potentially) unneeded Vector/Color structs&#10;Added memory management&#10;Fixed incorrect CPP guard name&#10;Moved DynamicArray and DynamicDictionary back to the engine&#10;Added I18N system&#10;Added GLFW&#10;Simplified keycodes lookup table&#10;Added missing initialized checks&#10;Removed every `unionVariable` name from the event structure&#10;Added internal API to make adding platform dependent renderer APIs a lot easier&#10;Tried to add functions to extend string functionality, may not be required&#10;Finally closed the gap between text mode and non-text mode by making text mode follow that new internal render API&#10;Rewrote the UI system&#10;Seperated EntryPoint to its own c file.">
-      <change afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/DeltaTime.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/source/BaconEngine/Console/PrivateConsole.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/Windows/Windows.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/Windows/Windows.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/Windows/WindowsRenderer.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/Windows/WindowsRenderer.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/Windows/WindowsWindow.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/Windows/WindowsWindow.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/source/BaconEngine/PrivateDeltaTime.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/PrivateLayer.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/PrivateRenderer.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="89d20441-8f26-473d-8175-08c4ea0d1359" name="Changes" comment="Updated rendering system to add more potential renderers&#10;Allowed the user to specify what renderer they want to use.&#10;Replace the flawed SEC_ArgumentHandler_GetValueWithShort with SEC_ArgumentHandler_GetInfoWithShort.&#10;SEC_ArgumentHandler_ContainsArgumentOrShort should be used instead of SEC_ArgumentHandler_GetInfoWithShort, if you only want to check if the argument exists.&#10;Added support assert macros, makes it easier to convey what the assert is there for. (I.E. telling that a function is not implemented, or that a branch should never have been reached)&#10;Allow the user to check what version the launcher/engine is at.&#10;Changed global variable names to try preventing name collisions.&#10;Change the output path for each binary to fit the structure that best fits the engine.&#10;Started stripping non-debug builds.&#10;Made some initializers/destroyers private.&#10;Created a DeltaTime header. This will allow people to get the delta time anywhere, even inside of events.&#10;Added invalid size check for DynamicArray.&#10;Fixed some functions not following the naming scheme.&#10;Started work on the help command.&#10;Replaced some C style struct initializations with SEC_CPP_SUPPORT_CREATE_STRUCT, which switches to the C++ style if using a C++ compiler. Happy now, MSVC?&#10;Removed some useless includes.&#10;Commented out BE_I18N_Translate. Find solution that doesn't use getline.&#10;Removed CppSupport header includes inside of source files. Their header files already include them, so there's no point in doing it again.&#10;Merged the software argument into the renderer argument.&#10;Stopped calling OnStop on layers that haven't initialized yet.&#10;Made the layer OnUpdate and OnEvent functions private. It would be a bad idea for the client to call them, especially inside an update/event function.&#10;Allow you to remove the new-line from the logger.&#10;Added Windows software rendering.&#10;Renamed SpecificRendererFunctions to SpecificPlatformFunctions.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dependencies/glfw" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dependencies/glfw/tests/allocator.c" beforeDir="false" afterPath="$PROJECT_DIR$/dependencies/glfw/tests/allocator.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/ClientInformation.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/ClientInformation.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Console/Command.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Console/Command.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Console/Console.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Console/Console.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Debugging/Assert.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Debugging/Assert.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Debugging/StrictMode.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Debugging/StrictMode.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/Layer.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/Layer.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/Renderer.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/Renderer.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/UI.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/UI.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/Window.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Rendering/Window.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/ANSI.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/ANSI.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/ArgumentHandler.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/ArgumentHandler.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/BuiltInArguments.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/BuiltInArguments.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/Internal/OperatingSystem.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/Internal/OperatingSystem.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/Logger.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/Logger.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEditor/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEditor/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/ClientInformation.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/ClientInformation.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Console/ArgumentManager.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Console/ArgumentManager.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Storage/DynamicArray.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Storage/DynamicArray.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/Console/Console.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Console/Console.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/Console/EngineCommands.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Console/EngineCommands.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Console/EngineCommands.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Console/EngineCommands.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/EngineMemory.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/EngineMemory.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/EntryPoint.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/EntryPoint.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/I18N.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/I18N.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Input/Keyboard.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Input/Keyboard.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Input/Mouse.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Input/Mouse.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGL.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGL.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGLRenderer.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGLRenderer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGLWindow.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGLWindow.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGLWindow.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGLWindow.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Platform/TextMode/TextMode.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/TextMode/TextMode.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/EngineLayers.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/EngineLayers.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/EngineUIs.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/EngineUIs.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/Layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/Layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/PrivateUI.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/PrivateUI.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/Renderer.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/Renderer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/SpecificRendererFunctions.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/SpecificPlatformFunctions.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/SpecificRendererFunctions.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/SpecificPlatformFunctions.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/UI.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/UI.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/Window.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/Window.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/Storage/DynamicArray.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Storage/DynamicArray.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Storage/DynamicDictionary.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Storage/DynamicDictionary.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngineLauncher/Main.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngineLauncher/Main.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconLauncher/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconLauncher/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconLauncher/Main.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconLauncher/Main.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconLauncherUI/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconLauncherUI/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/SharedEngineCode/ANSI.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/SharedEngineCode/ANSI.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/SharedEngineCode/ArgumentHandler.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/SharedEngineCode/ArgumentHandler.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/SharedEngineCode/Launcher.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/SharedEngineCode/Launcher.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/SharedEngineCode/Logger.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/SharedEngineCode/Logger.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/SharedEngineCode/OSUser.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/SharedEngineCode/OSUser.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/CustomStandaloneClientBinary/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/test/CustomStandaloneClientBinary/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/StandaloneClientBinary/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/test/StandaloneClientBinary/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/TestClientCPP/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/test/TestClientCPP/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/TestGame/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/test/TestGame/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/TestGame/Entry.c" beforeDir="false" afterPath="$PROJECT_DIR$/test/TestGame/Entry.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/TestGame/Layers.c" beforeDir="false" afterPath="$PROJECT_DIR$/test/TestGame/Layers.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -187,7 +131,7 @@
       <recent name="$PROJECT_DIR$/source/BaconEngine/Platform" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.CustomStandaloneClientBinary">
+  <component name="RunManager" selected="CMake Application.TestGame">
     <configuration name="BaconEditor" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-c BaconEditor" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="BaconEditor" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="BaconEngine" RUN_TARGET_NAME="BaconLauncher">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -233,7 +177,7 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TestGame" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-c ./TestGame -ll trc --log-level debug" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="TestGame" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="BaconEngine" RUN_TARGET_NAME="BaconLauncher">
+    <configuration name="TestGame" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-c ./TestGame -ll ftl --log-level debug" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="TestGame" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="BaconEngine" RUN_TARGET_NAME="BaconLauncher">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -311,8 +255,16 @@
       <workItem from="1665778088712" duration="4064000" />
       <workItem from="1665782890971" duration="50000" />
       <workItem from="1665782949815" duration="2243000" />
-      <workItem from="1665825920198" duration="9487000" />
+      <workItem from="1665825920198" duration="22879000" />
     </task>
+    <task id="LOCAL-00001" summary="Updated rendering system to add more potential renderers&#10;Allowed the user to specify what renderer they want to use.&#10;Replace the flawed SEC_ArgumentHandler_GetValueWithShort with SEC_ArgumentHandler_GetInfoWithShort.&#10;SEC_ArgumentHandler_ContainsArgumentOrShort should be used instead of SEC_ArgumentHandler_GetInfoWithShort, if you only want to check if the argument exists.&#10;Added support assert macros, makes it easier to convey what the assert is there for. (I.E. telling that a function is not implemented, or that a branch should never have been reached)&#10;Allow the user to check what version the launcher/engine is at.&#10;Changed global variable names to try preventing name collisions.&#10;Change the output path for each binary to fit the structure that best fits the engine.&#10;Started stripping non-debug builds.&#10;Made some initializers/destroyers private.&#10;Created a DeltaTime header. This will allow people to get the delta time anywhere, even inside of events.&#10;Added invalid size check for DynamicArray.&#10;Fixed some functions not following the naming scheme.&#10;Started work on the help command.&#10;Replaced some C style struct initializations with SEC_CPP_SUPPORT_CREATE_STRUCT, which switches to the C++ style if using a C++ compiler. Happy now, MSVC?&#10;Removed some useless includes.&#10;Commented out BE_I18N_Translate. Find solution that doesn't use getline.&#10;Removed CppSupport header includes inside of source files. Their header files already include them, so there's no point in doing it again.&#10;Merged the software argument into the renderer argument.&#10;Stopped calling OnStop on layers that haven't initialized yet.&#10;Made the layer OnUpdate and OnEvent functions private. It would be a bad idea for the client to call them, especially inside an update/event function.&#10;Allow you to remove the new-line from the logger.&#10;Added Windows software rendering.&#10;Renamed SpecificRendererFunctions to SpecificPlatformFunctions.">
+      <created>1665837478374</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1665837478374</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -328,6 +280,22 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Updated rendering system to add more potential renderers&#10;Allowed the user to specify what renderer they want to use.&#10;Replace the flawed SEC_ArgumentHandler_GetValueWithShort with SEC_ArgumentHandler_GetInfoWithShort.&#10;SEC_ArgumentHandler_ContainsArgumentOrShort should be used instead of SEC_ArgumentHandler_GetInfoWithShort, if you only want to check if the argument exists.&#10;Added support assert macros, makes it easier to convey what the assert is there for. (I.E. telling that a function is not implemented, or that a branch should never have been reached)&#10;Allow the user to check what version the launcher/engine is at.&#10;Changed global variable names to try preventing name collisions.&#10;Change the output path for each binary to fit the structure that best fits the engine.&#10;Started stripping non-debug builds.&#10;Made some initializers/destroyers private.&#10;Created a DeltaTime header. This will allow people to get the delta time anywhere, even inside of events.&#10;Added invalid size check for DynamicArray.&#10;Fixed some functions not following the naming scheme.&#10;Started work on the help command." />
+    <MESSAGE value="Updated rendering system to add more potential renderers&#10;Allowed the user to specify what renderer they want to use.&#10;Replace the flawed SEC_ArgumentHandler_GetValueWithShort with SEC_ArgumentHandler_GetInfoWithShort.&#10;SEC_ArgumentHandler_ContainsArgumentOrShort should be used instead of SEC_ArgumentHandler_GetInfoWithShort, if you only want to check if the argument exists.&#10;Added support assert macros, makes it easier to convey what the assert is there for. (I.E. telling that a function is not implemented, or that a branch should never have been reached)&#10;Allow the user to check what version the launcher/engine is at.&#10;Changed global variable names to try preventing name collisions.&#10;Change the output path for each binary to fit the structure that best fits the engine.&#10;Started stripping non-debug builds.&#10;Made some initializers/destroyers private.&#10;Created a DeltaTime header. This will allow people to get the delta time anywhere, even inside of events.&#10;Added invalid size check for DynamicArray.&#10;Fixed some functions not following the naming scheme.&#10;Started work on the help command.&#10;Replaced some C style struct initializations with SEC_CPP_SUPPORT_CREATE_STRUCT, which switches to the C++ style if using a C++ compiler. Happy now, MSVC?&#10;Removed some useless includes.&#10;Commented out BE_I18N_Translate. Find solution that doesn't use getline.&#10;Removed CppSupport header includes inside of source files. Their header files already include them, so there's no point in doing it again.&#10;Merged the software argument into the renderer argument.&#10;Stopped calling OnStop on layers that haven't initialized yet.&#10;Made the layer OnUpdate and OnEvent functions private. It would be a bad idea for the client to call them, especially inside an update/event function.&#10;Allow you to remove the new-line from the logger.&#10;Added Windows software rendering.&#10;Renamed SpecificRendererFunctions to SpecificPlatformFunctions." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated rendering system to add more potential renderers&#10;Allowed the user to specify what renderer they want to use.&#10;Replace the flawed SEC_ArgumentHandler_GetValueWithShort with SEC_ArgumentHandler_GetInfoWithShort.&#10;SEC_ArgumentHandler_ContainsArgumentOrShort should be used instead of SEC_ArgumentHandler_GetInfoWithShort, if you only want to check if the argument exists.&#10;Added support assert macros, makes it easier to convey what the assert is there for. (I.E. telling that a function is not implemented, or that a branch should never have been reached)&#10;Allow the user to check what version the launcher/engine is at.&#10;Changed global variable names to try preventing name collisions.&#10;Change the output path for each binary to fit the structure that best fits the engine.&#10;Started stripping non-debug builds.&#10;Made some initializers/destroyers private.&#10;Created a DeltaTime header. This will allow people to get the delta time anywhere, even inside of events.&#10;Added invalid size check for DynamicArray.&#10;Fixed some functions not following the naming scheme.&#10;Started work on the help command.&#10;Replaced some C style struct initializations with SEC_CPP_SUPPORT_CREATE_STRUCT, which switches to the C++ style if using a C++ compiler. Happy now, MSVC?&#10;Removed some useless includes.&#10;Commented out BE_I18N_Translate. Find solution that doesn't use getline.&#10;Removed CppSupport header includes inside of source files. Their header files already include them, so there's no point in doing it again.&#10;Merged the software argument into the renderer argument.&#10;Stopped calling OnStop on layers that haven't initialized yet.&#10;Made the layer OnUpdate and OnEvent functions private. It would be a bad idea for the client to call them, especially inside an update/event function.&#10;Allow you to remove the new-line from the logger.&#10;Added Windows software rendering.&#10;Renamed SpecificRendererFunctions to SpecificPlatformFunctions." />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/BaconEngine/Console/EngineCommands.c</url>
+          <line>81</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

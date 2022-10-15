@@ -25,7 +25,4 @@ int BE_Console_GetAllocatedCommandsAmount(void);
  */
 int BE_Console_GetCommandReallocationAmount(void);
 void BE_Console_ExecuteCommand(const char* input); // TODO: Client
-
-void BE_Console_RegisterCommand(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context));
-void BE_Console_DuplicateCommand(const char* name, const char* description);
 SEC_CPP_SUPPORT_GUARD_END()

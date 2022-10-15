@@ -9,82 +9,108 @@
 #include "EngineCommands.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-BE_DynamicArray commandArray;
-BE_Command* lastCommand;
-int duplicateCommand = 0;
-int consoleInitialized = 0;
+BE_DynamicArray beConsoleCommands;
+BE_Command* beConsoleLastCommand;
+int beConsoleDuplicateCommand = 0;
+int beConsoleInitialized = 0;
 
 BE_Command** BE_Console_GetCommands(void) {
-    return (BE_Command**) commandArray.internalArray;
+    return (BE_Command**) beConsoleCommands.internalArray;
 }
 
 int BE_Console_GetCommandAmount(void) {
-    return commandArray.used;
+    return beConsoleCommands.used;
 }
 
 int BE_Console_GetAllocatedCommandsAmount(void) {
-    return (int) commandArray.size;
+    return (int) beConsoleCommands.size;
 }
 
 int BE_Console_GetCommandReallocationAmount(void) {
-    return commandArray.calledRealloc;
+    return beConsoleCommands.calledRealloc;
 }
 
 void BE_PrivateConsole_Initialize(void) {
-    BE_ASSERT(!consoleInitialized, "Already initialized the console");
+    BE_ASSERT(!beConsoleInitialized, "Already initialized the console");
     SEC_LOGGER_INFO("Initializing console");
 
-    consoleInitialized = 1;
+    beConsoleInitialized = 1;
 
-    BE_DynamicArray_Create(&commandArray, 100);
+    BE_DynamicArray_Create(&beConsoleCommands, 100);
     SEC_LOGGER_INFO("Registering engine commands");
     BE_EngineCommands_Initialize();
 }
 
 // TODO: Verify arguments
-void BE_Console_RegisterCommand(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context)) {
-    for (int i = 0; i < (int) commandArray.used; i++)
-        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Command, commandArray, i)->name, name) != 0,
-                                            "The command '%s' is already registered", name);
+int BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context)) {
+    for (int i = 0; i < (int) beConsoleCommands.used; i++)
+        BE_STRICTMODE_CHECK(strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Command, beConsoleCommands, i)->name, name) != 0, -1,
+                            "The command '%s' is already registered", name);
 
-    if (!duplicateCommand)
+    if (!beConsoleDuplicateCommand)
         SEC_LOGGER_TRACE("Registering command\n"
                          "Name: %s\n"
                          "Description: %s\n"
                          "Flags: %i\n"
-                         "Spot: %i/%i", name, description, flags, commandArray.used, commandArray.size);
+                         "Spot: %i/%i", name, description, flags, beConsoleCommands.used, beConsoleCommands.size);
 
-    duplicateCommand = 0;
+    beConsoleDuplicateCommand = 0;
 
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE((flags & BE_COMMAND_FLAG_SERVER_ONLY) == 0 || (flags & BE_COMMAND_FLAG_CLIENT_ONLY) == 0,
+    BE_STRICTMODE_CHECK((flags & BE_COMMAND_FLAG_SERVER_ONLY) == 0 || (flags & BE_COMMAND_FLAG_CLIENT_ONLY) == 0, -1,
                                         "Invalid command flags, cannot be both for server and client only");
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE((flags & BE_COMMAND_FLAG_CHEATS_ONLY) == 0 || (flags & BE_COMMAND_FLAG_CLIENT_ONLY) == 0,
+    BE_STRICTMODE_CHECK((flags & BE_COMMAND_FLAG_CHEATS_ONLY) == 0 || (flags & BE_COMMAND_FLAG_CLIENT_ONLY) == 0, -1,
                                         "Invalid command flags, the client cannot run any cheat commands");
 
     BE_Command* command = (BE_Command*) BE_EngineMemory_AllocateMemory(sizeof(BE_Command), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
 
+    BE_DynamicArray_Create(&command->arguments, 10);
+
     command->name = name;
     command->description = description;
     command->flags = flags;
-//    command->arguments = arguments;
     command->Run = Run;
-    lastCommand = command;
+    beConsoleLastCommand = command;
 
-    BE_DynamicArray_AddElementToLast(&commandArray, (void*) command);
+    BE_DynamicArray_AddElementToLast(&beConsoleCommands, (void*) command);
+
+    return beConsoleCommands.used - 1;
 }
 
-void BE_Console_DuplicateCommand(const char* name, const char* description) {
-    BE_ASSERT(commandArray.used != 0, "There is no command to duplicate");
+void BE_Command_AddArgument(int id, const char* name, int required) {
+    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(id >= 0 && id < beConsoleCommands.used, "Invalid command ID");
+
+    BE_Command* command = BE_DYNAMICARRAY_GET_ELEMENT(BE_Command, beConsoleCommands, id);
+
+    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(command->arguments.used == 0 ||
+                                        BE_DYNAMICARRAY_GET_LAST_ELEMENT(BE_Command_Argument, command->arguments)->required ||
+                                        !required, "Required arguments cannot be added after an optional argument");
+
+    BE_Command_Argument* argument = BE_EngineMemory_AllocateMemory(sizeof(BE_Command_Argument), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+
+    argument->name = name;
+    argument->required = required;
+
+    BE_DynamicArray_AddElementToLast(&command->arguments, (void*) argument);
+}
+
+void BE_Command_DuplicatePrevious(const char* name, const char* description) {
+    BE_ASSERT(beConsoleCommands.used != 0, "There is no command to duplicate");
     SEC_LOGGER_TRACE("Duplicating command\n"
                      "Original name: %s\n"
                      "Original description: %s\n"
                      "New name: %s\n"
-                     "New description: %s", lastCommand->name, lastCommand->description, name,
-                     description != NULL ? description : lastCommand->description);
+                     "New description: %s", beConsoleLastCommand->name, beConsoleLastCommand->description, name,
+                     description != NULL ? description : beConsoleLastCommand->description);
 
-    duplicateCommand = 1;
+    beConsoleDuplicateCommand = 1;
 
-    BE_Console_RegisterCommand(name, description != NULL ? description : lastCommand->description, lastCommand->flags, lastCommand->Run);
+    BE_Command* lastCommand = beConsoleLastCommand;
+
+    BE_Command_Register(name, description != NULL ? description : lastCommand->description, lastCommand->flags,
+                        lastCommand->Run);
+
+    // FIXME: This is not thread safe.
+    BE_DYNAMICARRAY_GET_LAST_ELEMENT(BE_Command, beConsoleCommands)->arguments = lastCommand->arguments;
 }
 
 void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
@@ -96,21 +122,34 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         return;
 
     static BE_Command* cachedCommand = NULL;
-    char* name = (char*) input; // FIXME: Casting a const to non-const is undefined behavior.
+    char name[BE_COMMAND_MAX_NAME_LENGTH];
     BE_Command* command = NULL;
+    size_t inputLength = strlen(input);
+
+    memset(name, 0, BE_COMMAND_MAX_NAME_LENGTH);
+
+    {
+        int index;
+
+        for (index = 0; index < inputLength; index++) {
+            if (index >= BE_COMMAND_MAX_NAME_LENGTH || input[index] == ' ')
+                break;
+
+            name[index] = input[index];
+        }
+    }
 
     if (cachedCommand != NULL && strcmp(cachedCommand->name, name) == 0)
         command = cachedCommand;
 
-    if (command == NULL) {
-        for (int i = 0; i < (int) commandArray.used; i++) { // TODO: Find a way to replace a for loop with index.
-            if (strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Command, commandArray, i)->name, name) != 0)
+    if (command == NULL)
+        for (int i = 0; i < (int) beConsoleCommands.used; i++) { // TODO: Find a way to replace a for loop with index.
+            if (strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Command, beConsoleCommands, i)->name, name) != 0)
                 continue;
 
-            command = BE_DYNAMICARRAY_GET_ELEMENT(BE_Command, commandArray, i);
+            command = BE_DYNAMICARRAY_GET_ELEMENT(BE_Command, beConsoleCommands, i);
             break;
         }
-    }
 
     if (command == NULL) { // TODO: Tell the client.
         SEC_LOGGER_ERROR("'%s' is not a valid command", name);
@@ -135,7 +174,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
     if ((command->flags & BE_COMMAND_FLAG_CHEATS_ONLY) != 0 && !BE_ClientInformation_IsCheatsEnabled()) {
         // TODO: Tell client.
-        SEC_LOGGER_ERROR("This command requires beClientInformationCheats to be enabled");
+        SEC_LOGGER_ERROR("This command requires cheats to be enabled");
         return;
     }
 
@@ -145,14 +184,23 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 }
 
 void BE_PrivateConsole_Destroy(void) {
-    BE_ASSERT(consoleInitialized, "Console are not initialized");
+    BE_ASSERT(beConsoleInitialized, "Console are not initialized");
     SEC_LOGGER_INFO("Destroying console");
 
-    consoleInitialized = 0;
+    beConsoleInitialized = 0;
 
-    for (int i = 0; i < commandArray.used; i++)
-        BE_EngineMemory_DeallocateMemory(BE_DYNAMICARRAY_GET_ELEMENT(BE_Command, commandArray, i), sizeof(BE_Command), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+    for (int commandId = 0; commandId < beConsoleCommands.used; commandId++) {
+        BE_Command* command = BE_DYNAMICARRAY_GET_ELEMENT(BE_Command, beConsoleCommands, commandId);
 
-    BE_EngineMemory_DeallocateMemory(commandArray.internalArray, sizeof(void*) * commandArray.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+        for (int argumentId = 0; argumentId < command->arguments.used; argumentId++)
+            BE_EngineMemory_DeallocateMemory(command->arguments.internalArray[argumentId], sizeof(BE_Command_Argument),
+                                             BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+
+        // FIXME: This line causes an error due to duplicate commands sharing arguments.
+//        BE_EngineMemory_DeallocateMemory(command->arguments.internalArray, sizeof(void*) * command->arguments.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+        BE_EngineMemory_DeallocateMemory(command, sizeof(BE_Command), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+    }
+
+    BE_EngineMemory_DeallocateMemory(beConsoleCommands.internalArray, sizeof(void*) * beConsoleCommands.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 SEC_CPP_SUPPORT_GUARD_END()

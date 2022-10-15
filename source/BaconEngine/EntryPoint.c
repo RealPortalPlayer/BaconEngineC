@@ -43,8 +43,6 @@ void BE_EntryPoint_SignalDetected(int signal) {
             if (SEC_Logger_GetLogLevel() > SEC_LOGGER_LOG_LEVEL_FATAL && !antiDoubleSegfault) {
                 antiDoubleSegfault = 1;
 
-                write(STDOUT_FILENO, "\n", 1);
-
                 if (SEC_ANSI_IsEnabled()) {
                     write(STDOUT_FILENO, SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_BOLD), 4);
                     write(STDOUT_FILENO, SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_FOREGROUND_RED), 7);

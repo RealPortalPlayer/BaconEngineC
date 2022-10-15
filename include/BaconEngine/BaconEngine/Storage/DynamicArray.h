@@ -40,3 +40,5 @@ SEC_CPP_SUPPORT_GUARD_END()
 
 #define BE_DYNAMICARRAY_GET_ELEMENT(type, array, index) ((type*) (array).internalArray[index])
 #define BE_DYNAMICARRAY_GET_ELEMENT_PTR(type, array, index) ((type*) (array)->internalArray[index])
+#define BE_DYNAMICARRAY_GET_LAST_ELEMENT(type, array) BE_DYNAMICARRAY_GET_ELEMENT(type, (array), (array).used - 1)
+#define BE_DYNAMICARRAY_GET_LAST_ELEMENT_PTR(type, array) BE_DYNAMICARRAY_GET_ELEMENT_PTR(type, array, array->used - 1)

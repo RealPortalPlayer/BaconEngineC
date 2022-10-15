@@ -28,32 +28,66 @@ void BE_EngineCommands_Initialize(void) {
 
     initialized = 1;
 
-    BE_Console_RegisterCommand("help", "Shows information about each command.", BE_COMMAND_FLAG_NULL,
-                               &BE_EngineCommands_Help);
-    BE_Console_RegisterCommand("beClientInformationCheats", "Get information or modify if beClientInformationCheats are enabled.",
-                               BE_COMMAND_FLAG_SERVER_ONLY,
-                               &BE_EngineCommands_Cheats);
-    BE_Console_RegisterCommand("stop", BE_ClientInformation_IsServerModeEnabled() ? "Stops the server." : "Stops the client.",
-                               BE_COMMAND_FLAG_NULL,
-                               (void (*)(BE_Command_Context)) &BE_EngineCommands_Stop);
-    BE_Console_DuplicateCommand("exit", BE_ClientInformation_IsServerModeEnabled() ? "Exits the server." : "Exits the client.");
-    BE_Console_DuplicateCommand("quit", NULL);
-    BE_Console_DuplicateCommand("close", BE_ClientInformation_IsServerModeEnabled() ? "Closes the server." : "Closes the client.");
-    BE_Console_RegisterCommand("debuginfo", "Get debugging information.", BE_COMMAND_FLAG_NULL,
-                               (void (*)(BE_Command_Context)) &BE_EngineCommands_DebugInfo);
-    BE_Console_RegisterCommand("say", "Say something as the console.", BE_COMMAND_FLAG_NULL, &BE_EngineCommands_Say);
-    BE_Console_RegisterCommand("disconnect", "Disconnects from the server.", BE_COMMAND_FLAG_CLIENT_ONLY,
-                               &BE_EngineCommands_Disconnect);
-    BE_Console_RegisterCommand("connect", "Connects to a server.", BE_COMMAND_FLAG_CLIENT_ONLY,
-                               &BE_EngineCommands_Connect);
-    BE_Console_RegisterCommand("whatami", "Tells your current mode.", BE_COMMAND_FLAG_NULL,
-                               (void (*)(BE_Command_Context)) &BE_EngineCommands_WhatAmI);
-    BE_Console_RegisterCommand("kick", "Forcefully removes a client.", BE_COMMAND_FLAG_SERVER_ONLY,
-                               &BE_EngineCommands_Kick);
-    BE_Console_RegisterCommand("ban", "Forcefully removes a client, and prevents them from rejoining.",
-                               BE_COMMAND_FLAG_SERVER_ONLY, &BE_EngineCommands_Ban);
-    BE_Console_RegisterCommand("sudo", "Runs a command as the server.", BE_COMMAND_FLAG_CLIENT_ONLY,
-                               &BE_EngineCommands_Sudo);
+    int command = BE_Command_Register("help", "Shows information about each command.", BE_COMMAND_FLAG_NULL,
+                                      &BE_EngineCommands_Help);
+    {
+        BE_Command_AddArgument(command, "command", 0);
+    }
+
+    command = BE_Command_Register("cheats",
+                                  "Get information or modify if cheats are enabled.",
+                                  BE_COMMAND_FLAG_SERVER_ONLY,
+                                  &BE_EngineCommands_Cheats);
+    {
+        BE_Command_AddArgument(command, "toggle", 0);
+    }
+
+    BE_Command_Register("stop",
+                        BE_ClientInformation_IsServerModeEnabled() ? "Stops the server." : "Stops the client.",
+                        BE_COMMAND_FLAG_NULL,
+                        (void (*)(BE_Command_Context)) &BE_EngineCommands_Stop);
+    {
+        BE_Command_DuplicatePrevious("exit", "Exits the client.");
+        BE_Command_DuplicatePrevious("quit", NULL);
+        BE_Command_DuplicatePrevious("close", "Closes the client.");
+    }
+
+    BE_Command_Register("debuginfo", "Get debugging information.", BE_COMMAND_FLAG_NULL,
+                        (void (*)(BE_Command_Context)) &BE_EngineCommands_DebugInfo);
+
+    command = BE_Command_Register("say", "Say something as the console.", BE_COMMAND_FLAG_NULL, &BE_EngineCommands_Say);
+    {
+        BE_Command_AddArgument(command, "message", 1);
+    }
+
+    BE_Command_Register("disconnect", "Disconnects from the server.", BE_COMMAND_FLAG_CLIENT_ONLY,
+                        &BE_EngineCommands_Disconnect);
+    BE_Command_Register("connect", "Connects to a server.", BE_COMMAND_FLAG_CLIENT_ONLY,
+                        &BE_EngineCommands_Connect);
+    BE_Command_Register("whatami", "Tells your current mode.", BE_COMMAND_FLAG_NULL,
+                        (void (*)(BE_Command_Context)) &BE_EngineCommands_WhatAmI);
+
+    command = BE_Command_Register("kick", "Forcefully removes a client.", BE_COMMAND_FLAG_SERVER_ONLY,
+                                  &BE_EngineCommands_Kick);
+    {
+        BE_Command_AddArgument(command, "client id", 1);
+        BE_Command_AddArgument(command, "reason", 0);
+    }
+
+    command = BE_Command_Register("ban", "Forcefully removes a client, and prevents them from rejoining.",
+                                  BE_COMMAND_FLAG_SERVER_ONLY, &BE_EngineCommands_Ban);
+    {
+        BE_Command_AddArgument(command, "client id", 1);
+        BE_Command_AddArgument(command, "reason", 0);
+        BE_Command_AddArgument(command, "reason2", 1);
+    }
+
+    command = BE_Command_Register("sudo", "Runs a command as the server.", BE_COMMAND_FLAG_CLIENT_ONLY,
+                        &BE_EngineCommands_Sudo);
+    {
+        BE_Command_AddArgument(command, "key", 1);
+        BE_Command_AddArgument(command, "command", 1);
+    }
 }
 
 void BE_EngineCommands_Help(BE_Command_Context context) {
@@ -77,7 +111,7 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
 }
 
 void BE_EngineCommands_Cheats(BE_Command_Context context) {
-    if (BE_ArgumentHandler_GetString(context.arguments, "toggle", "")[0] == '\0') {
+    if (BE_ArgumentHandler_GetString(context.arguments, "toggle", NULL) == NULL) {
         SEC_LOGGER_INFO("Cheats are %s", BE_ClientInformation_IsCheatsEnabled() ? "enabled" : "disabled");
         return;
     }

@@ -1,7 +1,6 @@
 #include <SharedEngineCode/ArgumentHandler.h>
 #include <SharedEngineCode/Logger.h>
 #include <SharedEngineCode/Launcher.h>
-#include <stddef.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <SharedEngineCode/OSUser.h>
 
@@ -36,7 +35,6 @@ int main(int argc, char** argv) {
         SEC_LOGGER_FATAL("No client specified, please check help for more information");
         return 1;
     }
-
 
     SEC_Launcher_Configuration configuration = {
         .code = SEC_LAUNCHER_ERROR_CODE_NULL

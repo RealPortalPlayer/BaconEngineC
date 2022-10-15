@@ -28,6 +28,7 @@ int BE_DynamicArray_Create(BE_DynamicArray* array, size_t size) {
     array->internalArray = (void**) BE_EngineMemory_AllocateMemory(sizeof(void*) * size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
     array->used = 0;
     array->size = size;
+    array->frozen = 0;
     return 1;
 }
 
