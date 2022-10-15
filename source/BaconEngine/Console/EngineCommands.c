@@ -79,7 +79,6 @@ void BE_EngineCommands_Initialize(void) {
     {
         BE_Command_AddArgument(command, "client id", 1);
         BE_Command_AddArgument(command, "reason", 0);
-        BE_Command_AddArgument(command, "reason2", 1);
     }
 
     command = BE_Command_Register("sudo", "Runs a command as the server.", BE_COMMAND_FLAG_CLIENT_ONLY,
