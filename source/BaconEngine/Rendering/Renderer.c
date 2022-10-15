@@ -1,92 +1,94 @@
-#include <SharedEngineCode/Internal/CppSupport.h>
-#include <string.h>
+#include <SharedEngineCode/Internal/OperatingSystem.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <SharedEngineCode/StringExtension.h>
 
 #include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Rendering/Renderer.h"
-#include "SpecificRendererFunctions.h"
+#include "../Platform/SpecificPlatformFunctions.h"
+#include "../Platform/TextMode/TextMode.h"
 
 #ifndef BE_DISABLE_OPENGL
 #   include "../Platform/OpenGL/OpenGL.h"
 #endif
 
-#include "../Platform/TextMode/TextMode.h"
+#if SEC_OPERATINGSYSTEM_WINDOWS
+#   include "../Platform/Windows/Windows.h"
+#endif
+
+#include "BaconEngine/Debugging/Assert.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-BE_Renderer_Types currentType;
+BE_Renderer_Types beRendererCurrent;
 int renderCalls = 0;
 
 void BE_Renderer_SetClearColor(BE_Color_3U color) {
-    BE_SpecificRendererFunctions_Get().rendererFunctions.SetClearColor(color);
+    BE_SpecificPlatformFunctions_Get().rendererFunctions.SetClearColor(color);
 }
 
-void BE_Renderer_Initialize(void) {
+// TODO: Make this private.
+void BE_PrivateRenderer_Initialize(void) {
     static int initialized = 0;
 
     BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized rendererFunctions");
 
-    char* value = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_RENDERER, 0);
+    const char* specifiedRenderer = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_RENDERER, 0);
 
-    if (value != NULL) {
-        if (SEC_StringExtension_CompareCaseless(value, "opengl")) {
+    if (specifiedRenderer != NULL) {
+        if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "opengl") == 0) {
+            opengl:
 #ifndef BE_DISABLE_OPENGL
-            SEC_LOGGER_DEBUG("Using OpenGL rendererFunctions");
-
-            currentType = BE_RENDERER_TYPE_OPENGL;
-
+            SEC_LOGGER_INFO("Using OpenGL as the renderer");
             BE_OpenGL_Initialize();
+
+            beRendererCurrent = BE_RENDERER_TYPE_OPENGL;
 #else
-            SEC_LOGGER_DEBUG("OpenGL has been disabled, defaulting to text mode");
-
-            currentType = BE_RENDERER_TYPE_TEXT;
-
+            SEC_LOGGER_WARN("This binary has OpenGL disabled, defaulting to text-mode");
             BE_TextMode_Initialize();
+
+            beRendererCurrent = BE_RENDERER_TYPE_TEXT;
 #endif
+
             return;
         }
 
-        // TODO: Vulkan, Metal, and DirectX
-//      if (SEC_StringExtension_CompareCaseless(value, "vulkan")) {
-//          SEC_LOGGER_DEBUG("Using Vulkan rendererFunctions");
-//
-//          currentType = BE_RENDERER_TYPE_VULKAN;
-//
-//          BE_TextMode_Initialize();
-//          return;
-//      }
-
-        if (SEC_StringExtension_CompareCaseless(value, "text")) {
-            SEC_LOGGER_DEBUG("Using no renderer");
-
-            currentType = BE_RENDERER_TYPE_TEXT;
-
-            BE_TextMode_Initialize();
-            return;
+        if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "vulkan") == 0) {
+            BE_ASSERT_ALWAYS("Renderer not implemented");
         }
 
-        SEC_LOGGER_ERROR("Unknown renderer type: %s", value);
-    } else
-        SEC_LOGGER_DEBUG("No renderer specified, choosing the best renderer for your platform");
-
-    // TODO: This can get very complicated, think of a better way later.
-    // TODO: Can only do Windows when DirectX is implemented.
-    // TODO: Can only do MacOS when DirectX is implemented.
-    // TODO: Can only do Linux when Vulkan is implemented.
-
-#ifndef BE_DISABLE_OPENGL
-    currentType = BE_RENDERER_TYPE_OPENGL;
-
-    BE_OpenGL_Initialize();
+        if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "metal") == 0) {
+#if SEC_OPERATINGSYSTEM_APPLE
+            BE_ASSERT_NOT_IMPLEMENTED();
 #else
-    currentType = BE_RENDERER_TYPE_TEXT;
+            SEC_LOGGER_WARN("Metal only works on Apple operating systems, defaulting to text-mode");
+            BE_TextMode_Initialize();
 
-    BE_TextMode_Initialize();
+            beRendererCurrent = BE_RENDERER_TYPE_TEXT;
 #endif
+        }
+
+        if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "directx") == 0) {
+            BE_ASSERT_ALWAYS("Renderer not implemented");
+        }
+
+        if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "software") == 0) {
+            SEC_LOGGER_INFO("Using software rendering");
+            SEC_LOGGER_WARN("This is going to lag; use a better renderer");
+
+#if SEC_OPERATINGSYSTEM_WINDOWS
+            BE_Windows_Initialize();
+#else
+            BE_ASSERT_ALWAYS("No software renderer implementation for your OS");
+#endif
+        }
+
+        SEC_LOGGER_WARN("Invalid renderer: %s", specifiedRenderer);
+    }
+
+    goto opengl; // TODO: Get the best one depending on OS
 }
 
 void BE_Renderer_ClearScreen(void) {
-    BE_SpecificRendererFunctions_Get().rendererFunctions.ClearScreen();
+    BE_SpecificPlatformFunctions_Get().rendererFunctions.ClearScreen();
 }
 
 int BE_Renderer_GetCalls(void) {
@@ -94,20 +96,11 @@ int BE_Renderer_GetCalls(void) {
 }
 
 BE_Renderer_Types BE_Renderer_GetCurrentType(void) {
-    return currentType;
-}
-
-int BE_Renderer_IsSoftwareMode(void) {
-    static int software = -1;
-
-    if (software == -1)
-        software = SEC_ArgumentHandler_GetIndex(SEC_BUILTINARGUMENTS_SOFTWARE, 0) != -1;
-
-    return software;
+    return beRendererCurrent;
 }
 
 BE_Color_3U BE_Renderer_GetClearColor(void) {
-    return BE_SpecificRendererFunctions_Get().rendererFunctions.GetClearColor();
+    return BE_SpecificPlatformFunctions_Get().rendererFunctions.GetClearColor();
 }
 
 //BE_Vector_2U BE_Renderer_GetFontSize(TTF_Font* font, const char* text) {
@@ -179,7 +172,7 @@ void BE_Renderer_DrawPoint(BE_Vector_2I position, BE_Color_4U color) {
 }
 
 void BE_Renderer_DrawRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U color) {
-    BE_SpecificRendererFunctions_Get().rendererFunctions.DrawFilledRectangle(position, size, color);
+    BE_SpecificPlatformFunctions_Get().rendererFunctions.DrawFilledRectangle(position, size, color);
 }
 
 void BE_Renderer_FillRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U color) {

@@ -43,43 +43,38 @@ int SEC_ArgumentHandler_GetIndex(const char* argument, int ignoreDontParse) {
     return ignoreDontParse || dontParse == -1 || index < dontParse ? index : -1;
 }
 
-int SEC_ArgumentHandler_GetIndexWithShort(const char* argument, const char* shortArgument, int ignoreDontParse, int* argumentIndex, int* shortIndex) {
-    int foundArgumentIndex = SEC_ArgumentHandler_GetIndex(argument, ignoreDontParse);
-    int foundShortIndex = SEC_ArgumentHandler_GetIndex(shortArgument, ignoreDontParse);
-
-    if (argumentIndex != NULL)
-        *argumentIndex = foundArgumentIndex;
-
-    if (shortIndex != NULL)
-        *shortIndex = foundShortIndex;
-
-    return foundArgumentIndex != -1 || foundShortIndex != -1;
-}
-
 char* SEC_ArgumentHandler_GetValue(const char* argument, int ignoreDontParse) {
     int index = SEC_ArgumentHandler_GetIndex(argument, ignoreDontParse);
 
     return index != -1 && index != addedArgumentsCount - 1 ? argumentVector[index + 1] : NULL;
 }
 
-int SEC_ArgumentHandler_GetValueWithShort(const char* argument, const char* shortArgument, int ignoreDontParse, char** argumentValue, char** shortValue) {
-    int argumentIndex;
-    int shortIndex;
-    int returnValue = 0;
+int SEC_ArgumentHandler_GetInfoWithShort(const char* argument, const char* shortArgument, int ignoreDontParse,
+                                         SEC_ArgumentHandler_ShortResults* results) {
+    int returnResult = 0;
 
-    if (!SEC_ArgumentHandler_GetIndexWithShort(argument, shortArgument, ignoreDontParse, &argumentIndex, &shortIndex))
-        return 0;
+    results->argumentIndex = SEC_ArgumentHandler_GetIndex(argument, ignoreDontParse);
+    results->shortIndex = SEC_ArgumentHandler_GetIndex(shortArgument, ignoreDontParse);
 
-    if (argumentValue != NULL && argumentIndex != -1 && argumentIndex != addedArgumentsCount - 1) {
-        *argumentValue = argumentVector[argumentIndex + 1];
-        returnValue++;
+    if (results->argumentIndex != -1 && results->argumentIndex != addedArgumentsCount - 1) {
+        results->argumentValue = argumentVector[results->argumentIndex + 1];
+        results->value = &results->argumentValue;
+        results->index = &results->argumentIndex;
+        returnResult++;
     }
 
-    if (shortValue != NULL && shortIndex != -1 && shortIndex != addedArgumentsCount - 1) {
-        *shortValue = argumentValue[argumentIndex + 1];
-        returnValue++;
+    if (results->shortIndex != -1 && results->shortIndex != addedArgumentsCount - 1) {
+        results->shortValue = argumentVector[results->shortIndex + 1];
+        results->value = &results->shortValue;
+        results->index = &results->shortIndex;
+        returnResult++;
     }
 
-    return returnValue;
+    return returnResult;
+}
+
+int SEC_ArgumentHandler_ContainsArgumentOrShort(const char* argument, const char* shortArgument, int ignoreDontParse) {
+    return SEC_ArgumentHandler_GetIndex(argument, ignoreDontParse) != -1 ||
+           SEC_ArgumentHandler_GetIndex(shortArgument, ignoreDontParse) != -1;
 }
 SEC_CPP_SUPPORT_GUARD_END()

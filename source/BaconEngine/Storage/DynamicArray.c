@@ -1,4 +1,3 @@
-#include <SharedEngineCode/Internal/CppSupport.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -6,13 +5,15 @@
 #include "BaconEngine/Debugging/Assert.h"
 #include "BaconEngine/Storage/DynamicArray.h"
 #include "../EngineMemory.h"
+#include "BaconEngine/Debugging/Assert.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-void ReallocateArray(BE_DynamicArray* array) {
+void BE_DynamicArray_ReallocateArray(BE_DynamicArray* array) {
     if (array->size != (size_t) array->used)
         return;
 
     SEC_LOGGER_TRACE("Ran out of free space, expanding array\nThis is expensive, so you should try avoiding it");
+    BE_ASSERT(array->size >= array->used, "Invalid array state");
 
     array->size *= 2;
     array->calledRealloc++;
@@ -20,13 +21,13 @@ void ReallocateArray(BE_DynamicArray* array) {
     BE_EngineMemory_ReallocateMemory(array->internalArray, sizeof(void*) * (array->size / 2), sizeof(void*) * array->size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 
+// TODO: Make a public one that does not use engine memory.
 int BE_DynamicArray_Create(BE_DynamicArray* array, size_t size) {
     BE_STRICTMODE_CHECK(size != 0, 0, "Invalid size");
 
-    array->internalArray = BE_EngineMemory_AllocateMemory(sizeof(void*) * size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+    array->internalArray = (void**) BE_EngineMemory_AllocateMemory(sizeof(void*) * size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
     array->used = 0;
     array->size = size;
-
     return 1;
 }
 
@@ -34,17 +35,21 @@ int BE_DynamicArray_AddElementToStart(BE_DynamicArray* array, void* element) {
     if (array->frozen)
         return 0;
 
-    ReallocateArray(array);
-    (void) element; // TODO: Add element.
+    BE_DynamicArray_ReallocateArray(array);
 
-    return 0;
+    for (int id = array->used - 1; id > 0; id--)
+        array->internalArray[id] = array->internalArray[id - 1];
+
+    array->internalArray[0] = element;
+    array->used++;
+    return 1;
 }
 
 int BE_DynamicArray_AddElementToLast(BE_DynamicArray* array, void* element) {
     if (array->frozen)
         return 0;
 
-    ReallocateArray(array);
+    BE_DynamicArray_ReallocateArray(array);
 
     array->internalArray[array->used++] = element;
 
@@ -68,7 +73,6 @@ int BE_DynamicArray_RemoveLastElement(BE_DynamicArray* array) {
         return 0;
 
     array->internalArray[--array->used] = NULL;
-
     return 1;
 }
 
@@ -76,10 +80,10 @@ int BE_DynamicArray_RemoveElementAt(BE_DynamicArray* array, unsigned int index) 
     if ((int) index >= array->used || array->frozen)
         return 0;
 
-    ReallocateArray(array);
+    BE_DynamicArray_ReallocateArray(array);
 
-    for (unsigned int windowId = index; (int) windowId < array->used; windowId++)
-        array->internalArray[windowId] = array->internalArray[windowId + 1];
+    for (unsigned int id = index; (int) id < array->used; id++)
+        array->internalArray[id] = array->internalArray[id + 1];
 
     array->used--;
     return 1;

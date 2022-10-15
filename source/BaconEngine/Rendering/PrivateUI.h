@@ -19,6 +19,8 @@ typedef struct {
     int windowId;
 } BE_PrivateUI_Window;
 
+void BE_PrivateUI_Initialize(void);
 const BE_DynamicArray* BE_PrivateUI_GetWindows(void);
 const BE_DynamicArray* BE_PrivateUI_GetRenderWindows(void);
+void BE_PrivateUI_Destroy(void);
 SEC_CPP_SUPPORT_GUARD_END()

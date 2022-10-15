@@ -20,12 +20,12 @@ typedef enum {
 
 SEC_Logger_LogLevels SEC_Logger_GetLogLevel(void);
 void SEC_Logger_SetLogLevel(SEC_Logger_LogLevels logLevel);
-void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLevel, const char* message, ...);
+void SEC_Logger_LogImplementation(int includeHeader, int includeNewLine, SEC_Logger_LogLevels logLevel, const char* message, ...);
 SEC_CPP_SUPPORT_GUARD_END()
 
-#define SEC_LOGGER_TRACE(...) SEC_Logger_LogImplementation(1, SEC_LOGGER_LOG_LEVEL_TRACE, __VA_ARGS__)
-#define SEC_LOGGER_DEBUG(...) SEC_Logger_LogImplementation(1, SEC_LOGGER_LOG_LEVEL_DEBUG, __VA_ARGS__)
-#define SEC_LOGGER_INFO(...) SEC_Logger_LogImplementation(1, SEC_LOGGER_LOG_LEVEL_INFO, __VA_ARGS__)
-#define SEC_LOGGER_WARN(...) SEC_Logger_LogImplementation(1, SEC_LOGGER_LOG_LEVEL_WARN, __VA_ARGS__)
-#define SEC_LOGGER_ERROR(...) SEC_Logger_LogImplementation(1, SEC_LOGGER_LOG_LEVEL_ERROR, __VA_ARGS__)
-#define SEC_LOGGER_FATAL(...) SEC_Logger_LogImplementation(1, SEC_LOGGER_LOG_LEVEL_FATAL, __VA_ARGS__)
+#define SEC_LOGGER_TRACE(...) SEC_Logger_LogImplementation(1, 1, SEC_LOGGER_LOG_LEVEL_TRACE, __VA_ARGS__)
+#define SEC_LOGGER_DEBUG(...) SEC_Logger_LogImplementation(1, 1, SEC_LOGGER_LOG_LEVEL_DEBUG, __VA_ARGS__)
+#define SEC_LOGGER_INFO(...) SEC_Logger_LogImplementation(1, 1, SEC_LOGGER_LOG_LEVEL_INFO, __VA_ARGS__)
+#define SEC_LOGGER_WARN(...) SEC_Logger_LogImplementation(1, 1, SEC_LOGGER_LOG_LEVEL_WARN, __VA_ARGS__)
+#define SEC_LOGGER_ERROR(...) SEC_Logger_LogImplementation(1, 1, SEC_LOGGER_LOG_LEVEL_ERROR, __VA_ARGS__)
+#define SEC_LOGGER_FATAL(...) SEC_Logger_LogImplementation(1, 1, SEC_LOGGER_LOG_LEVEL_FATAL, __VA_ARGS__)

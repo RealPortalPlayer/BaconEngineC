@@ -1,4 +1,3 @@
-#include <SharedEngineCode/Internal/CppSupport.h>
 #include <BaconEngine/Storage/DynamicArray.h>
 #include <string.h>
 
@@ -7,8 +6,7 @@
 #include "BaconEngine/Rendering/Layer.h"
 #include "EngineLayers.h"
 #include "../EngineMemory.h"
-#include "BaconEngine/ClientInformation.h"
-#include "BaconEngine/Rendering/Renderer.h"
+#include "PrivateLayer.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 typedef struct {
@@ -16,47 +14,42 @@ typedef struct {
     BE_Layer_Functions functions;
     int calledStart;
     int enabled;
-} InternalClientLayer;
+} BE_Layer_Internal;
 
-BE_DynamicArray layerArray;
-int layerInitialized = 0;
+BE_DynamicArray beLayerArray;
+int beLayerInitialized = 0;
 
-int LayerNoOperation(void) {
+int BE_Layer_NoOperation(void) {
     return 0;
 }
 
-InternalClientLayer* InternalGetLayer(const char* name) {
-    if (layerInitialized) {
-        for (int i = 0; i < (int) layerArray.used; i++) {
-            if (strcmp(BE_DYNAMICARRAY_GET_ELEMENT(InternalClientLayer, layerArray, i)->publicLayer.name, name) != 0)
-                continue;
+BE_Layer_Internal* BE_Layer_InternalGet(const char* name) {
+    for (int i = 0; i < (int) beLayerArray.used; i++) {
+        if (strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->publicLayer.name, name) != 0)
+            continue;
 
-            return layerArray.internalArray[i];
-        }
+        return beLayerArray.internalArray[i];
     }
 
     return NULL;
 }
 
-void BE_Layer_InitializeLayers(void) {
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!layerInitialized, "Already initialized the layer stack");
+void BE_PrivateLayer_InitializeLayers(void) {
+    BE_ASSERT(!beLayerInitialized, "Already initialized the layer stack");
     SEC_LOGGER_INFO("Initializing layer stack");
 
-    layerInitialized = 1;
+    beLayerInitialized = 1;
 
-    BE_DynamicArray_Create(&layerArray, 100);
+    BE_DynamicArray_Create(&beLayerArray, 100);
     SEC_LOGGER_INFO("Registering engine layers");
     BE_EngineLayers_Initialize();
 }
 
 void BE_Layer_Register(const char* name, int enabled, BE_Layer_Functions functions) {
-    if (!layerInitialized)
-        return;
+    for (int i = 0; i < (int) beLayerArray.used; i++)
+        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->publicLayer.name, name) != 0, "The layer '%s' is already registered", name);
 
-    for (int i = 0; i < (int) layerArray.used; i++)
-        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(strcmp(BE_DYNAMICARRAY_GET_ELEMENT(InternalClientLayer, layerArray, i)->publicLayer.name, name) != 0, "The layer '%s' is already registered", name);
-
-    InternalClientLayer* layer = BE_EngineMemory_AllocateMemory(sizeof(InternalClientLayer), BE_ENGINEMEMORY_MEMORY_TYPE_LAYER);
+    BE_Layer_Internal* layer = (BE_Layer_Internal*) BE_EngineMemory_AllocateMemory(sizeof(BE_Layer_Internal), BE_ENGINEMEMORY_MEMORY_TYPE_LAYER);
 
     layer->publicLayer = (BE_Layer) {
         1,
@@ -64,42 +57,35 @@ void BE_Layer_Register(const char* name, int enabled, BE_Layer_Functions functio
     };
     layer->enabled = enabled;
     layer->calledStart = 0;
-    layer->functions.OnStart = functions.OnStart != NULL ? functions.OnStart : (void (*)(void)) &LayerNoOperation;
-    layer->functions.OnUpdate = functions.OnUpdate != NULL ? functions.OnUpdate : (void (*)(BE_Layer_UpdateTypes, double)) &LayerNoOperation;
-    layer->functions.OnToggle = functions.OnToggle != NULL ? functions.OnToggle : (void (*)(int)) &LayerNoOperation;
-    layer->functions.OnEvent = functions.OnEvent != NULL ? functions.OnEvent : (int (*)(BE_Event)) &LayerNoOperation;
-    layer->functions.OnStop = functions.OnStop != NULL ? functions.OnStop : (void (*)(void)) &LayerNoOperation;
+    layer->functions.OnStart = functions.OnStart != NULL ? functions.OnStart : (void (*)(void)) &BE_Layer_NoOperation;
+    layer->functions.OnUpdate = functions.OnUpdate != NULL ? functions.OnUpdate : (void (*)(BE_Layer_UpdateTypes)) &BE_Layer_NoOperation;
+    layer->functions.OnToggle = functions.OnToggle != NULL ? functions.OnToggle : (void (*)(int)) &BE_Layer_NoOperation;
+    layer->functions.OnEvent = functions.OnEvent != NULL ? functions.OnEvent : (int (*)(BE_Event)) &BE_Layer_NoOperation;
+    layer->functions.OnStop = functions.OnStop != NULL ? functions.OnStop : (void (*)(void)) &BE_Layer_NoOperation;
 
-    BE_DynamicArray_AddElementToLast(&layerArray, (void *) layer);
+    BE_DynamicArray_AddElementToLast(&beLayerArray, (void *) layer);
 }
 
 BE_Layer BE_Layer_Get(const char* name) {
-    BE_STRICTMODE_CHECK(layerInitialized, (BE_Layer) {0}, "Layers are not initialized");
+    BE_Layer_Internal* foundLayer = BE_Layer_InternalGet(name);
 
-    InternalClientLayer* foundLayer = InternalGetLayer(name);
-
-    if (foundLayer == NULL)
-        return (BE_Layer) {
-            .valid = 0
-        };
-
-    return foundLayer->publicLayer;
+    return foundLayer != NULL ? foundLayer->publicLayer : SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Layer, .valid = 0);
 }
 
 int BE_Layer_GetAmount(void) {
-    return layerInitialized ? layerArray.used : 0;
+    return beLayerInitialized ? beLayerArray.used : 0;
 }
 
 int BE_Layer_GetAllocatedLayersAmount(void) {
-    return layerInitialized ? (int) layerArray.size : 0;
+    return beLayerInitialized ? (int) beLayerArray.size : 0;
 }
 
 int BE_Layer_GetLayersReallocationAmount(void) {
-    return layerInitialized ? layerArray.calledRealloc : 0;
+    return beLayerInitialized ? beLayerArray.calledRealloc : 0;
 }
 
 int BE_Layer_Toggle(const char* name, int enable) {
-    InternalClientLayer* layer = InternalGetLayer(name);
+    BE_Layer_Internal* layer = BE_Layer_InternalGet(name);
 
     if (layer == NULL)
         return 0;
@@ -118,16 +104,12 @@ int BE_Layer_Toggle(const char* name, int enable) {
     layer->enabled = enable;
 
     layer->functions.OnToggle(enable); // FIXME: The layer could still be in the middle of an update/event.
-
     return 1;
 }
 
-void BE_Layer_OnUpdate(BE_Layer_UpdateTypes updateTypes, double deltaTime) {
-    if (!layerInitialized)
-        return;
-
-    for (int i = 0; i < layerArray.used; i++) {
-        InternalClientLayer* layer = BE_DYNAMICARRAY_GET_ELEMENT(InternalClientLayer, layerArray, i);
+void BE_PrivateLayer_OnUpdate(BE_Layer_UpdateTypes updateTypes) {
+    for (int i = 0; i < beLayerArray.used; i++) {
+        BE_Layer_Internal* layer = BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i);
 
         if (!layer->enabled)
             continue;
@@ -138,16 +120,13 @@ void BE_Layer_OnUpdate(BE_Layer_UpdateTypes updateTypes, double deltaTime) {
             layer->calledStart = 1;
         }
 
-        layer->functions.OnUpdate(updateTypes, deltaTime);
+        layer->functions.OnUpdate(updateTypes);
     }
 }
 
-int BE_Layer_OnEvent(BE_Event event) {
-    if (!layerInitialized)
-        return 0;
-
-    for (int i = 0; i < layerArray.used; i++) {
-        InternalClientLayer* layer = BE_DYNAMICARRAY_GET_ELEMENT(InternalClientLayer, layerArray, i);
+int BE_PrivateLayer_OnEvent(BE_Event event) {
+    for (int i = 0; i < beLayerArray.used; i++) {
+        BE_Layer_Internal* layer = BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i);
 
         if (!layer->enabled)
             continue;
@@ -169,29 +148,29 @@ int BE_Layer_OnEvent(BE_Event event) {
 }
 
 int BE_Layer_IsToggled(const char* name) {
-    InternalClientLayer* layer = InternalGetLayer(name);
+    BE_Layer_Internal* layer = BE_Layer_InternalGet(name);
 
     return layer != NULL && layer->enabled;
 }
 
-void BE_Layer_DestroyLayers(void) {
-    if (BE_ClientInformation_IsServerModeEnabled() || BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT)
-        return;
-
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(layerInitialized, "Layers are already destroyed");
+void BE_PrivateLayer_DestroyLayers(void) {
+    BE_ASSERT(beLayerInitialized, "Layers are already destroyed");
     SEC_LOGGER_INFO("Destroying layer stack");
 
-    layerInitialized = 0;
+    beLayerInitialized = 0;
 
-    for (int i = 0; i < layerArray.used; i++) {
-        InternalClientLayer* layer = BE_DYNAMICARRAY_GET_ELEMENT(InternalClientLayer, layerArray, i);
+    for (int i = 0; i < beLayerArray.used; i++) {
+        BE_Layer_Internal* layer = BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i);
+
+        if (!layer->calledStart)
+            continue;
 
         layer->functions.OnStop();
     }
 
-    for (int i = 0; i < layerArray.used; i++)
-        BE_EngineMemory_DeallocateMemory(BE_DYNAMICARRAY_GET_ELEMENT(InternalClientLayer, layerArray, i), sizeof(InternalClientLayer), BE_ENGINEMEMORY_MEMORY_TYPE_LAYER);
+    for (int i = 0; i < beLayerArray.used; i++)
+        BE_EngineMemory_DeallocateMemory(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i), sizeof(BE_Layer_Internal), BE_ENGINEMEMORY_MEMORY_TYPE_LAYER);
 
-    BE_EngineMemory_DeallocateMemory(layerArray.internalArray, sizeof(void *) * layerArray.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BE_EngineMemory_DeallocateMemory(beLayerArray.internalArray, sizeof(void *) * beLayerArray.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 SEC_CPP_SUPPORT_GUARD_END()

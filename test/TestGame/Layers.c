@@ -2,13 +2,14 @@
 #include <BaconEngine/Rendering/Renderer.h>
 #include <BaconEngine/Console/Console.h>
 #include <stdlib.h>
+#include <BaconEngine/DeltaTime.h>
 
 #include "Layers.h"
 
 int down = 0;
 BE_Color_3I color = {0, 0, 0};
 
-void ColorOnUpdate(BE_Layer_UpdateTypes updateType, double deltaTime);
+void ColorOnUpdate(BE_Layer_UpdateTypes updateType);
 int ColorOnEvent(BE_Event event);
 int ColorModifierOnEvent(BE_Event event);
 int UIOnEvent(BE_Event event);
@@ -40,7 +41,7 @@ int UIOnEvent(BE_Event event) {
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-void ColorOnUpdate(BE_Layer_UpdateTypes updateType, double deltaTime) {
+void ColorOnUpdate(BE_Layer_UpdateTypes updateType) {
     if (updateType != BE_LAYER_UPDATE_TYPE_BEFORE_RENDERING)
         return;
 
@@ -48,6 +49,8 @@ void ColorOnUpdate(BE_Layer_UpdateTypes updateType, double deltaTime) {
 
     if (!down)
         times = -1;
+
+    double deltaTime = BE_DeltaTime_GetMilliseconds();
 
     color.r += times * (int)(1000 * deltaTime);
     color.g += times * (int)(1000 * deltaTime);

@@ -19,12 +19,14 @@
 #include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Rendering/Window.h"
 #include "BaconEngine/Rendering/Renderer.h"
-#include "BaconEngine/Console/Console.h"
-#include "BaconEngine/Rendering/Layer.h"
 #include "BaconEngine/EngineMemoryInformation.h"
-#include "BaconEngine/Rendering/UI.h"
 #include "Rendering/PrivateWindow.h"
-#include "Rendering/SpecificRendererFunctions.h"
+#include "Platform/SpecificPlatformFunctions.h"
+#include "Rendering/PrivateLayer.h"
+#include "Rendering/PrivateUI.h"
+#include "PrivateDeltaTime.h"
+#include "Console/PrivateConsole.h"
+#include "Rendering/PrivateRenderer.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 int BE_EntryPoint_ClientStart(int argc, char** argv);
@@ -38,7 +40,7 @@ void BE_EntryPoint_SignalDetected(int signal) {
         {
             static int antiDoubleSegfault = 0;
 
-            if (SEC_Logger_GetLogLevel() <= SEC_LOGGER_LOG_LEVEL_FATAL && !antiDoubleSegfault) {
+            if (SEC_Logger_GetLogLevel() > SEC_LOGGER_LOG_LEVEL_FATAL && !antiDoubleSegfault) {
                 antiDoubleSegfault = 1;
 
                 write(STDOUT_FILENO, "\n", 1);
@@ -88,7 +90,7 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
 
     SEC_LOGGER_DEBUG("Registering signals");
     signal(SIGSEGV, BE_EntryPoint_SignalDetected);
-    BE_Renderer_Initialize();
+    BE_PrivateRenderer_Initialize();
 
     if (!BE_ClientInformation_IsServerModeEnabled() && BE_Renderer_GetCurrentType() != BE_RENDERER_TYPE_TEXT) {
         int width = 1080;
@@ -125,14 +127,13 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
             }
         }
 
-        BE_Layer_InitializeLayers();
-        BE_PrivateWindow_Initialize(BE_EntryPoint_GetClientName(), (BE_Vector_2U) {(unsigned) width, (unsigned) height});
+        BE_PrivateLayer_InitializeLayers();
+        BE_PrivateWindow_Initialize(BE_EntryPoint_GetClientName(), SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2U, (unsigned) width, (unsigned) height));
     }
 
-    BE_UI_Initialize();
-    BE_Console_Initialize();
+    BE_PrivateUI_Initialize();
+    BE_PrivateConsole_Initialize();
     BE_ASSERT(BE_EntryPoint_ClientStart(argc, argv) == 0, "Client start returned non-zero");
-    BE_Renderer_ClearScreen();
 
     {
         const char* preParsedExitCode = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_EXIT, 0);
@@ -153,8 +154,6 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
 
     double deltaStart = 0;
 
-    BE_SpecificRendererFunctions_Get().rendererFunctions.SetClearColor((BE_Color_3U) {255, 255, 255});
-
     while (BE_ClientInformation_IsRunning()) {
         if (!BE_Window_IsStillOpened()) {
             BE_ClientInformation_StopRunning();
@@ -163,24 +162,25 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
 
         BE_Renderer_ClearScreen();
 
-        double deltaNow = BE_SpecificRendererFunctions_Get().GetTimer();
+        double deltaNow = BE_SpecificPlatformFunctions_Get().GetTimer();
         double deltaTime = deltaNow - deltaStart;
 
         deltaStart = deltaNow;
 
-        BE_Layer_OnUpdate(BE_LAYER_UPDATE_TYPE_BEFORE_RENDERING, deltaTime);
-        BE_SpecificRendererFunctions_Get().rendererFunctions.Render();
-        BE_Layer_OnUpdate(BE_LAYER_UPDATE_TYPE_AFTER_RENDERING, deltaTime);
-        BE_SpecificRendererFunctions_Get().windowFunctions.UpdateEvents();
+        BE_PrivateDeltaTime_Setter(deltaTime);
+        BE_PrivateLayer_OnUpdate(BE_LAYER_UPDATE_TYPE_BEFORE_RENDERING);
+        BE_SpecificPlatformFunctions_Get().rendererFunctions.Render();
+        BE_PrivateLayer_OnUpdate(BE_LAYER_UPDATE_TYPE_AFTER_RENDERING);
+        BE_SpecificPlatformFunctions_Get().windowFunctions.UpdateEvents();
     }
 
     SEC_LOGGER_TRACE("Client loop ended, shutting down");
     BE_ASSERT(BE_EntryPoint_ClientShutdown() == 0, "Client shutdown returned non-zero");
-    BE_Layer_DestroyLayers();
-    BE_UI_Destroy();
-    BE_Console_Destroy();
+    BE_PrivateLayer_DestroyLayers();
+    BE_PrivateUI_Destroy();
+    BE_PrivateConsole_Destroy();
     BE_PrivateWindow_Destroy();
-    BE_SpecificRendererFunctions_Get().Destroy();
+    BE_SpecificPlatformFunctions_Get().Destroy();
 
     if (BE_EngineMemory_GetAllocatedBytes() > 0) {
         BE_EngineMemory_MemoryInformation memoryInformation = BE_EngineMemory_GetMemoryInformation();

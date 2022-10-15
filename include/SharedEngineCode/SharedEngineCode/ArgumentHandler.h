@@ -6,6 +6,25 @@
 #include "Internal/CppSupport.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
+typedef struct {
+    /**
+     * Will be the pointer to argumentValue.
+     * If short value is defined, then it will be pointing to that instead,
+     * no matter what.
+     * Short arguments has a higher priority than normal arguments.
+     */
+    char** value;
+
+    /**
+     * Same for value, but for the indexes instead.
+     */
+    int* index;
+    char* argumentValue;
+    char* shortValue;
+    int argumentIndex;
+    int shortIndex;
+} SEC_ArgumentHandler_ShortResults;
+
 void SEC_ArgumentHandler_Initialize(int argc, char** argv);
 int SEC_ArgumentHandler_GetCount(void);
 char** SEC_ArgumentHandler_GetVector(void);
@@ -16,21 +35,12 @@ char** SEC_ArgumentHandler_GetVector(void);
 int SEC_ArgumentHandler_GetIndex(const char* argument, int ignoreDontParse);
 
 /**
-  * @param argumentIndex The index if the argument was found, -1 if not. Doesn't set if NULL.
-  * @param shortIndex The same as argumentIndex, but for the short version.
-  * @return If either one isn't -1.
-  */
-int SEC_ArgumentHandler_GetIndexWithShort(const char* argument, const char* shortArgument, int ignoreDontParse, int* argumentIndex, int* shortIndex);
-
-/**
   * @return The value next to the argument if found, NULL if not.
   */
 char* SEC_ArgumentHandler_GetValue(const char* argument, int ignoreDontParse);
 
-/**
-  * @param argumentValue The value if the argument was found. Doesn't set if NULL/not found.
-  * @param shortValue The same as argumentValue, but for the short version.
-  * @return 1 if only one was set, 2 if both was set, and 0 if none was set.
-  */
-int SEC_ArgumentHandler_GetValueWithShort(const char* argument, const char* shortArgument, int ignoreDontParse, char** argumentValue, char** shortValue);
+int SEC_ArgumentHandler_GetInfoWithShort(const char* argument, const char* shortArgument, int ignoreDontParse,
+                                         SEC_ArgumentHandler_ShortResults* results);
+
+int SEC_ArgumentHandler_ContainsArgumentOrShort(const char* argument, const char* shortArgument, int ignoreDontParse);
 SEC_CPP_SUPPORT_GUARD_END()

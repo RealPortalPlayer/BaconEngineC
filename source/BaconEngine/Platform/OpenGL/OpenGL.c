@@ -2,13 +2,13 @@
 #include "GLFW/glfw3.h"
 
 #include "OpenGL.h"
-#include "../../Rendering/SpecificRendererFunctions.h"
+#include "../SpecificPlatformFunctions.h"
 #include "BaconEngine/Debugging/Assert.h"
 #include "OpenGLWindow.h"
 #include "OpenGLRenderer.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-static int initialized = 0;
+static int beOpenGLInitialized = 0;
 
 void BE_OpenGL_Error(int error, const char* description) {
     SEC_LOGGER_ERROR("GLFW Error:\n"
@@ -21,10 +21,10 @@ double BE_OpenGL_GetTimer(void) {
 }
 
 void BE_OpenGL_Initialize(void) {
-    BE_ASSERT(!initialized, "Already initialized OpenGL");
+    BE_ASSERT(!beOpenGLInitialized, "Already initialized OpenGL");
     BE_ASSERT(glfwInit(), "Failed to initialize GLFW");
     glfwSetErrorCallback(&BE_OpenGL_Error);
-    BE_SpecificRendererFunctions_InitializeWindow((BE_SpecificRendererFunctions_Window) {
+    BE_SpecificPlatformFunctions_InitializeWindow(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions_Window,
         &BE_OpenGLWindow_GetInternal,
         &BE_OpenGLWindow_Create,
         &BE_OpenGLWindow_GetTitle,
@@ -38,24 +38,24 @@ void BE_OpenGL_Initialize(void) {
         &BE_OpenGLWindow_SetVisibility,
         &BE_OpenGLWindow_Close,
         &BE_OpenGLWindow_UpdateEvents
-    });
-    BE_SpecificRendererFunctions_InitializeRenderer((BE_SpecificRendererFunctions_Renderer) {
+    ));
+    BE_SpecificPlatformFunctions_InitializeRenderer(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions_Renderer,
         &BE_OpenGLRenderer_ClearScreen,
         &BE_OpenGLRenderer_SetClearColor,
         &BE_OpenGLRenderer_GetClearColor,
         &BE_OpenGLRenderer_Render,
         &BE_OpenGLRenderer_DrawFilledRectangle
-    });
-    BE_SpecificRendererFunctions_SetDestroy(&BE_OpenGL_Destroy);
-    BE_SpecificRendererFunctions_SetGetTimer(&BE_OpenGL_GetTimer);
+    ));
+    BE_SpecificPlatformFunctions_SetDestroy(&BE_OpenGL_Destroy);
+    BE_SpecificPlatformFunctions_SetGetTimer(&BE_OpenGL_GetTimer);
 
-    initialized = 1;
+    beOpenGLInitialized = 1;
 }
 
 void BE_OpenGL_Destroy(void) {
-    BE_ASSERT(initialized, "Already destroyed OpenGL");
+    BE_ASSERT(beOpenGLInitialized, "Already destroyed OpenGL");
     glfwTerminate();
 
-    initialized = 0;
+    beOpenGLInitialized = 0;
 }
 SEC_CPP_SUPPORT_GUARD_END()

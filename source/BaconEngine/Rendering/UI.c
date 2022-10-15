@@ -1,40 +1,38 @@
-#include <SharedEngineCode/Internal/CppSupport.h>
-
 #include "BaconEngine/Rendering/UI.h"
 #include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Debugging/Assert.h"
 #include "../EngineMemory.h"
 #include "PrivateUI.h"
-#include "BaconEngine/ClientInformation.h"
 #include "BaconEngine/Math/Bitwise.h"
 #include "EngineUIs.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-BE_DynamicArray uiWindows;
-int initialized;
-BE_PrivateUI_Window* fullscreenWindow;
-BE_DynamicArray renderOrder;
+BE_DynamicArray beUIWindows;
+int beUIInitialized;
+//BE_PrivateUI_Window* beUIFullscreenWindow;
+BE_DynamicArray beUIRenderOrder;
 
 BE_PrivateUI_Window* BE_UI_GetWindowFromId(unsigned windowId) {
-    BE_STRICTMODE_CHECK(uiWindows.used > (int) windowId, NULL, "Invalid UI window ID");
-    return BE_DYNAMICARRAY_GET_ELEMENT(BE_PrivateUI_Window, uiWindows, windowId);
+    BE_STRICTMODE_CHECK(beUIWindows.used > (int) windowId, NULL, "Invalid UI window ID");
+    return BE_DYNAMICARRAY_GET_ELEMENT(BE_PrivateUI_Window, beUIWindows, windowId);
 }
 
 const BE_DynamicArray* BE_PrivateUI_GetWindows(void) {
-    return &uiWindows;
+    return &beUIWindows;
 }
 
 const BE_DynamicArray* BE_PrivateUI_GetRenderWindows(void) {
-    return &renderOrder;
+    return &beUIRenderOrder;
 }
 
-void BE_UI_Initialize(void) {
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!initialized, "The UI system was already initialized");
+// TODO: Make this private.
+void BE_PrivateUI_Initialize(void) {
+    BE_ASSERT(!beUIInitialized, "The UI system was already initialized");
 
-    initialized = 1;
+    beUIInitialized = 1;
 
-    if (!BE_DynamicArray_Create(&uiWindows, 100) || !BE_DynamicArray_Create(&renderOrder, 100)) {
-        initialized = 0;
+    if (!BE_DynamicArray_Create(&beUIWindows, 100) || !BE_DynamicArray_Create(&beUIRenderOrder, 100)) {
+        beUIInitialized = 0;
         return;
     }
 
@@ -42,11 +40,12 @@ void BE_UI_Initialize(void) {
 }
 
 unsigned BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector_2I position, BE_Vector_2U size) {
-    BE_ASSERT(initialized, "UI system is not initialized");
+    BE_ASSERT(beUIInitialized, "UI system is not initialized");
 
-    initialized = 1;
+    beUIInitialized = 1;
 
-    BE_PrivateUI_Window* uiWindow = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateUI_Window), BE_ENGINEMEMORY_MEMORY_TYPE_UI);
+    BE_PrivateUI_Window* uiWindow = (BE_PrivateUI_Window*) BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateUI_Window),
+                                                                                          BE_ENGINEMEMORY_MEMORY_TYPE_UI);
 
     // TODO: Validate flags
 
@@ -54,17 +53,17 @@ unsigned BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vect
     uiWindow->flags = flags;
     uiWindow->position = position;
     uiWindow->size = size;
-    uiWindow->currentRenderPosition = renderOrder.used;
+    uiWindow->currentRenderPosition = beUIRenderOrder.used;
 
     BE_DynamicArray_Create(&uiWindow->elements, 100);
-    BE_DynamicArray_AddElementToLast(&uiWindows, uiWindow);
-    BE_DynamicArray_AddElementToLast(&renderOrder, uiWindow);
+    BE_DynamicArray_AddElementToLast(&beUIWindows, uiWindow);
+    BE_DynamicArray_AddElementToLast(&beUIRenderOrder, uiWindow);
 
-    return (uiWindow->windowId = uiWindows.used - 1);
+    return (uiWindow->windowId = beUIWindows.used - 1);
 }
 
 int BE_UI_RegisterElement(unsigned windowId, BE_UI_Element* element) {
-    BE_ASSERT(initialized, "UI system is not initialized");
+    BE_ASSERT(beUIInitialized, "UI system is not initialized");
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
@@ -72,7 +71,7 @@ int BE_UI_RegisterElement(unsigned windowId, BE_UI_Element* element) {
 }
 
 int BE_UI_ToggleWindowFlag(unsigned windowId, BE_UI_WindowFlags flag, int toggle) {
-    BE_ASSERT(initialized, "UI system is not initialized");
+    BE_ASSERT(beUIInitialized, "UI system is not initialized");
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
@@ -84,7 +83,7 @@ int BE_UI_ToggleWindowFlag(unsigned windowId, BE_UI_WindowFlags flag, int toggle
 }
 
 const char* BE_UI_GetWindowName(unsigned windowId) {
-    BE_ASSERT(initialized, "UI system is not initialized");
+    BE_ASSERT(beUIInitialized, "UI system is not initialized");
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
@@ -92,7 +91,7 @@ const char* BE_UI_GetWindowName(unsigned windowId) {
 }
 
 int BE_UI_IsWindowStillOpen(unsigned windowId) {
-    BE_ASSERT(initialized, "UI system is not initialized");
+    BE_ASSERT(beUIInitialized, "UI system is not initialized");
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
@@ -100,7 +99,7 @@ int BE_UI_IsWindowStillOpen(unsigned windowId) {
 }
 
 BE_DynamicArray* BE_UI_GetWindowElements(unsigned windowId) {
-    BE_ASSERT(initialized, "UI system is not initialized");
+    BE_ASSERT(beUIInitialized, "UI system is not initialized");
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
@@ -110,13 +109,13 @@ BE_DynamicArray* BE_UI_GetWindowElements(unsigned windowId) {
 int BE_UI_SetActiveWindow(unsigned windowId) {
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
-    if (uiWindow == NULL || renderOrder.used <= 1 || uiWindow->currentRenderPosition == 0)
+    if (uiWindow == NULL || beUIRenderOrder.used <= 1 || uiWindow->currentRenderPosition == 0)
         return 0;
 
-    BE_PrivateUI_Window* activeWindow = BE_DYNAMICARRAY_GET_ELEMENT(BE_PrivateUI_Window, renderOrder, 0);
+    BE_PrivateUI_Window* activeWindow = BE_DYNAMICARRAY_GET_ELEMENT(BE_PrivateUI_Window, beUIRenderOrder, 0);
 
-    renderOrder.internalArray[0] = uiWindow;
-    renderOrder.internalArray[uiWindow->currentRenderPosition] = activeWindow;
+    beUIRenderOrder.internalArray[0] = uiWindow;
+    beUIRenderOrder.internalArray[uiWindow->currentRenderPosition] = activeWindow;
     activeWindow->currentRenderPosition = uiWindow->currentRenderPosition;
     uiWindow->currentRenderPosition = 0;
 
@@ -124,24 +123,25 @@ int BE_UI_SetActiveWindow(unsigned windowId) {
 }
 
 int BE_UI_GetWindowAmount(void) {
-    return initialized ? uiWindows.used : 0;
+    return beUIInitialized ? beUIWindows.used : 0;
 }
 
 int BE_UI_GetAllocatedWindowsAmount(void) {
-    return initialized ? (int) uiWindows.size : 0;
+    return beUIInitialized ? (int) beUIWindows.size : 0;
 }
 
 int BE_UI_GetWindowReallocationAmount(void) {
-    return initialized ? uiWindows.calledRealloc : 0;
+    return beUIInitialized ? beUIWindows.calledRealloc : 0;
 }
 
-void BE_UI_Destroy(void) {
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(initialized, "UI system has already been destroyed");
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_ClientInformation_IsRunning(), "Cannot destroy UI system while still running");
+// TODO: Make this private.
+void BE_PrivateUI_Destroy(void) {
+    BE_ASSERT(beUIInitialized, "UI system has already been destroyed");
+    BE_ASSERT(!BE_ClientInformation_IsRunning(), "Cannot destroy UI system while still running");
 
-    initialized = 0;
+    beUIInitialized = 0;
 
-    for (int windowId = 0; windowId < uiWindows.used; windowId++) {
+    for (int windowId = 0; windowId < beUIWindows.used; windowId++) {
         BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
         for (int elementId = 0; elementId < uiWindow->elements.used; elementId++)
@@ -151,7 +151,7 @@ void BE_UI_Destroy(void) {
         BE_EngineMemory_DeallocateMemory(uiWindow, sizeof(BE_PrivateUI_Window), BE_ENGINEMEMORY_MEMORY_TYPE_UI);
     }
 
-    BE_EngineMemory_DeallocateMemory(renderOrder.internalArray, sizeof(void*) * renderOrder.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
-    BE_EngineMemory_DeallocateMemory(uiWindows.internalArray, sizeof(void*) * uiWindows.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BE_EngineMemory_DeallocateMemory(beUIRenderOrder.internalArray, sizeof(void*) * beUIRenderOrder.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BE_EngineMemory_DeallocateMemory(beUIWindows.internalArray, sizeof(void*) * beUIWindows.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 SEC_CPP_SUPPORT_GUARD_END()

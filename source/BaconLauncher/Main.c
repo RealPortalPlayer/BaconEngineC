@@ -13,8 +13,12 @@
 
 int main(int argc, char** argv) {
     SEC_ArgumentHandler_Initialize(argc, argv);
+    SEC_LOGGER_TRACE("Built on: %s\nBuilt for: %s", __TIMESTAMP__, SEC_OPERATINGSYSTEM_NAME);
 
-    SEC_LOGGER_TRACE("Built: %s", __TIMESTAMP__);
+    if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_VERSION, SEC_BUILTINARGUMENTS_VERSION_SHORT, 0)) {
+        SEC_LOGGER_INFO("Launcher version: 0.1");
+        return 0;
+    }
 
     if (SEC_ArgumentHandler_GetIndex(SEC_BUILTINARGUMENTS_HELP, 0) != -1) {
         SEC_LOGGER_INFO("Arguments:\n%s", SEC_Launcher_GetDefaultHelpList());
@@ -24,24 +28,21 @@ int main(int argc, char** argv) {
     if (SEC_OSUser_IsAdmin())
         SEC_LOGGER_WARN("You're running as root! If a client says you require to be root, then it's probably a virus");
 
-    const char* clientPath = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_CLIENT, 0);
+    SEC_LOGGER_INFO("Getting configuration information");
 
-    if (clientPath == NULL)
-        clientPath = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_CLIENT_SHORT, 0);
+    SEC_ArgumentHandler_ShortResults results;
 
-    if (clientPath == NULL) {
-        SEC_LOGGER_WARN("You didn't specify what client you wanted to open, defaulting to 'Client'");
-
-        clientPath = "./Client";
+    if (SEC_ArgumentHandler_GetInfoWithShort(SEC_BUILTINARGUMENTS_CLIENT, SEC_BUILTINARGUMENTS_CLIENT_SHORT, 0, &results) == 0) {
+        SEC_LOGGER_FATAL("No client specified, please check help for more information");
+        return 1;
     }
 
-    SEC_LOGGER_INFO("Getting configuration information");
 
     SEC_Launcher_Configuration configuration = {
         .code = SEC_LAUNCHER_ERROR_CODE_NULL
     };
 
-    SEC_Launcher_CreateConfiguration(&configuration, clientPath);
+    SEC_Launcher_CreateConfiguration(&configuration, *results.value);
 
     if (configuration.code != SEC_LAUNCHER_ERROR_CODE_NULL) { // TODO: Parse Windows error code into string.
         switch (configuration.code) {

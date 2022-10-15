@@ -1,13 +1,14 @@
-#include "SharedEngineCode/Internal/CppSupport.h"
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
-#include "SharedEngineCode/Internal/OperatingSystem.h"
+#include <SharedEngineCode/Internal/CppSupport.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <SharedEngineCode/Internal/OperatingSystem.h>
 
 #include "OpenGLWindow.h"
 #include "BaconEngine/Debugging/Assert.h"
 #include "BaconEngine/Input/Keyboard.h"
 #include "BaconEngine/Rendering/Layer.h"
 #include "OpenGLRenderer.h"
+#include "../../Rendering/PrivateLayer.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 GLFWwindow* window;
@@ -151,12 +152,12 @@ void BE_OpenGLWindow_KeyEvent(GLFWwindow* theWindow, int key, int scanCode, int 
 
     BE_Keyboard_SetKeyDown(scanCode, action != GLFW_RELEASE);
     BE_Keyboard_SetKeyPressed(scanCode, action != GLFW_RELEASE);
-    BE_Layer_OnEvent((BE_Event) {
+    BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = action != GLFW_RELEASE ? BE_EVENT_TYPE_KEYBOARD_KEY_DOWN : BE_EVENT_TYPE_KEYBOARD_KEY_UP,
         .keyboard = {
             .key = keyCode
         }
-    });
+    ));
 }
 
 void BE_OpenGLWindow_MouseButtonEvent(GLFWwindow* theWindow, int button, int action, int mods) {
@@ -168,34 +169,34 @@ void BE_OpenGLWindow_MouseButtonEvent(GLFWwindow* theWindow, int button, int act
 
     glfwGetCursorPos(window, &x, &y);
     BE_Mouse_SetButtonDown(button, action != GLFW_RELEASE);
-    BE_Layer_OnEvent((BE_Event) {
+    BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = action != GLFW_RELEASE ? BE_EVENT_TYPE_MOUSE_BUTTON_DOWN : BE_EVENT_TYPE_MOUSE_BUTTON_UP,
         .mouse = {
-            .position = (BE_Vector_2F) {(float) x, (float) y},
+            .position = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2F, (float) x, (float) y),
             .button = {
                 button
             }
         }
-    });
+    ));
 }
 
 void BE_OpenGLWindow_CursorPositionMovedEvent(GLFWwindow* theWindow, double x, double y) {
     (void) theWindow;
 
-    BE_Layer_OnEvent((BE_Event) {
+    BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = BE_EVENT_TYPE_MOUSE_MOVED,
         .mouse = {
-            .position = (BE_Vector_2F) {(float) x, (float) y}
+            .position = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2F, (float) x, (float) y)
         }
-    });
+    ));
 }
 
 void BE_OpenGLWindow_CursorEnterEvent(GLFWwindow* theWindow, int entered) {
     (void) theWindow;
 
-    BE_Layer_OnEvent((BE_Event) {
+    BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = entered ? BE_EVENT_TYPE_MOUSE_ENTER : BE_EVENT_TYPE_MOUSE_LEAVE
-    });
+    ));
 }
 
 void BE_OpenGLWindow_ScrollEvent(GLFWwindow* theWindow, double x, double y) {
@@ -205,62 +206,62 @@ void BE_OpenGLWindow_ScrollEvent(GLFWwindow* theWindow, double x, double y) {
     double yPos;
 
     glfwGetCursorPos(window, &xPos, &yPos);
-    BE_Layer_OnEvent((BE_Event) {
+    BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = BE_EVENT_TYPE_MOUSE_WHEEL,
         .mouse = {
-            .position = (BE_Vector_2F) {(float) xPos, (float) yPos},
+            .position = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2F, (float) xPos, (float) yPos),
             .wheel = {
-                .scrollAmount = (BE_Vector_2F) {(float) x, (float) y}
+                .scrollAmount = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2F, (float) x, (float) y)
             }
         }
-    });
+    ));
 }
 
 void BE_OpenGLWindow_FocusEvent(GLFWwindow* theWindow, int focused) {
     (void) theWindow;
 
-    BE_Layer_OnEvent((BE_Event) {
+    BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = focused ? BE_EVENT_TYPE_WINDOW_FOCUS_GAINED : BE_EVENT_TYPE_WINDOW_FOCUS_LOST
-    });
+    ));
 }
 
 void BE_OpenGLWindow_CloseEvent(GLFWwindow* theWindow) {
     (void) theWindow;
 
-    BE_Layer_OnEvent((BE_Event) {
+    BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = BE_EVENT_TYPE_WINDOW_CLOSE
-    });
+    ));
 }
 
 void BE_OpenGLWindow_MaximizeEvent(GLFWwindow* theWindow, int maximized) {
     (void) theWindow;
 
-    BE_Layer_OnEvent((BE_Event) {
+    BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = maximized ? BE_EVENT_TYPE_WINDOW_MAXIMIZED : BE_EVENT_TYPE_WINDOW_RESTORED
-    });
+    ));
 }
 
 void BE_OpenGLWindow_MovedEvent(GLFWwindow* theWindow, int x, int y) {
     (void) theWindow;
 
-    BE_Layer_OnEvent((BE_Event) {
+    BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = BE_EVENT_TYPE_WINDOW_MOVED,
         .window = {
-            .newPosition = (BE_Vector_2I) {x, y}
+            .newPosition = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I, x, y)
         }
-    });
+    ));
 }
 
 void BE_OpenGLWindow_ResizedEvent(GLFWwindow* theWindow, int width, int height) {
     (void) theWindow;
 
     glViewport(0, 0, width, height);
-    BE_Layer_OnEvent((BE_Event) {
+    BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = BE_EVENT_TYPE_WINDOW_RESIZED,
         .window = {
-            .newSize = (BE_Vector_2I) {width, height}
+            .newSize = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I, width, height)
         }
-    });
+    ));
 }
 
 void BE_OpenGLWindow_Create(const char* title, BE_Vector_2U size, int monitor) {
@@ -274,7 +275,7 @@ void BE_OpenGLWindow_Create(const char* title, BE_Vector_2U size, int monitor) {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    window = glfwCreateWindow(size.x, size.y, title, NULL, NULL);
+    window = glfwCreateWindow((int) size.x, (int) size.y, title, NULL, NULL);
 
     BE_ASSERT(window != NULL, "Failed to create GLFW window");
     glfwMakeContextCurrent(window);
@@ -305,7 +306,7 @@ BE_Vector_2U BE_OpenGLWindow_GetSize(void) {
 
     glfwGetWindowSize(window, (int*) &width, (int*) &height); // FIXME: Converting a unsigned pointer to a int pointer is undefined behaviour.
 
-    return (BE_Vector_2U) {width, height};
+    return SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2U, width, height);
 }
 
 BE_Vector_2I BE_OpenGLWindow_GetPosition(void) {
@@ -314,7 +315,7 @@ BE_Vector_2I BE_OpenGLWindow_GetPosition(void) {
 
     glfwGetWindowPos(window, &x, &y);
 
-    return (BE_Vector_2I) {x, y};
+    return SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I, x, y);
 }
 
 int BE_OpenGLWindow_IsVisible(void) {

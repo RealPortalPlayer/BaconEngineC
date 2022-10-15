@@ -3,7 +3,6 @@
 #include <SharedEngineCode/Launcher.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <SharedEngineCode/OSUser.h>
-#include <SharedEngineCode/Internal/CppSupport.h>
 
 SEC_CPP_SUPPORT_GUARD_START()
 int BE_EntryPoint_StartBaconEngine(int, char**);
@@ -11,6 +10,13 @@ const char* BE_EntryPoint_GetClientName(void);
 
 int CallLauncherMain(int argc, char** argv) {
     SEC_ArgumentHandler_Initialize(argc, argv);
+
+    SEC_LOGGER_TRACE("Built on: %s\nBuilt for: %s", __TIMESTAMP__, SEC_OPERATINGSYSTEM_NAME);
+
+    if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_VERSION, SEC_BUILTINARGUMENTS_VERSION_SHORT, 0)) {
+        SEC_LOGGER_INFO("Engine version: 0.1");
+        return 0;
+    }
 
     if (SEC_ArgumentHandler_GetIndex(SEC_BUILTINARGUMENTS_HELP, 0) != -1) {
         SEC_LOGGER_INFO("Arguments:\n%s", SEC_Launcher_GetDefaultHelpList());

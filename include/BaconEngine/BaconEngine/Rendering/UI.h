@@ -13,7 +13,7 @@ SEC_CPP_SUPPORT_GUARD_START()
 struct BE_UI_Element;
 
 typedef struct {
-    void (*OnRender)(struct BE_UI_Element* thisElement, double deltaTime);
+    void (*OnRender)(struct BE_UI_Element* thisElement);
     void (*OnEvent)(struct BE_UI_Element* thisElement, BE_Event event);
 } BE_UI_ElementFunctions;
 
@@ -38,16 +38,15 @@ typedef enum {
     BE_UI_WINDOW_FLAG_MAXIMIZED = (1 << 8)
 } BE_UI_WindowFlags;
 
-void BE_UI_Initialize(void);
-unsigned BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector_2I position, BE_Vector_2U size);
-int BE_UI_RegisterElement(unsigned windowId, BE_UI_Element* element);
-int BE_UI_ToggleWindowFlag(unsigned windowId, BE_UI_WindowFlags flag, int toggle);
 const char* BE_UI_GetWindowName(unsigned windowId);
 int BE_UI_IsWindowStillOpen(unsigned windowId);
 BE_DynamicArray* BE_UI_GetWindowElements(unsigned windowId);
-int BE_UI_SetActiveWindow(unsigned windowId);
 int BE_UI_GetWindowAmount(void);
 int BE_UI_GetAllocatedWindowsAmount(void);
 int BE_UI_GetWindowReallocationAmount(void);
-void BE_UI_Destroy(void);
+
+unsigned BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector_2I position, BE_Vector_2U size);
+int BE_UI_RegisterElement(unsigned windowId, BE_UI_Element* element);
+int BE_UI_ToggleWindowFlag(unsigned windowId, BE_UI_WindowFlags flag, int toggle);
+int BE_UI_SetActiveWindow(unsigned windowId);
 SEC_CPP_SUPPORT_GUARD_END()

@@ -1,4 +1,3 @@
-#include <stddef.h>
 #include "SharedEngineCode/Internal/CppSupport.h"
 #include "SharedEngineCode/ANSI.h"
 #include "SharedEngineCode/ArgumentHandler.h"
@@ -21,7 +20,7 @@ int SEC_ANSI_IsEnabled(void) {
     static int enabled = -1;
 
     if (enabled == -1)
-        enabled = !SEC_ArgumentHandler_GetIndexWithShort(SEC_BUILTINARGUMENTS_DISABLE_ANSI_COLORING, SEC_BUILTINARGUMENTS_DISABLE_ANSI_COLORING_SHORT, 0, NULL, NULL);
+        enabled = !SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_DISABLE_ANSI_COLORING, SEC_BUILTINARGUMENTS_DISABLE_ANSI_COLORING_SHORT, 0);
 
     return enabled;
 }

@@ -1,12 +1,11 @@
 #include <string.h>
-#include <SharedEngineCode/Internal/CppSupport.h>
 
 #include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Debugging/Assert.h"
 #include "BaconEngine/Storage/DynamicDictionary.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-int UpdateFrozenState(BE_DynamicDictionary* dictionary) {
+int BE_DynamicDictionary_UpdateFrozenState(BE_DynamicDictionary* dictionary) {
     dictionary->frozen = dictionary->frozen || dictionary->keys.frozen || dictionary->values.frozen;
     dictionary->keys.frozen = 0;
     dictionary->values.frozen = 0;
@@ -14,14 +13,13 @@ int UpdateFrozenState(BE_DynamicDictionary* dictionary) {
 }
 
 int BE_DynamicDictionary_Create(BE_DynamicDictionary* dictionary, size_t size) {
-    BE_STRICTMODE_CHECK(size != 0, 0, "Invalid size");
     BE_DynamicArray_Create(&dictionary->keys, size);
     BE_DynamicArray_Create(&dictionary->values, size);
     return 1;
 }
 
 int BE_DynamicDictionary_AddElementToStart(BE_DynamicDictionary* dictionary, void* key, void* value) {
-    if (UpdateFrozenState(dictionary))
+    if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
         return 0;
 
     return BE_DynamicArray_AddElementToStart(&dictionary->keys, key) &&
@@ -29,7 +27,7 @@ int BE_DynamicDictionary_AddElementToStart(BE_DynamicDictionary* dictionary, voi
 }
 
 int BE_DynamicDictionary_AddElementToLast(BE_DynamicDictionary* dictionary, void* key, void* value) {
-    if (UpdateFrozenState(dictionary))
+    if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
         return 0;
 
     return BE_DynamicArray_AddElementToLast(&dictionary->keys, key) &&
@@ -37,7 +35,7 @@ int BE_DynamicDictionary_AddElementToLast(BE_DynamicDictionary* dictionary, void
 }
 
 int BE_DynamicDictionary_RemoveFirstElement(BE_DynamicDictionary* dictionary, int shift) {
-    if (UpdateFrozenState(dictionary))
+    if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
         return 0;
 
     return BE_DynamicArray_RemoveFirstElement(&dictionary->keys, shift) &&
@@ -45,7 +43,7 @@ int BE_DynamicDictionary_RemoveFirstElement(BE_DynamicDictionary* dictionary, in
 }
 
 int BE_DynamicDictionary_RemoveLastElement(BE_DynamicDictionary* dictionary) {
-    if (UpdateFrozenState(dictionary))
+    if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
         return 0;
 
     return BE_DynamicArray_RemoveLastElement(&dictionary->keys) &&
@@ -53,7 +51,7 @@ int BE_DynamicDictionary_RemoveLastElement(BE_DynamicDictionary* dictionary) {
 }
 
 int BE_DynamicDictionary_RemoveElementAt(BE_DynamicDictionary* dictionary, unsigned int index) {
-    if (UpdateFrozenState(dictionary))
+    if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
         return 0;
 
     return BE_DynamicArray_RemoveElementAt(&dictionary->keys, index) &&
@@ -61,7 +59,7 @@ int BE_DynamicDictionary_RemoveElementAt(BE_DynamicDictionary* dictionary, unsig
 }
 
 int BE_DynamicDictionary_RemoveElementViaKey(BE_DynamicDictionary* dictionary, void* key, size_t elementSize) {
-    if (UpdateFrozenState(dictionary))
+    if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
         return 0;
 
     int index = BE_DynamicDictionary_GetElementIndexFromKey(*dictionary, key, elementSize);
@@ -70,7 +68,7 @@ int BE_DynamicDictionary_RemoveElementViaKey(BE_DynamicDictionary* dictionary, v
 }
 
 int BE_DynamicDictionary_RemoveElementViaValue(BE_DynamicDictionary* dictionary, void* value, size_t elementSize) {
-    if (UpdateFrozenState(dictionary))
+    if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
         return 0;
 
     int index = BE_DynamicDictionary_GetElementIndexFromValue(*dictionary, value, elementSize);
@@ -131,7 +129,7 @@ void BE_DynamicDictionary_GetElementsViaValue(BE_DynamicDictionary dictionary, B
 }
 
 void BE_DynamicDictionary_Shrink(BE_DynamicDictionary* dictionary) {
-    if (UpdateFrozenState(dictionary))
+    if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
         return;
 
     SEC_LOGGER_TRACE("Shrinking dictionary, this is expensive");

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include "SharedEngineCode/Internal/CppSupport.h"
 
 #include "BaconEngine/Math/Vector.h"
 #include "BaconEngine/Math/Color.h"
@@ -23,7 +23,7 @@ typedef struct {
     void (*SetVisibility)(int visible);
     void (*CloseWindow)(void);
     void (*UpdateEvents)(void);
-} BE_SpecificRendererFunctions_Window;
+} BE_SpecificPlatformFunctions_Window;
 
 typedef struct {
     void (*ClearScreen)(void);
@@ -31,19 +31,18 @@ typedef struct {
     BE_Color_3U (*GetClearColor)(void);
     void (*Render)(void);
     void (*DrawFilledRectangle)(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U color);
-} BE_SpecificRendererFunctions_Renderer;
+} BE_SpecificPlatformFunctions_Renderer;
 
 typedef struct {
-    BE_SpecificRendererFunctions_Window windowFunctions;
-    BE_SpecificRendererFunctions_Renderer rendererFunctions;
+    BE_SpecificPlatformFunctions_Window windowFunctions;
+    BE_SpecificPlatformFunctions_Renderer rendererFunctions;
     void (*Destroy)(void);
     double (*GetTimer)(void);
-} BE_SpecificRendererFunctions;
+} BE_SpecificPlatformFunctions;
 
-BE_SpecificRendererFunctions BE_SpecificRendererFunctions_Get(void);
-void BE_SpecificRendererFunctions_InitializeWindow(BE_SpecificRendererFunctions_Window functions);
-void BE_SpecificRendererFunctions_InitializeRenderer(BE_SpecificRendererFunctions_Renderer renderer);
-void BE_SpecificRendererFunctions_SetDestroy(void (*Destroy)(void));
-void BE_SpecificRendererFunctions_SetGetTimer(double (*GetTimer)(void));
-// TODO: Other types.
+BE_SpecificPlatformFunctions BE_SpecificPlatformFunctions_Get(void);
+void BE_SpecificPlatformFunctions_InitializeWindow(BE_SpecificPlatformFunctions_Window functions);
+void BE_SpecificPlatformFunctions_InitializeRenderer(BE_SpecificPlatformFunctions_Renderer renderer);
+void BE_SpecificPlatformFunctions_SetDestroy(void (*Destroy)(void));
+void BE_SpecificPlatformFunctions_SetGetTimer(double (*GetTimer)(void));
 SEC_CPP_SUPPORT_GUARD_END()

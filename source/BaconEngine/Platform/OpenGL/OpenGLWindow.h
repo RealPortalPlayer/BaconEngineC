@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "SharedEngineCode/Internal/CppSupport.h"
+#include <SharedEngineCode/Internal/CppSupport.h>
 
 #include "BaconEngine/Math/Vector.h"
 

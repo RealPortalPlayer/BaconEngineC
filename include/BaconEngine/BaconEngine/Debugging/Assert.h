@@ -10,8 +10,11 @@ do {                          \
     SEC_LOGGER_TRACE("Assert checking: %s", #check); \
     if (!(check)) {           \
         SEC_LOGGER_FATAL("Assertion Failed\nCode: %s", #check); \
-        printf("Message: ");\
-        SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_FATAL, __VA_ARGS__); \
+        printf("Message: ");  \
+        SEC_Logger_LogImplementation(0, 1, SEC_LOGGER_LOG_LEVEL_FATAL, __VA_ARGS__); \
         abort();              \
     }                         \
 } while (0)
+
+#define BE_ASSERT_ALWAYS(message) BE_ASSERT(0, message)
+#define BE_ASSERT_NOT_IMPLEMENTED() BE_ASSERT_ALWAYS("This function is currently not implemented")

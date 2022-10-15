@@ -1,5 +1,3 @@
-#include <SharedEngineCode/Internal/CppSupport.h>
-
 #include "BaconEngine/Input/Keyboard.h"
 
 SEC_CPP_SUPPORT_GUARD_START()

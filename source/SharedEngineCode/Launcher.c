@@ -1,5 +1,4 @@
 #include "SharedEngineCode/Launcher.h"
-
 #include "SharedEngineCode/Internal/CppSupport.h"
 #include "SharedEngineCode/BuiltInArguments.h"
 
@@ -73,14 +72,14 @@ const char* SEC_Launcher_GetDefaultHelpList(void) {
            SEC_BUILTINARGUMENTS_DONT_PARSE " <argument>: Do not parse arguments beyond this point\n"
            SEC_BUILTINARGUMENTS_WIDTH " <width>: Changes the width of the window\n"
            SEC_BUILTINARGUMENTS_HEIGHT " <height>: Changes the height of the window\n"
-           SEC_BUILTINARGUMENTS_RENDERER " <opengl/vulkan/text>: Changes the default rendering system\n"
-           SEC_BUILTINARGUMENTS_SOFTWARE ": Use your CPU to render instead of your GPU\n"
+           SEC_BUILTINARGUMENTS_RENDERER " <opengl/vulkan/text/software>: Changes the default rendering system\n"
            SEC_BUILTINARGUMENTS_MONITOR " <id>: Create the window on a different display\n"
            SEC_BUILTINARGUMENTS_DISABLE_ANSI_COLORING " (" SEC_BUILTINARGUMENTS_DISABLE_ANSI_COLORING_SHORT "): Disable log colors\n"
            SEC_BUILTINARGUMENTS_LOG_LEVEL " <null/trace/trc/debug/dbg/warn/wrn/error/err/fatal/ftl> (" SEC_BUILTINARGUMENTS_LOG_LEVEL_SHORT "): Sets the current log level\n"
            SEC_BUILTINARGUMENTS_DONT_CHANGE_LOG_LEVELS " (" SEC_BUILTINARGUMENTS_DONT_CHANGE_LOG_LEVELS_SHORT "): Prevent the client from changing the log level\n"
            SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING " (" SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING_SHORT "): Don't render the UI\n"
            SEC_BUILTINARGUMENTS_EXIT " <code>: Exit the engine after initializing\n"
-           SEC_BUILTINARGUMENTS_CONSOLE ": Start with the console opened";
+           SEC_BUILTINARGUMENTS_CONSOLE ": Start with the console opened\n"
+           SEC_BUILTINARGUMENTS_VERSION " (" SEC_BUILTINARGUMENTS_VERSION_SHORT "): Show the version of the launcher/engine";
     }
 SEC_CPP_SUPPORT_GUARD_END()

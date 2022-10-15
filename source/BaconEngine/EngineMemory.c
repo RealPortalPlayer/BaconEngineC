@@ -1,41 +1,34 @@
-#include <SharedEngineCode/Internal/CppSupport.h>
-
 #include "BaconEngine/Debugging/Assert.h"
 #include "EngineMemory.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-BE_EngineMemory_MemoryInformation memoryInformation = {
-    {0, 0},
-    {0, 0},
-    {0, 0},
-    {0, 0}
-};
+BE_EngineMemory_MemoryInformation beEngineMemoryInformation;
 
 BE_EngineMemory_MemoryInformation BE_EngineMemory_GetMemoryInformation(void) {
-    return memoryInformation;
+    return beEngineMemoryInformation;
 }
 
 size_t BE_EngineMemory_GetAllocatedBytes(void) {
-    return memoryInformation.command.allocatedBytes + memoryInformation.ui.allocatedBytes +
-           memoryInformation.dynamicArray.allocatedBytes + memoryInformation.layer.allocatedBytes;
+    return beEngineMemoryInformation.command.allocatedBytes + beEngineMemoryInformation.ui.allocatedBytes +
+           beEngineMemoryInformation.dynamicArray.allocatedBytes + beEngineMemoryInformation.layer.allocatedBytes;
 }
 
 BE_EngineMemory_MemoryTypeInformation* BE_EngineMemory_GetMemoryTypeInformation(BE_EngineMemory_MemoryType memoryType) {
     switch (memoryType) {
         case BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND:
-            return &memoryInformation.command;
+            return &beEngineMemoryInformation.command;
 
         case BE_ENGINEMEMORY_MEMORY_TYPE_UI:
-            return &memoryInformation.ui;
+            return &beEngineMemoryInformation.ui;
 
         case BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY:
-            return &memoryInformation.dynamicArray;
+            return &beEngineMemoryInformation.dynamicArray;
 
         case BE_ENGINEMEMORY_MEMORY_TYPE_LAYER:
-            return &memoryInformation.layer;
+            return &beEngineMemoryInformation.layer;
 
         default:
-            BE_ASSERT(0, "This shouldn't be reached");
+            BE_ASSERT_ALWAYS("This shouldn't be reached");
     }
 }
 

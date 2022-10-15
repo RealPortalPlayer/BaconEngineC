@@ -13,6 +13,7 @@ BE_Vector_2U BE_Window_GetSize(void);
 BE_Vector_2I BE_Window_GetPosition(void);
 int BE_Window_IsVisible(void);
 int BE_Window_IsStillOpened(void);
+
 void BE_Window_SetTitle(const char* newTitle);
 void BE_Window_SetSize(BE_Vector_2U newSize);
 void BE_Window_SetWidth(unsigned newWidth);

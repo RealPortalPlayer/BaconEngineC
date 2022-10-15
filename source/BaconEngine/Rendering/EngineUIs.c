@@ -1,4 +1,3 @@
-#include <SharedEngineCode/Internal/CppSupport.h>
 #include <SharedEngineCode/ArgumentHandler.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 
@@ -20,6 +19,7 @@ void BE_EngineUIs_Initialize(void) {
     if (SEC_ArgumentHandler_GetIndex(SEC_BUILTINARGUMENTS_CONSOLE, 0) == -1)
         BE_BITWISE_SET_BIT(flags, BE_UI_WINDOW_FLAG_CLOSED);
 
-    BE_UI_RegisterWindow("Console", flags, (BE_Vector_2I) {5, 5}, (BE_Vector_2U) {300, 350});
+    BE_UI_RegisterWindow("Console", flags, SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I, 5, 5),
+                         SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2U, 300, 350));
 }
 SEC_CPP_SUPPORT_GUARD_END()

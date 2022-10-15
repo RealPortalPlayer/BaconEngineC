@@ -8,6 +8,7 @@
 #include "BaconEngine/Event.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
+// TODO: Is this even needed? Can't we just return a name then?
 typedef struct {
     int valid;
     const char* name;
@@ -20,21 +21,17 @@ typedef enum {
 
 typedef struct {
     void (*OnStart)(void);
-    void (*OnUpdate)(BE_Layer_UpdateTypes updateType, double deltaTime);
+    void (*OnUpdate)(BE_Layer_UpdateTypes updateType);
     void (*OnToggle)(int enabled);
     int (*OnEvent)(BE_Event event);
     void (*OnStop)(void);
 } BE_Layer_Functions;
 
-void BE_Layer_InitializeLayers(void);
 void BE_Layer_Register(const char* name, int enabled, BE_Layer_Functions functions);
 BE_Layer BE_Layer_Get(const char* name);
 int BE_Layer_GetAmount(void);
 int BE_Layer_GetAllocatedLayersAmount(void);
 int BE_Layer_GetLayersReallocationAmount(void);
 int BE_Layer_Toggle(const char* name, int enable);
-void BE_Layer_OnUpdate(BE_Layer_UpdateTypes updateTypes, double deltaTime);
-int BE_Layer_OnEvent(BE_Event event);
 int BE_Layer_IsToggled(const char* name);
-void BE_Layer_DestroyLayers(void);
 SEC_CPP_SUPPORT_GUARD_END()
