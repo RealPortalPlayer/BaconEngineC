@@ -11,27 +11,27 @@ const char* BE_EntryPoint_GetClientName(void);
 int CallLauncherMain(int argc, char** argv) {
     SEC_ArgumentHandler_Initialize(argc, argv);
 
-    SEC_LOGGER_TRACE("Built on: %s\nBuilt for: %s", __TIMESTAMP__, SEC_OPERATINGSYSTEM_NAME);
+    SEC_LOGGER_TRACE("Built on: %s\nBuilt for: %s\n", __TIMESTAMP__, SEC_OPERATINGSYSTEM_NAME);
 
     if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_VERSION, SEC_BUILTINARGUMENTS_VERSION_SHORT, 0)) {
-        SEC_LOGGER_INFO("Engine version: 0.1");
+        SEC_LOGGER_INFO("Engine version: 0.1\n");
         return 0;
     }
 
     if (SEC_ArgumentHandler_GetIndex(SEC_BUILTINARGUMENTS_HELP, 0) != -1) {
-        SEC_LOGGER_INFO("Arguments:\n%s", SEC_Launcher_GetDefaultHelpList());
+        SEC_LOGGER_INFO("Arguments:\n%s\n", SEC_Launcher_GetDefaultHelpList());
         return 0;
     }
 
     if (SEC_OSUser_IsAdmin())
-        SEC_LOGGER_WARN("You're running as root! If a client says you require to be root, then it's probably a virus");
+        SEC_LOGGER_WARN("You're running as root! If a client says you require to be root, then it's probably a virus\n");
 
-    SEC_LOGGER_INFO("Ready, starting '%s'", BE_EntryPoint_GetClientName());
-    SEC_LOGGER_TRACE("Entering engine code");
+    SEC_LOGGER_INFO("Ready, starting '%s'\n", BE_EntryPoint_GetClientName());
+    SEC_LOGGER_TRACE("Entering engine code\n");
 
     int returnValue = BE_EntryPoint_StartBaconEngine(argc, argv);
 
-    SEC_LOGGER_INFO("Goodbye");
+    SEC_LOGGER_INFO("Goodbye\n");
 
     return returnValue;
 }

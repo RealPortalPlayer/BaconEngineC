@@ -12,8 +12,8 @@ void BE_DynamicArray_ReallocateArray(BE_DynamicArray* array) {
     if (array->size != (size_t) array->used)
         return;
 
-    SEC_LOGGER_TRACE("Ran out of free space, expanding array\nThis is expensive, so you should try avoiding it");
-    BE_ASSERT(array->size >= array->used, "Invalid array state");
+    SEC_LOGGER_TRACE("Ran out of free space, expanding array\nThis is expensive, so you should try avoiding it\n");
+    BE_ASSERT(array->size >= array->used, "Invalid array state\n");
 
     array->size *= 2;
     array->calledRealloc++;
@@ -23,7 +23,7 @@ void BE_DynamicArray_ReallocateArray(BE_DynamicArray* array) {
 
 // TODO: Make a public one that does not use engine memory.
 int BE_DynamicArray_Create(BE_DynamicArray* array, size_t size) {
-    BE_STRICTMODE_CHECK(size != 0, 0, "Invalid size");
+    BE_STRICTMODE_CHECK(size != 0, 0, "Invalid size\n");
 
     array->internalArray = (void**) BE_EngineMemory_AllocateMemory(sizeof(void*) * size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
     array->used = 0;
@@ -98,7 +98,7 @@ void BE_DynamicArray_Shrink(BE_DynamicArray* array) {
 
     array->size = array->used;
 
-    SEC_LOGGER_TRACE("Shrinking array, this is expensive");
+    SEC_LOGGER_TRACE("Shrinking array, this is expensive\n");
     BE_EngineMemory_ReallocateMemory(array->internalArray, oldSize, array->size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 SEC_CPP_SUPPORT_GUARD_END()

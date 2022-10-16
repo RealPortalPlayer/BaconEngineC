@@ -29,7 +29,7 @@ void BE_Renderer_SetClearColor(BE_Color_3U color) {
 void BE_PrivateRenderer_Initialize(void) {
     static int initialized = 0;
 
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized rendererFunctions");
+    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized rendererFunctions\n");
 
     const char* specifiedRenderer = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_RENDERER, 0);
 
@@ -37,12 +37,12 @@ void BE_PrivateRenderer_Initialize(void) {
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "opengl") == 0) {
             opengl:
 #ifndef BE_DISABLE_OPENGL
-            SEC_LOGGER_INFO("Using OpenGL as the renderer");
+            SEC_LOGGER_INFO("Using OpenGL as the renderer\n");
             BE_OpenGL_Initialize();
 
             beRendererCurrent = BE_RENDERER_TYPE_OPENGL;
 #else
-            SEC_LOGGER_WARN("This binary has OpenGL disabled, defaulting to text-mode");
+            SEC_LOGGER_WARN("This binary has OpenGL disabled, defaulting to text-mode\n");
             BE_TextMode_Initialize();
 
             beRendererCurrent = BE_RENDERER_TYPE_TEXT;
@@ -52,14 +52,14 @@ void BE_PrivateRenderer_Initialize(void) {
         }
 
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "vulkan") == 0) {
-            BE_ASSERT_ALWAYS("Renderer not implemented");
+            BE_ASSERT_ALWAYS("Renderer not implemented\n");
         }
 
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "metal") == 0) {
 #if SEC_OPERATINGSYSTEM_APPLE
             BE_ASSERT_NOT_IMPLEMENTED();
 #else
-            SEC_LOGGER_WARN("Metal only works on Apple operating systems, defaulting to text-mode");
+            SEC_LOGGER_WARN("Metal only works on Apple operating systems, defaulting to text-mode\n");
             BE_TextMode_Initialize();
 
             beRendererCurrent = BE_RENDERER_TYPE_TEXT;
@@ -67,21 +67,21 @@ void BE_PrivateRenderer_Initialize(void) {
         }
 
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "directx") == 0) {
-            BE_ASSERT_ALWAYS("Renderer not implemented");
+            BE_ASSERT_ALWAYS("Renderer not implemented\n");
         }
 
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "software") == 0) {
-            SEC_LOGGER_INFO("Using software rendering");
-            SEC_LOGGER_WARN("This is going to lag; use a better renderer");
+            SEC_LOGGER_INFO("Using software rendering\n");
+            SEC_LOGGER_WARN("This is going to lag; use a better renderer\n");
 
 #if SEC_OPERATINGSYSTEM_WINDOWS
             BE_Windows_Initialize();
 #else
-            BE_ASSERT_ALWAYS("No software renderer implementation for your OS");
+            BE_ASSERT_ALWAYS("No software renderer implementation for your OS\n");
 #endif
         }
 
-        SEC_LOGGER_WARN("Invalid renderer: %s", specifiedRenderer);
+        SEC_LOGGER_WARN("Invalid renderer: %s\n", specifiedRenderer);
     }
 
     goto opengl; // TODO: Get the best one depending on OS

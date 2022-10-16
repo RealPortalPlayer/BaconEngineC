@@ -74,19 +74,19 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
     static int alreadyStarted = 0;
 
     SEC_ArgumentHandler_Initialize(argc, argv);
-    BE_STRICTMODE_CHECK(!alreadyStarted, 1, "Reinitializing the engine is not supported");
-    SEC_LOGGER_TRACE("Entered client code");
+    BE_STRICTMODE_CHECK(!alreadyStarted, 1, "Reinitializing the engine is not supported\n");
+    SEC_LOGGER_TRACE("Entered client code\n");
 
     alreadyStarted = 1;
 
-    SEC_LOGGER_INFO("Starting BaconEngine");
+    SEC_LOGGER_INFO("Starting BaconEngine\n");
 
     if (BE_ClientInformation_IsServerModeEnabled() && !BE_EntryPoint_ClientSupportsServer()) {
-        SEC_LOGGER_FATAL("This client does not support servers");
+        SEC_LOGGER_FATAL("This client does not support servers\n");
         return 1;
     }
 
-    SEC_LOGGER_DEBUG("Registering signals");
+    SEC_LOGGER_DEBUG("Registering signals\n");
     signal(SIGSEGV, BE_EntryPoint_SignalDetected);
     BE_PrivateRenderer_Initialize();
 
@@ -103,7 +103,7 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
                 int parsedWith = (int) strtol(preParsedWidth, &error, 0);
 
                 if (error != NULL && strlen(error) != 0) {
-                    SEC_LOGGER_ERROR("Invalid width was supplied, ignoring...");
+                    SEC_LOGGER_ERROR("Invalid width was supplied, ignoring...\n");
 
                     parsedWith = 1080;
                 }
@@ -116,7 +116,7 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
                 int parsedHeight = (int) strtol(preParsedHeight, &error, 0);
 
                 if (error != NULL && strlen(error) != 0) {
-                    SEC_LOGGER_ERROR("Invalid height was supplied, ignoring...");
+                    SEC_LOGGER_ERROR("Invalid height was supplied, ignoring...\n");
 
                     parsedHeight = 720;
                 }
@@ -131,7 +131,7 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
 
     BE_PrivateUI_Initialize();
     BE_PrivateConsole_Initialize();
-    BE_ASSERT(BE_EntryPoint_ClientStart(argc, argv) == 0, "Client start returned non-zero");
+    BE_ASSERT(BE_EntryPoint_ClientStart(argc, argv) == 0, "Client start returned non-zero\n");
 
     {
         const char* preParsedExitCode = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_EXIT, 0);
@@ -141,7 +141,7 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
             int parsedExitCode = (int) strtol(preParsedExitCode, &error, 0);
 
             if (error != NULL && strlen(error) != 0) {
-                SEC_LOGGER_ERROR("Invalid exit code, defaulting to 0");
+                SEC_LOGGER_ERROR("Invalid exit code, defaulting to 0\n");
 
                 parsedExitCode = 0;
             }
@@ -151,6 +151,8 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
     }
 
     double deltaStart = 0;
+
+    // TODO: Command running inside of terminal.
 
     while (BE_ClientInformation_IsRunning()) {
         if (!BE_Window_IsStillOpened()) {
@@ -172,8 +174,8 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
         BE_SpecificPlatformFunctions_Get().windowFunctions.UpdateEvents();
     }
 
-    SEC_LOGGER_TRACE("Client loop ended, shutting down");
-    BE_ASSERT(BE_EntryPoint_ClientShutdown() == 0, "Client shutdown returned non-zero");
+    SEC_LOGGER_TRACE("Client loop ended, shutting down\n");
+    BE_ASSERT(BE_EntryPoint_ClientShutdown() == 0, "Client shutdown returned non-zero\n");
     BE_PrivateLayer_DestroyLayers();
     BE_PrivateUI_Destroy();
     BE_PrivateConsole_Destroy();
@@ -188,7 +190,7 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
                         "Command: %lu allocated, %lu bytes\n"
                         "UI: %lu allocated, %lu bytes\n"
                         "DynamicArray: %lu allocated, %lu bytes\n"
-                        "Layer: %lu allocated, %lu bytes",
+                        "Layer: %lu allocated, %lu bytes\n",
                         BE_EngineMemory_GetAllocatedBytes(),
                         memoryInformation.command.allocatedAmount, memoryInformation.command.allocatedBytes,
                         memoryInformation.ui.allocatedAmount, memoryInformation.ui.allocatedBytes,

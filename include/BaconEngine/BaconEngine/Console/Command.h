@@ -8,7 +8,8 @@
 #include "BaconEngine/Storage/DynamicDictionary.h"
 #include "ArgumentManager.h"
 
-// TODO: Validate that none of the commands go over these limits.
+// TODO: Validate that none of the commands go over this limit.
+
 #define BE_COMMAND_MAX_NAME_LENGTH 1024
 
 SEC_CPP_SUPPORT_GUARD_START()
@@ -20,7 +21,7 @@ typedef enum {
 } BE_Command_Flags;
 
 typedef struct { // TODO: Client
-    const char** userArguments;
+    BE_DynamicArray userArguments;
     BE_DynamicDictionary arguments;
 } BE_Command_Context;
 
@@ -34,13 +35,14 @@ typedef struct {
     const char* description;
     BE_DynamicArray arguments;
     BE_Command_Flags flags;
+    int index;
     void (*Run)(BE_Command_Context context);
 } BE_Command;
 
 /**
  * @return The ID for the command, -1 if failed to add.
  */
-int BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context));
-void BE_Command_AddArgument(int id, const char* name, int required);
+void BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context));
+void BE_Command_AddArgument(const char* name, int required);
 void BE_Command_DuplicatePrevious(const char* name, const char* description);
 SEC_CPP_SUPPORT_GUARD_END()

@@ -50,12 +50,12 @@ void BE_WindowsWindow_Create(const char* title, BE_Vector_2U size, int monitor) 
         LoadIcon(NULL, IDI_APPLICATION)
     };
 
-    BE_ASSERT(RegisterClassEx(&windowClass), "Failed to register window class: %u", GetLastError());
+    BE_ASSERT(RegisterClassEx(&windowClass), "Failed to register window class: %u\n", GetLastError());
 
     beWindowsWindowHandle = CreateWindowEx(WS_EX_CLIENTEDGE, beWindowsWindowClassName, title, WS_OVERLAPPEDWINDOW,
                                            CW_USEDEFAULT, CW_USEDEFAULT, (int) size.x, (int) size.y, NULL, NULL, instance, NULL);
 
-    BE_ASSERT(beWindowsWindowHandle != NULL, "Failed to create window: %u", GetLastError());
+    BE_ASSERT(beWindowsWindowHandle != NULL, "Failed to create window: %u\n", GetLastError());
     ShowWindow(beWindowsWindowHandle, SW_SHOW);
     UpdateWindow(beWindowsWindowHandle);
 }

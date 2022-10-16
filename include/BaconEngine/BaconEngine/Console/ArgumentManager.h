@@ -9,8 +9,8 @@
 #include <BaconEngine/Storage/DynamicDictionary.h>
 
 SEC_CPP_SUPPORT_GUARD_START()
-int BE_ArgumentHandler_GetInt(BE_DynamicDictionary arguments, const char* name, int defaultValue);
-int BE_ArgumentHandler_GetBoolean(BE_DynamicDictionary arguments, const char* name, int defaultValue);
-float BE_ArgumentHandler_GetFloat(BE_DynamicDictionary arguments, const char* name, float defaultValue);
-const char* BE_ArgumentHandler_GetString(BE_DynamicDictionary arguments, const char* name, const char* defaultValue);
+int BE_ArgumentManager_GetInt(BE_DynamicDictionary arguments, const char* name, int defaultValue);
+int BE_ArgumentManager_GetBoolean(BE_DynamicDictionary arguments, const char* name, int defaultValue);
+float BE_ArgumentManager_GetFloat(BE_DynamicDictionary arguments, const char* name, float defaultValue);
+const char* BE_ArgumentManager_GetString(BE_DynamicDictionary arguments, const char* name, const char* defaultValue);
 SEC_CPP_SUPPORT_GUARD_END()

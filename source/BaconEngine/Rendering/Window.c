@@ -20,7 +20,7 @@ void BE_PrivateWindow_Initialize(const char* windowTitle, BE_Vector_2U windowSiz
             int parsedMonitor = (int) strtol(preParsedMonitor, &error, 0);
 
             if (error != NULL && strlen(error) != 0) {
-                SEC_LOGGER_ERROR("Invalid display was supplied, ignoring...");
+                SEC_LOGGER_ERROR("Invalid display was supplied, ignoring...\n");
 
                 parsedMonitor = 0;
             }
@@ -29,7 +29,7 @@ void BE_PrivateWindow_Initialize(const char* windowTitle, BE_Vector_2U windowSiz
         }
     }
 
-    SEC_LOGGER_INFO("Creating window\nTitle: %s\nSize: (%u, %u)\nMonitor: %i", windowTitle, windowSize.x, windowSize.y, monitorNumber);
+    SEC_LOGGER_INFO("Creating window\nTitle: %s\nSize: (%u, %u)\nMonitor: %i\n", windowTitle, windowSize.x, windowSize.y, monitorNumber);
     BE_SpecificPlatformFunctions_Get().windowFunctions.CreateWindow(windowTitle, windowSize, monitorNumber);
 }
 

@@ -25,7 +25,7 @@ void BE_OpenGLRenderer_CompileShaders(void) {
 #if 0 // FIXME: This isn't finished.
     unsigned vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
-    SEC_LOGGER_DEBUG("Compiling shaders");
+    SEC_LOGGER_DEBUG("Compiling shaders\n");
     glShaderSource(vertexShader, 1, &vertexShaderCode, NULL);
     glCompileShader(vertexShader);
 
@@ -58,7 +58,7 @@ void BE_OpenGLRenderer_CompileShaders(void) {
         }
     }
 
-    SEC_LOGGER_DEBUG("Creating shader program");
+    SEC_LOGGER_DEBUG("Creating shader program\n");
 
     shaderProgram = glCreateProgram();
 
@@ -74,7 +74,7 @@ void BE_OpenGLRenderer_CompileShaders(void) {
 
         if (!linked) {
             glGetProgramInfoLog(shaderProgram, 512, NULL, error);
-            SEC_LOGGER_ERROR("Failed to link shaders: %s", error);
+            SEC_LOGGER_ERROR("Failed to link shaders: %s\n", error);
         }
     }
 

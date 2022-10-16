@@ -13,7 +13,7 @@ static int beOpenGLInitialized = 0;
 void BE_OpenGL_Error(int error, const char* description) {
     SEC_LOGGER_ERROR("GLFW Error:\n"
                      "Error: %i\n"
-                     "Description: %s", error, description);
+                     "Description: %s\n", error, description);
 }
 
 double BE_OpenGL_GetTimer(void) {
@@ -21,8 +21,8 @@ double BE_OpenGL_GetTimer(void) {
 }
 
 void BE_OpenGL_Initialize(void) {
-    BE_ASSERT(!beOpenGLInitialized, "Already initialized OpenGL");
-    BE_ASSERT(glfwInit(), "Failed to initialize GLFW");
+    BE_ASSERT(!beOpenGLInitialized, "Already initialized OpenGL\n");
+    BE_ASSERT(glfwInit(), "Failed to initialize GLFW\n");
     glfwSetErrorCallback(&BE_OpenGL_Error);
     BE_SpecificPlatformFunctions_InitializeWindow(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions_Window,
         &BE_OpenGLWindow_GetInternal,
@@ -53,7 +53,7 @@ void BE_OpenGL_Initialize(void) {
 }
 
 void BE_OpenGL_Destroy(void) {
-    BE_ASSERT(beOpenGLInitialized, "Already destroyed OpenGL");
+    BE_ASSERT(beOpenGLInitialized, "Already destroyed OpenGL\n");
     glfwTerminate();
 
     beOpenGLInitialized = 0;

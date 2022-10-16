@@ -277,7 +277,7 @@ void BE_OpenGLWindow_Create(const char* title, BE_Vector_2U size, int monitor) {
 
     window = glfwCreateWindow((int) size.x, (int) size.y, title, NULL, NULL);
 
-    BE_ASSERT(window != NULL, "Failed to create GLFW window");
+    BE_ASSERT(window != NULL, "Failed to create GLFW window\n");
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, &BE_OpenGLWindow_KeyEvent);
     glfwSetMouseButtonCallback(window, &BE_OpenGLWindow_MouseButtonEvent);
@@ -289,7 +289,7 @@ void BE_OpenGLWindow_Create(const char* title, BE_Vector_2U size, int monitor) {
     glfwSetWindowMaximizeCallback(window, &BE_OpenGLWindow_MaximizeEvent);
     glfwSetWindowPosCallback(window, &BE_OpenGLWindow_MovedEvent);
     glfwSetWindowSizeCallback(window, &BE_OpenGLWindow_ResizedEvent);
-    BE_ASSERT(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "Failed to initialize Glad");
+    BE_ASSERT(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "Failed to initialize Glad\n");
     glViewport(0, 0, (int) size.x, (int) size.y);
     BE_OpenGLRenderer_CompileShaders();
 

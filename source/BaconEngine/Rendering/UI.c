@@ -13,7 +13,7 @@ int beUIInitialized;
 BE_DynamicArray beUIRenderOrder;
 
 BE_PrivateUI_Window* BE_UI_GetWindowFromId(unsigned windowId) {
-    BE_STRICTMODE_CHECK(beUIWindows.used > (int) windowId, NULL, "Invalid UI window ID");
+    BE_STRICTMODE_CHECK(beUIWindows.used > (int) windowId, NULL, "Invalid UI window ID\n");
     return BE_DYNAMICARRAY_GET_ELEMENT(BE_PrivateUI_Window, beUIWindows, windowId);
 }
 
@@ -27,7 +27,7 @@ const BE_DynamicArray* BE_PrivateUI_GetRenderWindows(void) {
 
 // TODO: Make this private.
 void BE_PrivateUI_Initialize(void) {
-    BE_ASSERT(!beUIInitialized, "The UI system was already initialized");
+    BE_ASSERT(!beUIInitialized, "The UI system was already initialized\n");
 
     beUIInitialized = 1;
 
@@ -40,7 +40,7 @@ void BE_PrivateUI_Initialize(void) {
 }
 
 unsigned BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector_2I position, BE_Vector_2U size) {
-    BE_ASSERT(beUIInitialized, "UI system is not initialized");
+    BE_ASSERT(beUIInitialized, "UI system is not initialized\n");
 
     beUIInitialized = 1;
 
@@ -63,7 +63,7 @@ unsigned BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vect
 }
 
 int BE_UI_RegisterElement(unsigned windowId, BE_UI_Element* element) {
-    BE_ASSERT(beUIInitialized, "UI system is not initialized");
+    BE_ASSERT(beUIInitialized, "UI system is not initialized\n");
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
@@ -71,7 +71,7 @@ int BE_UI_RegisterElement(unsigned windowId, BE_UI_Element* element) {
 }
 
 int BE_UI_ToggleWindowFlag(unsigned windowId, BE_UI_WindowFlags flag, int toggle) {
-    BE_ASSERT(beUIInitialized, "UI system is not initialized");
+    BE_ASSERT(beUIInitialized, "UI system is not initialized\n");
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
@@ -83,7 +83,7 @@ int BE_UI_ToggleWindowFlag(unsigned windowId, BE_UI_WindowFlags flag, int toggle
 }
 
 const char* BE_UI_GetWindowName(unsigned windowId) {
-    BE_ASSERT(beUIInitialized, "UI system is not initialized");
+    BE_ASSERT(beUIInitialized, "UI system is not initialized\n");
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
@@ -91,7 +91,7 @@ const char* BE_UI_GetWindowName(unsigned windowId) {
 }
 
 int BE_UI_IsWindowStillOpen(unsigned windowId) {
-    BE_ASSERT(beUIInitialized, "UI system is not initialized");
+    BE_ASSERT(beUIInitialized, "UI system is not initialized\n");
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
@@ -99,7 +99,7 @@ int BE_UI_IsWindowStillOpen(unsigned windowId) {
 }
 
 BE_DynamicArray* BE_UI_GetWindowElements(unsigned windowId) {
-    BE_ASSERT(beUIInitialized, "UI system is not initialized");
+    BE_ASSERT(beUIInitialized, "UI system is not initialized\n");
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
@@ -136,8 +136,8 @@ int BE_UI_GetWindowReallocationAmount(void) {
 
 // TODO: Make this private.
 void BE_PrivateUI_Destroy(void) {
-    BE_ASSERT(beUIInitialized, "UI system has already been destroyed");
-    BE_ASSERT(!BE_ClientInformation_IsRunning(), "Cannot destroy UI system while still running");
+    BE_ASSERT(beUIInitialized, "UI system has already been destroyed\n");
+    BE_ASSERT(!BE_ClientInformation_IsRunning(), "Cannot destroy UI system while still running\n");
 
     beUIInitialized = 0;
 

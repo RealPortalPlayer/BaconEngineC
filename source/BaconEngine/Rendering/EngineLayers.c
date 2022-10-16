@@ -21,7 +21,7 @@ int BE_EngineLayers_ConsoleOpener_OnEvent(BE_Event event);
 void BE_EngineLayers_Initialize(void) {
     static int initialized = 0;
 
-    BE_ASSERT(!initialized, "Engine layers are already initialized");
+    BE_ASSERT(!initialized, "Engine layers are already initialized\n");
 
     initialized = 1;
 

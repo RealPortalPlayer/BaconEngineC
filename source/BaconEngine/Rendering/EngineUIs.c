@@ -10,7 +10,7 @@ SEC_CPP_SUPPORT_GUARD_START()
 void BE_EngineUIs_Initialize(void) {
     static int initialized = 0;
 
-    BE_ASSERT(!initialized, "Engine UIs are already initialized");
+    BE_ASSERT(!initialized, "Engine UIs are already initialized\n");
 
     initialized = 1;
 

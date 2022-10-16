@@ -14,7 +14,7 @@ double BE_Windows_GetTimer(void) {
 }
 
 void BE_Windows_Initialize(void) {
-    BE_ASSERT(!beWindowsInitialized, "Already initialized Windows");
+    BE_ASSERT(!beWindowsInitialized, "Already initialized Windows\n");
     BE_SpecificPlatformFunctions_InitializeWindow(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions_Window,
         &BE_WindowsWindow_GetInternal,
         &BE_WindowsWindow_Create,

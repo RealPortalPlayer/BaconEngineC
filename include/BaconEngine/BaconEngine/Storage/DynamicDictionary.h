@@ -45,10 +45,10 @@ int BE_DynamicDictionary_RemoveElementViaKey(BE_DynamicDictionary* dictionary, v
 int BE_DynamicDictionary_RemoveElementViaValue(BE_DynamicDictionary* dictionary, void* value, size_t elementSize);
 int BE_DynamicDictionary_GetElementIndexFromKey(BE_DynamicDictionary dictionary, void* key, size_t elementSize);
 int BE_DynamicDictionary_GetElementIndexFromValue(BE_DynamicDictionary dictionary, void* value, size_t elementSize);
-void* BE_DynamicDictionary_GetElementViaValue(BE_DynamicDictionary dictionary, void* key, size_t elementSize);
-void* BE_DynamicDictionary_GetElementViaKey(BE_DynamicDictionary dictionary, void* value, size_t elementSize);
-void BE_DynamicDictionary_GetElementsViaValue(BE_DynamicDictionary dictionary, BE_DynamicDictionary* results, void* value, size_t elementSize);
-void BE_DynamicDictionary_GetElementsViaKey(BE_DynamicDictionary dictionary, BE_DynamicDictionary* results, void* key, size_t elementSize);
+void* BE_DynamicDictionary_GetElementKeyViaValue(BE_DynamicDictionary dictionary, void* value, size_t elementSize);
+void* BE_DynamicDictionary_GetElementValueViaKey(BE_DynamicDictionary dictionary, void* key, size_t elementSize);
+void BE_DynamicDictionary_GetElementsKeyViaValue(BE_DynamicDictionary dictionary, BE_DynamicDictionary* results, void* value, size_t elementSize);
+void BE_DynamicDictionary_GetElementsValueViaKey(BE_DynamicDictionary dictionary, BE_DynamicDictionary* results, void* key, size_t elementSize);
 void BE_DynamicDictionary_Shrink(BE_DynamicDictionary* dictionary);
 SEC_CPP_SUPPORT_GUARD_END()
 

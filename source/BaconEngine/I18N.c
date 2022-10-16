@@ -6,8 +6,8 @@
 
 SEC_CPP_SUPPORT_GUARD_START()
 const char* BE_I18N_Translate(FILE* languageFile, const char* key) {
-    BE_STRICTMODE_CHECK(key[0] != '\0', key, "Key cannot be empty");
-    BE_STRICTMODE_CHECK(languageFile != NULL, key, "Language file cannot be null");
+    BE_STRICTMODE_CHECK(key[0] != '\0', key, "Key cannot be empty\n");
+    BE_STRICTMODE_CHECK(languageFile != NULL, key, "Language file cannot be null\n");
 
     //char* line = NULL;
     //size_t lineCap;
@@ -23,7 +23,7 @@ const char* BE_I18N_Translate(FILE* languageFile, const char* key) {
         return line + keyLength + 1;
     }*/
 
-    SEC_LOGGER_ERROR("Failed to translate: %s", key);
+    SEC_LOGGER_ERROR("Failed to translate: %s\n", key);
 
     return key;
 }

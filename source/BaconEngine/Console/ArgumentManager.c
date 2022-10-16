@@ -12,9 +12,9 @@ int BE_ArgumentManager_EqualsStringBoolean(char* value) {
     return SEC_StringExtension_CompareCaseless(value, "false") == 0 ? 1 : 0;
 }
 
-int BE_ArgumentHandler_GetInt(BE_DynamicDictionary arguments, const char* name, int defaultValue) {
+int BE_ArgumentManager_GetInt(BE_DynamicDictionary arguments, const char* name, int defaultValue) {
     if (arguments.keys.size != 0) {
-        char* value = (char*) BE_ArgumentHandler_GetString(arguments, name, "");
+        char* value = (char*) BE_ArgumentManager_GetString(arguments, name, "");
         {
             int parsedValue = BE_ArgumentManager_EqualsStringBoolean(value);
 
@@ -32,13 +32,13 @@ int BE_ArgumentHandler_GetInt(BE_DynamicDictionary arguments, const char* name, 
     return defaultValue;
 }
 
-int BE_ArgumentHandler_GetBoolean(BE_DynamicDictionary arguments, const char* name, int defaultValue) {
-    return BE_ArgumentHandler_GetInt(arguments, name, defaultValue) >= 1;
+int BE_ArgumentManager_GetBoolean(BE_DynamicDictionary arguments, const char* name, int defaultValue) {
+    return BE_ArgumentManager_GetInt(arguments, name, defaultValue) >= 1;
 }
 
-float BE_ArgumentHandler_GetFloat(BE_DynamicDictionary arguments, const char* name, float defaultValue) {
+float BE_ArgumentManager_GetFloat(BE_DynamicDictionary arguments, const char* name, float defaultValue) {
     if (arguments.keys.size != 0) {
-        char* value = (char*) BE_ArgumentHandler_GetString(arguments, name, "");
+        char* value = (char*) BE_ArgumentManager_GetString(arguments, name, "");
         {
             int parsedValue = BE_ArgumentManager_EqualsStringBoolean(value);
 
@@ -56,8 +56,9 @@ float BE_ArgumentHandler_GetFloat(BE_DynamicDictionary arguments, const char* na
     return defaultValue;
 }
 
-const char* BE_ArgumentHandler_GetString(BE_DynamicDictionary arguments, const char* name, const char* defaultValue) {
-    const char* value = BE_DynamicDictionary_GetElementViaKey(arguments, (void*) name, sizeof(char) * strlen(name) + 1);
+const char* BE_ArgumentManager_GetString(BE_DynamicDictionary arguments, const char* name, const char* defaultValue) {
+    const char* value = BE_DynamicDictionary_GetElementValueViaKey(arguments, (void *) name,
+                                                                   sizeof(char) * strlen(name) + 1);
 
     return value != NULL ? value : defaultValue;
 }

@@ -33,7 +33,7 @@ BE_EngineMemory_MemoryTypeInformation* BE_EngineMemory_GetMemoryTypeInformation(
             return &beEngineMemoryInformation.layer;
 
         default:
-            BE_ASSERT_ALWAYS("This shouldn't be reached");
+            BE_ASSERT_ALWAYS("This shouldn't be reached\n");
     }
 }
 
@@ -44,9 +44,9 @@ void* BE_EngineMemory_AllocateMemory(size_t size, BE_EngineMemory_MemoryType mem
 
     SEC_LOGGER_TRACE("Allocating memory\n"
                      "Size: %lu\n"
-                     "Type: %i", size, memoryType);
-    BE_ASSERT(size > 0, "Size cannot be zero or below");
-    BE_ASSERT((pointer = malloc(size)) != NULL, "Failed to allocate %lu bytes of data", size);
+                     "Type: %i\n", size, memoryType);
+    BE_ASSERT(size > 0, "Size cannot be zero or below\n");
+    BE_ASSERT((pointer = malloc(size)) != NULL, "Failed to allocate %lu bytes of data\n", size);
 
     memoryTypeInformation->allocatedBytes += size;
     memoryTypeInformation->allocatedAmount++;
@@ -61,10 +61,10 @@ void BE_EngineMemory_ReallocateMemory(void* pointer, size_t oldSize, size_t newS
     SEC_LOGGER_TRACE("Reallocating memory\n"
                      "Old Size: %lu\n"
                      "New Size: %lu\n"
-                     "Type: %i", oldSize, newSize, memoryType);
-    BE_ASSERT(pointer != NULL, "Pointer cannot be null");
-    BE_ASSERT(oldSize > 0 && newSize > 0, "Size cannot be zero or below");
-    BE_ASSERT((pointer = realloc(pointer, newSize)) != NULL, "Failed to reallocate %lu bytes of data", newSize);
+                     "Type: %i\n", oldSize, newSize, memoryType);
+    BE_ASSERT(pointer != NULL, "Pointer cannot be null\n");
+    BE_ASSERT(oldSize > 0 && newSize > 0, "Size cannot be zero or below\n");
+    BE_ASSERT((pointer = realloc(pointer, newSize)) != NULL, "Failed to reallocate %lu bytes of data\n", newSize);
 
     memoryTypeInformation->allocatedBytes = memoryTypeInformation->allocatedBytes - oldSize + newSize;
 }
@@ -75,9 +75,9 @@ void BE_EngineMemory_DeallocateMemory(void* pointer, size_t oldSize, BE_EngineMe
 
     SEC_LOGGER_TRACE("Deallocating memory\n"
                      "Size: %lu\n"
-                     "Type: %i", oldSize, memoryType);
-    BE_ASSERT(pointer != NULL, "Pointer cannot be null");
-    BE_ASSERT(oldSize > 0, "Size cannot be zero or below");
+                     "Type: %i\n", oldSize, memoryType);
+    BE_ASSERT(pointer != NULL, "Pointer cannot be null\n");
+    BE_ASSERT(oldSize > 0, "Size cannot be zero or below\n");
     free(pointer);
 
     memoryTypeInformation->allocatedBytes -= oldSize;

@@ -13,9 +13,10 @@ int BE_DynamicDictionary_UpdateFrozenState(BE_DynamicDictionary* dictionary) {
 }
 
 int BE_DynamicDictionary_Create(BE_DynamicDictionary* dictionary, size_t size) {
-    BE_DynamicArray_Create(&dictionary->keys, size);
-    BE_DynamicArray_Create(&dictionary->values, size);
-    return 1;
+    int returnValue = BE_DynamicArray_Create(&dictionary->keys, size) && BE_DynamicArray_Create(&dictionary->values, size);
+
+    dictionary->frozen = 0;
+    return returnValue;
 }
 
 int BE_DynamicDictionary_AddElementToStart(BE_DynamicDictionary* dictionary, void* key, void* value) {
@@ -31,7 +32,7 @@ int BE_DynamicDictionary_AddElementToLast(BE_DynamicDictionary* dictionary, void
         return 0;
 
     return BE_DynamicArray_AddElementToLast(&dictionary->keys, key) &&
-           BE_DynamicArray_AddElementToLast(&dictionary->keys, value);
+           BE_DynamicArray_AddElementToLast(&dictionary->values, value);
 }
 
 int BE_DynamicDictionary_RemoveFirstElement(BE_DynamicDictionary* dictionary, int shift) {
@@ -98,19 +99,19 @@ int BE_DynamicDictionary_GetElementIndexFromValue(BE_DynamicDictionary dictionar
     return -1;
 }
 
-void* BE_DynamicDictionary_GetElementViaValue(BE_DynamicDictionary dictionary, void* key, size_t elementSize) {
-    int index = BE_DynamicDictionary_GetElementIndexFromKey(dictionary, key, elementSize);
-
-    return index != -1 ? dictionary.values.internalArray[index] : NULL;
-}
-
-void* BE_DynamicDictionary_GetElementViaKey(BE_DynamicDictionary dictionary, void* value, size_t elementSize) {
+void* BE_DynamicDictionary_GetElementKeyViaValue(BE_DynamicDictionary dictionary, void* value, size_t elementSize) {
     int index = BE_DynamicDictionary_GetElementIndexFromValue(dictionary, value, elementSize);
 
     return index != -1 ? dictionary.keys.internalArray[index] : NULL;
 }
 
-void BE_DynamicDictionary_GetElementsViaKey(BE_DynamicDictionary dictionary, BE_DynamicDictionary* results, void* key, size_t elementSize) {
+void* BE_DynamicDictionary_GetElementValueViaKey(BE_DynamicDictionary dictionary, void* key, size_t elementSize) {
+    int index = BE_DynamicDictionary_GetElementIndexFromKey(dictionary, key, elementSize);
+
+    return index != -1 ? dictionary.values.internalArray[index] : NULL;
+}
+
+void BE_DynamicDictionary_GetElementsValueViaKey(BE_DynamicDictionary dictionary, BE_DynamicDictionary* results, void* key, size_t elementSize) {
     for (int index = 0; index < dictionary.keys.used; index++) {
         if (dictionary.keys.internalArray[index] == NULL || memcmp(dictionary.keys.internalArray[index], key, elementSize) != 0)
             continue;
@@ -119,7 +120,7 @@ void BE_DynamicDictionary_GetElementsViaKey(BE_DynamicDictionary dictionary, BE_
     }
 }
 
-void BE_DynamicDictionary_GetElementsViaValue(BE_DynamicDictionary dictionary, BE_DynamicDictionary* results, void* value, size_t elementSize) {
+void BE_DynamicDictionary_GetElementsKeyViaValue(BE_DynamicDictionary dictionary, BE_DynamicDictionary* results, void* value, size_t elementSize) {
     for (int index = 0; index < dictionary.keys.used; index++) {
         if (dictionary.keys.internalArray[index] == NULL || memcmp(dictionary.keys.internalArray[index], value, elementSize) != 0)
             continue;
@@ -132,7 +133,7 @@ void BE_DynamicDictionary_Shrink(BE_DynamicDictionary* dictionary) {
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
         return;
 
-    SEC_LOGGER_TRACE("Shrinking dictionary, this is expensive");
+    SEC_LOGGER_TRACE("Shrinking dictionary, this is expensive\n");
 
     BE_DynamicArray_Shrink(&dictionary->keys);
     BE_DynamicArray_Shrink(&dictionary->values);

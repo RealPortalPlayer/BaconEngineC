@@ -28,9 +28,8 @@ void SEC_Logger_SetLogLevel(SEC_Logger_LogLevels logLevel) {
 }
 
 // FIXME: This function is the opposite of thread safe. We need to fix that before making this engine multi-threaded.
-// TODO: Replace the booleans with a flag enum.
 
-void SEC_Logger_LogImplementation(int includeHeader, int includeNewLine, SEC_Logger_LogLevels logLevel, const char* message, ...) {
+void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLevel, const char* message, ...) {
     {
         static int initialized = 0;
         static int initializing = 0;
@@ -125,10 +124,6 @@ void SEC_Logger_LogImplementation(int includeHeader, int includeNewLine, SEC_Log
     va_start(arguments, message);
     fprintf(output, "%s", SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_RESET));
     vfprintf(output, message, arguments);
-
-    if (includeNewLine)
-        fprintf(output, "\n");
-
     va_end(arguments);
 
     antiRecursiveLog = 0;

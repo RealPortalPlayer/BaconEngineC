@@ -16,8 +16,8 @@ do {                                                 \
             SEC_Logger_LogLevels level = SEC_LOGGER_LOG_LEVEL_FATAL; \
             if (!BE_ClientInformation_IsStrictModeEnabled()) \
                 level = SEC_LOGGER_LOG_LEVEL_ERROR;  \
-            SEC_Logger_LogImplementation(1, 0, level, "Strict Check Failed\nCode: %s\nMessage: ", #check); \
-            SEC_Logger_LogImplementation(0, 1, level, __VA_ARGS__); \
+            SEC_Logger_LogImplementation(1, level, "Strict Check Failed\nCode: %s\nMessage: ", #check); \
+            SEC_Logger_LogImplementation(0, level, __VA_ARGS__); \
             if (BE_ClientInformation_IsStrictModeEnabled()) \
                 abort();                             \
             else                                     \

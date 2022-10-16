@@ -35,19 +35,19 @@ BE_Layer_Internal* BE_Layer_InternalGet(const char* name) {
 }
 
 void BE_PrivateLayer_InitializeLayers(void) {
-    BE_ASSERT(!beLayerInitialized, "Already initialized the layer stack");
-    SEC_LOGGER_INFO("Initializing layer stack");
+    BE_ASSERT(!beLayerInitialized, "Already initialized the layer stack\n");
+    SEC_LOGGER_INFO("Initializing layer stack\n");
 
     beLayerInitialized = 1;
 
     BE_DynamicArray_Create(&beLayerArray, 100);
-    SEC_LOGGER_INFO("Registering engine layers");
+    SEC_LOGGER_INFO("Registering engine layers\n");
     BE_EngineLayers_Initialize();
 }
 
 void BE_Layer_Register(const char* name, int enabled, BE_Layer_Functions functions) {
     for (int i = 0; i < (int) beLayerArray.used; i++)
-        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->publicLayer.name, name) != 0, "The layer '%s' is already registered", name);
+        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->publicLayer.name, name) != 0, "The layer '%s' is already registered\n", name);
 
     BE_Layer_Internal* layer = (BE_Layer_Internal*) BE_EngineMemory_AllocateMemory(sizeof(BE_Layer_Internal), BE_ENGINEMEMORY_MEMORY_TYPE_LAYER);
 
@@ -99,7 +99,7 @@ int BE_Layer_Toggle(const char* name, int enable) {
     if (layer->enabled == enable)
         return 0;
 
-    SEC_LOGGER_DEBUG("%s %s", enable ? "Enabling" : "Disabling", name);
+    SEC_LOGGER_DEBUG("%s %s\n", enable ? "Enabling" : "Disabling", name);
 
     layer->enabled = enable;
 
@@ -140,7 +140,7 @@ int BE_PrivateLayer_OnEvent(BE_Event event) {
         if (!layer->functions.OnEvent(event))
             continue;
 
-        SEC_LOGGER_TRACE("%s layer stopped the event line", layer->publicLayer.name);
+        SEC_LOGGER_TRACE("%s layer stopped the event line\n", layer->publicLayer.name);
         return 1;
     }
 
@@ -154,8 +154,8 @@ int BE_Layer_IsToggled(const char* name) {
 }
 
 void BE_PrivateLayer_DestroyLayers(void) {
-    BE_ASSERT(beLayerInitialized, "Layers are already destroyed");
-    SEC_LOGGER_INFO("Destroying layer stack");
+    BE_ASSERT(beLayerInitialized, "Layers are already destroyed\n");
+    SEC_LOGGER_INFO("Destroying layer stack\n");
 
     beLayerInitialized = 0;
 

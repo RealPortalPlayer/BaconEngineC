@@ -9,6 +9,7 @@
 
 SEC_CPP_SUPPORT_GUARD_START()
 BE_Command** BE_Console_GetCommands(void);
+BE_Command* BE_Console_GetCommand(const char* name);
 
 /**
  * @return Amount of registered commands.
@@ -25,4 +26,5 @@ int BE_Console_GetAllocatedCommandsAmount(void);
  */
 int BE_Console_GetCommandReallocationAmount(void);
 void BE_Console_ExecuteCommand(const char* input); // TODO: Client
+int BE_Console_GetLastEngineCommandIndex(void);
 SEC_CPP_SUPPORT_GUARD_END()

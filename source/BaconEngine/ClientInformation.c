@@ -36,7 +36,7 @@ int BE_ClientInformation_IsStrictModeEnabled(void) {
 
 void BE_ClientInformation_StopRunning(void) {
     if (!beClientInformationRunning) {
-        SEC_LOGGER_WARN("Client is already stopping");
+        SEC_LOGGER_WARN("Client is already stopping\n");
         return;
     }
 
