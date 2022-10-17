@@ -27,6 +27,7 @@
 #include "PrivateDeltaTime.h"
 #include "Console/PrivateConsole.h"
 #include "Rendering/PrivateRenderer.h"
+#include "BaconEngine/Console/Console.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 int BE_EntryPoint_ClientStart(int argc, char** argv);
@@ -89,6 +90,7 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
     SEC_LOGGER_DEBUG("Registering signals\n");
     signal(SIGSEGV, BE_EntryPoint_SignalDetected);
     BE_PrivateRenderer_Initialize();
+    BE_PrivateLayer_InitializeLayers();
 
     if (!BE_ClientInformation_IsServerModeEnabled() && BE_Renderer_GetCurrentType() != BE_RENDERER_TYPE_TEXT) {
         int width = 1080;
@@ -125,7 +127,6 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
             }
         }
 
-        BE_PrivateLayer_InitializeLayers();
         BE_PrivateWindow_Initialize(BE_EntryPoint_GetClientName(), SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2U, (unsigned) width, (unsigned) height));
     }
 
@@ -155,23 +156,41 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
     // TODO: Command running inside of terminal.
 
     while (BE_ClientInformation_IsRunning()) {
-        if (!BE_Window_IsStillOpened()) {
-            BE_ClientInformation_StopRunning();
-            break;
+        // TODO: Allow the client to enter commands outside of text mode.
+
+        if (BE_Renderer_GetCurrentType() != BE_RENDERER_TYPE_TEXT) {
+            if (!BE_Window_IsStillOpened()) {
+                BE_ClientInformation_StopRunning();
+                break;
+            }
+
+            BE_Renderer_ClearScreen();
+
+            double deltaNow = BE_SpecificPlatformFunctions_Get().GetTimer();
+            double deltaTime = deltaNow - deltaStart;
+
+            deltaStart = deltaNow;
+
+            BE_PrivateDeltaTime_Setter(deltaTime);
+            BE_PrivateLayer_OnUpdate(BE_LAYER_UPDATE_TYPE_BEFORE_RENDERING);
+            BE_SpecificPlatformFunctions_Get().rendererFunctions.Render();
+            BE_PrivateLayer_OnUpdate(BE_LAYER_UPDATE_TYPE_AFTER_RENDERING);
+            BE_SpecificPlatformFunctions_Get().windowFunctions.UpdateEvents();
+            continue;
         }
 
-        BE_Renderer_ClearScreen();
+        char input[4024];
 
-        double deltaNow = BE_SpecificPlatformFunctions_Get().GetTimer();
-        double deltaTime = deltaNow - deltaStart;
+        printf("%s ", BE_ClientInformation_IsCheatsEnabled() ? "#" : "$");
 
-        deltaStart = deltaNow;
+        fgets(input, sizeof(input), stdin);
 
-        BE_PrivateDeltaTime_Setter(deltaTime);
-        BE_PrivateLayer_OnUpdate(BE_LAYER_UPDATE_TYPE_BEFORE_RENDERING);
-        BE_SpecificPlatformFunctions_Get().rendererFunctions.Render();
-        BE_PrivateLayer_OnUpdate(BE_LAYER_UPDATE_TYPE_AFTER_RENDERING);
-        BE_SpecificPlatformFunctions_Get().windowFunctions.UpdateEvents();
+        if (strlen(input) == 1)
+            continue;
+
+        input[strcspn(input, "\n")] = '\0';
+
+        BE_Console_ExecuteCommand(input);
     }
 
     SEC_LOGGER_TRACE("Client loop ended, shutting down\n");

@@ -95,29 +95,15 @@ void BE_EngineCommands_Initialize(void) {
     }
 }
 
-void BE_EngineCommands_HelpPrint(int commandIndex, int multi) {
-    static int printedHeader = 0;
-    BE_Command* command = BE_Console_GetCommands()[commandIndex];
-
-    if (printedHeader != 0 && commandIndex == 0)
-        printedHeader = 0;
-
-    if (printedHeader == 0 || (printedHeader == 1 && command->index > BE_Console_GetLastEngineCommandIndex())) {
-        if (command->index == 0)
-            SEC_LOGGER_INFO("Help:\n");
-        SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "    %s command%s:\n",
-                                     command->index <= BE_Console_GetLastEngineCommandIndex() ? "Engine" : "Client",
-                                     multi ? "s" : "");
-
-        printedHeader++;
-    }
-
+void BE_EngineCommands_HelpPrint(BE_Command* command) {
     SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "        %s", command->name);
     SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, " - ");
     SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "%s",
                                  command->description);
-    SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_DEBUG, " - flags: %i",
-                                 command->flags);
+
+    if (command->flags != BE_COMMAND_FLAG_NULL)
+        SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_DEBUG, " - flags: %i",
+                                     command->flags);
 
     for (int argumentId = 0; argumentId < command->arguments.used; argumentId++) {
         BE_Command_Argument* argument = BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, argumentId);
@@ -139,8 +125,22 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
     const char* commandName = BE_ArgumentManager_GetString(context.arguments, "command", NULL);
 
     if (commandName == NULL) {
-        for (int commandId = 0; commandId < BE_Console_GetCommandAmount(); commandId++)
-            BE_EngineCommands_HelpPrint(commandId, 1);
+        int headerStatus = 0;
+
+        SEC_LOGGER_INFO("Help:\n");
+
+        for (int commandId = 0; commandId < BE_Console_GetCommandAmount(); commandId++) {
+            if (commandId > BE_Console_GetLastEngineCommandIndex() && headerStatus == 1)
+                headerStatus = 2;
+
+            if (headerStatus == 0 || headerStatus == 2) {
+                SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "    %s Commands:\n", headerStatus == 0 ? "Engine" : "Client");
+
+                headerStatus++;
+            }
+
+            BE_EngineCommands_HelpPrint(BE_Console_GetCommands()[commandId]);
+        }
 
         return;
     }
@@ -152,7 +152,8 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
         return;
     }
 
-    BE_EngineCommands_HelpPrint(command->index, 0);
+    SEC_LOGGER_INFO("Help:\n    %s Command:\n", command->index <= BE_Console_GetLastEngineCommandIndex() ? "Engine" : "Client");
+    BE_EngineCommands_HelpPrint(command);
 }
 
 void BE_EngineCommands_Cheats(BE_Command_Context context) {

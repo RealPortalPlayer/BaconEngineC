@@ -80,6 +80,10 @@ const char* SEC_Launcher_GetDefaultHelpList(void) {
            SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING " (" SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING_SHORT "): Don't render the UI\n"
            SEC_BUILTINARGUMENTS_EXIT " <code>: Exit the engine after initializing\n"
            SEC_BUILTINARGUMENTS_CONSOLE ": Start with the console opened\n"
-           SEC_BUILTINARGUMENTS_VERSION " (" SEC_BUILTINARGUMENTS_VERSION_SHORT "): Show the version of the launcher/engine";
-    }
+           SEC_BUILTINARGUMENTS_VERSION " (" SEC_BUILTINARGUMENTS_VERSION_SHORT "): Show the version of the launcher/engine\n"
+           SEC_BUILTINARGUMENTS_ALWAYS_USE_STDOUT " (" SEC_BUILTINARGUMENTS_ALWAYS_USE_STDOUT_SHORT "): Always use STDOUT, even for errors\n"
+           SEC_BUILTINARGUMENTS_DONT_PRINT_ASSERT_CHECKS " (" SEC_BUILTINARGUMENTS_DONT_PRINT_ASSERT_CHECKS_SHORT "): Do not log assert checks, does nothing if log level is not trace\n"
+           SEC_BUILTINARGUMENTS_DONT_PRINT_STRICT_CHECKS " (" SEC_BUILTINARGUMENTS_DONT_PRINT_STRICT_CHECKS_SHORT "): Do not log strict checks, does nothing if log level is not trace\n"
+           SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOC " (" SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOC_SHORT "): Do not log when the engine allocates memory, does nothing if log level is not trace\n";
+}
 SEC_CPP_SUPPORT_GUARD_END()

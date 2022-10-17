@@ -30,6 +30,11 @@ void SEC_Logger_SetLogLevel(SEC_Logger_LogLevels logLevel) {
 // FIXME: This function is the opposite of thread safe. We need to fix that before making this engine multi-threaded.
 
 void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLevel, const char* message, ...) {
+     static int alwaysUseStdout = -1;
+
+    if (alwaysUseStdout == -1)
+        alwaysUseStdout = SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_ALWAYS_USE_STDOUT, SEC_BUILTINARGUMENTS_ALWAYS_USE_STDOUT_SHORT, 0);
+
     {
         static int initialized = 0;
         static int initializing = 0;
@@ -71,9 +76,13 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
         return;
 
     static int antiRecursiveLog = 0;
+    FILE* output = stdout;
+
+    if (!alwaysUseStdout && (logLevel == SEC_LOGGER_LOG_LEVEL_ERROR || logLevel == SEC_LOGGER_LOG_LEVEL_FATAL))
+        output = stderr;
 
     if (antiRecursiveLog) {
-        fprintf(stderr, "Logger called self, this is 100%% a bug with the engine\n"
+        fprintf(output, "Logger called self, this is 100%% a bug with the engine\n"
                "includeHeader: %i\n"
                "logLevel: %i\n"
                "message: %s\n", includeHeader, logLevel, message);
@@ -101,11 +110,11 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
                 break;
 
             case SEC_LOGGER_LOG_LEVEL_ERROR:
-                fprintf(stderr, "%s[ERR] ", SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_BRIGHT_FOREGROUND_RED));
+                fprintf(output, "%s[ERR] ", SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_BRIGHT_FOREGROUND_RED));
                 break;
 
             case SEC_LOGGER_LOG_LEVEL_FATAL:
-                fprintf(stderr, "%s%s[FTL] ", SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_BOLD),
+                fprintf(output, "%s%s[FTL] ", SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_BOLD),
                         SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_FOREGROUND_RED));
                 break;
 
@@ -113,11 +122,6 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
                 printf("[UNK] ");
                 break;
         }
-
-    FILE* output = stdout;
-
-    if (logLevel == SEC_LOGGER_LOG_LEVEL_ERROR || logLevel == SEC_LOGGER_LOG_LEVEL_FATAL)
-        output = stderr;
 
     va_list arguments;
 

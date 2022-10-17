@@ -15,6 +15,7 @@ option(BE_DISABLE_OPENGL "Don't compile with OpenGL" OFF)
 option(BE_DISABLE_METAL "Don't compile with Metal, does nothing for non-Apple operating systems" OFF)
 option(BE_DONT_STRIP "Don't remove debug information (no stripping)" OFF)
 option(BE_DONT_SET_BINARY_OUTPUT_PATH "Don't change the binary output path" OFF)
+option(BE_NO_ENGINE_COMMANDS "Disable every engine command" OFF)
 
 message(STATUS "Adding dependencies")
 

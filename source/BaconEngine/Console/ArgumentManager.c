@@ -25,7 +25,7 @@ int BE_ArgumentManager_GetInt(BE_DynamicDictionary arguments, const char* name, 
         char* errored;
         int parsedValue = (int) strtol(value, &errored, 0); // FIXME: This isn't a good idea.
 
-        if (errored == NULL)
+        if (errored == NULL || strlen(errored) == 0)
             return parsedValue;
     }
 
@@ -49,7 +49,7 @@ float BE_ArgumentManager_GetFloat(BE_DynamicDictionary arguments, const char* na
         char* errored;
         float parsedValue = strtof(value, &errored);
 
-        if (errored == NULL)
+        if (errored == NULL || strlen(errored) == 0)
             return parsedValue;
     }
 

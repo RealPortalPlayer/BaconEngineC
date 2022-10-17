@@ -7,8 +7,8 @@
 SEC_CPP_SUPPORT_GUARD_START()
 int BE_DynamicDictionary_UpdateFrozenState(BE_DynamicDictionary* dictionary) {
     dictionary->frozen = dictionary->frozen || dictionary->keys.frozen || dictionary->values.frozen;
-    dictionary->keys.frozen = 0;
-    dictionary->values.frozen = 0;
+    dictionary->keys.frozen = dictionary->frozen;
+    dictionary->values.frozen = dictionary->frozen;
     return dictionary->frozen;
 }
 

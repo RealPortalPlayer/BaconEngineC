@@ -65,7 +65,9 @@ add_library(BaconEngine STATIC
         ${BE_SOURCE_FILES}
         Platform/TextMode/TextMode.c
         Platform/TextMode/TextModeWindow.c
-        DeltaTime.c)
+        DeltaTime.c
+        Debugging/Assert.c
+        Debugging/StrictMode.c)
 
 if(NOT BE_DISABLE_OPENGL)
     set(BE_LIBRARIES glfw OpenGL::GL glad)
@@ -75,6 +77,10 @@ endif()
 
 if(BE_DISABLE_METAL OR NOT APPLE)
     target_compile_definitions(BaconEngine PUBLIC BE_DISABLE_METAL)
+endif()
+
+if(BE_NO_ENGINE_COMMANDS)
+    target_compile_definitions(BaconEngine PUBLIC BE_NO_ENGINE_COMMANDS)
 endif()
 
 target_include_directories(BaconEngine PUBLIC ../../include/BaconEngine)

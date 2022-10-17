@@ -1,3 +1,6 @@
+#include <SharedEngineCode/ArgumentHandler.h>
+#include <SharedEngineCode/BuiltInArguments.h>
+
 #include "BaconEngine/Debugging/Assert.h"
 #include "EngineMemory.h"
 
@@ -8,6 +11,15 @@ BE_EngineMemory_MemoryInformation beEngineMemoryInformation = {
         {0, 0},
         {0, 0}
 };
+
+int BE_EngineMemory_AllocDeallocLogsEnabled(void) {
+    static int enabled = -1;
+
+    if (enabled == -1)
+        enabled = !SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOC, SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOC_SHORT, 0);
+
+    return enabled;
+}
 
 BE_EngineMemory_MemoryInformation BE_EngineMemory_GetMemoryInformation(void) {
     return beEngineMemoryInformation;
@@ -42,9 +54,11 @@ void* BE_EngineMemory_AllocateMemory(size_t size, BE_EngineMemory_MemoryType mem
     BE_EngineMemory_MemoryTypeInformation* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(
             memoryType);
 
-    SEC_LOGGER_TRACE("Allocating memory\n"
-                     "Size: %lu\n"
-                     "Type: %i\n", size, memoryType);
+    if (BE_EngineMemory_AllocDeallocLogsEnabled())
+        SEC_LOGGER_TRACE("Allocating memory\n"
+                         "Size: %lu\n"
+                         "Type: %i\n", size, memoryType);
+
     BE_ASSERT(size > 0, "Size cannot be zero or below\n");
     BE_ASSERT((pointer = malloc(size)) != NULL, "Failed to allocate %lu bytes of data\n", size);
 
@@ -58,10 +72,12 @@ void BE_EngineMemory_ReallocateMemory(void* pointer, size_t oldSize, size_t newS
     BE_EngineMemory_MemoryTypeInformation* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(
             memoryType);
 
-    SEC_LOGGER_TRACE("Reallocating memory\n"
-                     "Old Size: %lu\n"
-                     "New Size: %lu\n"
-                     "Type: %i\n", oldSize, newSize, memoryType);
+    if (BE_EngineMemory_AllocDeallocLogsEnabled())
+        SEC_LOGGER_TRACE("Reallocating memory\n"
+                         "Old Size: %lu\n"
+                         "New Size: %lu\n"
+                         "Type: %i\n", oldSize, newSize, memoryType);
+
     BE_ASSERT(pointer != NULL, "Pointer cannot be null\n");
     BE_ASSERT(oldSize > 0 && newSize > 0, "Size cannot be zero or below\n");
     BE_ASSERT((pointer = realloc(pointer, newSize)) != NULL, "Failed to reallocate %lu bytes of data\n", newSize);
@@ -73,9 +89,11 @@ void BE_EngineMemory_DeallocateMemory(void* pointer, size_t oldSize, BE_EngineMe
     BE_EngineMemory_MemoryTypeInformation* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(
             memoryType);
 
-    SEC_LOGGER_TRACE("Deallocating memory\n"
-                     "Size: %lu\n"
-                     "Type: %i\n", oldSize, memoryType);
+    if (BE_EngineMemory_AllocDeallocLogsEnabled())
+        SEC_LOGGER_TRACE("Deallocating memory\n"
+                         "Size: %lu\n"
+                         "Type: %i\n", oldSize, memoryType);
+
     BE_ASSERT(pointer != NULL, "Pointer cannot be null\n");
     BE_ASSERT(oldSize > 0, "Size cannot be zero or below\n");
     free(pointer);

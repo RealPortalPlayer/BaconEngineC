@@ -58,8 +58,11 @@ void BE_PrivateConsole_Initialize(void) {
     beConsoleInitialized = 1;
 
     BE_DynamicArray_Create(&beConsoleCommands, 100);
+
+#ifndef BE_NO_ENGINE_COMMANDS
     SEC_LOGGER_INFO("Registering engine commands\n");
     BE_EngineCommands_Initialize();
+#endif
 
     beConsoleClientCommandStart = beConsoleCommands.used;
 }
@@ -134,7 +137,6 @@ void BE_Command_DuplicatePrevious(const char* name, const char* description) {
 }
 
 void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
-    // TODO: Arguments
     // Do not put any logs outside an if check.
     // We do not want to trick users into thinking something is part of the command.
 
@@ -169,38 +171,97 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
     if (command == NULL) { // TODO: Tell the client.
         SEC_LOGGER_ERROR("'%s' is not a valid command\n", name);
-        return;
+        goto destroy;
     }
 
-    {
+    if (command->arguments.used != 0) {
         // TODO: This is dumb, figure out a way to do this without allocating memory.
         // TODO: Make the argument max length constant.
         char* argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char) * 1024, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
         int current = 0;
+        int quotePosition = -1;
+        int doubleQuote = 0;
+        int escaped = 0;
+        int added = 0;
 
         memset(argument, 0, 1024);
 
         for (int writer = 0; index < inputLength && current < command->arguments.used; index++) {
-            // TODO: Parse quotes.
-            if (writer >= sizeof(argument) || input[index] == ' ') {
+            added = 0;
+
+            if (writer >= 1024) {
+                publish_argument:
                 writer = 0;
 
                 BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, current++)->name, argument);
                 BE_DynamicArray_AddElementToLast(&userArguments, (void*) argument);
 
-                argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char) * 400, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+                argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char) * 1024, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+                added = 1;
 
                 memset(argument, 0, 1024);
                 continue;
             }
 
+            if (input[index] == '\\' && !escaped) {
+                escaped = 1;
+                continue;
+            }
+
+            if (input[index] == '\'' && !escaped) {
+                if (quotePosition == -1) {
+                    quotePosition = index;
+                    continue;
+                }
+
+                if (!doubleQuote) {
+                    quotePosition = -1;
+
+                    goto publish_argument;
+                }
+            }
+
+            if (input[index] == '"' && !escaped) {
+                if (quotePosition == -1) {
+                    quotePosition = index;
+                    doubleQuote = 1;
+                    continue;
+                }
+
+                if (doubleQuote) {
+                    quotePosition = -1;
+                    doubleQuote = 0;
+
+                    goto publish_argument;
+                }
+            }
+
+            if (input[index] == ' ' && quotePosition == -1)
+                goto publish_argument;
+
             argument[writer++] = input[index];
+            escaped = 0;
+        }
+
+        if (quotePosition != -1) {
+            SEC_LOGGER_ERROR("Parsing error: unescaped %s quote at %i\n", doubleQuote ? "double" : "single", quotePosition);
+            goto destroy;
+        }
+
+        if (escaped) {
+            SEC_LOGGER_ERROR("Parsing error: stray escape character\n");
+            goto destroy;
         }
 
         if (argument[0] != '\0') {
             BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, current)->name, argument);
             BE_DynamicArray_AddElementToLast(&userArguments, (void*) argument);
+
+            added = 1;
         }
+
+        if (!added)
+            BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * 1024, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
     }
 
     if ((command->flags & BE_COMMAND_FLAG_SERVER_ONLY) != 0) {
@@ -208,23 +269,24 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
         if (!BE_ClientInformation_IsServerModeEnabled()) {
             SEC_LOGGER_ERROR("This command can only be ran by the server\n");
-            return;
+            goto destroy;
         }
     }
 
     if ((command->flags & BE_COMMAND_FLAG_CLIENT_ONLY) != 0 && BE_ClientInformation_IsServerModeEnabled()) {
         SEC_LOGGER_ERROR("This command can only be ran by a client\n"); // TODO: Kick client if the client is the one who ran it.
-        return;
+        goto destroy;
     }
 
     if ((command->flags & BE_COMMAND_FLAG_CHEATS_ONLY) != 0 && !BE_ClientInformation_IsCheatsEnabled()) {
         // TODO: Tell client.
         SEC_LOGGER_ERROR("This command requires cheats to be enabled\n");
-        return;
+        goto destroy;
     }
 
     command->Run(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Command_Context, userArguments, arguments));
 
+    destroy:
     for (int argumentId = 0; argumentId < arguments.keys.used; argumentId++)
         BE_EngineMemory_DeallocateMemory(arguments.values.internalArray[argumentId], sizeof(char) * 1024, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
 
