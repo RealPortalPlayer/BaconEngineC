@@ -25,9 +25,10 @@
       <config projectName="BaconEngine" targetName="glad" />
       <config projectName="BaconEngine" targetName="update_mappings" />
       <config projectName="BaconEngine" targetName="TestGame" />
+      <config projectName="BaconEngine" targetName="DummyLauncher" />
     </generated>
   </component>
-  <component name="CMakeSettings">
+  <component name="CMakeSettings" AUTO_RELOAD="true">
     <configurations>
       <configuration PROFILE_NAME="Debug" ENABLED="true" GENERATION_DIR="build/native/debug" CONFIG_NAME="Debug" />
       <configuration PROFILE_NAME="Release" ENABLED="true" GENERATION_DIR="build/native/release" CONFIG_NAME="Release" />
@@ -39,47 +40,34 @@
       <configuration PROFILE_NAME="Release-Linux64" ENABLED="true" GENERATION_DIR="build/cross/linux64/release" CONFIG_NAME="Release" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=&quot;~/CLionProjects/CMakeToolchains/Linux64-musl.cmake&quot; -DBE_DISABLE_OPENGL=ON" />
       <configuration PROFILE_NAME="Debug-Linux32" ENABLED="true" GENERATION_DIR="build/cross/linux32/debug" CONFIG_NAME="Debug" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=&quot;~/CLionProjects/CMakeToolchains/Linux32-musl.cmake&quot; -DBE_DISABLE_OPENGL=ON" />
       <configuration PROFILE_NAME="Release-Linux32" ENABLED="true" GENERATION_DIR="build/cross/linux32/release" CONFIG_NAME="Release" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=&quot;~/CLionProjects/CMakeToolchains/Linux32-musl.cmake&quot; -DBE_DISABLE_OPENGL=ON" />
-      <configuration PROFILE_NAME="Debug-Serenity64" ENABLED="true" GENERATION_DIR="build/cross/serenity64/debug" CONFIG_NAME="Debug" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=&quot;/Volumes/Data/serenity/Build/x86_64/CMakeToolchain.txt&quot; -DBE_DISABLE_OPENGL=1" />
-      <configuration PROFILE_NAME="Release-Serenity64" ENABLED="true" GENERATION_DIR="build/cross/serenity64/release" CONFIG_NAME="Release" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=&quot;/Volumes/Data/serenity/Build/x86_64/CMakeToolchain.txt&quot; -DBE_DISABLE_OPENGL=1" />
+      <configuration PROFILE_NAME="Debug-Serenity64" ENABLED="true" GENERATION_DIR="build/cross/serenity64/debug" CONFIG_NAME="Debug" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=&quot;/Users/portalplayer/Downloads/serenity/Build/x86_64/CMakeToolchain.txt&quot; -DBE_DISABLE_OPENGL=1" />
+      <configuration PROFILE_NAME="Release-Serenity64" ENABLED="true" GENERATION_DIR="build/cross/serenity64/release" CONFIG_NAME="Release" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=&quot;/Users/portalplayer/Downloads/serenity/Build/x86_64/CMakeToolchain.txt&quot; -DBE_DISABLE_OPENGL=1" />
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89d20441-8f26-473d-8175-08c4ea0d1359" name="Changes" comment="Added open source license.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="89d20441-8f26-473d-8175-08c4ea0d1359" name="Changes" comment="(Almost) finished the command argument system.&#10;Fixed missing strlen checks inside ArgumentManager.&#10;You can now disable assert, and strict mode checks.&#10;You can also disable engine memory allocation, reallocation, de-allocation, etc, messages.&#10;You can now force the logger to constantly use stdout.&#10;Fixed two memory leaks inside of BE_Console_ExecuteCommand.&#10;Made it so the keys and values frozen value gets updated accordingly for DynamicDictionary's.&#10;Simplified the HelpPrint function.&#10;The help command will no longer print the command flags, if said command has no flags.&#10;You can now execute commands in text-mode.&#10;Fixed missing new lines inside logged messages.&#10;The engine will now default to text-mode if in server mode.">
+      <change afterPath="$PROJECT_DIR$/test/DummyLauncher/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/DummyLauncher/Main.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/BaconEngine.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/discord.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dependencies/glfw" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dependencies/glfw/tests/allocator.c" beforeDir="false" afterPath="$PROJECT_DIR$/dependencies/glfw/tests/allocator.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Console/ArgumentManager.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Console/ArgumentManager.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Console/Command.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Console/Command.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Console/Console.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Console/Console.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Debugging/Assert.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Debugging/Assert.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Debugging/StrictMode.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Debugging/StrictMode.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Storage/DynamicDictionary.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/BaconEngine/BaconEngine/Storage/DynamicDictionary.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/Logger.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/Logger.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/ClientInformation.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/ClientInformation.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Console/ArgumentManager.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Console/ArgumentManager.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/Internal/OperatingSystem.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SharedEngineCode/SharedEngineCode/Internal/OperatingSystem.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/Console/Console.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Console/Console.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/Console/EngineCommands.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Console/EngineCommands.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/EngineMemory.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/EngineMemory.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/EntryPoint.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/EntryPoint.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/I18N.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/I18N.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGL.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGL.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGLRenderer.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGLRenderer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGLWindow.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/OpenGL/OpenGLWindow.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Platform/Windows/Windows.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/Windows/Windows.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Platform/Windows/WindowsWindow.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Platform/Windows/WindowsWindow.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/EngineLayers.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/EngineLayers.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/EngineUIs.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/EngineUIs.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/Layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/Layer.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/Renderer.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/Renderer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/UI.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/UI.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Rendering/Window.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Rendering/Window.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Storage/DynamicArray.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Storage/DynamicArray.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngine/Storage/DynamicDictionary.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngine/Storage/DynamicDictionary.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/BaconEngineLauncher/Main.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconEngineLauncher/Main.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/BaconLauncher/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconLauncher/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/BaconLauncher/Main.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/BaconLauncher/Main.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/SharedEngineCode/Logger.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/SharedEngineCode/Logger.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/TestGame/Entry.c" beforeDir="false" afterPath="$PROJECT_DIR$/test/TestGame/Entry.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/TestGame/Layers.c" beforeDir="false" afterPath="$PROJECT_DIR$/test/TestGame/Layers.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/SharedEngineCode/Launcher.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/SharedEngineCode/Launcher.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,6 +79,11 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="CMakeLists.txt" />
+      </list>
+    </option>
     <option name="SCHEME" value="Project" />
   </component>
   <component name="Git.Settings">
@@ -126,31 +119,42 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/portalplayer/Downloads/BaconEngineC/CMakeLists.txt&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;CMakeSettings&quot;,
-    &quot;structure.view.defaults.are.configured&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "cf.advertisement.text.has.clang-format": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "last_opened_file_path": "/Users/portalplayer/CLionProjects/BaconEngineC/build/native/debug/out",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "CMakeSettings",
+    "structure.view.defaults.are.configured": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/build/native/debug/out" />
+      <recent name="$PROJECT_DIR$/build/native/release/out" />
+      <recent name="$PROJECT_DIR$/test/DummyLauncher" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/source/BaconEngine/Rendering" />
       <recent name="$PROJECT_DIR$/source/BaconEngine/Platform" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.TestGame">
+  <component name="RunManager" selected="CMake Application.BaconLauncher">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="BaconEditor" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-c BaconEditor" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="BaconEditor" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="BaconEngine" RUN_TARGET_NAME="BaconLauncher">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -181,6 +185,11 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration name="DummyLauncher" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-ll trc" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="DummyLauncher" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="BaconEngine" RUN_TARGET_NAME="DummyLauncher">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="SharedEngineCode" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="SharedEngineCode" CONFIG_NAME="Debug">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -196,12 +205,7 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TestGame" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-c ./TestGame" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="TestGame" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="BaconEngine" RUN_TARGET_NAME="BaconLauncher">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+    <configuration name="TestGame" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-c ./TestGame -aus -dpac -dpsc -dpenma --renderer text" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="BaconEngine" TARGET_NAME="TestGame" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="BaconEngine" RUN_TARGET_NAME="BaconLauncher">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -238,6 +242,7 @@
       <item itemvalue="CMake Application.BaconLauncherUI" />
       <item itemvalue="CMake Application.SharedEngineCode" />
       <item itemvalue="CMake Application.CustomStandaloneClientBinary" />
+      <item itemvalue="CMake Application.DummyLauncher" />
       <item itemvalue="CMake Application.StandaloneClientBinary" />
       <item itemvalue="CMake Application.TestClientCPP" />
       <item itemvalue="CMake Application.TestGame" />
@@ -274,7 +279,10 @@
       <workItem from="1665778088712" duration="4064000" />
       <workItem from="1665782890971" duration="50000" />
       <workItem from="1665782949815" duration="2243000" />
-      <workItem from="1665825920198" duration="34599000" />
+      <workItem from="1665825920198" duration="35960000" />
+      <workItem from="1665938310463" duration="4352000" />
+      <workItem from="1665947914450" duration="18407000" />
+      <workItem from="1665989532418" duration="1244000" />
     </task>
     <task id="LOCAL-00001" summary="Updated rendering system to add more potential renderers&#10;Allowed the user to specify what renderer they want to use.&#10;Replace the flawed SEC_ArgumentHandler_GetValueWithShort with SEC_ArgumentHandler_GetInfoWithShort.&#10;SEC_ArgumentHandler_ContainsArgumentOrShort should be used instead of SEC_ArgumentHandler_GetInfoWithShort, if you only want to check if the argument exists.&#10;Added support assert macros, makes it easier to convey what the assert is there for. (I.E. telling that a function is not implemented, or that a branch should never have been reached)&#10;Allow the user to check what version the launcher/engine is at.&#10;Changed global variable names to try preventing name collisions.&#10;Change the output path for each binary to fit the structure that best fits the engine.&#10;Started stripping non-debug builds.&#10;Made some initializers/destroyers private.&#10;Created a DeltaTime header. This will allow people to get the delta time anywhere, even inside of events.&#10;Added invalid size check for DynamicArray.&#10;Fixed some functions not following the naming scheme.&#10;Started work on the help command.&#10;Replaced some C style struct initializations with SEC_CPP_SUPPORT_CREATE_STRUCT, which switches to the C++ style if using a C++ compiler. Happy now, MSVC?&#10;Removed some useless includes.&#10;Commented out BE_I18N_Translate. Find solution that doesn't use getline.&#10;Removed CppSupport header includes inside of source files. Their header files already include them, so there's no point in doing it again.&#10;Merged the software argument into the renderer argument.&#10;Stopped calling OnStop on layers that haven't initialized yet.&#10;Made the layer OnUpdate and OnEvent functions private. It would be a bad idea for the client to call them, especially inside an update/event function.&#10;Allow you to remove the new-line from the logger.&#10;Added Windows software rendering.&#10;Renamed SpecificRendererFunctions to SpecificPlatformFunctions.">
       <created>1665837478374</created>
@@ -304,7 +312,21 @@
       <option name="project" value="LOCAL" />
       <updated>1665869026849</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Fully added command arguments, and fixed some dumb bugs. A vulnerability fixed.&#10;Fixed ArgumentManager function names being incorrect.&#10;Logger system will no longer print the new line for you.&#10;Added a (temporary) index variable inside of command.&#10;Fixed DynamicDictionary creator, so it now returns the results from the DynamicArray creators.&#10;Fixed a dangerous and dumb DynamicDictionary bug where BE_DynamicDictionary_AddElementToLast adds to keys twice, whoops. This is a vulnerability, since it de-syncs the used variables, which is an UB. (Can cause crashes, which would be terrible once the engine starts supporting servers)&#10;Fixed another (but not as dangerous) dumb DynamicDictionary bug where BE_DynamicDictionary_GetElementKeyViaValue and BE_DynamicDictionary_GetElementsValueViaKey were flipped. The former returned the value, while the latter returned the key. (You can see how rushed DynamicDictionary was)&#10;Added echo command.&#10;(Almost) Finish the help command.">
+      <created>1665891330690</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1665891330690</updated>
+    </task>
+    <task id="LOCAL-00006" summary="(Almost) finished the command argument system.&#10;Fixed missing strlen checks inside ArgumentManager.&#10;You can now disable assert, and strict mode checks.&#10;You can also disable engine memory allocation, reallocation, de-allocation, etc, messages.&#10;You can now force the logger to constantly use stdout.&#10;Fixed two memory leaks inside of BE_Console_ExecuteCommand.&#10;Made it so the keys and values frozen value gets updated accordingly for DynamicDictionary's.&#10;Simplified the HelpPrint function.&#10;The help command will no longer print the command flags, if said command has no flags.&#10;You can now execute commands in text-mode.&#10;Fixed missing new lines inside logged messages.&#10;The engine will now default to text-mode if in server mode.">
+      <created>1665973345344</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1665973345344</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -327,7 +349,9 @@
     <MESSAGE value="Fixed and optimized Assert/Strict Mode check.&#10;Started on attempting to parse command arguments.&#10;Fixed some values not being pre-initialized.&#10;Moved console register and duplicate outside of console, and inside the command header. This allows us to avoid including many potentially unneeded functions.&#10;Removed stray new-line inside the signal handler." />
     <MESSAGE value="Removed test line, oops." />
     <MESSAGE value="Added open source license." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added open source license." />
+    <MESSAGE value="Fully added command arguments, and fixed some dumb bugs. A vulnerability fixed.&#10;Fixed ArgumentManager function names being incorrect.&#10;Logger system will no longer print the new line for you.&#10;Added a (temporary) index variable inside of command.&#10;Fixed DynamicDictionary creator, so it now returns the results from the DynamicArray creators.&#10;Fixed a dangerous and dumb DynamicDictionary bug where BE_DynamicDictionary_AddElementToLast adds to keys twice, whoops. This is a vulnerability, since it de-syncs the used variables, which is an UB. (Can cause crashes, which would be terrible once the engine starts supporting servers)&#10;Fixed another (but not as dangerous) dumb DynamicDictionary bug where BE_DynamicDictionary_GetElementKeyViaValue and BE_DynamicDictionary_GetElementsValueViaKey were flipped. The former returned the value, while the latter returned the key. (You can see how rushed DynamicDictionary was)&#10;Added echo command.&#10;(Almost) Finish the help command." />
+    <MESSAGE value="(Almost) finished the command argument system.&#10;Fixed missing strlen checks inside ArgumentManager.&#10;You can now disable assert, and strict mode checks.&#10;You can also disable engine memory allocation, reallocation, de-allocation, etc, messages.&#10;You can now force the logger to constantly use stdout.&#10;Fixed two memory leaks inside of BE_Console_ExecuteCommand.&#10;Made it so the keys and values frozen value gets updated accordingly for DynamicDictionary's.&#10;Simplified the HelpPrint function.&#10;The help command will no longer print the command flags, if said command has no flags.&#10;You can now execute commands in text-mode.&#10;Fixed missing new lines inside logged messages.&#10;The engine will now default to text-mode if in server mode." />
+    <option name="LAST_COMMIT_MESSAGE" value="(Almost) finished the command argument system.&#10;Fixed missing strlen checks inside ArgumentManager.&#10;You can now disable assert, and strict mode checks.&#10;You can also disable engine memory allocation, reallocation, de-allocation, etc, messages.&#10;You can now force the logger to constantly use stdout.&#10;Fixed two memory leaks inside of BE_Console_ExecuteCommand.&#10;Made it so the keys and values frozen value gets updated accordingly for DynamicDictionary's.&#10;Simplified the HelpPrint function.&#10;The help command will no longer print the command flags, if said command has no flags.&#10;You can now execute commands in text-mode.&#10;Fixed missing new lines inside logged messages.&#10;The engine will now default to text-mode if in server mode." />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
