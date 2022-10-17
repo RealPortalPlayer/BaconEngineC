@@ -154,6 +154,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
     memset(name, 0, BE_COMMAND_MAX_NAME_LENGTH);
 
     int index;
+    int argumentStartingIndex;
 
     for (index = 0; index < inputLength; index++) {
         if (input[index] == ' ') {
@@ -168,6 +169,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
     }
 
     command = BE_Console_GetCommand(name);
+    argumentStartingIndex = index;
 
     if (command == NULL) { // TODO: Tell the client.
         SEC_LOGGER_ERROR("'%s' is not a valid command\n", name);
@@ -284,7 +286,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         goto destroy;
     }
 
-    command->Run(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Command_Context, userArguments, arguments));
+    command->Run(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Command_Context, input, input + argumentStartingIndex, userArguments, arguments));
 
     destroy:
     for (int argumentId = 0; argumentId < arguments.keys.used; argumentId++)

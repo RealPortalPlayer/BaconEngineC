@@ -31,17 +31,17 @@ void BE_PrivateRenderer_Initialize(void) {
 
     BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized rendererFunctions\n");
 
-    if (BE_ClientInformation_IsServerModeEnabled()) {
-        SEC_LOGGER_INFO("Server mode enabled, using text-mode\n");
-        BE_TextMode_Initialize();
-
-        beRendererCurrent = BE_RENDERER_TYPE_TEXT;
-        return;
-    }
-
     const char* specifiedRenderer = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_RENDERER, 0);
 
     if (specifiedRenderer != NULL) {
+        if (BE_ClientInformation_IsServerModeEnabled() || SEC_StringExtension_CompareCaseless(specifiedRenderer, "text") == 0) {
+            SEC_LOGGER_INFO("Using no renderer\n");
+            BE_TextMode_Initialize();
+
+            beRendererCurrent = BE_RENDERER_TYPE_TEXT;
+            return;
+        }
+
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "opengl") == 0) {
             opengl:
 #ifndef BE_DISABLE_OPENGL

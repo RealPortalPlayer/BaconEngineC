@@ -1,6 +1,10 @@
 project(BaconLauncher C)
 
-add_executable(BaconLauncher Main.c)
+if(WIN32)
+    add_executable(BaconLauncher WIN32 Main.c)
+else()
+    add_executable(BaconLauncher Main.c)
+endif()
 
 target_link_libraries(BaconLauncher LINK_PRIVATE SharedEngineCode)
 

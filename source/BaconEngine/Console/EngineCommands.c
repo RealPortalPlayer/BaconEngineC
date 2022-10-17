@@ -7,6 +7,7 @@
 #include "BaconEngine/ClientInformation.h"
 #include "BaconEngine/EngineMemoryInformation.h"
 #include "BaconEngine/Rendering/UI.h"
+#include "BaconEngine/Math/Bitwise.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 void BE_EngineCommands_Help(BE_Command_Context context);
@@ -130,6 +131,12 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
         SEC_LOGGER_INFO("Help:\n");
 
         for (int commandId = 0; commandId < BE_Console_GetCommandAmount(); commandId++) {
+            BE_Command* command = BE_Console_GetCommands()[commandId];
+
+            if ((BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY) && !BE_ClientInformation_IsServerModeEnabled()) ||
+                (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
+                continue;
+
             if (commandId > BE_Console_GetLastEngineCommandIndex() && headerStatus == 1)
                 headerStatus = 2;
 
@@ -139,7 +146,7 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
                 headerStatus++;
             }
 
-            BE_EngineCommands_HelpPrint(BE_Console_GetCommands()[commandId]);
+            BE_EngineCommands_HelpPrint(command);
         }
 
         return;
@@ -250,6 +257,6 @@ void BE_EngineCommands_Sudo(BE_Command_Context context) {
 }
 
 void BE_EngineCommands_Echo(BE_Command_Context context) {
-    SEC_LOGGER_INFO("%s\n", BE_ArgumentManager_GetString(context.arguments, "message", ""));
+    SEC_LOGGER_INFO("%s\n", context.unparsedArguments);
 }
 SEC_CPP_SUPPORT_GUARD_END()

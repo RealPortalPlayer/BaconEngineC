@@ -8,9 +8,16 @@
 #   include <dlfcn.h>
 #elif SEC_OPERATINGSYSTEM_WINDOWS
 #   include <Windows.h>
+#   include <stdlib.h>
+#   define argc __argc
+#   define argv __argv
 #endif
 
+#if SEC_OPERATINGSYSTEM_WINDOWS
+BOOL WINAPI WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR commandLine, int showCommand) {
+#else
 int main(int argc, char** argv) {
+#endif
     SEC_ArgumentHandler_Initialize(argc, argv);
     SEC_LOGGER_TRACE("Built on: %s\nBuilt for: %s\n", __TIMESTAMP__, SEC_OPERATINGSYSTEM_NAME);
 

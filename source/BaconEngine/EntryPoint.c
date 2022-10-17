@@ -182,11 +182,7 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
         char input[4024];
 
         printf("%s ", BE_ClientInformation_IsCheatsEnabled() ? "#" : "$");
-
         fgets(input, sizeof(input), stdin);
-
-        if (strlen(input) == 1)
-            continue;
 
         input[strcspn(input, "\n")] = '\0';
 

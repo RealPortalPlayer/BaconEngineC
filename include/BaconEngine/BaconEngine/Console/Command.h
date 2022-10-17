@@ -17,10 +17,13 @@ typedef enum {
     BE_COMMAND_FLAG_NULL,
     BE_COMMAND_FLAG_CHEATS_ONLY,
     BE_COMMAND_FLAG_SERVER_ONLY = (1 << 1),
-    BE_COMMAND_FLAG_CLIENT_ONLY = (1 << 2)
+    BE_COMMAND_FLAG_CLIENT_ONLY = (1 << 2),
+    BE_COMMAND_FLAGS_RAN_ON_SERVER = (1 << 3)
 } BE_Command_Flags;
 
 typedef struct { // TODO: Client
+    const char* fullInput;
+    const char* unparsedArguments;
     BE_DynamicArray userArguments;
     BE_DynamicDictionary arguments;
 } BE_Command_Context;
