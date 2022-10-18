@@ -179,6 +179,9 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
             continue;
         }
 
+        if (BE_Console_GetCommandAmount() == 0)
+            continue;
+
         char input[4024];
 
         printf("%s ", BE_ClientInformation_IsCheatsEnabled() ? "#" : "$");
