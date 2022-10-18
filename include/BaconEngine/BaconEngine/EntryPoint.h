@@ -27,6 +27,7 @@ int CallLauncherMain(int argc, char** argv);
 #   if SEC_OPERATINGSYSTEM_WINDOWS
 #       define WIN32_LEAN_AND_MEAN
 #       include <Windows.h> // FIXME: I really don't want to include this in a header (especially a header like this one), but it seems like the only way.
+#       include <stdlib.h>
 BOOL WINAPI WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR commandLine, int showCommand) {
     return CallLauncherMain(__argc, __argv);
 }
