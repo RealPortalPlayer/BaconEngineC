@@ -12,8 +12,8 @@ int beUIInitialized;
 //BE_PrivateUI_Window* beUIFullscreenWindow;
 BE_DynamicArray beUIRenderOrder;
 
-BE_PrivateUI_Window* BE_UI_GetWindowFromId(unsigned windowId) {
-    BE_STRICTMODE_CHECK(beUIWindows.used > (int) windowId, NULL, "Invalid UI window ID\n");
+BE_PrivateUI_Window* BE_UI_GetWindowFromId(int windowId) {
+    BE_STRICTMODE_CHECK(windowId >= 0 && windowId < beUIWindows.used, NULL, "Invalid UI window ID\n");
     return BE_DYNAMICARRAY_GET_ELEMENT(BE_PrivateUI_Window, beUIWindows, windowId);
 }
 
@@ -39,7 +39,7 @@ void BE_PrivateUI_Initialize(void) {
     BE_EngineUIs_Initialize();
 }
 
-unsigned BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector_2I position, BE_Vector_2U size) {
+int BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector_2I position, BE_Vector_2U size) {
     BE_ASSERT(beUIInitialized, "UI system is not initialized\n");
 
     beUIInitialized = 1;
@@ -47,7 +47,12 @@ unsigned BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vect
     BE_PrivateUI_Window* uiWindow = (BE_PrivateUI_Window*) BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateUI_Window),
                                                                                           BE_ENGINEMEMORY_MEMORY_TYPE_UI);
 
-    // TODO: Validate flags
+    if (flags != BE_UI_WINDOW_FLAG_NULL) {
+        BE_STRICTMODE_CHECK(!BE_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_NO_TITLE_BAR) || !BE_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_MINIMIZED), -1,
+                            "Invalid window flags, cannot both be missing a title-bar and also be minimized");
+        BE_STRICTMODE_CHECK(!BE_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_MINIMIZED) || !BE_BITWISE_IS_BIT_SET(flags, BE_EVENT_TYPE_WINDOW_MAXIMIZED), -1,
+                            "Invalid window flags, cannot both be minimized and maximized");
+    }
 
     uiWindow->name = name;
     uiWindow->flags = flags;
@@ -58,11 +63,10 @@ unsigned BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vect
     BE_DynamicArray_Create(&uiWindow->elements, 100);
     BE_DynamicArray_AddElementToLast(&beUIWindows, uiWindow);
     BE_DynamicArray_AddElementToLast(&beUIRenderOrder, uiWindow);
-
     return (uiWindow->windowId = beUIWindows.used - 1);
 }
 
-int BE_UI_RegisterElement(unsigned windowId, BE_UI_Element* element) {
+int BE_UI_RegisterElement(int windowId, BE_UI_Element* element) {
     BE_ASSERT(beUIInitialized, "UI system is not initialized\n");
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
@@ -70,7 +74,7 @@ int BE_UI_RegisterElement(unsigned windowId, BE_UI_Element* element) {
     return uiWindow != NULL && BE_DynamicArray_AddElementToLast(&uiWindow->elements, element);
 }
 
-int BE_UI_ToggleWindowFlag(unsigned windowId, BE_UI_WindowFlags flag, int toggle) {
+int BE_UI_ToggleWindowFlag(int windowId, BE_UI_WindowFlags flag, int toggle) {
     BE_ASSERT(beUIInitialized, "UI system is not initialized\n");
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
@@ -82,7 +86,7 @@ int BE_UI_ToggleWindowFlag(unsigned windowId, BE_UI_WindowFlags flag, int toggle
     return 1;
 }
 
-const char* BE_UI_GetWindowName(unsigned windowId) {
+const char* BE_UI_GetWindowName(int windowId) {
     BE_ASSERT(beUIInitialized, "UI system is not initialized\n");
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
@@ -90,7 +94,7 @@ const char* BE_UI_GetWindowName(unsigned windowId) {
     return uiWindow != NULL ? uiWindow->name : "";
 }
 
-int BE_UI_IsWindowStillOpen(unsigned windowId) {
+int BE_UI_IsWindowStillOpen(int windowId) {
     BE_ASSERT(beUIInitialized, "UI system is not initialized\n");
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
@@ -98,7 +102,7 @@ int BE_UI_IsWindowStillOpen(unsigned windowId) {
     return uiWindow != NULL && !BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_CLOSED);
 }
 
-BE_DynamicArray* BE_UI_GetWindowElements(unsigned windowId) {
+BE_DynamicArray* BE_UI_GetWindowElements(int windowId) {
     BE_ASSERT(beUIInitialized, "UI system is not initialized\n");
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
@@ -106,7 +110,7 @@ BE_DynamicArray* BE_UI_GetWindowElements(unsigned windowId) {
     return uiWindow != NULL ? &uiWindow->elements : NULL;
 }
 
-int BE_UI_SetActiveWindow(unsigned windowId) {
+int BE_UI_SetActiveWindow(int windowId) {
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
     if (uiWindow == NULL || beUIRenderOrder.used <= 1 || uiWindow->currentRenderPosition == 0)

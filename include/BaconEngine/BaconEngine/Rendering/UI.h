@@ -38,15 +38,15 @@ typedef enum {
     BE_UI_WINDOW_FLAG_MAXIMIZED = (1 << 8)
 } BE_UI_WindowFlags;
 
-const char* BE_UI_GetWindowName(unsigned windowId);
-int BE_UI_IsWindowStillOpen(unsigned windowId);
-BE_DynamicArray* BE_UI_GetWindowElements(unsigned windowId);
+const char* BE_UI_GetWindowName(int windowId);
+int BE_UI_IsWindowStillOpen(int windowId);
+BE_DynamicArray* BE_UI_GetWindowElements(int windowId);
 int BE_UI_GetWindowAmount(void);
 int BE_UI_GetAllocatedWindowsAmount(void);
 int BE_UI_GetWindowReallocationAmount(void);
 
-unsigned BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector_2I position, BE_Vector_2U size);
-int BE_UI_RegisterElement(unsigned windowId, BE_UI_Element* element);
-int BE_UI_ToggleWindowFlag(unsigned windowId, BE_UI_WindowFlags flag, int toggle);
-int BE_UI_SetActiveWindow(unsigned windowId);
+int BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector_2I position, BE_Vector_2U size);
+int BE_UI_RegisterElement(int windowId, BE_UI_Element* element);
+int BE_UI_ToggleWindowFlag(int windowId, BE_UI_WindowFlags flag, int toggle);
+int BE_UI_SetActiveWindow(int windowId);
 SEC_CPP_SUPPORT_GUARD_END()
