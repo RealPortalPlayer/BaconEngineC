@@ -126,25 +126,35 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
     const char* commandName = BE_ArgumentManager_GetString(context.arguments, "command", NULL);
 
     if (commandName == NULL) {
-        int headerStatus = 0;
+        int commandId = 0;
 
-        SEC_LOGGER_INFO("Help:\n");
+        SEC_LOGGER_INFO("Help:\n"
+                        "    Engine Commands:\n");
 
-        for (int commandId = 0; commandId < BE_Console_GetCommandAmount(); commandId++) {
+        for (; commandId < BE_Console_GetCommandAmount(); commandId++) {
             BE_Command* command = BE_Console_GetCommands()[commandId];
+
+            if (!BE_Console_IsEngineCommand(*command))
+                break;
 
             if ((BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY) && !BE_ClientInformation_IsServerModeEnabled()) ||
                 (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
                 continue;
 
-            if (commandId > BE_Console_GetLastEngineCommandIndex() && headerStatus == 1)
-                headerStatus = 2;
+            BE_EngineCommands_HelpPrint(command);
+        }
 
-            if (headerStatus == 0 || headerStatus == 2) {
-                SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "    %s Commands:\n", headerStatus == 0 ? "Engine" : "Client");
+        if (commandId >= BE_Console_GetCommandAmount())
+            return;
 
-                headerStatus++;
-            }
+        SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "    Client Commands:\n");
+
+        for (; commandId < BE_Console_GetCommandAmount(); commandId++) {
+            BE_Command* command = BE_Console_GetCommands()[commandId];
+
+            if ((BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY) && !BE_ClientInformation_IsServerModeEnabled()) ||
+                (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
+                continue;
 
             BE_EngineCommands_HelpPrint(command);
         }
@@ -159,7 +169,7 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
         return;
     }
 
-    SEC_LOGGER_INFO("Help:\n    %s Command:\n", command->index <= BE_Console_GetLastEngineCommandIndex() ? "Engine" : "Client");
+    SEC_LOGGER_INFO("Help:\n    %s Command:\n", BE_Console_IsEngineCommand(*command) ? "Engine" : "Client");
     BE_EngineCommands_HelpPrint(command);
 }
 

@@ -24,7 +24,6 @@ typedef enum {
 typedef struct { // TODO: Client
     const char* fullInput;
     const char* unparsedArguments;
-    BE_DynamicArray userArguments;
     BE_DynamicDictionary arguments;
 } BE_Command_Context;
 
@@ -38,7 +37,6 @@ typedef struct {
     const char* description;
     BE_DynamicArray arguments;
     BE_Command_Flags flags;
-    int index;
     void (*Run)(BE_Command_Context context);
 } BE_Command;
 

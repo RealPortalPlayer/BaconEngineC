@@ -33,7 +33,7 @@ int BE_EntryPoint_ClientStart(int argc, char** argv) {
 
     InitializeTestLayers();
     BE_Command_Register("test", "Tests the command handler.", BE_COMMAND_FLAG_NULL,
-                                      (void (*)(BE_Command_Context)) &TestCommand);
+                        (void (*)(BE_Command_Context)) &TestCommand);
     {
         BE_Command_AddArgument("test", 0);
         BE_Command_AddArgument("test2", 0);
