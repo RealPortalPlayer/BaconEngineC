@@ -198,12 +198,18 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         int quotePosition = -1;
         int doubleQuote = 0;
         int escaped = 0;
+        int addedQuoted = 0;
         int added = 0;
 
         memset(argument, 0, 1024);
 
         for (int writer = 0; index < inputLength && current < command->arguments.used; index++) {
             added = 0;
+
+            if (input[index] == ' ' && addedQuoted) {
+                addedQuoted = 0;
+                continue;
+            }
 
             if (writer >= 1024) {
                 publish_argument:
@@ -246,6 +252,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
                 if (doubleQuote) {
                     quotePosition = -1;
                     doubleQuote = 0;
+                    addedQuoted = 1;
 
                     goto publish_argument;
                 }
