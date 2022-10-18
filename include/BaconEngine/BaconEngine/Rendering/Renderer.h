@@ -15,7 +15,7 @@ typedef enum {
     BE_RENDERER_TYPE_METAL,
     BE_RENDERER_TYPE_DIRECTX,
     BE_RENDERER_TYPE_SOFTWARE,
-    BE_RENDERER_TYPE_TEXT,
+    BE_RENDERER_TYPE_TEXT
 } BE_Renderer_Types;
 
 int BE_Renderer_GetCalls(void);

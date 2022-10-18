@@ -95,7 +95,7 @@ int BE_UI_IsWindowStillOpen(unsigned windowId) {
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
-    return uiWindow != NULL && (uiWindow->flags & BE_UI_WINDOW_FLAG_CLOSED) == 0;
+    return uiWindow != NULL && !BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_CLOSED);
 }
 
 BE_DynamicArray* BE_UI_GetWindowElements(unsigned windowId) {

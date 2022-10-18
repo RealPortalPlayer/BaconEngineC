@@ -8,6 +8,7 @@
 #include "BaconEngine/Console/Console.h"
 #include "EngineCommands.h"
 #include "PrivateConsole.h"
+#include "BaconEngine/Math/Bitwise.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 BE_DynamicArray beConsolePrivateCommands;
@@ -88,10 +89,12 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
                          "Flags: %i\n"
                          "Spot: %i/%i\n", name, description, flags, beConsoleCommands.used, beConsoleCommands.size);
 
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE((flags & BE_COMMAND_FLAG_SERVER_ONLY) == 0 || (flags & BE_COMMAND_FLAG_CLIENT_ONLY) == 0,
-                                        "Invalid command flags, cannot be both for server and client only\n");
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE((flags & BE_COMMAND_FLAG_CHEATS_ONLY) == 0 || (flags & BE_COMMAND_FLAG_CLIENT_ONLY) == 0,
-                                        "Invalid command flags, the client cannot run any cheat commands\n");
+    if (flags != BE_COMMAND_FLAG_NULL) {
+        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_SERVER_ONLY) || !BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY),
+                                            "Invalid command flags, cannot be both for server and client only\n");
+        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CHEATS_ONLY) || !BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY),
+                                            "Invalid command flags, the client cannot run any cheat commands\n");
+    }
 
     BE_PrivateConsole_Command* privateConsoleCommand = (BE_PrivateConsole_Command*) BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateConsole_Command), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
 
@@ -285,7 +288,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
             BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * 1024, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
     }
 
-    if ((command->flags & BE_COMMAND_FLAG_SERVER_ONLY) != 0) {
+    if (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY)) {
         // TODO: Kick client.
 
         if (!BE_ClientInformation_IsServerModeEnabled()) {
@@ -294,7 +297,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         }
     }
 
-    if ((command->flags & BE_COMMAND_FLAG_CLIENT_ONLY) != 0 && BE_ClientInformation_IsServerModeEnabled()) {
+    if (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()) {
         SEC_LOGGER_ERROR("This command can only be ran by a client\n"); // TODO: Kick client if the client is the one who ran it.
         goto destroy;
     }
