@@ -24,9 +24,17 @@ SEC_CPP_SUPPORT_GUARD_START()
 #ifdef BACON_ENGINE_LAUNCHER
 int CallLauncherMain(int argc, char** argv);
 
+#   if SEC_OPERATINGSYSTEM_WINDOWS
+#       define WIN32_LEAN_AND_MEAN
+#       include <Windows.h> // FIXME: I really don't want to include this in a header (especially a header like this one), but it seems like the only way.
+BOOL WINAPI WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR commandLine, int showCommand) {
+    return CallLauncherMain(__argc, __argv);
+}
+#   else
 int main(int argc, char** argv) {
     return CallLauncherMain(argc, argv);
 }
+#   endif
 #endif
 
 int BE_EntryPoint_ClientStart(int argc, char** argv);
