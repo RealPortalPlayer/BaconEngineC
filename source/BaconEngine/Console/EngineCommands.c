@@ -97,6 +97,10 @@ void BE_EngineCommands_Initialize(void) {
 }
 
 void BE_EngineCommands_HelpPrint(BE_Command* command) {
+    if ((BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY) && !BE_ClientInformation_IsServerModeEnabled()) ||
+        (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
+        return;
+
     SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "        %s", command->name);
     SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, " - ");
     SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "%s",
@@ -127,6 +131,7 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
 
     if (commandName == NULL) {
         int commandId = 0;
+        int showClient = 0;
 
         SEC_LOGGER_INFO("Help:\n"
                         "    Engine Commands:\n");
@@ -134,30 +139,25 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
         for (; commandId < BE_Console_GetCommandAmount(); commandId++) {
             BE_Command* command = BE_Console_GetCommands()[commandId];
 
-            if (!BE_Console_IsEngineCommand(*command))
-                break;
+            if (!BE_Console_IsEngineCommand(*command)) {
+                if ((BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY) && !BE_ClientInformation_IsServerModeEnabled()) ||
+                    (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
+                    continue;
 
-            if ((BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY) && !BE_ClientInformation_IsServerModeEnabled()) ||
-                (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
+                showClient++;
                 continue;
+            }
 
             BE_EngineCommands_HelpPrint(command);
         }
 
-        if (commandId >= BE_Console_GetCommandAmount())
+        if (commandId >= BE_Console_GetCommandAmount() || showClient == 0)
             return;
 
         SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "    Client Commands:\n");
 
-        for (; commandId < BE_Console_GetCommandAmount(); commandId++) {
-            BE_Command* command = BE_Console_GetCommands()[commandId];
-
-            if ((BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY) && !BE_ClientInformation_IsServerModeEnabled()) ||
-                (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
-                continue;
-
-            BE_EngineCommands_HelpPrint(command);
-        }
+        for (; commandId < BE_Console_GetCommandAmount(); commandId++)
+            BE_EngineCommands_HelpPrint(BE_Console_GetCommands()[commandId]);
 
         return;
     }
