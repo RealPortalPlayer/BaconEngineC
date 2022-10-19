@@ -19,7 +19,7 @@ int SEC_OSUser_IsAdmin(void) {
     SID_IDENTIFIER_AUTHORITY authority = SECURITY_NT_AUTHORITY;
     PSID adminGroup;
     int admin = AllocateAndInitializeSid(&authority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0,
-                                          0, 0, 0, &adminGroup);
+                                         0, 0, 0, &adminGroup);
 
     if (admin) {
         if (!CheckTokenMembership(NULL, adminGroup, &admin))

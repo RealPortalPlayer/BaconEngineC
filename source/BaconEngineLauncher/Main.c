@@ -4,12 +4,28 @@
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <SharedEngineCode/OSUser.h>
 
+#if SEC_OPERATINGSYSTEM_WINDOWS
+#   include <stdio.h>
+#   include <Windows.h>
+#endif
+
 SEC_CPP_SUPPORT_GUARD_START()
 int BE_EntryPoint_StartBaconEngine(int, char**);
 const char* BE_EntryPoint_GetClientName(void);
 
 int CallLauncherMain(int argc, char** argv) {
     SEC_ArgumentHandler_Initialize(argc, argv);
+
+#if SEC_OPERATINGSYSTEM_WINDOWS
+    FILE* consoleHandle;
+
+    if (SEC_ArgumentHandler_GetIndex(SEC_BUILTINARGUMENTS_SHOW_TERMINAL, 0) != -1 && AllocConsole()) {
+        SetConsoleTitle("BaconEngine");
+        freopen_s(&consoleHandle, "CONIN$", "r", stdin);
+        freopen_s(&consoleHandle, "CONOUT$", "w", stderr);
+        freopen_s(&consoleHandle, "CONOUT$", "w", stdout);
+    }
+#endif
 
     SEC_LOGGER_TRACE("Built on: %s\nBuilt for: %s\n", __TIMESTAMP__, SEC_OPERATINGSYSTEM_NAME);
 
@@ -32,6 +48,13 @@ int CallLauncherMain(int argc, char** argv) {
     int returnValue = BE_EntryPoint_StartBaconEngine(argc, argv);
 
     SEC_LOGGER_INFO("Goodbye\n");
+
+#if SEC_OPERATINGSYSTEM_WINDOWS
+    if (consoleHandle != NULL) {
+        fclose(consoleHandle);
+        FreeConsole();
+    }
+#endif
 
     return returnValue;
 }
