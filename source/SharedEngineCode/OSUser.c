@@ -3,7 +3,7 @@
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <unistd.h>
 #   include <pwd.h>
-#else
+#elif SEC_OPERATINGSYSTEM_WINDOWS
 #   define WIN32_LEAN_AND_MEAN
 #   include <Windows.h>
 #   include <Lmcons.h>
