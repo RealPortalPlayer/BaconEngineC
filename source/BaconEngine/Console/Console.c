@@ -266,7 +266,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
                 }
             }
 
-            if (input[index] == ' ' && quotePosition == -1)
+            if (input[index] == ' ' && quotePosition == -1 && !escaped)
                 goto publish_argument;
 
             argument[writer++] = input[index];
