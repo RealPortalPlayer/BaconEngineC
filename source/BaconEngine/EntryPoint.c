@@ -9,6 +9,7 @@
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <unistd.h>
 #   include <signal.h>
+#   include <fcntl.h>
 #elif SEC_OPERATINGSYSTEM_WINDOWS
 #   include <signal.h>
 #   include <io.h>
@@ -73,18 +74,34 @@ void BE_EntryPoint_SignalDetected(int signal) {
 }
 
 void* BE_EntryPoint_CommandThreadFunction(void* arguments) {
+    int printedCursor = 0;
+
+    fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
+
     while (BE_ClientInformation_IsRunning()) {
         if (BE_Console_GetCommandAmount() == 0)
             continue;
 
         char input[4024];
 
-        printf("%s ", BE_ClientInformation_IsCheatsEnabled() ? "#" : "$");
+        memset(input, 0, 4024);
+
+        if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT && !printedCursor) {
+            SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "%s ", BE_ClientInformation_IsCheatsEnabled() ? "#" : "$");
+
+            printedCursor = 1;
+        }
+
         fgets(input, sizeof(input), stdin);
 
         input[strcspn(input, "\n")] = '\0';
 
+        if (input[0] == '\0')
+            continue;
+
         BE_Console_ExecuteCommand(input);
+
+        printedCursor = 0;
     }
 
     return NULL;
@@ -204,6 +221,7 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
     BE_ASSERT(BE_EntryPoint_ClientShutdown() == 0, "Client shutdown returned non-zero\n");
     SEC_LOGGER_INFO("Waiting for thread shutdown (press CTRL+C if frozen)\n");
     pthread_join(commandThread, NULL);
+    SEC_LOGGER_DEBUG("Command thread ended\n");
     BE_PrivateLayer_DestroyLayers();
     BE_PrivateUI_Destroy();
     BE_PrivateConsole_Destroy();
