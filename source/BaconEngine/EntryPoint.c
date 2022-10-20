@@ -4,6 +4,7 @@
 #include <SharedEngineCode/Internal/OperatingSystem.h>
 #include <SharedEngineCode/ANSI.h>
 #include <SharedEngineCode/BuiltInArguments.h>
+#include <pthread.h>
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <unistd.h>
@@ -69,6 +70,24 @@ void BE_EntryPoint_SignalDetected(int signal) {
         default:
             break;
     }
+}
+
+void* BE_EntryPoint_CommandThreadFunction(void* arguments) {
+    while (BE_ClientInformation_IsRunning()) {
+        if (BE_Console_GetCommandAmount() == 0)
+            continue;
+
+        char input[4024];
+
+        printf("%s ", BE_ClientInformation_IsCheatsEnabled() ? "#" : "$");
+        fgets(input, sizeof(input), stdin);
+
+        input[strcspn(input, "\n")] = '\0';
+
+        BE_Console_ExecuteCommand(input);
+    }
+
+    return NULL;
 }
 
 int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
@@ -151,49 +170,40 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
         }
     }
 
+    SEC_LOGGER_INFO("Starting threads\n");
+
+    pthread_t commandThread;
+
+    pthread_create(&commandThread, NULL, &BE_EntryPoint_CommandThreadFunction, NULL);
+
     double deltaStart = 0;
 
     // TODO: Command running inside of terminal.
 
     while (BE_ClientInformation_IsRunning()) {
-        // TODO: Allow the client to enter commands outside of text mode.
-
-        if (BE_Renderer_GetCurrentType() != BE_RENDERER_TYPE_TEXT) {
-            if (!BE_Window_IsStillOpened()) {
-                BE_ClientInformation_StopRunning();
-                break;
-            }
-
-            BE_Renderer_ClearScreen();
-
-            double deltaNow = BE_SpecificPlatformFunctions_Get().GetTimer();
-            double deltaTime = deltaNow - deltaStart;
-
-            deltaStart = deltaNow;
-
-            BE_PrivateDeltaTime_Setter(deltaTime);
-            BE_PrivateLayer_OnUpdate(BE_LAYER_UPDATE_TYPE_BEFORE_RENDERING);
-            BE_SpecificPlatformFunctions_Get().rendererFunctions.Render();
-            BE_PrivateLayer_OnUpdate(BE_LAYER_UPDATE_TYPE_AFTER_RENDERING);
-            BE_SpecificPlatformFunctions_Get().windowFunctions.UpdateEvents();
-            continue;
+        if (!BE_Window_IsStillOpened()) {
+            BE_ClientInformation_StopRunning();
+            break;
         }
 
-        if (BE_Console_GetCommandAmount() == 0)
-            continue;
+        BE_Renderer_ClearScreen();
 
-        char input[4024];
+        double deltaNow = BE_SpecificPlatformFunctions_Get().GetTimer();
+        double deltaTime = deltaNow - deltaStart;
 
-        printf("%s ", BE_ClientInformation_IsCheatsEnabled() ? "#" : "$");
-        fgets(input, sizeof(input), stdin);
+        deltaStart = deltaNow;
 
-        input[strcspn(input, "\n")] = '\0';
-
-        BE_Console_ExecuteCommand(input);
+        BE_PrivateDeltaTime_Setter(deltaTime);
+        BE_PrivateLayer_OnUpdate(BE_LAYER_UPDATE_TYPE_BEFORE_RENDERING);
+        BE_SpecificPlatformFunctions_Get().rendererFunctions.Render();
+        BE_PrivateLayer_OnUpdate(BE_LAYER_UPDATE_TYPE_AFTER_RENDERING);
+        BE_SpecificPlatformFunctions_Get().windowFunctions.UpdateEvents();
     }
 
     SEC_LOGGER_TRACE("Client loop ended, shutting down\n");
     BE_ASSERT(BE_EntryPoint_ClientShutdown() == 0, "Client shutdown returned non-zero\n");
+    SEC_LOGGER_INFO("Waiting for thread shutdown (press CTRL+C if frozen)\n");
+    pthread_join(commandThread, NULL);
     BE_PrivateLayer_DestroyLayers();
     BE_PrivateUI_Destroy();
     BE_PrivateConsole_Destroy();
