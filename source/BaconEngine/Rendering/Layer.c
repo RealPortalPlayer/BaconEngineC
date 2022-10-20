@@ -7,6 +7,7 @@
 #include "EngineLayers.h"
 #include "../EngineMemory.h"
 #include "PrivateLayer.h"
+#include "BaconEngine/Rendering/Renderer.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 typedef struct {
@@ -108,6 +109,9 @@ int BE_Layer_Toggle(const char* name, int enable) {
 }
 
 void BE_PrivateLayer_OnUpdate(BE_Layer_UpdateTypes updateTypes) {
+    if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT)
+        return;
+
     for (int i = 0; i < beLayerArray.used; i++) {
         BE_Layer_Internal* layer = BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i);
 
