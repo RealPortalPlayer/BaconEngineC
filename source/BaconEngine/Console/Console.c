@@ -87,7 +87,7 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
                          "Name: %s\n"
                          "Description: %s\n"
                          "Flags: %i\n"
-                         "Spot: %i/%i\n", name, description, flags, beConsoleCommands.used, beConsoleCommands.size);
+                         "Spot: %i/%zu\n", name, description, flags, beConsoleCommands.used, beConsoleCommands.size);
 
     if (flags != BE_COMMAND_FLAG_NULL) {
         BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_SERVER_ONLY) || !BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY),
