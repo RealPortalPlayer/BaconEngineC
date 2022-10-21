@@ -1,3 +1,6 @@
+#include <string.h>
+#include <errno.h>
+
 #include "SharedEngineCode/Launcher.h"
 #include "SharedEngineCode/Internal/CppSupport.h"
 #include "SharedEngineCode/BuiltInArguments.h"
@@ -27,7 +30,11 @@
 
 SEC_CPP_SUPPORT_GUARD_START()
 void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration, const char* path) {
-    CHDIR(path);
+    if (CHDIR(path) != 0) {
+        configuration->code = SEC_LAUNCHER_ERROR_CODE_CHDIR;
+        configuration->errorMessage = strerror(errno);
+        return;
+    }
 
     configuration->clientBinary = GET_BINARY("./binary" BINARY_EXTENSION, RTLD_NOW);
 

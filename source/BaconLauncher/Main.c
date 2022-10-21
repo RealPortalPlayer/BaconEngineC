@@ -92,6 +92,16 @@ int main(int argc, char** argv) {
                 SEC_MessageBox_Display("Failed to get important methods", "Launcher - Fatal Error", SEC_MESSAGEBOX_ICON_ERROR, SEC_MESSAGEBOX_BUTTON_OK);
                 return 1;
 
+            case SEC_LAUNCHER_ERROR_CODE_CHDIR:
+#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
+                SEC_LOGGER_FATAL("Failed to set current directory: %s\n", configuration.errorMessage);
+#elif SEC_OPERATINGSYSTEM_WINDOWS
+                SEC_LOGGER_FATAL("Failed to set current directory: %i\n", configuration.code);
+#endif
+                SEC_MessageBox_Display("Failed to access client directory", "Launcher - Fatal Error", SEC_MESSAGEBOX_ICON_ERROR, SEC_MESSAGEBOX_BUTTON_OK);
+                return 1;
+
+
             default:
                 SEC_LOGGER_FATAL("Unknown error: %i\n", configuration.code);
                 SEC_MessageBox_Display("An unknown error occurred, perhaps your launcher is too old", "Launcher - Unknown Error", SEC_MESSAGEBOX_ICON_ERROR, SEC_MESSAGEBOX_BUTTON_OK);

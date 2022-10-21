@@ -13,7 +13,8 @@ typedef enum {
     SEC_LAUNCHER_ERROR_CODE_NULL, // No error.
     SEC_LAUNCHER_ERROR_CODE_BINARY, // Errored while opening binary file.
     SEC_LAUNCHER_ERROR_CODE_NAME_NULL, // Errored attempting to load the name method.
-    SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL // Errored attempting to load the entry point.
+    SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL, // Errored attempting to load the entry point.
+    SEC_LAUNCHER_ERROR_CODE_CHDIR // Errored while changing directories.
 } SEC_Launcher_ErrorCodes;
 
 typedef struct SEC_Launcher_Configuration {
