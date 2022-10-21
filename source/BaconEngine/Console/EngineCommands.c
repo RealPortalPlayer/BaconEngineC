@@ -8,6 +8,7 @@
 #include "BaconEngine/EngineMemoryInformation.h"
 #include "BaconEngine/Rendering/UI.h"
 #include "BaconEngine/Math/Bitwise.h"
+#include "BaconEngine/DeltaTime.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 void BE_EngineCommands_Help(BE_Command_Context context);
@@ -206,7 +207,8 @@ void BE_EngineCommands_Stop(void) {
 void BE_EngineCommands_DebugInfo(void) {
     BE_EngineMemory_MemoryInformation memoryInformation = BE_EngineMemory_GetMemoryInformation();
 
-    SEC_LOGGER_INFO("Command: %i/%i (%i realloc)\n"
+    SEC_LOGGER_INFO("DeltaTime: %f seconds (%f milliseconds)\n"
+                    "Command: %i/%i (%i realloc)\n"
                     "UI: %i rendered (%i/%i, %i realloc)\n"
                     "Layer: %i/%i (%i realloc)\n"
                     "Renderer: %i calls\n"
@@ -215,6 +217,7 @@ void BE_EngineCommands_DebugInfo(void) {
                     "    UI: %zu allocated, %zu bytes\n"
                     "    DynamicArray: %zu allocated, %zu bytes\n"
                     "    Layer: %zu allocated, %zu bytes\n",
+                    BE_DeltaTime_GetSeconds(), BE_DeltaTime_GetMilliseconds(),
                     BE_Console_GetCommandAmount(), BE_Console_GetAllocatedCommandsAmount(), BE_Console_GetCommandReallocationAmount(), // Command
                     BE_EngineLayers_GetUIWindowRenderCount(), BE_UI_GetWindowAmount(), BE_UI_GetAllocatedWindowsAmount(), BE_UI_GetWindowReallocationAmount(), // UI
                     BE_Layer_GetAmount(), BE_Layer_GetAllocatedLayersAmount(), BE_Layer_GetLayersReallocationAmount(), // Layer
