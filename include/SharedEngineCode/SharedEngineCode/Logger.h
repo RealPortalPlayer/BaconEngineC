@@ -20,7 +20,7 @@ typedef enum {
 
 SEC_Logger_LogLevels SEC_Logger_GetLogLevel(void);
 void SEC_Logger_SetLogLevel(SEC_Logger_LogLevels logLevel);
-void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLevel, const char* message, ...);
+void __attribute__((__format__(__printf__, 3, 4))) SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLevel, const char* message, ...);
 SEC_CPP_SUPPORT_GUARD_END()
 
 #define SEC_LOGGER_TRACE(...) SEC_Logger_LogImplementation(1, SEC_LOGGER_LOG_LEVEL_TRACE, __VA_ARGS__)
