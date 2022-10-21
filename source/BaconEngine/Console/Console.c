@@ -201,6 +201,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
     if (command->arguments.used != 0) {
         // TODO: This is dumb, figure out a way to do this without allocating memory.
         // TODO: Make the argument max length constant.
+        // FIXME: This causes a memory leak if the command stops the client.
         char* argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char) * 1024, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
         int current = 0;
         int quotePosition = -1;

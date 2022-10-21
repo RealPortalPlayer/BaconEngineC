@@ -76,7 +76,10 @@ void BE_EntryPoint_SignalDetected(int signal) {
 void* BE_EntryPoint_CommandThreadFunction(void* arguments) {
     int printedCursor = 0;
 
+    // FIXME: Find out why this is not working on Serenity.
+#if !SEC_OPERATINGSYSTEM_SERENITY
     fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
+#endif
 
     while (BE_ClientInformation_IsRunning()) {
         if (BE_Console_GetCommandAmount() == 0)
@@ -92,7 +95,7 @@ void* BE_EntryPoint_CommandThreadFunction(void* arguments) {
             printedCursor = 1;
         }
 
-        fgets(input, sizeof(input), stdin);
+        fgets(input, sizeof(input), stdin); // TODO: Arrow keys to go back in history.
 
         input[strcspn(input, "\n")] = '\0';
 
