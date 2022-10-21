@@ -235,11 +235,11 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
         BE_EngineMemory_MemoryInformation memoryInformation = BE_EngineMemory_GetMemoryInformation();
 
         SEC_LOGGER_WARN("Memory leak detected:\n"
-                        "Leaked: %lu bytes\n"
-                        "Command: %lu allocated, %lu bytes\n"
-                        "UI: %lu allocated, %lu bytes\n"
-                        "DynamicArray: %lu allocated, %lu bytes\n"
-                        "Layer: %lu allocated, %lu bytes\n",
+                        "Leaked: %zu bytes\n"
+                        "Command: %zu allocated, %zu bytes\n"
+                        "UI: %zu allocated, %zu bytes\n"
+                        "DynamicArray: %zu allocated, %zu bytes\n"
+                        "Layer: %zu allocated, %zu bytes\n",
                         BE_EngineMemory_GetAllocatedBytes(),
                         memoryInformation.command.allocatedAmount, memoryInformation.command.allocatedBytes,
                         memoryInformation.ui.allocatedAmount, memoryInformation.ui.allocatedBytes,

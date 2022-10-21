@@ -210,11 +210,11 @@ void BE_EngineCommands_DebugInfo(void) {
                     "UI: %i rendered (%i/%i, %i realloc)\n"
                     "Layer: %i/%i (%i realloc)\n"
                     "Renderer: %i calls\n"
-                    "Engine Memory: %lu bytes\n"
-                    "    Command: %lu allocated, %lu bytes\n"
-                    "    UI: %lu allocated, %lu bytes\n"
-                    "    DynamicArray: %lu allocated, %lu bytes\n"
-                    "    Layer: %lu allocated, %lu bytes\n",
+                    "Engine Memory: %zu bytes\n"
+                    "    Command: %zu allocated, %zu bytes\n"
+                    "    UI: %zu allocated, %zu bytes\n"
+                    "    DynamicArray: %zu allocated, %zu bytes\n"
+                    "    Layer: %zu allocated, %zu bytes\n",
                     BE_Console_GetCommandAmount(), BE_Console_GetAllocatedCommandsAmount(), BE_Console_GetCommandReallocationAmount(), // Command
                     BE_EngineLayers_GetUIWindowRenderCount(), BE_UI_GetWindowAmount(), BE_UI_GetAllocatedWindowsAmount(), BE_UI_GetWindowReallocationAmount(), // UI
                     BE_Layer_GetAmount(), BE_Layer_GetAllocatedLayersAmount(), BE_Layer_GetLayersReallocationAmount(), // Layer
