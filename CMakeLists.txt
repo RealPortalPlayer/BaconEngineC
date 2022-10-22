@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 project(BaconEngine C CXX)
 
-option(DISABLE_SDL "Don't include SDL." OFF)
-option(DISABLE_SDL_TTF "Don't include SDL TTF." OFF)
-
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -16,6 +13,7 @@ option(BE_DISABLE_METAL "Don't compile with Metal, does nothing for non-Apple op
 option(BE_DONT_STRIP "Don't remove debug information (no stripping)" OFF)
 option(BE_DONT_SET_BINARY_OUTPUT_PATH "Don't change the binary output path" OFF)
 option(BE_NO_ENGINE_COMMANDS "Disable every engine command" OFF)
+option(BE_NO_IDE_FOLDERS "Don't make any IDE folders" ON)
 
 message(STATUS "Adding dependencies")
 
@@ -51,6 +49,11 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT BE_DONT_STRIP)
     endif()
 endif()
 
+if(NOT BE_NO_IDE_FOLDERS)
+    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+    set_property(GLOBAL PROPERTY FOLDER "Dependencies")
+endif()
+
 if(NOT BE_DISABLE_OPENGL)
     find_package(OpenGL REQUIRED)
     set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -62,6 +65,10 @@ endif()
 
 if(NOT BE_DISABLE_METAL AND APPLE) # TODO: Metal
 #    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
+endif()
+
+if(NOT BE_NO_IDE_FOLDERS)
+    set_property(GLOBAL PROPERTY FOLDER "Official")
 endif()
 
 message(STATUS "Adding meta projects.")
@@ -79,6 +86,11 @@ if(NOT BE_DISABLE_OFFICIAL_PROJECTS)
 endif()
 
 if(NOT BE_DISABLE_TEST_PROJECTS)
+    if(NOT BE_NO_IDE_FOLDERS)
+        set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+        set_property(GLOBAL PROPERTY FOLDER "Tests")
+    endif()
+
     message(STATUS "Adding test projects.")
 
     add_subdirectory(test/TestGame)
