@@ -42,6 +42,7 @@ add_library(BaconEngine STATIC
         Console/PrivateConsole.h
         Rendering/PrivateRenderer.h
         Rendering/PrivateWindow.h
+        Server/PrivateServer.h
 
         # Source files
         Rendering/Window.c
@@ -67,7 +68,8 @@ add_library(BaconEngine STATIC
         Platform/TextMode/TextModeWindow.c
         DeltaTime.c
         Debugging/Assert.c
-        Debugging/StrictMode.c)
+        Debugging/StrictMode.c
+        Server/Server.c)
 
 if(NOT BE_DISABLE_OPENGL)
     set(BE_LIBRARIES glfw OpenGL::GL glad)

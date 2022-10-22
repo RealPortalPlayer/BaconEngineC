@@ -4,12 +4,14 @@
 #include <SharedEngineCode/Internal/OperatingSystem.h>
 #include <SharedEngineCode/ANSI.h>
 #include <SharedEngineCode/BuiltInArguments.h>
-#include <pthread.h>
+#include <errno.h>
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <unistd.h>
 #   include <signal.h>
 #   include <fcntl.h>
+#   include <pthread.h>
+#   include <netinet/in.h>
 #elif SEC_OPERATINGSYSTEM_WINDOWS
 #   include <signal.h>
 #   include <io.h>
@@ -30,6 +32,8 @@
 #include "Console/PrivateConsole.h"
 #include "Rendering/PrivateRenderer.h"
 #include "BaconEngine/Console/Console.h"
+#include "BaconEngine/Server/Server.h"
+#include "Server/PrivateServer.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 int BE_EntryPoint_ClientStart(int argc, char** argv);
@@ -110,6 +114,30 @@ void* BE_EntryPoint_CommandThreadFunction(void* arguments) {
     return NULL;
 }
 
+void* BE_EntryPoint_ServerThreadFunction(void* arguments) {
+    while (BE_ClientInformation_IsRunning()) {
+        struct sockaddr_in clientInterface;
+        socklen_t clientSize = sizeof(clientInterface);
+
+        int connectionDescriptor = accept(BE_PrivateServer_GetSocketDescriptor(), (struct sockaddr*)&clientInterface, &clientSize);
+
+        if (connectionDescriptor < 0) {
+            SEC_LOGGER_ERROR("Errored while client connecting: %s\n", strerror(errno));
+            continue;
+        }
+
+        if (fork() != 0) {
+            close(BE_PrivateServer_GetSocketDescriptor());
+            send(connectionDescriptor, "Hello, World!", 13, 0);
+            return NULL;
+        }
+
+        close(connectionDescriptor);
+    }
+
+    return NULL;
+}
+
 int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
     static int alreadyStarted = 0;
 
@@ -129,6 +157,10 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
     SEC_LOGGER_DEBUG("Registering signals\n");
     signal(SIGSEGV, BE_EntryPoint_SignalDetected);
     BE_PrivateRenderer_Initialize();
+
+    if (BE_ClientInformation_IsServerModeEnabled())
+        BE_Server_Start(5000); // TODO: Custom port number.
+
     BE_PrivateLayer_InitializeLayers();
 
     if (!BE_ClientInformation_IsServerModeEnabled() && BE_Renderer_GetCurrentType() != BE_RENDERER_TYPE_TEXT) {
@@ -193,8 +225,12 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
     SEC_LOGGER_INFO("Starting threads\n");
 
     pthread_t commandThread;
+    pthread_t serverThread;
 
     pthread_create(&commandThread, NULL, &BE_EntryPoint_CommandThreadFunction, NULL);
+
+    if (BE_ClientInformation_IsServerModeEnabled())
+        pthread_create(&serverThread, NULL, &BE_EntryPoint_ServerThreadFunction, NULL);
 
     double deltaStart = 0;
 
@@ -225,7 +261,17 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
     SEC_LOGGER_INFO("Waiting for thread shutdown (press CTRL+C if frozen)\n");
     pthread_join(commandThread, NULL);
     SEC_LOGGER_DEBUG("Command thread ended\n");
+
+    if (BE_ClientInformation_IsServerModeEnabled()) {
+        pthread_join(serverThread, NULL);
+        SEC_LOGGER_DEBUG("Server thread ended\n");
+    }
+
     BE_PrivateLayer_DestroyLayers();
+
+    if (BE_Server_IsRunning())
+        BE_Server_Stop();
+
     BE_PrivateUI_Destroy();
     BE_PrivateConsole_Destroy();
     BE_PrivateWindow_Destroy();
