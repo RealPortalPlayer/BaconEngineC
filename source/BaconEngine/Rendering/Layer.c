@@ -36,6 +36,9 @@ BE_Layer_Internal* BE_Layer_InternalGet(const char* name) {
 }
 
 void BE_PrivateLayer_InitializeLayers(void) {
+    if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT)
+        return;
+
     BE_ASSERT(!beLayerInitialized, "Already initialized the layer stack\n");
     SEC_LOGGER_INFO("Initializing layer stack\n");
 
@@ -47,6 +50,9 @@ void BE_PrivateLayer_InitializeLayers(void) {
 }
 
 void BE_Layer_Register(const char* name, int enabled, BE_Layer_Functions functions) {
+    if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT)
+        return;
+
     for (int i = 0; i < (int) beLayerArray.used; i++)
         BE_STRICTMODE_CHECK_NO_RETURN_VALUE(strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->publicLayer.name, name) != 0, "The layer '%s' is already registered\n", name);
 
@@ -158,6 +164,9 @@ int BE_Layer_IsToggled(const char* name) {
 }
 
 void BE_PrivateLayer_DestroyLayers(void) {
+    if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT)
+        return;
+
     BE_ASSERT(beLayerInitialized, "Layers are already destroyed\n");
     SEC_LOGGER_INFO("Destroying layer stack\n");
 
