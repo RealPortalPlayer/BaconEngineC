@@ -115,6 +115,8 @@ void* BE_EntryPoint_CommandThreadFunction(void* arguments) {
 }
 
 void* BE_EntryPoint_ServerThreadFunction(void* arguments) {
+    fcntl(BE_PrivateServer_GetSocketDescriptor(), F_SETFL, O_NONBLOCK);
+
     while (BE_ClientInformation_IsRunning()) {
         struct sockaddr_in clientInterface;
         socklen_t clientSize = sizeof(clientInterface);
@@ -122,6 +124,9 @@ void* BE_EntryPoint_ServerThreadFunction(void* arguments) {
         int connectionDescriptor = accept(BE_PrivateServer_GetSocketDescriptor(), (struct sockaddr*)&clientInterface, &clientSize);
 
         if (connectionDescriptor < 0) {
+            if (errno == EWOULDBLOCK)
+                continue;
+
             SEC_LOGGER_ERROR("Errored while client connecting: %s\n", strerror(errno));
             continue;
         }
