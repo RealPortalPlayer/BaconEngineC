@@ -3,7 +3,7 @@
 
 #pragma once
 
-#define BE_BITWISE_IS_BIT_SET(mainBit, compareBit) ((mainBit & compareBit) != 0)
+#define BE_BITWISE_IS_BIT_SET(mainBit, compareBit) ((mainBit & compareBit) == compareBit)
 #define BE_BITWISE_SET_BIT(mainBit, bit) mainBit |= bit
 #define BE_BITWISE_UNSET_BIT(mainBit, bit) mainBit &= ~bit
 #define BE_BITWISE_TOGGLE_BIT(mainBit, bit) \
