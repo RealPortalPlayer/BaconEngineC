@@ -9,6 +9,7 @@ BE_EngineMemory_MemoryInformation beEngineMemoryInformation = {
         {0, 0},
         {0, 0},
         {0, 0},
+        {0, 0},
         {0, 0}
 };
 
@@ -27,25 +28,18 @@ BE_EngineMemory_MemoryInformation BE_EngineMemory_GetMemoryInformation(void) {
 
 size_t BE_EngineMemory_GetAllocatedBytes(void) {
     return beEngineMemoryInformation.command.allocatedBytes + beEngineMemoryInformation.ui.allocatedBytes +
-           beEngineMemoryInformation.dynamicArray.allocatedBytes + beEngineMemoryInformation.layer.allocatedBytes;
+           beEngineMemoryInformation.dynamicArray.allocatedBytes + beEngineMemoryInformation.layer.allocatedBytes +
+           beEngineMemoryInformation.server.allocatedBytes;
 }
 
 BE_EngineMemory_MemoryTypeInformation* BE_EngineMemory_GetMemoryTypeInformation(BE_EngineMemory_MemoryType memoryType) {
     switch (memoryType) {
-        case BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND:
-            return &beEngineMemoryInformation.command;
-
-        case BE_ENGINEMEMORY_MEMORY_TYPE_UI:
-            return &beEngineMemoryInformation.ui;
-
-        case BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY:
-            return &beEngineMemoryInformation.dynamicArray;
-
-        case BE_ENGINEMEMORY_MEMORY_TYPE_LAYER:
-            return &beEngineMemoryInformation.layer;
-
-        default:
-            BE_ASSERT_ALWAYS("This shouldn't be reached\n");
+        case BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND:       return &beEngineMemoryInformation.command;
+        case BE_ENGINEMEMORY_MEMORY_TYPE_UI:            return &beEngineMemoryInformation.ui;
+        case BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY: return &beEngineMemoryInformation.dynamicArray;
+        case BE_ENGINEMEMORY_MEMORY_TYPE_LAYER:         return &beEngineMemoryInformation.layer;
+        case BE_ENGINEMEMORY_MEMORY_TYPE_SERVER:        return &beEngineMemoryInformation.server;
+        default: BE_ASSERT_ALWAYS("This shouldn't be reached\n");
     }
 }
 

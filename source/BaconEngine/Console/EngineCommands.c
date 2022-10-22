@@ -216,7 +216,8 @@ void BE_EngineCommands_DebugInfo(void) {
                     "    Command: %zu allocated, %zu bytes\n"
                     "    UI: %zu allocated, %zu bytes\n"
                     "    DynamicArray: %zu allocated, %zu bytes\n"
-                    "    Layer: %zu allocated, %zu bytes\n",
+                    "    Layer: %zu allocated, %zu bytes\n"
+                    "    Server: %zu allocated, %zu bytes\n",
                     BE_DeltaTime_GetSeconds(), BE_DeltaTime_GetMilliseconds(),
                     BE_Console_GetCommandAmount(), BE_Console_GetAllocatedCommandsAmount(), BE_Console_GetCommandReallocationAmount(), // Command
                     BE_EngineLayers_GetUIWindowRenderCount(), BE_UI_GetWindowAmount(), BE_UI_GetAllocatedWindowsAmount(), BE_UI_GetWindowReallocationAmount(), // UI
@@ -226,7 +227,8 @@ void BE_EngineCommands_DebugInfo(void) {
                     memoryInformation.command.allocatedAmount, memoryInformation.command.allocatedBytes, // Command memory
                     memoryInformation.ui.allocatedAmount, memoryInformation.ui.allocatedBytes, // UI memory
                     memoryInformation.dynamicArray.allocatedAmount, memoryInformation.dynamicArray.allocatedBytes, // DynamicArray memory
-                    memoryInformation.layer.allocatedAmount, memoryInformation.layer.allocatedBytes); // Layer memory
+                    memoryInformation.layer.allocatedAmount, memoryInformation.layer.allocatedBytes,
+                    memoryInformation.server.allocatedAmount, memoryInformation.server.allocatedBytes); // Layer memory
 }
 
 void BE_EngineCommands_Say(BE_Command_Context context) {

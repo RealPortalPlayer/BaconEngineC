@@ -17,6 +17,7 @@ typedef struct {
     BE_EngineMemory_MemoryTypeInformation ui;
     BE_EngineMemory_MemoryTypeInformation dynamicArray;
     BE_EngineMemory_MemoryTypeInformation layer;
+    BE_EngineMemory_MemoryTypeInformation server;
 } BE_EngineMemory_MemoryInformation;
 
 BE_EngineMemory_MemoryInformation BE_EngineMemory_GetMemoryInformation(void);

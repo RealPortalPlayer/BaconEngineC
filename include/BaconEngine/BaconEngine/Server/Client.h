@@ -3,6 +3,7 @@
 
 #pragma once
 
-//typedef struct {
-//
-//} BE_Client;
+typedef struct {
+    int clientId;
+    int clientDescriptor; // TODO: Make this private
+} BE_Client_Connected;

@@ -160,7 +160,7 @@ void BE_Command_DuplicatePrevious(const char* name, const char* description) {
 //    newCommand->duplicate = 1;
 }
 
-void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
+void BE_Console_ExecuteCommand(const char* input, BE_Client_Connected* client) {
     // Do not put any logs outside an if check.
     // We do not want to trick users into thinking something is part of the command.
 
@@ -294,21 +294,32 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
             BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * 1024, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
     }
 
-    if (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY)) {
-        // TODO: Kick client.
+    if (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAGS_RAN_ON_SERVER) && !BE_ClientInformation_IsServerModeEnabled()) {
+        // TODO: Send command packet to server
+        goto destroy;
+    }
 
+    if (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY)) {
         if (!BE_ClientInformation_IsServerModeEnabled()) {
             SEC_LOGGER_ERROR("This command can only be ran by the server\n");
+            goto destroy;
+        } else if (client != NULL) {
+            // TODO: Kick client: invalid packet (client doesn't send a command packet if command is server only)
             goto destroy;
         }
     }
 
     if (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()) {
-        SEC_LOGGER_ERROR("This command can only be ran by a client\n"); // TODO: Kick client if the client is the one who ran it.
+        if (client != NULL) {
+            // TODO: Kick client: invalid packet (client should never **ever** send a command packet if command is client only)
+            goto destroy;
+        }
+
+        SEC_LOGGER_ERROR("This command can only be ran by a client\n");
         goto destroy;
     }
 
-    if ((command->flags & BE_COMMAND_FLAG_CHEATS_ONLY) != 0 && !BE_ClientInformation_IsCheatsEnabled()) {
+    if (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CHEATS_ONLY) && !BE_ClientInformation_IsCheatsEnabled()) {
         // TODO: Tell client.
         SEC_LOGGER_ERROR("This command requires cheats to be enabled\n");
         goto destroy;
@@ -329,7 +340,7 @@ int BE_Console_IsEngineCommand(BE_Command command) {
 }
 
 void BE_PrivateConsole_Destroy(void) {
-    BE_ASSERT(beConsoleInitialized, "Console are not initialized\n");
+    BE_ASSERT(beConsoleInitialized, "Console is not initialized\n");
     SEC_LOGGER_INFO("Destroying console\n");
 
     beConsoleInitialized = 0;

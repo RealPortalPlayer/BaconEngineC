@@ -7,6 +7,7 @@
 
 #include "BaconEngine/Storage/DynamicDictionary.h"
 #include "ArgumentManager.h"
+#include "BaconEngine/Server/Client.h"
 
 // TODO: Validate that none of the commands go over this limit.
 
@@ -25,6 +26,12 @@ typedef struct { // TODO: Client
     const char* fullInput;
     const char* unparsedArguments;
     BE_DynamicDictionary arguments;
+
+    /**
+     * The client who ran the command.
+     * NULL when either the command was ran by the server, or the command is client only.
+     */
+    BE_Client_Connected* client;
 } BE_Command_Context;
 
 typedef struct {

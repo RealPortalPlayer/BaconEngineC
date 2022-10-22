@@ -7,4 +7,5 @@
 
 SEC_CPP_SUPPORT_GUARD_START()
 int BE_PrivateServer_GetSocketDescriptor(void);
+void BE_PrivateServer_AddConnection(int clientDescriptor);
 SEC_CPP_SUPPORT_GUARD_END()

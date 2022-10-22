@@ -106,7 +106,7 @@ void* BE_EntryPoint_CommandThreadFunction(void* arguments) {
         if (input[0] == '\0')
             continue;
 
-        BE_Console_ExecuteCommand(input);
+        BE_Console_ExecuteCommand(input, NULL);
 
         printedCursor = 0;
     }
@@ -133,7 +133,7 @@ void* BE_EntryPoint_ServerThreadFunction(void* arguments) {
 
         if (fork() != 0) {
             close(BE_PrivateServer_GetSocketDescriptor());
-            send(connectionDescriptor, "Hello, World!", 13, 0);
+            BE_PrivateServer_AddConnection(connectionDescriptor);
             return NULL;
         }
 
@@ -290,12 +290,14 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
                         "Command: %zu allocated, %zu bytes\n"
                         "UI: %zu allocated, %zu bytes\n"
                         "DynamicArray: %zu allocated, %zu bytes\n"
-                        "Layer: %zu allocated, %zu bytes\n",
+                        "Layer: %zu allocated, %zu bytes\n"
+                        "Server: %zu allocated, %zu bytes\n",
                         BE_EngineMemory_GetAllocatedBytes(),
                         memoryInformation.command.allocatedAmount, memoryInformation.command.allocatedBytes,
                         memoryInformation.ui.allocatedAmount, memoryInformation.ui.allocatedBytes,
                         memoryInformation.dynamicArray.allocatedAmount, memoryInformation.dynamicArray.allocatedBytes,
-                        memoryInformation.layer.allocatedAmount, memoryInformation.layer.allocatedBytes);
+                        memoryInformation.layer.allocatedAmount, memoryInformation.layer.allocatedBytes,
+                        memoryInformation.server.allocatedAmount, memoryInformation.server.allocatedBytes);
     }
 
     return 0;
