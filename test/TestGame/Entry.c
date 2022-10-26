@@ -1,3 +1,6 @@
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #include <BaconEngine/EntryPoint.h>
 #include <BaconEngine/Console/Console.h>
 #include <SharedEngineCode/Logger.h>

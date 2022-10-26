@@ -1,6 +1,9 @@
 // Purpose: Does some strict checking.
 // Created on: 7/29/22 @ 3:42 PM
 
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #include <SharedEngineCode/ArgumentHandler.h>
 #include <SharedEngineCode/Logger.h>
 #include <stdio.h>

@@ -1,3 +1,6 @@
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #include <stdlib.h>
 #include <string.h>
 

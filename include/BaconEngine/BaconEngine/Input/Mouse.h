@@ -1,6 +1,9 @@
 // Purpose: Every supported mouse related stuff.
 // Created on: 8/15/22 @ 10:29 PM
 
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>

@@ -1,3 +1,6 @@
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #include <BaconEngine/Rendering/Layer.h>
 #include <BaconEngine/Rendering/Renderer.h>
 #include <BaconEngine/Console/Console.h>

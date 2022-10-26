@@ -1,6 +1,9 @@
 // Purpose: Every supported keyboard key-code, and their char representation.
 // Created on: 8/15/22 @ 1:59 PM
 
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>

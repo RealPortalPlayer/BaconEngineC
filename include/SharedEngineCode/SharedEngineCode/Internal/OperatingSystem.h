@@ -1,6 +1,9 @@
 // Purpose: OS specific definitions.
 // Created on: 4/1/22 @ 7:25 PM
 
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #define SEC_OPERATINGSYSTEM_NAME "Unknown"

@@ -1,3 +1,6 @@
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #include <SharedEngineCode/Launcher.h>
 
 int main(int argc, char** argv) {

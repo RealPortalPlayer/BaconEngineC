@@ -1,6 +1,9 @@
 // Purpose: Secret layer initializer.
 // Created on: 10/8/22 @ 5:54 PM
 
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>

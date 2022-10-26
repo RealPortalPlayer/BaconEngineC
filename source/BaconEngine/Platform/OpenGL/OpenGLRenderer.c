@@ -1,3 +1,6 @@
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #include "SharedEngineCode/Internal/CppSupport.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"

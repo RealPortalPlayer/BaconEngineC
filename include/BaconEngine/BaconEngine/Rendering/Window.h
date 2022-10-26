@@ -1,6 +1,9 @@
 // Purpose: SDL window wrapper.
 // Created on: 3/31/22 @ 1:52 PM
 
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>

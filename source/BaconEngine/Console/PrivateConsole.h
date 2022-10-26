@@ -1,6 +1,9 @@
 // Purpose: Private console constructor.
 // Created on: 10/12/22 @ 1:30 AM
 
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>

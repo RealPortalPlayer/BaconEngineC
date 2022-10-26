@@ -1,6 +1,9 @@
 // Purpose: Simplify bitwise operations.
 // Created on: 9/12/22 @ 11:36 AM
 
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #define BE_BITWISE_IS_BIT_SET(mainBit, compareBit) ((mainBit & compareBit) == compareBit)

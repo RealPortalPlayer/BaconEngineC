@@ -1,3 +1,6 @@
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #include "SharedEngineCode/MessageBox.h"
 #include "SharedEngineCode/Internal/OperatingSystem.h"
 

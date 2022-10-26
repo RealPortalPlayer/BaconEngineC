@@ -1,6 +1,9 @@
 // Purpose: Renderer specific functions.
 // Created on: 9/14/22 @ 11:54 AM
 
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include "SharedEngineCode/Internal/CppSupport.h"

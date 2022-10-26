@@ -1,6 +1,9 @@
 // Purpose: Windows software renderer functions.
 // Created on: 10/9/22 @ 3:17 PM
 
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>

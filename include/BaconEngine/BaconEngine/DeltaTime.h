@@ -1,6 +1,9 @@
 // Purpose: Stores the current delta-time.
 // Created on: 10/11/22 @ 9:28 PM
 
+// Copyright (c) 2022, PortalPlayer
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>
