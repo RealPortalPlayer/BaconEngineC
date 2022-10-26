@@ -1,3 +1,6 @@
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #include <SharedEngineCode/Internal/CppSupport.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -13,7 +16,6 @@
 SEC_CPP_SUPPORT_GUARD_START()
 GLFWwindow* window;
 const char* windowTitle;
-// This is retarded.
 const BE_Keyboard_KeyCodes glToEngineCodes[GLFW_KEY_LAST + 1] = {
         BE_KEYBOARD_KEY_CODE_NULL, BE_KEYBOARD_KEY_CODE_NULL, BE_KEYBOARD_KEY_CODE_NULL,
         BE_KEYBOARD_KEY_CODE_NULL, BE_KEYBOARD_KEY_CODE_NULL, BE_KEYBOARD_KEY_CODE_NULL,

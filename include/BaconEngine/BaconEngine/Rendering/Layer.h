@@ -1,6 +1,9 @@
 // Purpose: Stores every layer.
 // Created on: 8/8/22 @ 3:36 PM
 
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>

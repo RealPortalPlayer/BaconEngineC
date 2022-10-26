@@ -1,3 +1,6 @@
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #include "SharedEngineCode/Internal/OperatingSystem.h"
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT

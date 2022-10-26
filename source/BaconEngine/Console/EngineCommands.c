@@ -1,3 +1,6 @@
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #include "BaconEngine/Debugging/Assert.h"
 #include "EngineCommands.h"
 #include "BaconEngine/Console/Console.h"

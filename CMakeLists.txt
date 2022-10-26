@@ -15,6 +15,33 @@ option(BE_DONT_SET_BINARY_OUTPUT_PATH "Don't change the binary output path" OFF)
 option(BE_NO_ENGINE_COMMANDS "Disable every engine command" OFF)
 option(BE_NO_IDE_FOLDERS "Don't make any IDE folders" ON)
 
+macro(engine_project)
+    cmake_parse_arguments(PARSED "STANDALONE" "NAME" "SOURCES" ${ARGN})
+
+    if(NOT PARSED_NAME)
+        message(FATAL_ERROR "Your client requires a name")
+    endif()
+
+    project("${PARSED_NAME}")
+
+    if(BE_SUPPORTS_SHARED_LIBS AND NOT PARSED_STANDALONE)
+        message(STATUS "Creating binary client: ${PARSED_NAME}")
+        add_library("${PARSED_NAME}" SHARED ${PARSED_SOURCES})
+        target_link_libraries("${PARSED_NAME}" LINK_PRIVATE BaconEngine)
+        set_target_properties("${PARSED_NAME}" PROPERTIES OUTPUT_NAME "binary")
+    else()
+        message(STATUS "Creating standalone client: ${PARSED_NAME}")
+        add_executable("${PARSED_NAME}" ${PARSED_SOURCES})
+        target_link_libraries("${PARSED_NAME}" LINK_PRIVATE BaconEngineLauncher)
+    endif()
+endmacro()
+
+get_cmake_property(BE_SUPPORTS_SHARED_LIBS TARGET_SUPPORTS_SHARED_LIBS)
+
+if(NOT BE_SUPPORTS_SHARED_LIBS)
+    message(WARNING "Your platform does not support shared libraries, defaulting to BaconEngineLauncher")
+endif()
+
 message(STATUS "Adding dependencies")
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT BE_DONT_STRIP)

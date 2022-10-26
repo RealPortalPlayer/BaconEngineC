@@ -1,6 +1,9 @@
 // Purpose: Private delta time setter.
 // Created on: 10/11/22 @ 9:30 PM
 
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>

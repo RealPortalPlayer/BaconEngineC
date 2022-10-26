@@ -1,6 +1,9 @@
 // Purpose: Stores a variable amount of elements.
 // Created on: 8/8/22 @ 3:50 PM
 
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include <stddef.h>

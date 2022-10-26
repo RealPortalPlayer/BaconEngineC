@@ -1,4 +1,7 @@
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
 #include "BaconEngine/Rendering/UI.h"
+
 #include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Debugging/Assert.h"
 #include "../EngineMemory.h"
@@ -9,7 +12,6 @@
 SEC_CPP_SUPPORT_GUARD_START()
 BE_DynamicArray beUIWindows;
 int beUIInitialized;
-//BE_PrivateUI_Window* beUIFullscreenWindow;
 BE_DynamicArray beUIRenderOrder;
 
 BE_PrivateUI_Window* BE_UI_GetWindowFromId(int windowId) {

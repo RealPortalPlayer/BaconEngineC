@@ -1,3 +1,6 @@
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #include <stddef.h>
 #include <string.h>
 
@@ -178,16 +181,26 @@ void BE_Console_ExecuteCommand(const char* input, BE_Client_Connected* client) {
     int index;
     int argumentStartingIndex;
 
-    for (index = 0; index < inputLength; index++) {
-        if (input[index] == ' ') {
-            index++;
-            break;
+    {
+        int trimmed = 0;
+        int writer = 0;
+
+        for (index = 0; index < inputLength; index++) {
+            if (input[index] == ' ') {
+                if (!trimmed)
+                    continue;
+
+                index++;
+                break;
+            }
+
+            if (index >= BE_COMMAND_MAX_NAME_LENGTH)
+                break;
+
+            trimmed = 1;
+            name[writer++] = input[index];
         }
 
-        if (index >= BE_COMMAND_MAX_NAME_LENGTH)
-            break;
-
-        name[index] = input[index];
     }
 
     command = BE_Console_GetCommand(name);
@@ -207,18 +220,19 @@ void BE_Console_ExecuteCommand(const char* input, BE_Client_Connected* client) {
         int quotePosition = -1;
         int doubleQuote = 0;
         int escaped = 0;
-        int addedQuoted = 0;
         int added = 0;
+        int trimmed = 0;
+        int quoteAdded = 0;
 
         memset(argument, 0, 1024);
 
         for (int writer = 0; index < inputLength && current < command->arguments.used; index++) {
             added = 0;
 
-            if (input[index] == ' ' && addedQuoted) {
-                addedQuoted = 0;
+            if (quoteAdded && input[index] == ' ')
                 continue;
-            }
+
+            quoteAdded = 0;
 
             if (writer >= 1024) {
                 publish_argument:
@@ -228,10 +242,14 @@ void BE_Console_ExecuteCommand(const char* input, BE_Client_Connected* client) {
 
                 argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char) * 1024, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
                 added = 1;
+                trimmed = 0;
 
                 memset(argument, 0, 1024);
                 continue;
             }
+
+            if (input[index] == ' ' && trimmed && quotePosition == -1 && !escaped)
+                goto publish_argument;
 
             if (input[index] == '\\' && !escaped) {
                 escaped = 1;
@@ -246,6 +264,7 @@ void BE_Console_ExecuteCommand(const char* input, BE_Client_Connected* client) {
 
                 if (!doubleQuote) {
                     quotePosition = -1;
+                    quoteAdded = 1;
 
                     goto publish_argument;
                 }
@@ -261,19 +280,19 @@ void BE_Console_ExecuteCommand(const char* input, BE_Client_Connected* client) {
                 if (doubleQuote) {
                     quotePosition = -1;
                     doubleQuote = 0;
-                    addedQuoted = 1;
+                    quoteAdded = 1;
 
                     goto publish_argument;
                 }
             }
 
-            if (input[index] == ' ' && quotePosition == -1 && !escaped)
-                goto publish_argument;
-
+            trimmed = 1;
             argument[writer++] = input[index];
+            // TODO: Should we throw a parse error if someone tries to escape a normal character, or should we just assume they meant to use a backslash
             escaped = 0;
         }
 
+        // FIXME: This doesn't trigger at times when it probably should
         if (quotePosition != -1) {
             SEC_LOGGER_ERROR("Parsing error: unescaped %s quote at %i\n", doubleQuote ? "double" : "single", quotePosition);
             goto destroy;

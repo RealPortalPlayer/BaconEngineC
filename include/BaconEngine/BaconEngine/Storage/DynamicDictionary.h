@@ -1,6 +1,9 @@
 // Purpose: Stores a variable amount of keys and values.
 // Created on: 8/15/22 @ 8:18 PM
 
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include <stddef.h>

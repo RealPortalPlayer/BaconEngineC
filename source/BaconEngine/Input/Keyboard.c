@@ -1,3 +1,6 @@
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #include "BaconEngine/Input/Keyboard.h"
 
 SEC_CPP_SUPPORT_GUARD_START()

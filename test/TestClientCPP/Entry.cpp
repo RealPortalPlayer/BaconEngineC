@@ -1,3 +1,6 @@
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #include <BaconEngine/EntryPoint.h>
 
 int BE_EntryPoint_ClientStart(int argc, char** argv) {

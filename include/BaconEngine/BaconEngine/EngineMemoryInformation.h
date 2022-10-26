@@ -1,6 +1,9 @@
 // Purpose: Get allocated engine memory information.
 // Created on: 9/9/22 @ 10:23 PM
 
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>

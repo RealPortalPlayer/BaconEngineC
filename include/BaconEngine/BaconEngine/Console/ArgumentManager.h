@@ -1,6 +1,9 @@
 // Purpose: Manages the arguments a user sends.
 // Created on: 8/7/22 @ 12:02 PM
 
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>

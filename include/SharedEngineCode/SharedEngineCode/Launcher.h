@@ -1,6 +1,9 @@
 // Purpose: Allows making launchers easier.
 // Created on: 3/28/22 @ 9:54 PM
 
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include <limits.h>

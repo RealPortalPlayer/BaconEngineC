@@ -1,6 +1,9 @@
 // Purpose: Stores and manages commands.
 // Created on: 8/7/22 @ 10:03 AM
 
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>

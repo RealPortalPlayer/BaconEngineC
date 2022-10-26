@@ -1,6 +1,9 @@
 // Purpose: Defines for every ANSI code.
 // Created on: 3/29/22 @ 11:27 AM
 
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include "Internal/CppSupport.h"

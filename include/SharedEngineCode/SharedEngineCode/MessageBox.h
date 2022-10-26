@@ -1,6 +1,9 @@
 // Purpose: Allows you to show a messagebox.
 // Created on: 10/18/22 @ 4:21 PM
 
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include "Internal/CppSupport.h"
