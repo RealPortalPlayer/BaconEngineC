@@ -1,7 +1,7 @@
 // Purpose: OS specific definitions.
 // Created on: 4/1/22 @ 7:25 PM
 
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once

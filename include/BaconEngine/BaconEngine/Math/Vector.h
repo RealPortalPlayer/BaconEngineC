@@ -1,7 +1,7 @@
 // Purpose: Vector structures.
 // Created on: 3/31/22 @ 1:55 PM
 
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once

@@ -1,7 +1,7 @@
 // Purpose: All the built-in engine UIs.
 // Created on: 8/11/22 @ 9:44 AM
 
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once

@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <SharedEngineCode/ArgumentHandler.h>

@@ -1,7 +1,7 @@
 // Purpose: OpenGL entry point.
 // Created on: 9/14/22 @ 11:53 AM
 
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once

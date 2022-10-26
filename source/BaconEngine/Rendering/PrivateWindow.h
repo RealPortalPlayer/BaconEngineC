@@ -1,7 +1,7 @@
 // Purpose: Window functions only to be called by the engine's entry point.
 // Created on: 9/13/22 @ 9:08 PM
 
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once

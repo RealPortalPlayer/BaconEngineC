@@ -1,7 +1,7 @@
 // Purpose: All the built-in engine layers.
 // Created on: 8/9/22 @ 7:28 PM
 
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once

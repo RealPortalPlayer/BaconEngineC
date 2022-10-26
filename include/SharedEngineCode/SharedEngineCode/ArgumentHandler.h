@@ -1,7 +1,7 @@
 // Purpose: Helps with argument handling.
 // Created on: 3/28/22 @ 9:21 PM
 
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once

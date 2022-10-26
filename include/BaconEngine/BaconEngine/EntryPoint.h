@@ -1,7 +1,7 @@
 // Purpose: The entry point for the game engine.
 // Created on: 3/29/22 @ 12:33 AM
 
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <SharedEngineCode/Internal/CppSupport.h>

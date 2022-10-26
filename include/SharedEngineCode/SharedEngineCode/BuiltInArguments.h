@@ -1,7 +1,7 @@
 // Purpose: Defines for all the built-in arguments.
 // Created on: 9/11/22 @ 12:40 AM
 
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once

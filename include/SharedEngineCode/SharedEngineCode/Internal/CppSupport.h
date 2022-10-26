@@ -1,7 +1,7 @@
 // Purpose: Simplifies a guard header that makes sure this should work with C++.
 // Created on: 7/29/22 @ 2:36 PM
 
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #ifdef __cplusplus

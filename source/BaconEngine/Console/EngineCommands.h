@@ -1,7 +1,7 @@
 // Purpose: All the built-in engine commands.
 // Created on: 8/7/22 @ 10:42 AM
 
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once

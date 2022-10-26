@@ -1,7 +1,7 @@
 // Purpose: Windows software entry-point.
 // Created on: 10/9/22 @ 3:10 PM
 
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once

@@ -1,7 +1,7 @@
 // Purpose: Makes logging easier.
 // Created on: 3/29/22 @ 2:01 AM
 
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once

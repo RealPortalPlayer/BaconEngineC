@@ -1,7 +1,7 @@
 // Purpose: No operation functions, for text mode/server mode.
 // Created on: 9/14/22 @ 1:03 PM
 
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once

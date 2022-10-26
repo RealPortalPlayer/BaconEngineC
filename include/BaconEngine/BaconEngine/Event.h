@@ -1,7 +1,7 @@
 // Purpose: An event.
 // Created on: 8/15/22 @ 4:57 PM
 
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once

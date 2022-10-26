@@ -1,7 +1,7 @@
 // Purpose: Private console constructor.
 // Created on: 10/12/22 @ 1:30 AM
 
-// Copyright (c) 2022, PortalPlayer
+// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
