@@ -86,12 +86,18 @@ if(NOT BE_NO_IDE_FOLDERS)
 endif()
 
 if(NOT BE_DISABLE_OPENGL)
-    find_package(OpenGL REQUIRED)
-    set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-    set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-    set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-    add_subdirectory(dependencies/glfw)
-    add_subdirectory(dependencies/glad)
+    find_package(OpenGL QUIET)
+
+    if(NOT OPENGL_FOUND)
+        message(WARNING "Failed to find OpenGL, disabling")
+        set(BE_DISABLE_OPENGL ON)
+    else()
+        set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+        set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+        set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+        add_subdirectory(dependencies/glfw)
+        add_subdirectory(dependencies/glad)
+    endif()
 endif()
 
 if(NOT BE_DISABLE_METAL AND APPLE) # TODO: Metal
@@ -118,7 +124,6 @@ endif()
 
 if(NOT BE_DISABLE_TEST_PROJECTS)
     if(NOT BE_NO_IDE_FOLDERS)
-        set_property(GLOBAL PROPERTY USE_FOLDERS ON)
         set_property(GLOBAL PROPERTY FOLDER "Tests")
     endif()
 
