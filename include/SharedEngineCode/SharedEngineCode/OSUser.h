@@ -7,8 +7,9 @@
 #pragma once
 
 #include "Internal/CppSupport.h"
+#include "Internal/Boolean.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-int SEC_OSUser_IsAdmin(void);
+SEC_Boolean SEC_OSUser_IsAdmin(void);
 const char* SEC_OSUser_GetUsername(void);
 SEC_CPP_SUPPORT_GUARD_END()

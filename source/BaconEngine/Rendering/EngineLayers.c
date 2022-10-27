@@ -14,7 +14,7 @@
 
 SEC_CPP_SUPPORT_GUARD_START()
 int beEngineLayersRenderCount = 0;
-int beEngineLayersMovingUi = 0;
+SEC_Boolean beEngineLayersMovingUi = SEC_FALSE;
 BE_Vector_2I beEngineLayersMoveOffset;
 
 void BE_EngineLayers_UIRendering_OnUpdate(BE_Layer_UpdateTypes updateType);
@@ -22,11 +22,11 @@ int BE_EngineLayers_UIRendering_OnEvent(BE_Event event);
 int BE_EngineLayers_ConsoleOpener_OnEvent(BE_Event event);
 
 void BE_EngineLayers_Initialize(void) {
-    static int initialized = 0;
+    static SEC_Boolean initialized = SEC_FALSE;
 
     BE_ASSERT(!initialized, "Engine layers are already initialized\n");
 
-    initialized = 1;
+    initialized = SEC_TRUE;
 
     static int disableUIRendering = -1;
 
@@ -41,7 +41,7 @@ void BE_EngineLayers_Initialize(void) {
     if (disableUIRendering)
         return;
 
-    BE_Layer_Register("BE_UIRendering", 1, (BE_Layer_Functions) {
+    BE_Layer_Register("BE_UIRendering", SEC_TRUE, (BE_Layer_Functions) {
         .OnUpdate = &BE_EngineLayers_UIRendering_OnUpdate,
         .OnEvent = &BE_EngineLayers_UIRendering_OnEvent
     });
@@ -51,13 +51,12 @@ int BE_EngineLayers_GetUIWindowRenderCount(void) {
     return beEngineLayersRenderCount;
 }
 
-int BE_EngineLayers_ConsoleOpener_OnEvent(BE_Event event) {
+SEC_Boolean BE_EngineLayers_ConsoleOpener_OnEvent(BE_Event event) {
     if (event.type != BE_EVENT_TYPE_KEYBOARD_KEY_DOWN || event.keyboard.key != BE_KEYBOARD_KEY_CODE_BACKTICK)
-        return 0;
+        return SEC_FALSE;
 
-    BE_UI_ToggleWindowFlag(0, BE_UI_WINDOW_FLAG_CLOSED, 0);
-    // BE_UI_ToggleWindowClosed(0, 0);
-return 1;
+    BE_UI_ToggleWindowFlag(0, BE_UI_WINDOW_FLAG_CLOSED, SEC_FALSE);
+    return SEC_TRUE;
 }
 
 #define TITLE_COLORS (uiWindow->currentRenderPosition == 0 ? SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Color_4U, 60, 60, 60, 255) : SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Color_4U, 44, 44, 44, 255))
@@ -162,7 +161,7 @@ void BE_EngineLayers_UIRendering_OnUpdate(BE_Layer_UpdateTypes updateType) {
     }
 }
 
-int BE_EngineLayers_UIRendering_OnEvent(BE_Event event) {
+SEC_Boolean BE_EngineLayers_UIRendering_OnEvent(BE_Event event) {
     const BE_DynamicArray* renderOrder = BE_PrivateUI_GetRenderWindows();
 
 //        SDL_Point mousePoint = {
@@ -179,7 +178,7 @@ int BE_EngineLayers_UIRendering_OnEvent(BE_Event event) {
         switch (event.type) {
             case BE_EVENT_TYPE_MOUSE_BUTTON_DOWN:
                 if (event.mouse.button.which != BE_MOUSE_BUTTON_TYPE_LEFT)
-                    return 0;
+                    return SEC_FALSE;
 
 //              if (!SDL_PointInRect(&mousePoint, &(SDL_Rect) {uiWindow->position.x, uiWindow->position.y, (int) uiWindow->size.x, (int) uiWindow->size.y + 24}))
 //                  continue;
@@ -215,27 +214,27 @@ int BE_EngineLayers_UIRendering_OnEvent(BE_Event event) {
 //
 //                  beEngineLayersMovingUi = 0;
 //              }
-                return 1;
+                return SEC_TRUE;
 
             case BE_EVENT_TYPE_MOUSE_BUTTON_UP:
                 beEngineLayersMovingUi = event.mouse.button.which != BE_MOUSE_BUTTON_TYPE_LEFT;
-                return 1;
+                return SEC_TRUE;
 
             case BE_EVENT_TYPE_MOUSE_MOVED:
                 if (!beEngineLayersMovingUi)
                     continue;
 
                 uiWindow->position = (BE_Vector_2I) {
-                        (int) event.mouse.position.x - beEngineLayersMoveOffset.x,
-                        (int) event.mouse.position.y - beEngineLayersMoveOffset.y
+                    (int) event.mouse.position.x - beEngineLayersMoveOffset.x,
+                    (int) event.mouse.position.y - beEngineLayersMoveOffset.y
                 };
-                return 1;
+                return SEC_TRUE;
 
             default:
-                return 0;
+                return SEC_FALSE;
             }
         }
 
-        return 0;
+        return SEC_FALSE;
     }
 SEC_CPP_SUPPORT_GUARD_END()

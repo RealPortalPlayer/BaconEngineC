@@ -8,76 +8,75 @@
 #include "BaconEngine/Storage/DynamicDictionary.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-int BE_DynamicDictionary_UpdateFrozenState(BE_DynamicDictionary* dictionary) {
-    dictionary->frozen = dictionary->frozen || dictionary->keys.frozen || dictionary->values.frozen;
+SEC_Boolean BE_DynamicDictionary_UpdateFrozenState(BE_DynamicDictionary* dictionary) {
     dictionary->keys.frozen = dictionary->frozen;
     dictionary->values.frozen = dictionary->frozen;
     return dictionary->frozen;
 }
 
-int BE_DynamicDictionary_Create(BE_DynamicDictionary* dictionary, size_t size) {
+SEC_Boolean BE_DynamicDictionary_Create(BE_DynamicDictionary* dictionary, size_t size) {
     int returnValue = BE_DynamicArray_Create(&dictionary->keys, size) && BE_DynamicArray_Create(&dictionary->values, size);
 
-    dictionary->frozen = 0;
+    dictionary->frozen = SEC_FALSE;
     return returnValue;
 }
 
-int BE_DynamicDictionary_AddElementToStart(BE_DynamicDictionary* dictionary, void* key, void* value) {
+SEC_Boolean BE_DynamicDictionary_AddElementToStart(BE_DynamicDictionary* dictionary, void* key, void* value) {
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
-        return 0;
+        return SEC_FALSE;
 
     return BE_DynamicArray_AddElementToStart(&dictionary->keys, key) &&
            BE_DynamicArray_AddElementToStart(&dictionary->values, value);
 }
 
-int BE_DynamicDictionary_AddElementToLast(BE_DynamicDictionary* dictionary, void* key, void* value) {
+SEC_Boolean BE_DynamicDictionary_AddElementToLast(BE_DynamicDictionary* dictionary, void* key, void* value) {
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
-        return 0;
+        return SEC_FALSE;
 
     return BE_DynamicArray_AddElementToLast(&dictionary->keys, key) &&
            BE_DynamicArray_AddElementToLast(&dictionary->values, value);
 }
 
-int BE_DynamicDictionary_RemoveFirstElement(BE_DynamicDictionary* dictionary, int shift) {
+SEC_Boolean BE_DynamicDictionary_RemoveFirstElement(BE_DynamicDictionary* dictionary, int shift) {
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
-        return 0;
+        return SEC_FALSE;
 
     return BE_DynamicArray_RemoveFirstElement(&dictionary->keys, shift) &&
            BE_DynamicArray_RemoveFirstElement(&dictionary->values, shift);
 }
 
-int BE_DynamicDictionary_RemoveLastElement(BE_DynamicDictionary* dictionary) {
+SEC_Boolean BE_DynamicDictionary_RemoveLastElement(BE_DynamicDictionary* dictionary) {
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
-        return 0;
+        return SEC_FALSE;
 
     return BE_DynamicArray_RemoveLastElement(&dictionary->keys) &&
            BE_DynamicArray_RemoveLastElement(&dictionary->values);
 }
 
-int BE_DynamicDictionary_RemoveElementAt(BE_DynamicDictionary* dictionary, unsigned int index) {
+SEC_Boolean BE_DynamicDictionary_RemoveElementAt(BE_DynamicDictionary* dictionary, unsigned int index) {
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
-        return 0;
+        return SEC_FALSE;
 
     return BE_DynamicArray_RemoveElementAt(&dictionary->keys, index) &&
            BE_DynamicArray_RemoveElementAt(&dictionary->values, index);
 }
 
-int BE_DynamicDictionary_RemoveElementViaKey(BE_DynamicDictionary* dictionary, void* key, size_t elementSize) {
+SEC_Boolean BE_DynamicDictionary_RemoveElementViaKey(BE_DynamicDictionary* dictionary, void* key, size_t elementSize) {
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
-        return 0;
+        return SEC_FALSE;
 
     int index = BE_DynamicDictionary_GetElementIndexFromKey(*dictionary, key, elementSize);
 
-    return index != -1 ? BE_DynamicDictionary_RemoveElementAt(dictionary, index) : 0;
+    return index != -1 ? BE_DynamicDictionary_RemoveElementAt(dictionary, index) : SEC_FALSE;
 }
 
-int BE_DynamicDictionary_RemoveElementViaValue(BE_DynamicDictionary* dictionary, void* value, size_t elementSize) {
+SEC_Boolean BE_DynamicDictionary_RemoveElementViaValue(BE_DynamicDictionary* dictionary, void* value, size_t elementSize) {
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
-        return 0;
+        return SEC_FALSE;
 
     int index = BE_DynamicDictionary_GetElementIndexFromValue(*dictionary, value, elementSize);
 
-    return index != -1 ? BE_DynamicDictionary_RemoveElementAt(dictionary, index) : 0;
+    return index != -1 ? BE_DynamicDictionary_RemoveElementAt(dictionary, index) : SEC_FALSE;
 }
 
 int BE_DynamicDictionary_GetElementIndexFromKey(BE_DynamicDictionary dictionary, void* key, size_t elementSize) {

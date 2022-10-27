@@ -15,7 +15,7 @@ BE_EngineMemory_MemoryInformation beEngineMemoryInformation = {
         {0, 0}
 };
 
-int BE_EngineMemory_AllocDeallocLogsEnabled(void) {
+SEC_Boolean BE_EngineMemory_AllocDeallocLogsEnabled(void) {
     static int enabled = -1;
 
     if (enabled == -1)

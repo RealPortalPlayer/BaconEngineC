@@ -19,7 +19,7 @@ const char* ansiCodesCharArray[SEC_ANSI_CODE_SIZE] = {
     "\033[0;46m", "\033[0;47m", "\033[0;49m"
 };
 
-int SEC_ANSI_IsEnabled(void) {
+SEC_Boolean SEC_ANSI_IsEnabled(void) {
     static int enabled = -1;
 
     if (enabled == -1)

@@ -15,37 +15,37 @@ SEC_CPP_SUPPORT_GUARD_START() // UNTESTED: I'm not sure any of this works.
 typedef struct {
     BE_DynamicArray keys;
     BE_DynamicArray values;
-    int frozen;
+    SEC_Boolean frozen;
 } BE_DynamicDictionary;
 
-int BE_DynamicDictionary_Create(BE_DynamicDictionary* dictionary, size_t size);
-int BE_DynamicDictionary_AddElementToStart(BE_DynamicDictionary* dictionary, void* key, void* value);
-int BE_DynamicDictionary_AddElementToLast(BE_DynamicDictionary* dictionary, void* key, void* value);
+SEC_Boolean BE_DynamicDictionary_Create(BE_DynamicDictionary* dictionary, size_t size);
+SEC_Boolean BE_DynamicDictionary_AddElementToStart(BE_DynamicDictionary* dictionary, void* key, void* value);
+SEC_Boolean BE_DynamicDictionary_AddElementToLast(BE_DynamicDictionary* dictionary, void* key, void* value);
 
 /**
   * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
   */
-int BE_DynamicDictionary_RemoveFirstElement(BE_DynamicDictionary* dictionary, int shift);
+SEC_Boolean BE_DynamicDictionary_RemoveFirstElement(BE_DynamicDictionary* dictionary, SEC_Boolean shift);
 
 /**
   * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
   */
-int BE_DynamicDictionary_RemoveLastElement(BE_DynamicDictionary* dictionary);
+SEC_Boolean BE_DynamicDictionary_RemoveLastElement(BE_DynamicDictionary* dictionary);
 
 /**
     * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
     */
-int BE_DynamicDictionary_RemoveElementAt(BE_DynamicDictionary* dictionary, unsigned int index);
+SEC_Boolean BE_DynamicDictionary_RemoveElementAt(BE_DynamicDictionary* dictionary, unsigned int index);
 
 /**
   * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
   */
-int BE_DynamicDictionary_RemoveElementViaKey(BE_DynamicDictionary* dictionary, void* key, size_t elementSize);
+SEC_Boolean BE_DynamicDictionary_RemoveElementViaKey(BE_DynamicDictionary* dictionary, void* key, size_t elementSize);
 
 /**
   * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
   */
-int BE_DynamicDictionary_RemoveElementViaValue(BE_DynamicDictionary* dictionary, void* value, size_t elementSize);
+SEC_Boolean BE_DynamicDictionary_RemoveElementViaValue(BE_DynamicDictionary* dictionary, void* value, size_t elementSize);
 int BE_DynamicDictionary_GetElementIndexFromKey(BE_DynamicDictionary dictionary, void* key, size_t elementSize);
 int BE_DynamicDictionary_GetElementIndexFromValue(BE_DynamicDictionary dictionary, void* value, size_t elementSize);
 void* BE_DynamicDictionary_GetElementKeyViaValue(BE_DynamicDictionary dictionary, void* value, size_t elementSize);

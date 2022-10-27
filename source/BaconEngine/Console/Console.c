@@ -17,9 +17,9 @@ SEC_CPP_SUPPORT_GUARD_START()
 BE_DynamicArray beConsolePrivateCommands;
 BE_DynamicArray beConsoleCommands;
 BE_PrivateConsole_Command* beConsoleLastCommand;
-int beConsoleDuplicateCommand = 0;
-int beConsoleInitialized = 0;
-int beConsoleAddingEngineCommands = 1;
+SEC_Boolean beConsoleDuplicateCommand = SEC_FALSE;
+SEC_Boolean beConsoleInitialized = SEC_FALSE;
+SEC_Boolean beConsoleAddingEngineCommands = SEC_TRUE;
 
 BE_PrivateConsole_Command* BE_Console_GetPrivateCommand(const char* name) {
     static BE_PrivateConsole_Command* cachedCommand = NULL;
@@ -37,7 +37,7 @@ BE_PrivateConsole_Command* BE_Console_GetPrivateCommand(const char* name) {
         return foundCommand;
     }
 
-    return 0;
+    return NULL;
 }
 
 BE_Command** BE_Console_GetCommands(void) {
@@ -66,7 +66,7 @@ void BE_PrivateConsole_Initialize(void) {
     BE_ASSERT(!beConsoleInitialized, "Already initialized the console\n");
     SEC_LOGGER_INFO("Initializing console\n");
 
-    beConsoleInitialized = 1;
+    beConsoleInitialized = SEC_TRUE;
 
     BE_DynamicArray_Create(&beConsoleCommands, 100);
     BE_DynamicArray_Create(&beConsolePrivateCommands, 100);
@@ -76,7 +76,7 @@ void BE_PrivateConsole_Initialize(void) {
     BE_EngineCommands_Initialize();
 #endif
 
-    beConsoleAddingEngineCommands = 0;
+    beConsoleAddingEngineCommands = SEC_FALSE;
 }
 
 // TODO: Verify arguments
@@ -122,7 +122,7 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
     BE_DynamicArray_AddElementToLast(&beConsolePrivateCommands, (void*) privateConsoleCommand);
     BE_DynamicArray_AddElementToLast(&beConsoleCommands, (void*) &privateConsoleCommand->publicCommand);
 
-    beConsoleDuplicateCommand = 0;
+    beConsoleDuplicateCommand = SEC_FALSE;
 }
 
 void BE_Command_AddArgument(const char* name, int required) {
@@ -149,7 +149,7 @@ void BE_Command_DuplicatePrevious(const char* name, const char* description) {
                      "New description: %s\n", beConsoleLastCommand->publicCommand.name, beConsoleLastCommand->publicCommand.description, name,
                      description != NULL ? description : beConsoleLastCommand->publicCommand.description);
 
-    beConsoleDuplicateCommand = 1;
+    beConsoleDuplicateCommand = SEC_TRUE;
 
     BE_PrivateConsole_Command* lastCommand = beConsoleLastCommand;
 
@@ -182,7 +182,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
     int argumentStartingIndex;
 
     {
-        int trimmed = 0;
+        SEC_Boolean trimmed = SEC_FALSE;
         int writer = 0;
 
         for (index = 0; index < inputLength; index++) {
@@ -197,10 +197,9 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
             if (index >= BE_COMMAND_MAX_NAME_LENGTH)
                 break;
 
-            trimmed = 1;
+            trimmed = SEC_TRUE;
             name[writer++] = input[index];
         }
-
     }
 
     command = BE_Console_GetCommand(name);
@@ -218,21 +217,21 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         char* argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char) * 1024, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
         int current = 0;
         int quotePosition = -1;
-        int doubleQuote = 0;
-        int escaped = 0;
-        int added = 0;
-        int trimmed = 0;
-        int quoteAdded = 0;
+        SEC_Boolean doubleQuote = SEC_FALSE;
+        SEC_Boolean escaped = SEC_FALSE;
+        SEC_Boolean added = SEC_FALSE;
+        SEC_Boolean trimmed = SEC_FALSE;
+        SEC_Boolean quoteAdded = SEC_FALSE;
 
         memset(argument, 0, 1024);
 
         for (int writer = 0; index < inputLength && current < command->arguments.used; index++) {
-            added = 0;
+            added = SEC_FALSE;
 
             if (quoteAdded && input[index] == ' ')
                 continue;
 
-            quoteAdded = 0;
+            quoteAdded = SEC_FALSE;
 
             if (writer >= 1024) {
                 publish_argument:
@@ -241,8 +240,8 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
                 BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, current++)->name, argument);
 
                 argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char) * 1024, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
-                added = 1;
-                trimmed = 0;
+                added = SEC_TRUE;
+                trimmed = SEC_FALSE;
 
                 memset(argument, 0, 1024);
                 continue;
@@ -252,7 +251,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
                 goto publish_argument;
 
             if (input[index] == '\\' && !escaped) {
-                escaped = 1;
+                escaped = SEC_TRUE;
                 continue;
             }
 
@@ -264,7 +263,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
                 if (!doubleQuote) {
                     quotePosition = -1;
-                    quoteAdded = 1;
+                    quoteAdded = SEC_TRUE;
 
                     goto publish_argument;
                 }
@@ -273,23 +272,23 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
             if (input[index] == '"' && !escaped) {
                 if (quotePosition == -1) {
                     quotePosition = index;
-                    doubleQuote = 1;
+                    doubleQuote = SEC_TRUE;
                     continue;
                 }
 
                 if (doubleQuote) {
                     quotePosition = -1;
-                    doubleQuote = 0;
-                    quoteAdded = 1;
+                    doubleQuote = SEC_FALSE;
+                    quoteAdded = SEC_TRUE;
 
                     goto publish_argument;
                 }
             }
 
-            trimmed = 1;
+            trimmed = SEC_TRUE;
             argument[writer++] = input[index];
             // TODO: Should we throw a parse error if someone tries to escape a normal character, or should we just assume they meant to use a backslash
-            escaped = 0;
+            escaped = SEC_FALSE;
         }
 
         // FIXME: This doesn't trigger at times when it probably should
@@ -306,7 +305,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         if (argument[0] != '\0') {
             BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, current)->name, argument);
 
-            added = 1;
+            added = SEC_TRUE;
         }
 
         if (!added)
@@ -351,7 +350,7 @@ void BE_PrivateConsole_Destroy(void) {
     BE_ASSERT(beConsoleInitialized, "Console are not initialized\n");
     SEC_LOGGER_INFO("Destroying console\n");
 
-    beConsoleInitialized = 0;
+    beConsoleInitialized = SEC_FALSE;
 
     for (int commandId = 0; commandId < beConsoleCommands.used; commandId++) {
         BE_PrivateConsole_Command* command = BE_DYNAMICARRAY_GET_ELEMENT(BE_PrivateConsole_Command, beConsoleCommands, commandId);

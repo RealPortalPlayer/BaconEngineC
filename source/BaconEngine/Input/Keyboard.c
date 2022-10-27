@@ -43,17 +43,17 @@ char keyCodesCharArray[BE_KEYBOARD_KEY_CODE_SIZE] = {
     '0', '.'
 };
 
-int keysDown[BE_KEYBOARD_KEY_CODE_SIZE] = {0};
-int keysPressed[BE_KEYBOARD_KEY_CODE_SIZE] = {0};
+SEC_Boolean keysDown[BE_KEYBOARD_KEY_CODE_SIZE] = {SEC_FALSE};
+SEC_Boolean keysPressed[BE_KEYBOARD_KEY_CODE_SIZE] = {SEC_FALSE};
 
-void BE_Keyboard_SetKeyDown(BE_Keyboard_KeyCodes keyCode, int down) {
+void BE_Keyboard_SetKeyDown(BE_Keyboard_KeyCodes keyCode, SEC_Boolean down) {
     if (!BE_Keyboard_IsEngineKeyCodeValid(keyCode))
         return;
 
     keysDown[keyCode] = down;
 }
 
-void BE_Keyboard_SetKeyPressed(BE_Keyboard_KeyCodes keyCode, int pressed) {
+void BE_Keyboard_SetKeyPressed(BE_Keyboard_KeyCodes keyCode, SEC_Boolean pressed) {
     if (!BE_Keyboard_IsEngineKeyCodeValid(keyCode))
         return;
 
@@ -64,23 +64,23 @@ char BE_Keyboard_ConvertKeyCodeToChar(BE_Keyboard_KeyCodes keyCode) {
     return (char) (BE_Keyboard_IsEngineKeyCodeValid(keyCode) ? keyCodesCharArray[keyCode] : 0);
 }
 
-int BE_Keyboard_IsKeyDown(BE_Keyboard_KeyCodes keyCode) {
+SEC_Boolean BE_Keyboard_IsKeyDown(BE_Keyboard_KeyCodes keyCode) {
     return BE_Keyboard_IsEngineKeyCodeValid(keyCode) && keysDown[keyCode];
 }
 
-int BE_Keyboard_IsKeyPressed(BE_Keyboard_KeyCodes keyCode) {
+SEC_Boolean BE_Keyboard_IsKeyPressed(BE_Keyboard_KeyCodes keyCode) {
     return BE_Keyboard_IsEngineKeyCodeValid(keyCode) && keysPressed[keyCode];
 }
 
-int BE_Keyboard_IsKeyUp(BE_Keyboard_KeyCodes keyCode) {
+SEC_Boolean BE_Keyboard_IsKeyUp(BE_Keyboard_KeyCodes keyCode) {
     return BE_Keyboard_IsEngineKeyCodeValid(keyCode) && !keysDown[keyCode] && !keysPressed[keyCode];
 }
 
-int BE_Keyboard_IsEngineKeyCodeValid(BE_Keyboard_KeyCodes keyCode) {
-    return keyCode < BE_KEYBOARD_KEY_CODE_SIZE && ((int) keyCodesCharArray[keyCode]) != 1;
+SEC_Boolean BE_Keyboard_IsEngineKeyCodeValid(BE_Keyboard_KeyCodes keyCode) {
+    return keyCode < BE_KEYBOARD_KEY_CODE_SIZE && keyCodesCharArray[keyCode] != 1;
 }
 
-int BE_Keyboard_IsKeyCodeFromKeyPad(BE_Keyboard_KeyCodes keyCode) {
+SEC_Boolean BE_Keyboard_IsKeyCodeFromKeyPad(BE_Keyboard_KeyCodes keyCode) {
     return (keyCode >= BE_KEYBOARD_KEY_CODE_KP_NUM_LOCK && keyCode <= BE_KEYBOARD_KEY_CODE_KP_MINUS) ||
            (keyCode >= BE_KEYBOARD_KEY_CODE_KP_SEVEN && keyCode <= BE_KEYBOARD_KEY_CODE_KP_PLUS) ||
            (keyCode >= BE_KEYBOARD_KEY_CODE_KP_FOUR && keyCode <= BE_KEYBOARD_KEY_CODE_KP_SIX) ||

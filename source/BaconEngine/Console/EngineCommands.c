@@ -28,11 +28,11 @@ void BE_EngineCommands_Sudo(BE_Command_Context context);
 void BE_EngineCommands_Echo(BE_Command_Context context);
 
 void BE_EngineCommands_Initialize(void) {
-    static int initialized = 0;
+    static SEC_Boolean initialized = SEC_FALSE;
 
     BE_ASSERT(!initialized, "Engine commands are already initialized\n");
 
-    initialized = 1;
+    initialized = SEC_TRUE;
 
     BE_Command_Register("help", "Shows information about each command.", BE_COMMAND_FLAG_NULL,
                         &BE_EngineCommands_Help);
@@ -105,27 +105,27 @@ void BE_EngineCommands_HelpPrint(BE_Command* command) {
         (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
         return;
 
-    SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "        %s", command->name);
-    SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, " - ");
-    SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "%s",
+    SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "        %s", command->name);
+    SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, " - ");
+    SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "%s",
                                  command->description);
 
     if (command->flags != BE_COMMAND_FLAG_NULL)
-        SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_DEBUG, " - flags: %i",
+        SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_DEBUG, " - flags: %i",
                                      command->flags);
 
     for (int argumentId = 0; argumentId < command->arguments.used; argumentId++) {
         BE_Command_Argument* argument = BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, argumentId);
 
-        SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "%s", argumentId != 0 ? " " : " - args: ");
+        SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "%s", argumentId != 0 ? " " : " - args: ");
 
         if (argument->required)
-            SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "<%s>", argument->name);
+            SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "<%s>", argument->name);
         else
-            SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "[%s]", argument->name);
+            SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "[%s]", argument->name);
     }
 
-    SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "\n");
+    SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "\n");
 }
 
 void BE_EngineCommands_Help(BE_Command_Context context) {
@@ -162,7 +162,7 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
         if (commandIdClient == -1 || showClient == 0)
             return;
 
-        SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "    Client Commands:\n");
+        SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "    Client Commands:\n");
 
         for (; commandIdClient < BE_Console_GetCommandAmount(); commandIdClient++)
             BE_EngineCommands_HelpPrint(BE_Console_GetCommands()[commandIdClient]);
@@ -187,7 +187,7 @@ void BE_EngineCommands_Cheats(BE_Command_Context context) {
         return;
     }
 
-    int value = BE_ArgumentManager_GetBoolean(context.arguments, "toggle", 0);
+    SEC_Boolean value = BE_ArgumentManager_GetBoolean(context.arguments, "toggle", 0);
 
     if (BE_ClientInformation_IsCheatsEnabled() == value) {
         SEC_LOGGER_WARN("Cheats are already %s\n", BE_ClientInformation_IsCheatsEnabled() ? "enabled" : "disabled");

@@ -37,17 +37,17 @@
 SEC_CPP_SUPPORT_GUARD_START()
 int BE_EntryPoint_ClientStart(int argc, char** argv);
 int BE_EntryPoint_ClientShutdown(void);
-int BE_EntryPoint_ClientSupportsServer(void);
+SEC_Boolean BE_EntryPoint_ClientSupportsServer(void);
 const char* BE_EntryPoint_GetClientName(void);
 
 void BE_EntryPoint_SignalDetected(int signal) {
     switch (signal) {
         case SIGSEGV:
         {
-            static int antiDoubleSegfault = 0;
+            static SEC_Boolean antiDoubleSegfault = SEC_FALSE;
 
             if (SEC_Logger_GetLogLevel() > SEC_LOGGER_LOG_LEVEL_FATAL && !antiDoubleSegfault) {
-                antiDoubleSegfault = 1;
+                antiDoubleSegfault = SEC_TRUE;
 
                 if (SEC_ANSI_IsEnabled()) {
                     write(STDOUT_FILENO, SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_BOLD), 4);
@@ -77,7 +77,7 @@ void BE_EntryPoint_SignalDetected(int signal) {
 }
 
 void* BE_EntryPoint_CommandThreadFunction(void* arguments) {
-    int printedCursor = 0;
+    SEC_Boolean printedCursor = SEC_FALSE;
 
     // FIXME: Find out why this is not working on Serenity.
     // TODO: Find fcntl replacement for Windows.
@@ -94,9 +94,9 @@ void* BE_EntryPoint_CommandThreadFunction(void* arguments) {
         memset(input, 0, 4024);
 
         if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT && !printedCursor) {
-            SEC_Logger_LogImplementation(0, SEC_LOGGER_LOG_LEVEL_INFO, "%s ", BE_ClientInformation_IsCheatsEnabled() ? "#" : "$");
+            SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "%s ", BE_ClientInformation_IsCheatsEnabled() ? "#" : "$");
 
-            printedCursor = 1;
+            printedCursor = SEC_TRUE;
         }
 
         fgets(input, sizeof(input), stdin); // TODO: Arrow keys to go back in history.
@@ -108,20 +108,20 @@ void* BE_EntryPoint_CommandThreadFunction(void* arguments) {
 
         BE_Console_ExecuteCommand(input);
 
-        printedCursor = 0;
+        printedCursor = SEC_FALSE;
     }
 
     return NULL;
 }
 
 int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
-    static int alreadyStarted = 0;
+    static SEC_Boolean alreadyStarted = SEC_FALSE;
 
     SEC_ArgumentHandler_Initialize(argc, argv);
     BE_STRICTMODE_CHECK(!alreadyStarted, 1, "Reinitializing the engine is not supported\n");
     SEC_LOGGER_TRACE("Entered client code\n");
 
-    alreadyStarted = 1;
+    alreadyStarted = SEC_TRUE;
 
     SEC_LOGGER_INFO("Starting BaconEngine\n");
 

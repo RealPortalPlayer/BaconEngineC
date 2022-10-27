@@ -39,8 +39,8 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
         alwaysUseStdout = SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_ALWAYS_USE_STDOUT, SEC_BUILTINARGUMENTS_ALWAYS_USE_STDOUT_SHORT, 0);
 
     {
-        static int initialized = 0;
-        static int initializing = 0;
+        static SEC_Boolean initialized = SEC_FALSE;
+        static SEC_Boolean initializing = SEC_FALSE;
 
         if (!initialized) {
             SEC_ArgumentHandler_ShortResults results;
@@ -53,7 +53,7 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
                 abort();
             }
 
-            initializing = 1;
+            initializing = SEC_TRUE;
 
             if (SEC_ArgumentHandler_GetInfoWithShort(SEC_BUILTINARGUMENTS_LOG_LEVEL, SEC_BUILTINARGUMENTS_LOG_LEVEL_SHORT, 0, &results) != 0) {
                 if (SEC_StringExtension_CompareCaseless(*results.value, "null") == 0) // TODO: Tell the user if they specify a invalid log level.
@@ -70,15 +70,15 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
                     beLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_FATAL;
             }
 
-            initialized = 1;
-            initializing = 0;
+            initialized = SEC_TRUE;
+            initializing = SEC_FALSE;
         }
     }
 
     if (beLoggerCurrentLogLevel == SEC_LOGGER_LOG_LEVEL_NULL || logLevel > beLoggerCurrentLogLevel)
         return;
 
-    static int antiRecursiveLog = 0;
+    static SEC_Boolean antiRecursiveLog = SEC_FALSE;
     FILE* output = stdout;
 
     if (!alwaysUseStdout && (logLevel == SEC_LOGGER_LOG_LEVEL_ERROR || logLevel == SEC_LOGGER_LOG_LEVEL_FATAL))
@@ -92,7 +92,7 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
         abort();
     }
 
-    antiRecursiveLog = 1;
+    antiRecursiveLog = SEC_TRUE;
 
     if (includeHeader)
         switch (logLevel) {
@@ -133,6 +133,6 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
     vfprintf(output, message, arguments);
     va_end(arguments);
 
-    antiRecursiveLog = 0;
+    antiRecursiveLog = SEC_FALSE;
 }
 SEC_CPP_SUPPORT_GUARD_END()

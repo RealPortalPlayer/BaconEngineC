@@ -11,11 +11,11 @@
 
 SEC_CPP_SUPPORT_GUARD_START()
 void BE_EngineUIs_Initialize(void) {
-    static int initialized = 0;
+    static SEC_Boolean initialized = SEC_FALSE;
 
     BE_ASSERT(!initialized, "Engine UIs are already initialized\n");
 
-    initialized = 1;
+    initialized = SEC_TRUE;
 
     BE_UI_WindowFlags flags = BE_UI_WINDOW_FLAG_NO_MAXIMIZE | BE_UI_WINDOW_FLAG_NO_MINIMIZE;
 

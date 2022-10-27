@@ -52,11 +52,11 @@ BE_Vector_2I BE_Window_GetPosition(void) {
     return BE_SpecificPlatformFunctions_Get().windowFunctions.GetPosition();
 }
 
-int BE_Window_IsVisible(void) {
+SEC_Boolean BE_Window_IsVisible(void) {
     return BE_SpecificPlatformFunctions_Get().windowFunctions.IsVisible();
 }
 
-int BE_Window_IsStillOpened(void) {
+SEC_Boolean BE_Window_IsStillOpened(void) {
     return BE_SpecificPlatformFunctions_Get().windowFunctions.IsStillOpened();
 }
 
@@ -88,7 +88,7 @@ void BE_Window_SetYPosition(int newY) {
     BE_Window_SetPosition(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I, BE_Window_GetPosition().x, newY));
 }
 
-void BE_Window_SetVisibility(int visible) {
+void BE_Window_SetVisibility(SEC_Boolean visible) {
     BE_SpecificPlatformFunctions_Get().windowFunctions.SetVisibility(visible);
 }
 SEC_CPP_SUPPORT_GUARD_END()

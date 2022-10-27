@@ -16,12 +16,12 @@ SEC_CPP_SUPPORT_GUARD_START()
 typedef struct {
     BE_Layer publicLayer;
     BE_Layer_Functions functions;
-    int calledStart;
-    int enabled;
+    SEC_Boolean calledStart;
+    SEC_Boolean enabled;
 } BE_Layer_Internal;
 
 BE_DynamicArray beLayerArray;
-int beLayerInitialized = 0;
+SEC_Boolean beLayerInitialized = SEC_FALSE;
 
 int BE_Layer_NoOperation(void) {
     return 0;
@@ -45,14 +45,14 @@ void BE_PrivateLayer_InitializeLayers(void) {
     BE_ASSERT(!beLayerInitialized, "Already initialized the layer stack\n");
     SEC_LOGGER_INFO("Initializing layer stack\n");
 
-    beLayerInitialized = 1;
+    beLayerInitialized = SEC_TRUE;
 
     BE_DynamicArray_Create(&beLayerArray, 100);
     SEC_LOGGER_INFO("Registering engine layers\n");
     BE_EngineLayers_Initialize();
 }
 
-void BE_Layer_Register(const char* name, int enabled, BE_Layer_Functions functions) {
+void BE_Layer_Register(const char* name, SEC_Boolean enabled, BE_Layer_Functions functions) {
     if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT)
         return;
 
@@ -62,11 +62,11 @@ void BE_Layer_Register(const char* name, int enabled, BE_Layer_Functions functio
     BE_Layer_Internal* layer = (BE_Layer_Internal*) BE_EngineMemory_AllocateMemory(sizeof(BE_Layer_Internal), BE_ENGINEMEMORY_MEMORY_TYPE_LAYER);
 
     layer->publicLayer = (BE_Layer) {
-        1,
+        SEC_TRUE,
         name
     };
     layer->enabled = enabled;
-    layer->calledStart = 0;
+    layer->calledStart = SEC_FALSE;
     layer->functions.OnStart = functions.OnStart != NULL ? functions.OnStart : (void (*)(void)) &BE_Layer_NoOperation;
     layer->functions.OnUpdate = functions.OnUpdate != NULL ? functions.OnUpdate : (void (*)(BE_Layer_UpdateTypes)) &BE_Layer_NoOperation;
     layer->functions.OnToggle = functions.OnToggle != NULL ? functions.OnToggle : (void (*)(int)) &BE_Layer_NoOperation;
@@ -94,27 +94,27 @@ int BE_Layer_GetLayersReallocationAmount(void) {
     return beLayerInitialized ? beLayerArray.calledRealloc : 0;
 }
 
-int BE_Layer_Toggle(const char* name, int enable) {
+SEC_Boolean BE_Layer_Toggle(const char* name, SEC_Boolean enable) {
     BE_Layer_Internal* layer = BE_Layer_InternalGet(name);
 
     if (layer == NULL)
-        return 0;
+        return SEC_FALSE;
 
     if (!layer->calledStart) {
         layer->functions.OnStart();
 
-        layer->calledStart = 1;
+        layer->calledStart = SEC_TRUE;
     }
 
     if (layer->enabled == enable)
-        return 0;
+        return SEC_FALSE;
 
     SEC_LOGGER_DEBUG("%s %s\n", enable ? "Enabling" : "Disabling", name);
 
     layer->enabled = enable;
 
     layer->functions.OnToggle(enable); // FIXME: The layer could still be in the middle of an update/event.
-    return 1;
+    return SEC_TRUE;
 }
 
 void BE_PrivateLayer_OnUpdate(BE_Layer_UpdateTypes updateTypes) {
@@ -130,7 +130,7 @@ void BE_PrivateLayer_OnUpdate(BE_Layer_UpdateTypes updateTypes) {
         if (!layer->calledStart) {
             layer->functions.OnStart();
 
-            layer->calledStart = 1;
+            layer->calledStart = SEC_TRUE;
         }
 
         layer->functions.OnUpdate(updateTypes);
@@ -147,20 +147,20 @@ int BE_PrivateLayer_OnEvent(BE_Event event) {
         if (!layer->calledStart) {
             layer->functions.OnStart();
 
-            layer->calledStart = 1;
+            layer->calledStart = SEC_TRUE;
         }
 
         if (!layer->functions.OnEvent(event))
             continue;
 
         SEC_LOGGER_TRACE("%s layer stopped the event line\n", layer->publicLayer.name);
-        return 1;
+        return SEC_TRUE;
     }
 
-    return 0;
+    return SEC_FALSE;
 }
 
-int BE_Layer_IsToggled(const char* name) {
+SEC_Boolean BE_Layer_IsToggled(const char* name) {
     BE_Layer_Internal* layer = BE_Layer_InternalGet(name);
 
     return layer != NULL && layer->enabled;
@@ -173,7 +173,7 @@ void BE_PrivateLayer_DestroyLayers(void) {
     BE_ASSERT(beLayerInitialized, "Layers are already destroyed\n");
     SEC_LOGGER_INFO("Destroying layer stack\n");
 
-    beLayerInitialized = 0;
+    beLayerInitialized = SEC_FALSE;
 
     for (int i = 0; i < beLayerArray.used; i++) {
         BE_Layer_Internal* layer = BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i);

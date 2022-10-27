@@ -7,6 +7,7 @@
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>
+#include <SharedEngineCode/Internal/Boolean.h>
 
 SEC_CPP_SUPPORT_GUARD_START()
 typedef enum {
@@ -17,6 +18,6 @@ typedef enum {
     BE_MOUSE_BUTTON_TYPE_FORTH
 } BE_Mouse_ButtonType;
 
-void BE_Mouse_SetButtonDown(BE_Mouse_ButtonType button, int down);
-int BE_Mouse_IsButtonDown(BE_Mouse_ButtonType button);
+void BE_Mouse_SetButtonDown(BE_Mouse_ButtonType button, SEC_Boolean down);
+SEC_Boolean BE_Mouse_IsButtonDown(BE_Mouse_ButtonType button);
 SEC_CPP_SUPPORT_GUARD_END()

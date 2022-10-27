@@ -24,7 +24,7 @@ typedef struct BE_UI_Element {
     BE_UI_ElementFunctions functions;
     BE_Vector_2U position;
     BE_Vector_2U size;
-    int enabled;
+    SEC_Boolean enabled;
     BE_DynamicArray elements;
 } BE_UI_Element;
 
@@ -42,14 +42,14 @@ typedef enum {
 } BE_UI_WindowFlags;
 
 const char* BE_UI_GetWindowName(int windowId);
-int BE_UI_IsWindowStillOpen(int windowId);
+SEC_Boolean BE_UI_IsWindowStillOpen(int windowId);
 BE_DynamicArray* BE_UI_GetWindowElements(int windowId);
 int BE_UI_GetWindowAmount(void);
 int BE_UI_GetAllocatedWindowsAmount(void);
 int BE_UI_GetWindowReallocationAmount(void);
 
 int BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector_2I position, BE_Vector_2U size);
-int BE_UI_RegisterElement(int windowId, BE_UI_Element* element);
-int BE_UI_ToggleWindowFlag(int windowId, BE_UI_WindowFlags flag, int toggle);
-int BE_UI_SetActiveWindow(int windowId);
+SEC_Boolean BE_UI_RegisterElement(int windowId, BE_UI_Element* element);
+SEC_Boolean BE_UI_ToggleWindowFlag(int windowId, BE_UI_WindowFlags flag, SEC_Boolean toggle);
+SEC_Boolean BE_UI_SetActiveWindow(int windowId);
 SEC_CPP_SUPPORT_GUARD_END()

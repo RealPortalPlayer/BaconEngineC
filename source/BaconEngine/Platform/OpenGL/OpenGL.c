@@ -11,7 +11,7 @@
 #include "OpenGLRenderer.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-static int beOpenGLInitialized = 0;
+static SEC_Boolean beOpenGLInitialized = SEC_FALSE;
 
 void BE_OpenGL_Error(int error, const char* description) {
     SEC_LOGGER_ERROR("GLFW Error:\n"
@@ -52,13 +52,13 @@ void BE_OpenGL_Initialize(void) {
     BE_SpecificPlatformFunctions_SetDestroy(&BE_OpenGL_Destroy);
     BE_SpecificPlatformFunctions_SetGetTimer(&BE_OpenGL_GetTimer);
 
-    beOpenGLInitialized = 1;
+    beOpenGLInitialized = SEC_TRUE;
 }
 
 void BE_OpenGL_Destroy(void) {
     BE_ASSERT(beOpenGLInitialized, "Already destroyed OpenGL\n");
     glfwTerminate();
 
-    beOpenGLInitialized = 0;
+    beOpenGLInitialized = SEC_FALSE;
 }
 SEC_CPP_SUPPORT_GUARD_END()
