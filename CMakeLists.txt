@@ -36,19 +36,15 @@ macro(engine_project)
     endif()
 endmacro()
 
-get_cmake_property(BE_SUPPORTS_SHARED_LIBS TARGET_SUPPORTS_SHARED_LIBS)
-
-if(NOT BE_SUPPORTS_SHARED_LIBS)
-    message(WARNING "Your platform does not support shared libraries, defaulting to BaconEngineLauncher")
+if(MINGW OR MSYS)
+    message(FATAL_ERROR "MinGW is not a supported compiler")
 endif()
-
-message(STATUS "Adding dependencies")
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT BE_DONT_STRIP)
     message(STATUS "Binaries will not have any debug information")
 
     if("${CMAKE_C_COMPILER_ID}" STREQUAL "")
-        message(FATAL_ERROR "No C compiler specified (or your C compiler isn't configured correctly). This is a C project, so exiting now.")
+        message(FATAL_ERROR "No C compiler specified (or your C compiler isn't configured correctly), this is a C project, so exiting now")
     elseif(CMAKE_C_COMPILER_ID STREQUAL "AppleClang")
         message(STATUS "Stripping isn't support on AppleClang")
     elseif(CMAKE_C_COMPILER_ID STREQUAL "Clang")
@@ -76,6 +72,14 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT BE_DONT_STRIP)
     endif()
 endif()
 
+get_cmake_property(BE_SUPPORTS_SHARED_LIBS TARGET_SUPPORTS_SHARED_LIBS)
+
+if(NOT BE_SUPPORTS_SHARED_LIBS)
+    message(WARNING "Your platform does not support shared libraries, defaulting to BaconEngineLauncher")
+endif()
+
+message(STATUS "Adding dependencies")
+
 if(NOT BE_NO_IDE_FOLDERS)
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
     set_property(GLOBAL PROPERTY FOLDER "Dependencies")
@@ -98,7 +102,7 @@ if(NOT BE_NO_IDE_FOLDERS)
     set_property(GLOBAL PROPERTY FOLDER "Official")
 endif()
 
-message(STATUS "Adding meta projects.")
+message(STATUS "Adding meta projects")
 
 add_subdirectory(source/SharedEngineCode)
 add_subdirectory(source/BaconLauncher)
@@ -106,7 +110,7 @@ add_subdirectory(source/BaconEngine)
 add_subdirectory(source/BaconEngineLauncher)
 
 if(NOT BE_DISABLE_OFFICIAL_PROJECTS)
-    message(STATUS "Adding official engine clients.")
+    message(STATUS "Adding official engine clients")
 
     add_subdirectory(source/BaconEditor)
     add_subdirectory(source/BaconLauncherUI)
@@ -118,7 +122,7 @@ if(NOT BE_DISABLE_TEST_PROJECTS)
         set_property(GLOBAL PROPERTY FOLDER "Tests")
     endif()
 
-    message(STATUS "Adding test projects.")
+    message(STATUS "Adding test projects")
 
     add_subdirectory(test/TestGame)
     add_subdirectory(test/TestClientCPP)
