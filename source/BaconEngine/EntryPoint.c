@@ -80,7 +80,8 @@ void* BE_EntryPoint_CommandThreadFunction(void* arguments) {
     int printedCursor = 0;
 
     // FIXME: Find out why this is not working on Serenity.
-#if !SEC_OPERATINGSYSTEM_SERENITY
+    // TODO: Find fcntl replacement for Windows.
+#if !SEC_OPERATINGSYSTEM_SERENITY && !SEC_OPERATINGSYSTEM_WINDOWS
     fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
 #endif
 
