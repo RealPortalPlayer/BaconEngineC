@@ -7,7 +7,7 @@
 #include "BaconEngine/Debugging/Assert.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-int BE_Assert_CheckLogsEnabled(void) {
+SEC_Boolean BE_Assert_CheckLogsEnabled(void) {
     static int enabled = -1;
 
     if (enabled == -1)

@@ -13,8 +13,8 @@
 SEC_CPP_SUPPORT_GUARD_START()
 typedef struct {
     BE_Command publicCommand;
-    int engineCommand;
-    int duplicate;
+    SEC_Boolean engineCommand;
+    SEC_Boolean duplicate;
 } BE_PrivateConsole_Command;
 
 void BE_PrivateConsole_Initialize(void);

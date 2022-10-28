@@ -2,6 +2,7 @@
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include "SharedEngineCode/Internal/OperatingSystem.h"
+#include "SharedEngineCode/OSUser.h"
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <unistd.h>
@@ -9,13 +10,10 @@
 #elif SEC_OPERATINGSYSTEM_WINDOWS
 #   define WIN32_LEAN_AND_MEAN
 #   include <Windows.h>
-#   include <Lmcons.h>
 #endif
 
-#include "SharedEngineCode/Internal/CppSupport.h"
-
 SEC_CPP_SUPPORT_GUARD_START()
-int SEC_OSUser_IsAdmin(void) {
+SEC_Boolean SEC_OSUser_IsAdmin(void) {
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
     return getuid() == 0;
 #elif SEC_OPERATINGSYSTEM_WINDOWS

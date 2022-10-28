@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Internal/CppSupport.h"
+#include "Internal/Boolean.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 typedef enum {
@@ -49,6 +50,6 @@ typedef enum {
     SEC_ANSI_CODE_SIZE
 } SEC_ANSI_Codes;
 
-int SEC_ANSI_IsEnabled(void);
+SEC_Boolean SEC_ANSI_IsEnabled(void);
 const char* SEC_ANSI_ConvertCodeToString(SEC_ANSI_Codes ansi);
 SEC_CPP_SUPPORT_GUARD_END()

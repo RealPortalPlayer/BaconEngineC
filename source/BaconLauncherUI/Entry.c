@@ -18,8 +18,8 @@ int BE_EntryPoint_ClientShutdown(void) {
     return 0;
 }
 
-BE_ENTRYPOINT_EXPOSE_FUNC int BE_EntryPoint_ClientSupportsServer(void) {
-    return 0;
+BE_ENTRYPOINT_EXPOSE_FUNC SEC_Boolean BE_EntryPoint_ClientSupportsServer(void) {
+    return SEC_FALSE;
 }
 
 BE_ENTRYPOINT_EXPOSE_FUNC const char* BE_EntryPoint_GetClientName(void) {

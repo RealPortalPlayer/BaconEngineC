@@ -7,6 +7,7 @@
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>
+#include <SharedEngineCode/Internal/Boolean.h>
 
 #include "BaconEngine/Storage/DynamicDictionary.h"
 #include "ArgumentManager.h"
@@ -39,7 +40,7 @@ typedef struct { // TODO: Client
 
 typedef struct {
     const char* name;
-    int required;
+    SEC_Boolean required;
 } BE_Command_Argument;
 
 typedef struct {
@@ -54,6 +55,6 @@ typedef struct {
  * @return The ID for the command, -1 if failed to add.
  */
 void BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context));
-void BE_Command_AddArgument(const char* name, int required);
+void BE_Command_AddArgument(const char* name, SEC_Boolean required);
 void BE_Command_DuplicatePrevious(const char* name, const char* description);
 SEC_CPP_SUPPORT_GUARD_END()

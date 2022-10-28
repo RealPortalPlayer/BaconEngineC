@@ -10,7 +10,7 @@
 #include "WindowsRenderer.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-static int beWindowsInitialized = 0;
+static SEC_Boolean beWindowsInitialized = SEC_FALSE;
 
 double BE_Windows_GetTimer(void) {
     return GetTickCount();
@@ -18,6 +18,9 @@ double BE_Windows_GetTimer(void) {
 
 void BE_Windows_Initialize(void) {
     BE_ASSERT(!beWindowsInitialized, "Already initialized Windows\n");
+
+    beWindowsInitialized = SEC_TRUE;
+
     BE_SpecificPlatformFunctions_InitializeWindow(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions_Window,
         &BE_WindowsWindow_GetInternal,
         &BE_WindowsWindow_Create,

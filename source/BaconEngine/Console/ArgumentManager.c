@@ -35,7 +35,7 @@ int BE_ArgumentManager_GetInt(BE_DynamicDictionary arguments, const char* name, 
     return defaultValue;
 }
 
-int BE_ArgumentManager_GetBoolean(BE_DynamicDictionary arguments, const char* name, int defaultValue) {
+SEC_Boolean BE_ArgumentManager_GetBoolean(BE_DynamicDictionary arguments, const char* name, int defaultValue) {
     return BE_ArgumentManager_GetInt(arguments, name, defaultValue) >= 1;
 }
 

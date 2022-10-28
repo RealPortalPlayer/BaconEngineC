@@ -7,6 +7,7 @@
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>
+#include <SharedEngineCode/Internal/Boolean.h>
 
 SEC_CPP_SUPPORT_GUARD_START()
 typedef enum {
@@ -83,12 +84,12 @@ typedef enum {
     BE_KEYBOARD_KEY_CODE_KP_DELETE = BE_KEYBOARD_KEY_CODE_KP_PERIOD,     BE_KEYBOARD_KEY_CODE_KP_DOT = BE_KEYBOARD_KEY_CODE_KP_PERIOD
 } BE_Keyboard_KeyCodes;
 
-void BE_Keyboard_SetKeyDown(BE_Keyboard_KeyCodes keyCode, int down);
-void BE_Keyboard_SetKeyPressed(BE_Keyboard_KeyCodes keyCode, int pressed);
+void BE_Keyboard_SetKeyDown(BE_Keyboard_KeyCodes keyCode, SEC_Boolean down);
+void BE_Keyboard_SetKeyPressed(BE_Keyboard_KeyCodes keyCode, SEC_Boolean pressed);
 char BE_Keyboard_ConvertKeyCodeToChar(BE_Keyboard_KeyCodes keyCode);
-int BE_Keyboard_IsKeyDown(BE_Keyboard_KeyCodes keyCode);
-int BE_Keyboard_IsKeyPressed(BE_Keyboard_KeyCodes keyCode);
-int BE_Keyboard_IsKeyUp(BE_Keyboard_KeyCodes keyCode);
-int BE_Keyboard_IsEngineKeyCodeValid(BE_Keyboard_KeyCodes keyCode);
-int BE_Keyboard_IsKeyCodeFromKeyPad(BE_Keyboard_KeyCodes keyCode);
+SEC_Boolean BE_Keyboard_IsKeyDown(BE_Keyboard_KeyCodes keyCode);
+SEC_Boolean BE_Keyboard_IsKeyPressed(BE_Keyboard_KeyCodes keyCode);
+SEC_Boolean BE_Keyboard_IsKeyUp(BE_Keyboard_KeyCodes keyCode);
+SEC_Boolean BE_Keyboard_IsEngineKeyCodeValid(BE_Keyboard_KeyCodes keyCode);
+SEC_Boolean BE_Keyboard_IsKeyCodeFromKeyPad(BE_Keyboard_KeyCodes keyCode);
 SEC_CPP_SUPPORT_GUARD_END()

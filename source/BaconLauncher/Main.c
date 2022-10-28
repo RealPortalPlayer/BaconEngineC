@@ -22,7 +22,7 @@
 do {                                       \
     SEC_LOGGER_FATAL(message "\n");        \
     SEC_MessageBox_Display(message, "Launcher - Fatal Error", SEC_MESSAGEBOX_ICON_ERROR, SEC_MESSAGEBOX_BUTTON_OK); \
-} while (0)
+} while (SEC_FALSE)
 
 #if SEC_OPERATINGSYSTEM_WINDOWS
 BOOL WINAPI WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR commandLine, int showCommand) {

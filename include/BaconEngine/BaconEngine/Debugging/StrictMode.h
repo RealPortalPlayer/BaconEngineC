@@ -9,11 +9,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <SharedEngineCode/BuiltInArguments.h>
+#include <SharedEngineCode/Internal/Boolean.h>
 
 #include "BaconEngine/ClientInformation.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-int BE_StrictMode_CheckLogsEnabled(void);
+SEC_Boolean BE_StrictMode_CheckLogsEnabled(void);
 SEC_CPP_SUPPORT_GUARD_END()
 
 #define BE_STRICTMODE_CHECK(check, returnValue, ...) \
@@ -24,13 +25,13 @@ do {                                                 \
             SEC_Logger_LogLevels level = SEC_LOGGER_LOG_LEVEL_FATAL; \
             if (!BE_ClientInformation_IsStrictModeEnabled()) \
                 level = SEC_LOGGER_LOG_LEVEL_ERROR;  \
-            SEC_Logger_LogImplementation(1, level, "Strict Check Failed\nCode: %s\nMessage: ", #check); \
-            SEC_Logger_LogImplementation(0, level, __VA_ARGS__);  \
+            SEC_Logger_LogImplementation(SEC_TRUE, level, "Strict Check Failed\nCode: %s\nMessage: ", #check); \
+            SEC_Logger_LogImplementation(SEC_FALSE, level, __VA_ARGS__);  \
             if (BE_ClientInformation_IsStrictModeEnabled()) \
                 abort();                             \
             else                                     \
                 return returnValue;                  \
         }                                            \
-} while (0)
+} while (SEC_FALSE)
 
 #define BE_STRICTMODE_CHECK_NO_RETURN_VALUE(check, ...) BE_STRICTMODE_CHECK(check, , __VA_ARGS__)

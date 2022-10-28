@@ -25,19 +25,19 @@ void BE_DynamicArray_ReallocateArray(BE_DynamicArray* array) {
 }
 
 // TODO: Make a public one that does not use engine memory.
-int BE_DynamicArray_Create(BE_DynamicArray* array, size_t size) {
-    BE_STRICTMODE_CHECK(size != 0, 0, "Invalid size\n");
+SEC_Boolean BE_DynamicArray_Create(BE_DynamicArray* array, size_t size) {
+    BE_STRICTMODE_CHECK(size != 0, SEC_FALSE, "Invalid size\n");
 
     array->internalArray = (void**) BE_EngineMemory_AllocateMemory(sizeof(void*) * size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
     array->used = 0;
     array->size = size;
-    array->frozen = 0;
-    return 1;
+    array->frozen = SEC_FALSE;
+    return SEC_TRUE;
 }
 
-int BE_DynamicArray_AddElementToStart(BE_DynamicArray* array, void* element) {
+SEC_Boolean BE_DynamicArray_AddElementToStart(BE_DynamicArray* array, void* element) {
     if (array->frozen)
-        return 0;
+        return SEC_FALSE;
 
     BE_DynamicArray_ReallocateArray(array);
 
@@ -46,43 +46,43 @@ int BE_DynamicArray_AddElementToStart(BE_DynamicArray* array, void* element) {
 
     array->internalArray[0] = element;
     array->used++;
-    return 1;
+    return SEC_TRUE;
 }
 
-int BE_DynamicArray_AddElementToLast(BE_DynamicArray* array, void* element) {
+SEC_Boolean BE_DynamicArray_AddElementToLast(BE_DynamicArray* array, void* element) {
     if (array->frozen)
-        return 0;
+        return SEC_FALSE;
 
     BE_DynamicArray_ReallocateArray(array);
 
     array->internalArray[array->used++] = element;
 
-    return 1;
+    return SEC_TRUE;
 }
 
-int BE_DynamicArray_RemoveFirstElement(BE_DynamicArray* array, int shift) {
+SEC_Boolean BE_DynamicArray_RemoveFirstElement(BE_DynamicArray* array, SEC_Boolean shift) {
     if (array->used == 0 || array->frozen)
-        return 0;
+        return SEC_FALSE;
 
     if (!shift) {
         array->internalArray[0] = NULL;
-        return 1;
+        return SEC_TRUE;
     }
 
     return BE_DynamicArray_RemoveElementAt(array, 0);
 }
 
-int BE_DynamicArray_RemoveLastElement(BE_DynamicArray* array) {
+SEC_Boolean BE_DynamicArray_RemoveLastElement(BE_DynamicArray* array) {
     if (array->used == 0 || array->frozen)
-        return 0;
+        return SEC_FALSE;
 
     array->internalArray[--array->used] = NULL;
-    return 1;
+    return SEC_TRUE;
 }
 
-int BE_DynamicArray_RemoveElementAt(BE_DynamicArray* array, unsigned int index) {
+SEC_Boolean BE_DynamicArray_RemoveElementAt(BE_DynamicArray* array, unsigned int index) {
     if ((int) index >= array->used || array->frozen)
-        return 0;
+        return SEC_FALSE;
 
     BE_DynamicArray_ReallocateArray(array);
 
@@ -90,7 +90,7 @@ int BE_DynamicArray_RemoveElementAt(BE_DynamicArray* array, unsigned int index) 
         array->internalArray[id] = array->internalArray[id + 1];
 
     array->used--;
-    return 1;
+    return SEC_TRUE;
 }
 
 void BE_DynamicArray_Shrink(BE_DynamicArray* array) {

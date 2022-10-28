@@ -30,7 +30,7 @@ void BE_Renderer_SetClearColor(BE_Color_3U color) {
 
 // TODO: Make this private.
 void BE_PrivateRenderer_Initialize(void) {
-    static int initialized = 0;
+    static SEC_Boolean initialized = SEC_FALSE;
 
     BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized rendererFunctions\n");
 

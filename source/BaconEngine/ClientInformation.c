@@ -8,18 +8,18 @@
 #include "BaconEngine/ClientInformation.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-int beClientInformationRunning = 1;
-int beClientInformationCheats = 0;
+SEC_Boolean beClientInformationRunning = SEC_TRUE;
+SEC_Boolean beClientInformationCheats = SEC_FALSE;
 
-int BE_ClientInformation_IsRunning(void) {
+SEC_Boolean BE_ClientInformation_IsRunning(void) {
     return beClientInformationRunning;
 }
 
-int BE_ClientInformation_IsCheatsEnabled(void) {
+SEC_Boolean BE_ClientInformation_IsCheatsEnabled(void) {
     return beClientInformationCheats;
 }
 
-int BE_ClientInformation_IsServerModeEnabled(void) {
+SEC_Boolean BE_ClientInformation_IsServerModeEnabled(void) {
     static int enabled = -1;
 
     if (enabled == -1)
@@ -28,7 +28,7 @@ int BE_ClientInformation_IsServerModeEnabled(void) {
     return enabled;
 }
 
-int BE_ClientInformation_IsStrictModeEnabled(void) {
+SEC_Boolean BE_ClientInformation_IsStrictModeEnabled(void) {
     static int enabled = -1;
 
     if (enabled == -1)
@@ -43,10 +43,10 @@ void BE_ClientInformation_StopRunning(void) {
         return;
     }
 
-    beClientInformationRunning = 0;
+    beClientInformationRunning = SEC_FALSE;
 }
 
-void BE_ClientInformation_SetCheats(int enable) {
+void BE_ClientInformation_SetCheats(SEC_Boolean enable) {
     beClientInformationCheats = enable;
 }
 SEC_CPP_SUPPORT_GUARD_END()

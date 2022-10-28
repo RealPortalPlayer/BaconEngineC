@@ -14,6 +14,8 @@ option(BE_DONT_STRIP "Don't remove debug information (no stripping)" OFF)
 option(BE_DONT_SET_BINARY_OUTPUT_PATH "Don't change the binary output path" OFF)
 option(BE_NO_ENGINE_COMMANDS "Disable every engine command" OFF)
 option(BE_NO_IDE_FOLDERS "Don't make any IDE folders" ON)
+option(BE_IGNORE_ANTI_MINGW "Ignore the checks for MinGW, works best with BE_DISABLE_PEDANTIC_MODE" OFF)
+option(BE_DISABLE_PEDANTIC_MODE "Don't enable pedantic checks" OFF)
 
 macro(engine_project)
     cmake_parse_arguments(PARSED "STANDALONE" "NAME" "SOURCES" ${ARGN})
@@ -36,19 +38,19 @@ macro(engine_project)
     endif()
 endmacro()
 
-get_cmake_property(BE_SUPPORTS_SHARED_LIBS TARGET_SUPPORTS_SHARED_LIBS)
-
-if(NOT BE_SUPPORTS_SHARED_LIBS)
-    message(WARNING "Your platform does not support shared libraries, defaulting to BaconEngineLauncher")
+if(MINGW OR MSYS)
+    if(NOT BE_IGNORE_ANTI_MINGW)
+        message(FATAL_ERROR "MinGW is not a supported compiler")
+    else()
+        message(WARNING "MinGW is not supported, all issues from now on are invalid, you're on your own")
+    endif()
 endif()
-
-message(STATUS "Adding dependencies")
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT BE_DONT_STRIP)
     message(STATUS "Binaries will not have any debug information")
 
     if("${CMAKE_C_COMPILER_ID}" STREQUAL "")
-        message(FATAL_ERROR "No C compiler specified (or your C compiler isn't configured correctly). This is a C project, so exiting now.")
+        message(FATAL_ERROR "No C compiler specified (or your C compiler isn't configured correctly), this is a C project, so exiting now")
     elseif(CMAKE_C_COMPILER_ID STREQUAL "AppleClang")
         message(STATUS "Stripping isn't support on AppleClang")
     elseif(CMAKE_C_COMPILER_ID STREQUAL "Clang")
@@ -76,18 +78,32 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT BE_DONT_STRIP)
     endif()
 endif()
 
+get_cmake_property(BE_SUPPORTS_SHARED_LIBS TARGET_SUPPORTS_SHARED_LIBS)
+
+if(NOT BE_SUPPORTS_SHARED_LIBS)
+    message(WARNING "Your platform does not support shared libraries, defaulting to BaconEngineLauncher")
+endif()
+
+message(STATUS "Adding dependencies")
+
 if(NOT BE_NO_IDE_FOLDERS)
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
     set_property(GLOBAL PROPERTY FOLDER "Dependencies")
 endif()
 
 if(NOT BE_DISABLE_OPENGL)
-    find_package(OpenGL REQUIRED)
-    set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-    set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-    set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-    add_subdirectory(dependencies/glfw)
-    add_subdirectory(dependencies/glad)
+    find_package(OpenGL QUIET)
+
+    if(NOT OPENGL_FOUND)
+        message(WARNING "Failed to find OpenGL, disabling")
+        set(BE_DISABLE_OPENGL ON)
+    else()
+        set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+        set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+        set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+        add_subdirectory(dependencies/glfw)
+        add_subdirectory(dependencies/glad)
+    endif()
 endif()
 
 if(NOT BE_DISABLE_METAL AND APPLE) # TODO: Metal
@@ -98,7 +114,7 @@ if(NOT BE_NO_IDE_FOLDERS)
     set_property(GLOBAL PROPERTY FOLDER "Official")
 endif()
 
-message(STATUS "Adding meta projects.")
+message(STATUS "Adding meta projects")
 
 add_subdirectory(source/SharedEngineCode)
 add_subdirectory(source/BaconLauncher)
@@ -106,7 +122,7 @@ add_subdirectory(source/BaconEngine)
 add_subdirectory(source/BaconEngineLauncher)
 
 if(NOT BE_DISABLE_OFFICIAL_PROJECTS)
-    message(STATUS "Adding official engine clients.")
+    message(STATUS "Adding official engine clients")
 
     add_subdirectory(source/BaconEditor)
     add_subdirectory(source/BaconLauncherUI)
@@ -114,11 +130,10 @@ endif()
 
 if(NOT BE_DISABLE_TEST_PROJECTS)
     if(NOT BE_NO_IDE_FOLDERS)
-        set_property(GLOBAL PROPERTY USE_FOLDERS ON)
         set_property(GLOBAL PROPERTY FOLDER "Tests")
     endif()
 
-    message(STATUS "Adding test projects.")
+    message(STATUS "Adding test projects")
 
     add_subdirectory(test/TestGame)
     add_subdirectory(test/TestClientCPP)

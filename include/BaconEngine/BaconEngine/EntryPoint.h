@@ -6,6 +6,7 @@
 
 #include <SharedEngineCode/Internal/CppSupport.h>
 #include <SharedEngineCode/Internal/OperatingSystem.h>
+#include <SharedEngineCode/Internal/Boolean.h>
 
 #ifdef BACON_ENGINE_INCLUDED_ENTRY_POINT
 #   error You cannot include the entry point more than once.
@@ -43,7 +44,7 @@ int main(int argc, char** argv) {
 
 int BE_EntryPoint_ClientStart(int argc, char** argv);
 int BE_EntryPoint_ClientShutdown(void);
-BE_ENTRYPOINT_EXPOSE_FUNC int BE_EntryPoint_ClientSupportsServer(void);
+BE_ENTRYPOINT_EXPOSE_FUNC SEC_Boolean BE_EntryPoint_ClientSupportsServer(void);
 BE_ENTRYPOINT_EXPOSE_FUNC const char* BE_EntryPoint_GetClientName(void);
 int BE_EntryPoint_StartBaconEngine(int argc, char** argv);
 

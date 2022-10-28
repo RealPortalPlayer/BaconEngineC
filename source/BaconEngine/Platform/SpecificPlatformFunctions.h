@@ -6,7 +6,8 @@
 
 #pragma once
 
-#include "SharedEngineCode/Internal/CppSupport.h"
+#include <SharedEngineCode/Internal/CppSupport.h>
+#include <SharedEngineCode/Internal/Boolean.h>
 
 #include "BaconEngine/Math/Vector.h"
 #include "BaconEngine/Math/Color.h"
@@ -18,12 +19,12 @@ typedef struct {
     const char* (*GetTitle)(void);
     BE_Vector_2U (*GetSize)(void);
     BE_Vector_2I (*GetPosition)(void);
-    int (*IsVisible)(void);
-    int (*IsStillOpened)(void);
+    SEC_Boolean (*IsVisible)(void);
+    SEC_Boolean (*IsStillOpened)(void);
     void (*SetTitle)(const char* title);
     void (*SetSize)(BE_Vector_2U newSize);
     void (*SetPosition)(BE_Vector_2I position);
-    void (*SetVisibility)(int visible);
+    void (*SetVisibility)(SEC_Boolean visible);
     void (*CloseWindow)(void);
     void (*UpdateEvents)(void);
 } BE_SpecificPlatformFunctions_Window;

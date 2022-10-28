@@ -29,5 +29,5 @@ int BE_Console_GetAllocatedCommandsAmount(void);
  */
 int BE_Console_GetCommandReallocationAmount(void);
 void BE_Console_ExecuteCommand(const char* input, BE_Client_Connected* client); // TODO: Client
-int BE_Console_IsEngineCommand(BE_Command command);
+SEC_Boolean BE_Console_IsEngineCommand(BE_Command command);
 SEC_CPP_SUPPORT_GUARD_END()

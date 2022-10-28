@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Internal/CppSupport.h"
+#include "Internal/Boolean.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 typedef struct {
@@ -35,15 +36,15 @@ char** SEC_ArgumentHandler_GetVector(void);
 /**
   *  @return The index if the argument was found, -1 if not.
   */
-int SEC_ArgumentHandler_GetIndex(const char* argument, int ignoreDontParse);
+int SEC_ArgumentHandler_GetIndex(const char* argument, SEC_Boolean ignoreDontParse);
 
 /**
   * @return The value next to the argument if found, NULL if not.
   */
-char* SEC_ArgumentHandler_GetValue(const char* argument, int ignoreDontParse);
+char* SEC_ArgumentHandler_GetValue(const char* argument, SEC_Boolean ignoreDontParse);
 
-int SEC_ArgumentHandler_GetInfoWithShort(const char* argument, const char* shortArgument, int ignoreDontParse,
+int SEC_ArgumentHandler_GetInfoWithShort(const char* argument, const char* shortArgument, SEC_Boolean ignoreDontParse,
                                          SEC_ArgumentHandler_ShortResults* results);
 
-int SEC_ArgumentHandler_ContainsArgumentOrShort(const char* argument, const char* shortArgument, int ignoreDontParse);
+SEC_Boolean SEC_ArgumentHandler_ContainsArgumentOrShort(const char* argument, const char* shortArgument, SEC_Boolean ignoreDontParse);
 SEC_CPP_SUPPORT_GUARD_END()
