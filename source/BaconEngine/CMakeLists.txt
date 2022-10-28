@@ -38,7 +38,6 @@ add_library(BaconEngine STATIC
         Rendering/PrivateUI.h
         Platform/SpecificPlatformFunctions.h
         Platform/TextMode/TextMode.h
-        Platform/TextMode/TextModeWindow.h
         Rendering/PrivateLayer.h
         PrivateDeltaTime.h
         Console/PrivateConsole.h
@@ -66,7 +65,6 @@ add_library(BaconEngine STATIC
         Platform/SpecificPlatformFunctions.c
         ${BE_SOURCE_FILES}
         Platform/TextMode/TextMode.c
-        Platform/TextMode/TextModeWindow.c
         DeltaTime.c
         Debugging/Assert.c
         Debugging/StrictMode.c)

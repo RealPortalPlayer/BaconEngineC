@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "SharedEngineCode/Internal/CppSupport.h"
+#include <SharedEngineCode/Internal/CppSupport.h>
 
 SEC_CPP_SUPPORT_GUARD_START()
 void BE_OpenGL_Initialize(void);

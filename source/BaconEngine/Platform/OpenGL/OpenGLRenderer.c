@@ -1,12 +1,11 @@
 // Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include "SharedEngineCode/Internal/CppSupport.h"
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 #include "OpenGLRenderer.h"
-#include "../SpecificPlatformFunctions.h"
+#include "OpenGLWindow.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 BE_Color_3U clearColor;
@@ -102,7 +101,7 @@ BE_Color_3U BE_OpenGLRenderer_GetClearColor(void) {
 }
 
 void BE_OpenGLRenderer_Render(void) {
-    glfwSwapBuffers(BE_SpecificPlatformFunctions_Get().windowFunctions.GetInternalWindow());
+    glfwSwapBuffers(BE_OpenGLWindow_GetWindow());
 }
 
 void BE_OpenGLRenderer_DrawFilledRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U color) {

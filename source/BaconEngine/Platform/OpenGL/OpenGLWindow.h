@@ -12,7 +12,7 @@
 #include "BaconEngine/Math/Vector.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-void* BE_OpenGLWindow_GetInternal(void);
+void* BE_OpenGLWindow_GetWindow(void);
 void BE_OpenGLWindow_Create(const char* title, BE_Vector_2U size, int monitor);
 const char* BE_OpenGLWindow_GetTitle(void);
 BE_Vector_2U BE_OpenGLWindow_GetSize(void);

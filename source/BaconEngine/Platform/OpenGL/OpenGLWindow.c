@@ -1,7 +1,6 @@
 // Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include <SharedEngineCode/Internal/CppSupport.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <SharedEngineCode/Internal/OperatingSystem.h>
@@ -136,7 +135,7 @@ const BE_Keyboard_KeyCodes glToEngineCodes[GLFW_KEY_LAST + 1] = {
         BE_KEYBOARD_KEY_CODE_NULL
 };
 
-void* BE_OpenGLWindow_GetInternal(void) {
+void* BE_OpenGLWindow_GetWindow(void) {
     return window;
 }
 
