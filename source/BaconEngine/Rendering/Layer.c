@@ -14,7 +14,7 @@
 
 SEC_CPP_SUPPORT_GUARD_START()
 typedef struct {
-    BE_Layer publicLayer;
+    const char* name;
     BE_Layer_Functions functions;
     SEC_Boolean calledStart;
     SEC_Boolean enabled;
@@ -29,7 +29,7 @@ int BE_Layer_NoOperation(void) {
 
 BE_Layer_Internal* BE_Layer_InternalGet(const char* name) {
     for (int i = 0; i < (int) beLayerArray.used; i++) {
-        if (strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->publicLayer.name, name) != 0)
+        if (strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->name, name) != 0)
             continue;
 
         return beLayerArray.internalArray[i];
@@ -57,14 +57,11 @@ void BE_Layer_Register(const char* name, SEC_Boolean enabled, BE_Layer_Functions
         return;
 
     for (int i = 0; i < (int) beLayerArray.used; i++)
-        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->publicLayer.name, name) != 0, "The layer '%s' is already registered\n", name);
+        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->name, name) != 0, "The layer '%s' is already registered\n", name);
 
     BE_Layer_Internal* layer = (BE_Layer_Internal*) BE_EngineMemory_AllocateMemory(sizeof(BE_Layer_Internal), BE_ENGINEMEMORY_MEMORY_TYPE_LAYER);
 
-    layer->publicLayer = (BE_Layer) {
-        SEC_TRUE,
-        name
-    };
+    layer->name = name;
     layer->enabled = enabled;
     layer->calledStart = SEC_FALSE;
     layer->functions.OnStart = functions.OnStart != NULL ? functions.OnStart : (void (*)(void)) &BE_Layer_NoOperation;
@@ -74,12 +71,6 @@ void BE_Layer_Register(const char* name, SEC_Boolean enabled, BE_Layer_Functions
     layer->functions.OnStop = functions.OnStop != NULL ? functions.OnStop : (void (*)(void)) &BE_Layer_NoOperation;
 
     BE_DynamicArray_AddElementToLast(&beLayerArray, (void *) layer);
-}
-
-BE_Layer BE_Layer_Get(const char* name) {
-    BE_Layer_Internal* foundLayer = BE_Layer_InternalGet(name);
-
-    return foundLayer != NULL ? foundLayer->publicLayer : SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Layer, .valid = 0);
 }
 
 int BE_Layer_GetAmount(void) {
@@ -153,7 +144,7 @@ int BE_PrivateLayer_OnEvent(BE_Event event) {
         if (!layer->functions.OnEvent(event))
             continue;
 
-        SEC_LOGGER_TRACE("%s layer stopped the event line\n", layer->publicLayer.name);
+        SEC_LOGGER_TRACE("%s layer stopped the event line\n", layer->name);
         return SEC_TRUE;
     }
 
@@ -164,6 +155,10 @@ SEC_Boolean BE_Layer_IsToggled(const char* name) {
     BE_Layer_Internal* layer = BE_Layer_InternalGet(name);
 
     return layer != NULL && layer->enabled;
+}
+
+SEC_Boolean BE_Layer_Exists(const char* name) {
+    return BE_Layer_InternalGet(name) != NULL;
 }
 
 void BE_PrivateLayer_DestroyLayers(void) {
