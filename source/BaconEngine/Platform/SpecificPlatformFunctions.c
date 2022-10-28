@@ -30,4 +30,8 @@ void BE_SpecificPlatformFunctions_SetGetTimer(double (*GetTimer)(void)) {
 void BE_SpecificPlatformFunctions_InitializeRenderer(BE_SpecificPlatformFunctions_Renderer renderer) {
     rendererFunctions.rendererFunctions = renderer;
 }
+
+void BE_SpecificPlatformFunctions_InitializeInput(BE_SpecificPlatformFunctions_Input input) {
+    rendererFunctions.inputFunctions = input;
+}
 SEC_CPP_SUPPORT_GUARD_END()

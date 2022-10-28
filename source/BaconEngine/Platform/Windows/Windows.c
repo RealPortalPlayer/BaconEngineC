@@ -43,6 +43,7 @@ void BE_Windows_Initialize(void) {
         &BE_WindowsRenderer_Render,
         &BE_WindowsRenderer_DrawFilledRectangle
     ));
+    // TODO: Input
     BE_SpecificPlatformFunctions_SetDestroy(&BE_Windows_Destroy);
     BE_SpecificPlatformFunctions_SetGetTimer(&BE_Windows_GetTimer);
 }

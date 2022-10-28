@@ -11,6 +11,8 @@
 
 #include "BaconEngine/Math/Vector.h"
 #include "BaconEngine/Math/Color.h"
+#include "BaconEngine/Input/Keyboard.h"
+#include "BaconEngine/Input/Mouse.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 typedef struct {
@@ -38,8 +40,15 @@ typedef struct {
 } BE_SpecificPlatformFunctions_Renderer;
 
 typedef struct {
+    SEC_Boolean (*IsKeyDown)(BE_Keyboard_KeyCodes keyCode);
+    SEC_Boolean (*IsKeyPressed)(BE_Keyboard_KeyCodes keyCode);
+    SEC_Boolean (*IsMouseButtonDown)(BE_Mouse_ButtonType button);
+} BE_SpecificPlatformFunctions_Input;
+
+typedef struct {
     BE_SpecificPlatformFunctions_Window windowFunctions;
     BE_SpecificPlatformFunctions_Renderer rendererFunctions;
+    BE_SpecificPlatformFunctions_Input inputFunctions;
     void (*Destroy)(void);
     double (*GetTimer)(void);
 } BE_SpecificPlatformFunctions;
@@ -47,6 +56,7 @@ typedef struct {
 BE_SpecificPlatformFunctions BE_SpecificPlatformFunctions_Get(void);
 void BE_SpecificPlatformFunctions_InitializeWindow(BE_SpecificPlatformFunctions_Window functions);
 void BE_SpecificPlatformFunctions_InitializeRenderer(BE_SpecificPlatformFunctions_Renderer renderer);
+void BE_SpecificPlatformFunctions_InitializeInput(BE_SpecificPlatformFunctions_Input input);
 void BE_SpecificPlatformFunctions_SetDestroy(void (*Destroy)(void));
 void BE_SpecificPlatformFunctions_SetGetTimer(double (*GetTimer)(void));
 SEC_CPP_SUPPORT_GUARD_END()

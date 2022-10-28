@@ -6,11 +6,13 @@ if(NOT BE_DISABLE_OPENGL)
             Platform/OpenGL/OpenGL.h
             Platform/OpenGL/OpenGLWindow.h
             Platform/OpenGL/OpenGLRenderer.h
+            Platform/OpenGL/OpenGLInput.h
 
             # Source files
             Platform/OpenGL/OpenGL.c
             Platform/OpenGL/OpenGLWindow.c
-            Platform/OpenGL/OpenGLRenderer.c)
+            Platform/OpenGL/OpenGLRenderer.c
+            Platform/OpenGL/OpenGLInput.c)
 endif()
 
 if(WIN32)

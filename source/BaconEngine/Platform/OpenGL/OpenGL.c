@@ -9,6 +9,7 @@
 #include "BaconEngine/Debugging/Assert.h"
 #include "OpenGLWindow.h"
 #include "OpenGLRenderer.h"
+#include "OpenGLInput.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 static SEC_Boolean beOpenGLInitialized = SEC_FALSE;
@@ -48,6 +49,11 @@ void BE_OpenGL_Initialize(void) {
         &BE_OpenGLRenderer_GetClearColor,
         &BE_OpenGLRenderer_Render,
         &BE_OpenGLRenderer_DrawFilledRectangle
+    ));
+    BE_SpecificPlatformFunctions_InitializeInput(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions_Input,
+        &BE_OpenGLInput_IsKeyDown,
+        &BE_OpenGLInput_IsKeyPressed,
+        &BE_OpenGLInput_IsMouseDown
     ));
     BE_SpecificPlatformFunctions_SetDestroy(&BE_OpenGL_Destroy);
     BE_SpecificPlatformFunctions_SetGetTimer(&BE_OpenGL_GetTimer);
