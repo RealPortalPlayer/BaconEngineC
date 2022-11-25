@@ -1,8 +1,7 @@
 // Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include "SharedEngineCode/Internal/CppSupport.h"
-#include <stddef.h>
+#include <SharedEngineCode/Internal/CppSupport.h>
 
 #include "SpecificPlatformFunctions.h"
 

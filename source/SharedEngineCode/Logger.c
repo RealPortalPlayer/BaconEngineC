@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #include "SharedEngineCode/Logger.h"
 #include "SharedEngineCode/ANSI.h"
@@ -13,6 +14,7 @@
 
 SEC_CPP_SUPPORT_GUARD_START()
 SEC_Logger_LogLevels beLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_INFO;
+pthread_mutex_t beLoggerLock;
 
 SEC_Logger_LogLevels SEC_Logger_GetLogLevel(void) {
     return beLoggerCurrentLogLevel;
@@ -30,8 +32,6 @@ void SEC_Logger_SetLogLevel(SEC_Logger_LogLevels logLevel) {
     beLoggerCurrentLogLevel = logLevel;
 }
 
-// FIXME: This function is the opposite of thread safe. We need to fix that before making this engine multi-threaded.
-
 void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLevel, const char* message, ...) {
      static int alwaysUseStdout = -1;
 
@@ -43,6 +43,8 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
         static SEC_Boolean initializing = SEC_FALSE;
 
         if (!initialized) {
+            pthread_mutex_init(&beLoggerLock, NULL);
+
             SEC_ArgumentHandler_ShortResults results;
 
             if (initializing) {
@@ -75,8 +77,12 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
         }
     }
 
-    if (beLoggerCurrentLogLevel == SEC_LOGGER_LOG_LEVEL_NULL || logLevel > beLoggerCurrentLogLevel)
+    pthread_mutex_lock(&beLoggerLock);
+
+    if (beLoggerCurrentLogLevel == SEC_LOGGER_LOG_LEVEL_NULL || logLevel > beLoggerCurrentLogLevel) {
+        pthread_mutex_unlock(&beLoggerLock);
         return;
+    }
 
     static SEC_Boolean antiRecursiveLog = SEC_FALSE;
     FILE* output = stdout;
@@ -134,5 +140,7 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
     va_end(arguments);
 
     antiRecursiveLog = SEC_FALSE;
+
+    pthread_mutex_unlock(&beLoggerLock);
 }
 SEC_CPP_SUPPORT_GUARD_END()
