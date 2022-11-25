@@ -15,7 +15,7 @@ SEC_Boolean BE_DynamicDictionary_UpdateFrozenState(BE_DynamicDictionary* diction
 }
 
 SEC_Boolean BE_DynamicDictionary_Create(BE_DynamicDictionary* dictionary, size_t size) {
-    int returnValue = BE_DynamicArray_Create(&dictionary->keys, size) && BE_DynamicArray_Create(&dictionary->values, size);
+    SEC_Boolean returnValue = BE_DynamicArray_Create(&dictionary->keys, size) && BE_DynamicArray_Create(&dictionary->values, size);
 
     dictionary->frozen = SEC_FALSE;
     return returnValue;
@@ -37,7 +37,7 @@ SEC_Boolean BE_DynamicDictionary_AddElementToLast(BE_DynamicDictionary* dictiona
            BE_DynamicArray_AddElementToLast(&dictionary->values, value);
 }
 
-SEC_Boolean BE_DynamicDictionary_RemoveFirstElement(BE_DynamicDictionary* dictionary, int shift) {
+SEC_Boolean BE_DynamicDictionary_RemoveFirstElement(BE_DynamicDictionary* dictionary, SEC_Boolean shift) {
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
         return SEC_FALSE;
 

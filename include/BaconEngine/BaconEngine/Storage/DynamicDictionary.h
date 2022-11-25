@@ -33,8 +33,8 @@ SEC_Boolean BE_DynamicDictionary_RemoveFirstElement(BE_DynamicDictionary* dictio
 SEC_Boolean BE_DynamicDictionary_RemoveLastElement(BE_DynamicDictionary* dictionary);
 
 /**
-    * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
-    */
+  * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
+  */
 SEC_Boolean BE_DynamicDictionary_RemoveElementAt(BE_DynamicDictionary* dictionary, unsigned int index);
 
 /**

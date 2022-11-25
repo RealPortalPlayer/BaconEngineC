@@ -49,8 +49,8 @@ int BE_EntryPoint_ClientShutdown(void) {
     return 0;
 }
 
-int BE_EntryPoint_ClientSupportsServer(void) {
-    return 1;
+SEC_Boolean BE_EntryPoint_ClientSupportsServer(void) {
+    return SEC_TRUE;
 }
 
 const char* BE_EntryPoint_GetClientName(void) {
