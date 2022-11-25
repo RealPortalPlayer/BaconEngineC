@@ -51,7 +51,8 @@ void BE_TextMode_Initialize(void) {
             (SEC_Boolean (*)(BE_Keyboard_KeyCodes)) &BE_TextMode_IntNoOperation,
             (SEC_Boolean (*)(BE_Mouse_ButtonType)) &BE_TextMode_IntNoOperation
         },
-        (void (*)(void)) &BE_TextMode_IntNoOperation
+        (void (*)(void)) &BE_TextMode_IntNoOperation,
+        (double (*)(void)) &BE_TextMode_IntNoOperation
     ));
 }
 SEC_CPP_SUPPORT_GUARD_END()
