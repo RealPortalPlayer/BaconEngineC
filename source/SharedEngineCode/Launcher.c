@@ -21,7 +21,13 @@
 #   define CHDIR(dir) _chdir(dir)
 #   define GET_BINARY(name, options) LoadLibrary(name)
 #   define GET_ADDRESS(binary, name) GetProcAddress(binary, name)
-#   define SET_ERROR() configuration->errorMessage = NULL
+#   define SET_ERROR() do { \
+    DWORD id = GetLastError(); \
+    LPSTR message = NULL;   \
+    size_t size = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, id, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&message, 0, NULL); \
+                            \
+    configuration->errorMessage = message; \
+} while (0)
 #   define BINARY_EXTENSION ".dll"
 #endif
 
