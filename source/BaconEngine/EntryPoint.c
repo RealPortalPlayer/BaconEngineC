@@ -16,7 +16,7 @@
 #elif SEC_OPERATINGSYSTEM_WINDOWS
 #   include <signal.h>
 #   include <io.h>
-#   define STDOUT_FILENO _fileno(stdout)
+#   define fileno _fileno
 #   define write _write // HACK: This is a stupid idea, but it's the only way to make MSVC shut up.
 #endif
 
@@ -46,20 +46,11 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
         {
             static SEC_Boolean antiDoubleSegfault = SEC_FALSE;
 
-            if (SEC_Logger_GetLogLevel() > SEC_LOGGER_LOG_LEVEL_FATAL && !antiDoubleSegfault) {
+            if (SEC_Logger_IsLevelEnabled(SEC_LOGGER_LOG_LEVEL_FATAL) && !antiDoubleSegfault) {
                 antiDoubleSegfault = SEC_TRUE;
 
-#define BE_ENTRYPOINT_SAFE_PUTS(message) write(STDOUT_FILENO, message, strlen(message))
-                if (SEC_ANSI_IsEnabled()) {
-                    BE_ENTRYPOINT_SAFE_PUTS(SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_BOLD));
-                    BE_ENTRYPOINT_SAFE_PUTS(SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_FOREGROUND_RED));
-                }
-
-                BE_ENTRYPOINT_SAFE_PUTS("[FTL] ");
-
-                if (SEC_ANSI_IsEnabled())
-                    BE_ENTRYPOINT_SAFE_PUTS(SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_RESET));
-
+#define BE_ENTRYPOINT_SAFE_PUTS(message) write(fileno(stdout), message, strlen(message))
+                SEC_Logger_LogHeader(stdout, SEC_LOGGER_LOG_LEVEL_FATAL);
                 BE_ENTRYPOINT_SAFE_PUTS("A segmentation fault was detected\n"
                                         "This means something tried to access bad memory (for example, tried to dereference a null pointer)\n"
                                         "If you're a user, then your only option is to report it to the developers\n"
@@ -67,8 +58,8 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
                                         "If you suspect this is a problem with the engine, then please report it to us\n"
                                         "Users should avoid this client until further notice, as segmentation faults could be a sign of a lurking (and potentially dangerous) vulnerability\n"
                                         "Forcing a crash due to the program being in a unstable state\n");
-            }
 #undef BE_ENTRYPOINT_SAFE_PUTS
+            }
 
             abort();
         }

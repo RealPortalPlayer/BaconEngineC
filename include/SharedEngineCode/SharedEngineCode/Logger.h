@@ -7,6 +7,7 @@
 #pragma once
 
 #include <stdarg.h>
+#include <stdio.h>
 
 #include "Internal/CppSupport.h"
 #include "Internal/Boolean.h"
@@ -23,8 +24,11 @@ typedef enum {
 } SEC_Logger_LogLevels;
 
 SEC_Logger_LogLevels SEC_Logger_GetLogLevel(void);
-void SEC_Logger_SetLogLevel(SEC_Logger_LogLevels logLevel);
 void __attribute__((__format__(__printf__, 3, 4))) SEC_Logger_LogImplementation(SEC_Boolean includeHeader, SEC_Logger_LogLevels logLevel, const char* message, ...);
+void SEC_Logger_LogHeader(FILE* output, SEC_Logger_LogLevels logLevel);
+SEC_Boolean SEC_Logger_IsLevelEnabled(SEC_Logger_LogLevels logLevel);
+
+void SEC_Logger_SetLogLevel(SEC_Logger_LogLevels logLevel);
 SEC_CPP_SUPPORT_GUARD_END()
 
 #define SEC_LOGGER_TRACE(...) SEC_Logger_LogImplementation(SEC_TRUE, SEC_LOGGER_LOG_LEVEL_TRACE, __VA_ARGS__)
