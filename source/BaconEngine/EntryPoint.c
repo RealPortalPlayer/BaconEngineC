@@ -43,12 +43,7 @@ const char* BE_EntryPoint_GetClientName(void);
 void BE_EntryPoint_SignalDetected(int receivedSignal) {
     switch (receivedSignal) {
         case SIGSEGV:
-        {
-            static SEC_Boolean antiDoubleSegfault = SEC_FALSE;
-
-            if (SEC_Logger_IsLevelEnabled(SEC_LOGGER_LOG_LEVEL_FATAL) && !antiDoubleSegfault) {
-                antiDoubleSegfault = SEC_TRUE;
-
+            if (SEC_Logger_IsLevelEnabled(SEC_LOGGER_LOG_LEVEL_FATAL)) {
 #define BE_ENTRYPOINT_SAFE_PUTS(message) write(fileno(stdout), message, strlen(message))
                 SEC_Logger_LogHeader(stdout, SEC_LOGGER_LOG_LEVEL_FATAL);
                 BE_ENTRYPOINT_SAFE_PUTS("A segmentation fault was detected\n"
@@ -57,12 +52,13 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
                                         "If you're a developer, then you should start debugging your code\n"
                                         "If you suspect this is a problem with the engine, then please report it to us\n"
                                         "Users should avoid this client until further notice, as segmentation faults could be a sign of a lurking (and potentially dangerous) vulnerability\n"
-                                        "Forcing a crash due to the program being in a unstable state\n");
+                                        "This client will now exit\n");
 #undef BE_ENTRYPOINT_SAFE_PUTS
             }
 
-            abort();
-        }
+            signal(SIGSEGV, SIG_DFL);
+            raise(SIGSEGV);
+            return;
 
         case SIGINT:
             if (!BE_ClientInformation_IsRunning())
@@ -216,7 +212,6 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
         }
 
         BE_Renderer_ClearScreen();
-
 
         double deltaNow = BE_SpecificPlatformFunctions_Get().GetTimer();
         double deltaTime = deltaNow - deltaStart;
