@@ -95,7 +95,7 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
     }
 
     static SEC_Boolean antiRecursiveLog = SEC_FALSE;
-    FILE *output = stdout;
+    FILE* output = stdout;
 
     if (!alwaysUseStdout && (logLevel == SEC_LOGGER_LOG_LEVEL_ERROR || logLevel == SEC_LOGGER_LOG_LEVEL_FATAL))
         output = stderr;
@@ -127,6 +127,16 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
 void SEC_Logger_LogHeader(FILE* output, SEC_Logger_LogLevels logLevel) {
     if (!SEC_Logger_IsLevelEnabled(logLevel))
         return;
+
+    {
+        static int dontLogHeader = -1;
+
+        if (dontLogHeader == -1)
+            dontLogHeader = SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_DISABLE_LOG_HEADER, SEC_BUILTINARGUMENTS_DISABLE_LOG_HEADER_SHORT, 0);
+
+        if (dontLogHeader)
+            return;
+    }
 
 #define SEC_LOGGER_SAFE_PUTS(message) write(fileno(output), message, strlen(message))
     switch (logLevel) {
