@@ -79,7 +79,7 @@ void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration,
 }
 
 const char* SEC_Launcher_GetDefaultHelpList(void) {
-    return SEC_BUILTINARGUMENTS_HELP ": Shows information about each argument\n"
+    return SEC_BUILTINARGUMENTS_HELP " (" SEC_BUILTINARGUMENTS_HELP_SHORT "): Shows information about each argument\n"
 #ifndef BACON_ENGINE_LAUNCHER
            SEC_BUILTINARGUMENTS_CLIENT " <path> (" SEC_BUILTINARGUMENTS_CLIENT_SHORT "): Specifies what client you want to run\n"
 #endif
