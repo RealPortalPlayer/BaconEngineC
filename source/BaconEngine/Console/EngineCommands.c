@@ -1,6 +1,8 @@
 // Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
+#include <string.h>
+
 #include "BaconEngine/Debugging/Assert.h"
 #include "EngineCommands.h"
 #include "BaconEngine/Console/Console.h"
@@ -176,6 +178,9 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
         SEC_LOGGER_ERROR("'%s' is not a valid command\n", commandName);
         return;
     }
+
+    if (strcmp(command->name, "help") == 0 && rand() % 50 == 0)
+        SEC_LOGGER_WARN("There is no help\n");
 
     SEC_LOGGER_INFO("Help:\n    %s Command:\n", BE_Console_IsEngineCommand(*command) ? "Engine" : "Client");
     BE_EngineCommands_HelpPrint(command);
