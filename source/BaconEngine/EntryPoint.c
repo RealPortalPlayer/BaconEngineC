@@ -40,8 +40,8 @@ int BE_EntryPoint_ClientShutdown(void);
 SEC_Boolean BE_EntryPoint_ClientSupportsServer(void);
 const char* BE_EntryPoint_GetClientName(void);
 
-void BE_EntryPoint_SignalDetected(int signal) {
-    switch (signal) {
+void BE_EntryPoint_SignalDetected(int receivedSignal) {
+    switch (receivedSignal) {
         case SIGSEGV:
         {
             static SEC_Boolean antiDoubleSegfault = SEC_FALSE;
@@ -71,8 +71,17 @@ void BE_EntryPoint_SignalDetected(int signal) {
             abort();
         }
 
+        case SIGINT:
+            if (!BE_ClientInformation_IsRunning())
+                return;
+
+            // TODO: Reprint cursor
+            siginterrupt(SIGINT, SEC_FALSE);
+            printf(" (type 'exit' to quit)\n");
+            return;
+
         default:
-            break;
+            return;
     }
 }
 
@@ -128,11 +137,13 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
         return 1;
     }
 
-#ifndef BE_ASAN_ENABLED
     SEC_LOGGER_DEBUG("Registering signals\n");
+
+#ifndef BE_ASAN_ENABLED
     signal(SIGSEGV, BE_EntryPoint_SignalDetected);
 #endif
 
+    signal(SIGINT, BE_EntryPoint_SignalDetected);
     BE_PrivateRenderer_Initialize();
     BE_PrivateLayer_InitializeLayers();
 
