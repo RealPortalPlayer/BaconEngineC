@@ -2,6 +2,7 @@
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <string.h>
+#include <signal.h>
 
 #include "BaconEngine/Debugging/Assert.h"
 #include "EngineCommands.h"
@@ -28,6 +29,7 @@ void BE_EngineCommands_Kick(BE_Command_Context context);
 void BE_EngineCommands_Ban(BE_Command_Context context);
 void BE_EngineCommands_Sudo(BE_Command_Context context);
 void BE_EngineCommands_Echo(BE_Command_Context context);
+void BE_EngineCommands_Crash(void);
 
 void BE_EngineCommands_Initialize(void) {
     static SEC_Boolean initialized = SEC_FALSE;
@@ -36,24 +38,19 @@ void BE_EngineCommands_Initialize(void) {
 
     initialized = SEC_TRUE;
 
-    BE_Command_Register("help", "Shows information about each command.", BE_COMMAND_FLAG_NULL,
-                        &BE_EngineCommands_Help);
+    BE_Command_Register("help", "Shows information about each command.", BE_COMMAND_FLAG_NULL, &BE_EngineCommands_Help);
     {
         BE_Command_AddArgument("command", 0);
     }
 
-    BE_Command_Register("cheats",
-                        "Get information or modify if cheats are enabled.",
-                        BE_COMMAND_FLAG_SERVER_ONLY,
+    BE_Command_Register("cheats", "Get information or modify if cheats are enabled.", BE_COMMAND_FLAG_SERVER_ONLY,
                         &BE_EngineCommands_Cheats);
     {
         BE_Command_AddArgument("toggle", 0);
     }
 
-    BE_Command_Register("stop",
-                        BE_ClientInformation_IsServerModeEnabled() ? "Stops the server." : "Stops the client.",
-                        BE_COMMAND_FLAG_NULL,
-                        (void (*)(BE_Command_Context)) &BE_EngineCommands_Stop);
+    BE_Command_Register("stop", BE_ClientInformation_IsServerModeEnabled() ? "Stops the server." : "Stops the client.",
+                        BE_COMMAND_FLAG_NULL, (void (*)(BE_Command_Context)) &BE_EngineCommands_Stop);
     {
         BE_Command_DuplicatePrevious("exit", "Exits the client.");
         BE_Command_DuplicatePrevious("quit", NULL);
@@ -70,13 +67,11 @@ void BE_EngineCommands_Initialize(void) {
 
     BE_Command_Register("disconnect", "Disconnects from the server.", BE_COMMAND_FLAG_CLIENT_ONLY,
                         &BE_EngineCommands_Disconnect);
-    BE_Command_Register("connect", "Connects to a server.", BE_COMMAND_FLAG_CLIENT_ONLY,
-                        &BE_EngineCommands_Connect);
+    BE_Command_Register("connect", "Connects to a server.", BE_COMMAND_FLAG_CLIENT_ONLY, &BE_EngineCommands_Connect);
     BE_Command_Register("whatami", "Tells your current mode.", BE_COMMAND_FLAG_NULL,
                         (void (*)(BE_Command_Context)) &BE_EngineCommands_WhatAmI);
 
-    BE_Command_Register("kick", "Forcefully removes a client.", BE_COMMAND_FLAG_SERVER_ONLY,
-                        &BE_EngineCommands_Kick);
+    BE_Command_Register("kick", "Forcefully removes a client.", BE_COMMAND_FLAG_SERVER_ONLY, &BE_EngineCommands_Kick);
     {
         BE_Command_AddArgument("client id", 1);
         BE_Command_AddArgument("reason", 0);
@@ -89,8 +84,7 @@ void BE_EngineCommands_Initialize(void) {
         BE_Command_AddArgument("reason", 0);
     }
 
-    BE_Command_Register("sudo", "Runs a command as the server.", BE_COMMAND_FLAG_CLIENT_ONLY,
-                        &BE_EngineCommands_Sudo);
+    BE_Command_Register("sudo", "Runs a command as the server.", BE_COMMAND_FLAG_CLIENT_ONLY, &BE_EngineCommands_Sudo);
     {
         BE_Command_AddArgument("key", 1);
         BE_Command_AddArgument("command", 1);
@@ -100,6 +94,9 @@ void BE_EngineCommands_Initialize(void) {
     {
         BE_Command_AddArgument("message", 0);
     }
+
+    BE_Command_Register("crash", "Force a segmentation fault", BE_COMMAND_FLAG_SERVER_ONLY,
+                        (void (*)(BE_Command_Context)) &BE_EngineCommands_Crash);
 }
 
 void BE_EngineCommands_HelpPrint(BE_Command* command) {
@@ -283,5 +280,9 @@ void BE_EngineCommands_Sudo(BE_Command_Context context) {
 
 void BE_EngineCommands_Echo(BE_Command_Context context) {
     SEC_LOGGER_INFO("%s\n", context.unparsedArguments);
+}
+
+void BE_EngineCommands_Crash(void) {
+    raise(SIGSEGV);
 }
 SEC_CPP_SUPPORT_GUARD_END()
