@@ -7,7 +7,7 @@
 #include <SharedEngineCode/Internal/OperatingSystem.h>
 #include <SharedEngineCode/ANSI.h>
 #include <SharedEngineCode/BuiltInArguments.h>
-#include <pthread.h>
+#include <SharedEngineCode/Threads.h>
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <unistd.h>
@@ -76,7 +76,7 @@ void BE_EntryPoint_SignalDetected(int signal) {
     }
 }
 
-void* BE_EntryPoint_CommandThreadFunction(void* arguments) {
+void BE_EntryPoint_CommandThreadFunction(void) {
     SEC_Boolean printedCursor = SEC_FALSE;
 
     // FIXME: Find out why this is not working on Serenity.
@@ -110,8 +110,6 @@ void* BE_EntryPoint_CommandThreadFunction(void* arguments) {
 
         printedCursor = SEC_FALSE;
     }
-
-    return NULL;
 }
 
 int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
@@ -130,8 +128,11 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
         return 1;
     }
 
+#ifndef BE_ASAN_ENABLED
     SEC_LOGGER_DEBUG("Registering signals\n");
     signal(SIGSEGV, BE_EntryPoint_SignalDetected);
+#endif
+
     BE_PrivateRenderer_Initialize();
     BE_PrivateLayer_InitializeLayers();
 
@@ -196,9 +197,9 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
 
     SEC_LOGGER_INFO("Starting threads\n");
 
-    pthread_t commandThread;
+    SEC_Thread commandThread;
 
-    pthread_create(&commandThread, NULL, &BE_EntryPoint_CommandThreadFunction, NULL);
+    SEC_Thread_Create(&commandThread, &BE_EntryPoint_CommandThreadFunction);
 
     double deltaStart = 0;
 
@@ -211,6 +212,7 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
         }
 
         BE_Renderer_ClearScreen();
+
 
         double deltaNow = BE_SpecificPlatformFunctions_Get().GetTimer();
         double deltaTime = deltaNow - deltaStart;
@@ -227,7 +229,7 @@ int BE_EntryPoint_StartBaconEngine(int argc, char** argv) {
     SEC_LOGGER_TRACE("Client loop ended, shutting down\n");
     BE_ASSERT(BE_EntryPoint_ClientShutdown() == 0, "Client shutdown returned non-zero\n");
     SEC_LOGGER_INFO("Waiting for thread shutdown (press CTRL+C if frozen)\n");
-    pthread_join(commandThread, NULL);
+    SEC_Thread_Join(commandThread);
     SEC_LOGGER_DEBUG("Command thread ended\n");
     BE_PrivateLayer_DestroyLayers();
     BE_PrivateUI_Destroy();

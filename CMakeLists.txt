@@ -17,6 +17,7 @@ option(BE_NO_IDE_FOLDERS "Don't make any IDE folders" ON)
 option(BE_IGNORE_ANTI_MINGW "Ignore the checks for MinGW, works best with BE_DISABLE_PEDANTIC_MODE" OFF)
 option(BE_DISABLE_PEDANTIC_MODE "Don't enable pedantic checks" OFF)
 option(BE_LOCAL_GLFW "Use GLFW from 'dependencies/glfw' instead of trying to find it" OFF)
+set(BE_ASAN_SANITIZER "" CACHE STRING "Set what ASAN sanitizer to use")
 
 macro(engine_project)
     cmake_parse_arguments(PARSED "STANDALONE" "NAME" "SOURCES" ${ARGN})

@@ -10,6 +10,7 @@
 #elif SEC_OPERATINGSYSTEM_WINDOWS
 #   define WIN32_LEAN_AND_MEAN
 #   include <Windows.h>
+#   include <stdio.h>
 #endif
 
 SEC_CPP_SUPPORT_GUARD_START()
@@ -19,12 +20,12 @@ SEC_Boolean SEC_OSUser_IsAdmin(void) {
 #elif SEC_OPERATINGSYSTEM_WINDOWS
     SID_IDENTIFIER_AUTHORITY authority = SECURITY_NT_AUTHORITY;
     PSID adminGroup;
-    int admin = AllocateAndInitializeSid(&authority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0,
-                                         0, 0, 0, &adminGroup);
+    SEC_Boolean admin = AllocateAndInitializeSid(&authority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0,
+                                                 0, 0, 0, &adminGroup);
 
     if (admin) {
         if (!CheckTokenMembership(NULL, adminGroup, &admin))
-            admin = 0;
+            admin = SEC_FALSE;
 
         FreeSid(adminGroup);
     }

@@ -3,7 +3,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
+#include <string.h>
+#include <errno.h>
 
 #include "SharedEngineCode/Logger.h"
 #include "SharedEngineCode/ANSI.h"
@@ -11,10 +12,11 @@
 #include "SharedEngineCode/ArgumentHandler.h"
 #include "SharedEngineCode/BuiltInArguments.h"
 #include "SharedEngineCode/StringExtension.h"
+#include "SharedEngineCode/Threads.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 SEC_Logger_LogLevels beLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_INFO;
-pthread_mutex_t beLoggerLock;
+SEC_Thread_Lock beLoggerLock; // FIXME: This causes a memory leak
 
 SEC_Logger_LogLevels SEC_Logger_GetLogLevel(void) {
     return beLoggerCurrentLogLevel;
@@ -43,10 +45,6 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
         static SEC_Boolean initializing = SEC_FALSE;
 
         if (!initialized) {
-            pthread_mutex_init(&beLoggerLock, NULL);
-
-            SEC_ArgumentHandler_ShortResults results;
-
             if (initializing) {
                 fprintf(stderr, "Logger called self during initializing, this is 100%% a bug with the engine\n"
                                 "includeHeader: %i\n"
@@ -55,21 +53,30 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
                 abort();
             }
 
+            if (!SEC_Thread_CreateLock(&beLoggerLock)) {
+                printf("Failed to initialize logger lock: %s (%i)\n", strerror(errno), errno);
+                abort();
+            }
+
             initializing = SEC_TRUE;
 
-            if (SEC_ArgumentHandler_GetInfoWithShort(SEC_BUILTINARGUMENTS_LOG_LEVEL, SEC_BUILTINARGUMENTS_LOG_LEVEL_SHORT, 0, &results) != 0) {
-                if (SEC_StringExtension_CompareCaseless(*results.value, "null") == 0) // TODO: Tell the user if they specify a invalid log level.
-                    beLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_NULL;
-                else if (SEC_StringExtension_CompareCaseless(*results.value, "trace") == 0 || SEC_StringExtension_CompareCaseless(*results.value, "trc") == 0)
-                    beLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_TRACE;
-                else if (SEC_StringExtension_CompareCaseless(*results.value, "debug") == 0 || SEC_StringExtension_CompareCaseless(*results.value, "dbg") == 0)
-                    beLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_DEBUG;
-                else if (SEC_StringExtension_CompareCaseless(*results.value, "warn") == 0 || SEC_StringExtension_CompareCaseless(*results.value, "wrn") == 0)
-                    beLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_WARN;
-                else if (SEC_StringExtension_CompareCaseless(*results.value, "error") == 0 || SEC_StringExtension_CompareCaseless(*results.value, "err") == 0)
-                    beLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_ERROR;
-                else if (SEC_StringExtension_CompareCaseless(*results.value, "fatal") == 0 || SEC_StringExtension_CompareCaseless(*results.value, "ftl") == 0)
-                    beLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_FATAL;
+            {
+                SEC_ArgumentHandler_ShortResults results;
+
+                if (SEC_ArgumentHandler_GetInfoWithShort(SEC_BUILTINARGUMENTS_LOG_LEVEL, SEC_BUILTINARGUMENTS_LOG_LEVEL_SHORT, 0, &results) != 0) {
+                    if (SEC_StringExtension_CompareCaseless(*results.value, "null") == 0) // TODO: Tell the user if they specify a invalid log level.
+                        beLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_NULL;
+                    else if (SEC_StringExtension_CompareCaseless(*results.value, "trace") == 0 || SEC_StringExtension_CompareCaseless(*results.value, "trc") == 0)
+                        beLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_TRACE;
+                    else if (SEC_StringExtension_CompareCaseless(*results.value, "debug") == 0 || SEC_StringExtension_CompareCaseless(*results.value, "dbg") == 0)
+                        beLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_DEBUG;
+                    else if (SEC_StringExtension_CompareCaseless(*results.value, "warn") == 0 || SEC_StringExtension_CompareCaseless(*results.value, "wrn") == 0)
+                        beLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_WARN;
+                    else if (SEC_StringExtension_CompareCaseless(*results.value, "error") == 0 || SEC_StringExtension_CompareCaseless(*results.value, "err") == 0)
+                        beLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_ERROR;
+                    else if (SEC_StringExtension_CompareCaseless(*results.value, "fatal") == 0 || SEC_StringExtension_CompareCaseless(*results.value, "ftl") == 0)
+                        beLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_FATAL;
+                }
             }
 
             initialized = SEC_TRUE;
@@ -77,10 +84,10 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
         }
     }
 
-    pthread_mutex_lock(&beLoggerLock);
+    SEC_Thread_UseLock(&beLoggerLock);
 
     if (beLoggerCurrentLogLevel == SEC_LOGGER_LOG_LEVEL_NULL || logLevel > beLoggerCurrentLogLevel) {
-        pthread_mutex_unlock(&beLoggerLock);
+        SEC_Thread_Unlock(&beLoggerLock);
         return;
     }
 
@@ -141,6 +148,6 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
 
     antiRecursiveLog = SEC_FALSE;
 
-    pthread_mutex_unlock(&beLoggerLock);
+    SEC_Thread_Unlock(&beLoggerLock);
 }
 SEC_CPP_SUPPORT_GUARD_END()

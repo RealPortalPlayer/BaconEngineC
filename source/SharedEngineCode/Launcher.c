@@ -101,6 +101,6 @@ const char* SEC_Launcher_GetDefaultHelpList(void) {
            SEC_BUILTINARGUMENTS_DONT_PRINT_ASSERT_CHECKS " (" SEC_BUILTINARGUMENTS_DONT_PRINT_ASSERT_CHECKS_SHORT "): Do not log assert checks, does nothing if log level is not trace\n"
            SEC_BUILTINARGUMENTS_DONT_PRINT_STRICT_CHECKS " (" SEC_BUILTINARGUMENTS_DONT_PRINT_STRICT_CHECKS_SHORT "): Do not log strict checks, does nothing if log level is not trace\n"
            SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOC " (" SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOC_SHORT "): Do not log when the engine allocates memory, does nothing if log level is not trace\n"
-           SEC_BUILTINARGUMENTS_SHOW_TERMINAL ": Shows a terminal window, does nothing for non-Windows.\n";
+           SEC_BUILTINARGUMENTS_SHOW_TERMINAL ": Shows a terminal window, does nothing for non-Windows";
 }
 SEC_CPP_SUPPORT_GUARD_END()

@@ -8,7 +8,7 @@
 
 #include <limits.h>
 
-#include "SharedEngineCode/Internal/OperatingSystem.h"
+#include "Internal/OperatingSystem.h"
 #include "Internal/CppSupport.h"
 
 SEC_CPP_SUPPORT_GUARD_START()

@@ -84,6 +84,9 @@ typedef enum {
     BE_KEYBOARD_KEY_CODE_KP_DELETE = BE_KEYBOARD_KEY_CODE_KP_PERIOD,     BE_KEYBOARD_KEY_CODE_KP_DOT = BE_KEYBOARD_KEY_CODE_KP_PERIOD
 } BE_Keyboard_KeyCodes;
 
+/**
+ * @return The character that represents the keycode, 0 if there is none
+ */
 char BE_Keyboard_ConvertKeyCodeToChar(BE_Keyboard_KeyCodes keyCode);
 SEC_Boolean BE_Keyboard_IsKeyDown(BE_Keyboard_KeyCodes keyCode);
 SEC_Boolean BE_Keyboard_IsKeyPressed(BE_Keyboard_KeyCodes keyCode);

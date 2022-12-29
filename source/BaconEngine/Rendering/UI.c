@@ -139,7 +139,6 @@ int BE_UI_GetWindowReallocationAmount(void) {
     return beUIInitialized ? beUIWindows.calledRealloc : 0;
 }
 
-// TODO: Make this private.
 void BE_PrivateUI_Destroy(void) {
     BE_ASSERT(beUIInitialized, "UI system has already been destroyed\n");
     BE_ASSERT(!BE_ClientInformation_IsRunning(), "Cannot destroy UI system while still running\n");
