@@ -235,7 +235,7 @@ void BE_EngineCommands_DebugInfo(void) {
 }
 
 void BE_EngineCommands_Say(BE_Command_Context context) {
-    SEC_LOGGER_INFO("Server: %s\n", BE_ArgumentManager_GetString(context.arguments, "message", ""));
+    SEC_LOGGER_INFO("Server: %s\n", context.unparsedArguments);
     // TODO: Broadcast to everyone
 }
 
