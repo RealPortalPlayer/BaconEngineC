@@ -62,7 +62,7 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
 
                 if (SEC_ArgumentHandler_GetInfoWithShort(SEC_BUILTINARGUMENTS_LOG_LEVEL,
                                                          SEC_BUILTINARGUMENTS_LOG_LEVEL_SHORT, 0, &results) != 0) {
-                    if (SEC_StringExtension_CompareCaseless(*results.value, "null") == 0) // TODO: Tell the user if they specify a invalid log level.
+                    if (SEC_StringExtension_CompareCaseless(*results.value, "null") == 0)
                         secLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_NULL;
                     else if (SEC_StringExtension_CompareCaseless(*results.value, "trace") == 0 ||
                              SEC_StringExtension_CompareCaseless(*results.value, "trc") == 0)
@@ -79,6 +79,11 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
                     else if (SEC_StringExtension_CompareCaseless(*results.value, "fatal") == 0 ||
                              SEC_StringExtension_CompareCaseless(*results.value, "ftl") == 0)
                         secLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_FATAL;
+                    else if (SEC_StringExtension_CompareCaseless(*results.value, "info") != 0 &&
+                             SEC_StringExtension_CompareCaseless(*results.value, "inf") != 0) {
+                        SEC_Logger_LogHeader(stderr, SEC_LOGGER_LOG_LEVEL_ERROR);
+                        printf("Invalid log type: %s\n", *results.value);
+                    }
                 }
             }
 
