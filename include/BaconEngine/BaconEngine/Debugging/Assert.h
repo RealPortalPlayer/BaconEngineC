@@ -24,4 +24,4 @@ do {                          \
 } while (SEC_FALSE)
 
 #define BE_ASSERT_ALWAYS(message) BE_ASSERT(0, message)
-#define BE_ASSERT_NOT_IMPLEMENTED() BE_ASSERT_ALWAYS("This function is currently not implemented")
+#define BE_ASSERT_NOT_IMPLEMENTED() BE_ASSERT_ALWAYS("This function is currently not implemented\n")
