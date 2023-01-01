@@ -255,12 +255,34 @@ void BE_EngineCommands_WhatAmI(void) {
         return;
     }
 
-    if (BE_Renderer_GetCurrentType() != BE_RENDERER_TYPE_TEXT) {
-        SEC_LOGGER_INFO("Client\n");
-        return;
-    }
+    switch (BE_Renderer_GetCurrentType()) {
+        case BE_RENDERER_TYPE_OPENGL:
+            SEC_LOGGER_INFO("OpenGL Client\n");
+            return;
 
-    SEC_LOGGER_INFO("Headless Client\n");
+        case BE_RENDERER_TYPE_VULKAN:
+            SEC_LOGGER_INFO("Vulkan Client\n");
+            return;
+
+        case BE_RENDERER_TYPE_METAL:
+            SEC_LOGGER_INFO("Metal Client\n");
+            return;
+
+        case BE_RENDERER_TYPE_DIRECTX:
+            SEC_LOGGER_INFO("DirectX Client\n");
+            return;
+
+        case BE_RENDERER_TYPE_SOFTWARE:
+            SEC_LOGGER_INFO("Client\n");
+            return;
+
+        case BE_RENDERER_TYPE_TEXT:
+            SEC_LOGGER_INFO("Headless Client\n");
+            return;
+
+        default:
+            BE_ASSERT_INVALID_STATE();
+    }
 }
 
 void BE_EngineCommands_Kick(BE_Command_Context context) {

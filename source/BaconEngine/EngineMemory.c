@@ -48,7 +48,7 @@ BE_EngineMemory_MemoryTypeInformation* BE_EngineMemory_GetMemoryTypeInformation(
             return &beEngineMemoryInformation.layer;
 
         default:
-            BE_ASSERT_ALWAYS("This shouldn't be reached\n");
+            BE_ASSERT_INVALID_STATE();
     }
 }
 
