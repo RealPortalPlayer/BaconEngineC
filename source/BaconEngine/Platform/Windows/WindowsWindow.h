@@ -1,7 +1,7 @@
 // Purpose: Windows software window functions.
 // Created on: 10/9/22 @ 3:17 PM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
@@ -13,12 +13,13 @@
 
 SEC_CPP_SUPPORT_GUARD_START()
 void* BE_WindowsWindow_GetInternal(void);
-void BE_WindowsWindow_Create(const char* title, BE_Vector_2U size, int monitor);
 const char* BE_WindowsWindow_GetTitle(void);
 BE_Vector_2U BE_WindowsWindow_GetSize(void);
 BE_Vector_2I BE_WindowsWindow_GetPosition(void);
 SEC_Boolean BE_WindowsWindow_IsVisible(void);
 SEC_Boolean BE_WindowsWindow_IsStillOpened(void);
+
+void BE_WindowsWindow_Create(const char* title, BE_Vector_2U size, int monitor);
 void BE_WindowsWindow_SetTitle(const char* title);
 void BE_WindowsWindow_SetSize(BE_Vector_2U newSize);
 void BE_WindowsWindow_SetPosition(BE_Vector_2I newPosition);
