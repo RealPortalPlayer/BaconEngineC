@@ -84,12 +84,12 @@ typedef enum {
     BE_KEYBOARD_KEY_CODE_KP_DELETE = BE_KEYBOARD_KEY_CODE_KP_PERIOD,     BE_KEYBOARD_KEY_CODE_KP_DOT = BE_KEYBOARD_KEY_CODE_KP_PERIOD
 } BE_Keyboard_KeyCodes;
 
-void BE_Keyboard_SetKeyDown(BE_Keyboard_KeyCodes keyCode, SEC_Boolean down);
-void BE_Keyboard_SetKeyPressed(BE_Keyboard_KeyCodes keyCode, SEC_Boolean pressed);
+/**
+ * @return The character that represents the keycode, 0 if there is none
+ */
 char BE_Keyboard_ConvertKeyCodeToChar(BE_Keyboard_KeyCodes keyCode);
 SEC_Boolean BE_Keyboard_IsKeyDown(BE_Keyboard_KeyCodes keyCode);
 SEC_Boolean BE_Keyboard_IsKeyPressed(BE_Keyboard_KeyCodes keyCode);
-SEC_Boolean BE_Keyboard_IsKeyUp(BE_Keyboard_KeyCodes keyCode);
 SEC_Boolean BE_Keyboard_IsEngineKeyCodeValid(BE_Keyboard_KeyCodes keyCode);
 SEC_Boolean BE_Keyboard_IsKeyCodeFromKeyPad(BE_Keyboard_KeyCodes keyCode);
 SEC_CPP_SUPPORT_GUARD_END()

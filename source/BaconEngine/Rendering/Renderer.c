@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <SharedEngineCode/Internal/OperatingSystem.h>
@@ -16,6 +16,8 @@
 
 #if SEC_OPERATINGSYSTEM_WINDOWS
 #   include "../Platform/Windows/Windows.h"
+#elif SEC_OPERATINGSYSTEM_APPLE && !defined(BE_DISABLE_METAL)
+#   include "../Platform/Metal/Metal.h"
 #endif
 
 #include "BaconEngine/Debugging/Assert.h"
@@ -37,6 +39,7 @@ void BE_PrivateRenderer_Initialize(void) {
     const char* specifiedRenderer = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_RENDERER, 0);
 
     if (BE_ClientInformation_IsServerModeEnabled() || (specifiedRenderer != NULL && SEC_StringExtension_CompareCaseless(specifiedRenderer, "text") == 0)) {
+        textmode:
         SEC_LOGGER_INFO("Using no renderer\n");
         BE_TextMode_Initialize();
 
@@ -46,39 +49,56 @@ void BE_PrivateRenderer_Initialize(void) {
 
     if (specifiedRenderer != NULL) {
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "opengl") == 0) {
-            opengl:
 #ifndef BE_DISABLE_OPENGL
+            opengl:
             SEC_LOGGER_INFO("Using OpenGL as the renderer\n");
             BE_OpenGL_Initialize();
 
             beRendererCurrent = BE_RENDERER_TYPE_OPENGL;
 #else
-            SEC_LOGGER_WARN("This binary has OpenGL disabled, defaulting to text-mode\n");
-            BE_TextMode_Initialize();
+            SEC_LOGGER_WARN("This binary has OpenGL disabled\n");
+            goto textmode;
+#endif
+            return;
+        }
 
-            beRendererCurrent = BE_RENDERER_TYPE_TEXT;
+        if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "vulkan") == 0) {
+#if !SEC_OPERATINGSYSTEM_APPLE
+            vulkan:
+            BE_ASSERT_ALWAYS("Renderer not implemented\n");
+#else
+            SEC_LOGGER_WARN("Vulkan doesn't support Apple operating systems\n");
+            goto textmode;
+#endif
+        }
+
+        if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "metal") == 0) {
+#if SEC_OPERATINGSYSTEM_APPLE
+#   ifndef BE_DISABLE_METAL
+            metal:
+            SEC_LOGGER_INFO("Using Metal as the renderer");
+            BE_Metal_Initialize();
+#   else
+            SEC_LOGGER_WARN("This binary has Metal disabled\n");
+            goto textmode;
+#   endif
+#else
+            SEC_LOGGER_WARN("Metal only works on Apple operating systems\n");
+            goto textmode;
 #endif
 
             return;
         }
 
-        if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "vulkan") == 0) {
-            BE_ASSERT_ALWAYS("Renderer not implemented\n");
-        }
-
-        if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "metal") == 0) {
-#if SEC_OPERATINGSYSTEM_APPLE
-            BE_ASSERT_NOT_IMPLEMENTED();
-#else
-            SEC_LOGGER_WARN("Metal only works on Apple operating systems, defaulting to text-mode\n");
-            BE_TextMode_Initialize();
-
-            beRendererCurrent = BE_RENDERER_TYPE_TEXT;
-#endif
-        }
-
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "directx") == 0) {
+#if SEC_OPERATINGSYSTEM_WINDOWS
+            directx:
             BE_ASSERT_ALWAYS("Renderer not implemented\n");
+#else
+            SEC_LOGGER_WARN("DirectX only works on Microsoft operating systems\n");
+            goto textmode;
+#endif
+            return;
         }
 
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "software") == 0) {
@@ -90,12 +110,28 @@ void BE_PrivateRenderer_Initialize(void) {
 #else
             BE_ASSERT_ALWAYS("No software renderer implementation for your OS\n");
 #endif
+            return;
         }
 
         SEC_LOGGER_WARN("Invalid renderer: %s\n", specifiedRenderer);
     }
 
-    goto opengl; // TODO: Get the best one depending on OS
+#if SEC_OPERATINGSYSTEM_APPLE
+#   if !defined(BE_DISABLE_METAL)
+
+    goto metal;
+#   elif !defined(BE_DISABLE_OPENGL)
+    SEC_LOGGER_WARN("This binary does not have Metal enabled\n");
+    goto opengl;
+#   else
+    SEC_LOGGER_WARN("This binary doesn't support any renderers for your OS");
+    goto textmode;
+#   endif
+#elif SEC_OPERATINGSYSTEM_LINUX
+    goto vulkan;
+#elif SSEC_OPERATINGSYSTEM_WINDOWS
+    goto directx;
+#endif
 }
 
 void BE_Renderer_ClearScreen(void) {

@@ -125,7 +125,7 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
     beConsoleDuplicateCommand = SEC_FALSE;
 }
 
-void BE_Command_AddArgument(const char* name, int required) {
+void BE_Command_AddArgument(const char* name, SEC_Boolean required) {
     BE_Command* command = BE_DYNAMICARRAY_GET_LAST_ELEMENT(BE_Command, beConsoleCommands);
 
     BE_STRICTMODE_CHECK_NO_RETURN_VALUE(command->arguments.used == 0 ||
@@ -353,7 +353,7 @@ void BE_Console_ExecuteCommand(const char* input, BE_Client_Connected* client) {
     BE_EngineMemory_DeallocateMemory(arguments.values.internalArray, sizeof(void*) * arguments.keys.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 
-int BE_Console_IsEngineCommand(BE_Command command) {
+SEC_Boolean BE_Console_IsEngineCommand(BE_Command command) {
     return BE_Console_GetPrivateCommand(command.name)->engineCommand;
 }
 

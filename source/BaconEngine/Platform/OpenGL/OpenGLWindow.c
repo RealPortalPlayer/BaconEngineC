@@ -1,7 +1,6 @@
 // Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include <SharedEngineCode/Internal/CppSupport.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <SharedEngineCode/Internal/OperatingSystem.h>
@@ -136,7 +135,7 @@ const BE_Keyboard_KeyCodes glToEngineCodes[GLFW_KEY_LAST + 1] = {
         BE_KEYBOARD_KEY_CODE_NULL
 };
 
-void* BE_OpenGLWindow_GetInternal(void) {
+void* BE_OpenGLWindow_GetWindow(void) {
     return window;
 }
 
@@ -152,8 +151,6 @@ void BE_OpenGLWindow_KeyEvent(GLFWwindow* theWindow, int key, int scanCode, int 
     if (!BE_Keyboard_IsEngineKeyCodeValid(keyCode))
         return;
 
-    BE_Keyboard_SetKeyDown(scanCode, action != GLFW_RELEASE);
-    BE_Keyboard_SetKeyPressed(scanCode, action != GLFW_RELEASE);
     BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = action != GLFW_RELEASE ? BE_EVENT_TYPE_KEYBOARD_KEY_DOWN : BE_EVENT_TYPE_KEYBOARD_KEY_UP,
         .keyboard = {
@@ -170,7 +167,6 @@ void BE_OpenGLWindow_MouseButtonEvent(GLFWwindow* theWindow, int button, int act
     double y;
 
     glfwGetCursorPos(window, &x, &y);
-    BE_Mouse_SetButtonDown(button, action != GLFW_RELEASE);
     BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = action != GLFW_RELEASE ? BE_EVENT_TYPE_MOUSE_BUTTON_DOWN : BE_EVENT_TYPE_MOUSE_BUTTON_UP,
         .mouse = {

@@ -92,11 +92,11 @@ BE_Vector_2I BE_WindowsWindow_GetPosition(void) {
     return SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I, rectangle.left, rectangle.top);
 }
 
-int BE_WindowsWindow_IsVisible(void) {
+SEC_Boolean BE_WindowsWindow_IsVisible(void) {
     return IsWindowVisible(beWindowsWindowHandle);
 }
 
-int BE_WindowsWindow_IsStillOpened(void) {
+SEC_Boolean BE_WindowsWindow_IsStillOpened(void) {
     return beWindowsWindowHandle != NULL;
 }
 
@@ -116,7 +116,7 @@ void BE_WindowsWindow_SetPosition(BE_Vector_2I newPosition) {
     SetWindowPos(beWindowsWindowHandle, HWND_TOP, newPosition.x, newPosition.y, (int) size.x, (int) size.y, SWP_NOOWNERZORDER);
 }
 
-void BE_WindowsWindow_SetVisibility(int visible) {
+void BE_WindowsWindow_SetVisibility(SEC_Boolean visible) {
     ShowWindow(beWindowsWindowHandle, visible ? SW_SHOW : SW_HIDE);
 }
 

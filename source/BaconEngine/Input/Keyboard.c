@@ -2,6 +2,7 @@
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include "BaconEngine/Input/Keyboard.h"
+#include "../Platform/SpecificPlatformFunctions.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 char keyCodesCharArray[BE_KEYBOARD_KEY_CODE_SIZE] = {
@@ -43,37 +44,16 @@ char keyCodesCharArray[BE_KEYBOARD_KEY_CODE_SIZE] = {
     '0', '.'
 };
 
-SEC_Boolean keysDown[BE_KEYBOARD_KEY_CODE_SIZE] = {SEC_FALSE};
-SEC_Boolean keysPressed[BE_KEYBOARD_KEY_CODE_SIZE] = {SEC_FALSE};
-
-void BE_Keyboard_SetKeyDown(BE_Keyboard_KeyCodes keyCode, SEC_Boolean down) {
-    if (!BE_Keyboard_IsEngineKeyCodeValid(keyCode))
-        return;
-
-    keysDown[keyCode] = down;
-}
-
-void BE_Keyboard_SetKeyPressed(BE_Keyboard_KeyCodes keyCode, SEC_Boolean pressed) {
-    if (!BE_Keyboard_IsEngineKeyCodeValid(keyCode))
-        return;
-
-    keysPressed[keyCode] = pressed;
-}
-
 char BE_Keyboard_ConvertKeyCodeToChar(BE_Keyboard_KeyCodes keyCode) {
     return (char) (BE_Keyboard_IsEngineKeyCodeValid(keyCode) ? keyCodesCharArray[keyCode] : 0);
 }
 
 SEC_Boolean BE_Keyboard_IsKeyDown(BE_Keyboard_KeyCodes keyCode) {
-    return BE_Keyboard_IsEngineKeyCodeValid(keyCode) && keysDown[keyCode];
+    return BE_Keyboard_IsEngineKeyCodeValid(keyCode) && BE_SpecificPlatformFunctions_Get().inputFunctions.IsKeyDown(keyCode);
 }
 
 SEC_Boolean BE_Keyboard_IsKeyPressed(BE_Keyboard_KeyCodes keyCode) {
-    return BE_Keyboard_IsEngineKeyCodeValid(keyCode) && keysPressed[keyCode];
-}
-
-SEC_Boolean BE_Keyboard_IsKeyUp(BE_Keyboard_KeyCodes keyCode) {
-    return BE_Keyboard_IsEngineKeyCodeValid(keyCode) && !keysDown[keyCode] && !keysPressed[keyCode];
+    return BE_Keyboard_IsEngineKeyCodeValid(keyCode) && BE_SpecificPlatformFunctions_Get().inputFunctions.IsKeyPressed(keyCode);
 }
 
 SEC_Boolean BE_Keyboard_IsEngineKeyCodeValid(BE_Keyboard_KeyCodes keyCode) {

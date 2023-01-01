@@ -6,11 +6,13 @@ if(NOT BE_DISABLE_OPENGL)
             Platform/OpenGL/OpenGL.h
             Platform/OpenGL/OpenGLWindow.h
             Platform/OpenGL/OpenGLRenderer.h
+            Platform/OpenGL/OpenGLInput.h
 
             # Source files
             Platform/OpenGL/OpenGL.c
             Platform/OpenGL/OpenGLWindow.c
-            Platform/OpenGL/OpenGLRenderer.c)
+            Platform/OpenGL/OpenGLRenderer.c
+            Platform/OpenGL/OpenGLInput.c)
 endif()
 
 if(WIN32)
@@ -26,8 +28,16 @@ if(WIN32)
             Platform/Windows/WindowsRenderer.c)
 endif()
 
-#if(NOT BE_DISABLE_METAL AND APPLE)
-#endif()
+if(NOT BE_DISABLE_METAL AND APPLE)
+    set(BE_SOURCE_FILES ${BE_SOURCE_FILES}
+            # Header files
+            Platform/Metal/Metal.h
+            Platform/Metal/MetalWindow.h
+
+            # Source files
+            Platform/Metal/Metal.c
+            Platform/Metal/MetalWindow.m)
+endif()
 
 add_library(BaconEngine STATIC
         # Header files
@@ -36,7 +46,6 @@ add_library(BaconEngine STATIC
         Rendering/PrivateUI.h
         Platform/SpecificPlatformFunctions.h
         Platform/TextMode/TextMode.h
-        Platform/TextMode/TextModeWindow.h
         Rendering/PrivateLayer.h
         PrivateDeltaTime.h
         Console/PrivateConsole.h
@@ -65,7 +74,6 @@ add_library(BaconEngine STATIC
         Platform/SpecificPlatformFunctions.c
         ${BE_SOURCE_FILES}
         Platform/TextMode/TextMode.c
-        Platform/TextMode/TextModeWindow.c
         DeltaTime.c
         Debugging/Assert.c
         Debugging/StrictMode.c
@@ -93,5 +101,19 @@ if(NOT BE_DISABLE_PEDANTIC_MODE)
         target_compile_options(BaconEngine PRIVATE /W4 /WX)
     else()
         target_compile_options(BaconEngine PRIVATE -Wall -Wpedantic -Werror)
+    endif()
+endif()
+
+if(NOT "${BE_ASAN_SANITIZER}" STREQUAL "")
+    message(STATUS "Enabling ASAN sanitizer")
+
+    if(MSVC)
+        target_compile_options(BaconEngine PUBLIC /fsanitize=${BE_ASAN_SANITIZER})
+        target_link_options(BaconEngine PUBLIC /fsanitize=${BE_ASAN_SANITIZER})
+        target_compile_definitions(BaconEngine PUBLIC BE_ASAN_ENABLED)
+    else()
+        target_compile_options(BaconEngine PUBLIC -fsanitize=${BE_ASAN_SANITIZER})
+        target_link_options(BaconEngine PUBLIC -fsanitize=${BE_ASAN_SANITIZER})
+        target_compile_definitions(BaconEngine PUBLIC BE_ASAN_ENABLED)
     endif()
 endif()

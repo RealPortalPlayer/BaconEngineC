@@ -21,7 +21,13 @@
 #   define CHDIR(dir) _chdir(dir)
 #   define GET_BINARY(name, options) LoadLibrary(name)
 #   define GET_ADDRESS(binary, name) GetProcAddress(binary, name)
-#   define SET_ERROR() configuration->errorMessage = NULL
+#   define SET_ERROR() do { \
+    DWORD id = GetLastError(); \
+    LPSTR message = NULL;   \
+    size_t size = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, id, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&message, 0, NULL); \
+                            \
+    configuration->errorMessage = message; \
+} while (0)
 #   define BINARY_EXTENSION ".dll"
 #endif
 
@@ -73,7 +79,7 @@ void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration,
 }
 
 const char* SEC_Launcher_GetDefaultHelpList(void) {
-    return SEC_BUILTINARGUMENTS_HELP ": Shows information about each argument\n"
+    return SEC_BUILTINARGUMENTS_HELP " (" SEC_BUILTINARGUMENTS_HELP_SHORT "): Shows information about each argument\n"
 #ifndef BACON_ENGINE_LAUNCHER
            SEC_BUILTINARGUMENTS_CLIENT " <path> (" SEC_BUILTINARGUMENTS_CLIENT_SHORT "): Specifies what client you want to run\n"
 #endif
@@ -95,6 +101,9 @@ const char* SEC_Launcher_GetDefaultHelpList(void) {
            SEC_BUILTINARGUMENTS_DONT_PRINT_ASSERT_CHECKS " (" SEC_BUILTINARGUMENTS_DONT_PRINT_ASSERT_CHECKS_SHORT "): Do not log assert checks, does nothing if log level is not trace\n"
            SEC_BUILTINARGUMENTS_DONT_PRINT_STRICT_CHECKS " (" SEC_BUILTINARGUMENTS_DONT_PRINT_STRICT_CHECKS_SHORT "): Do not log strict checks, does nothing if log level is not trace\n"
            SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOC " (" SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOC_SHORT "): Do not log when the engine allocates memory, does nothing if log level is not trace\n"
-           SEC_BUILTINARGUMENTS_SHOW_TERMINAL ": Shows a terminal window, does nothing for non-Windows.\n";
+#if SEC_OPERATINGSYSTEM_WINDOWS
+           SEC_BUILTINARGUMENTS_SHOW_TERMINAL ": Shows a terminal window, does nothing for non-Windows\n"
+#endif
+           SEC_BUILTINARGUMENTS_DISABLE_LOG_HEADER " (" SEC_BUILTINARGUMENTS_DISABLE_LOG_HEADER_SHORT "): Do not log the log level header";
 }
 SEC_CPP_SUPPORT_GUARD_END()

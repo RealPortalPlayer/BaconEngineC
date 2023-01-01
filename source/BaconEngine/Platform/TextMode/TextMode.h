@@ -10,5 +10,4 @@
 
 SEC_CPP_SUPPORT_GUARD_START()
 void BE_TextMode_Initialize(void);
-void BE_TextMode_Destroy(void);
 SEC_CPP_SUPPORT_GUARD_END()

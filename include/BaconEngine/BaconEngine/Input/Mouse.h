@@ -18,6 +18,5 @@ typedef enum {
     BE_MOUSE_BUTTON_TYPE_FORTH
 } BE_Mouse_ButtonType;
 
-void BE_Mouse_SetButtonDown(BE_Mouse_ButtonType button, SEC_Boolean down);
 SEC_Boolean BE_Mouse_IsButtonDown(BE_Mouse_ButtonType button);
 SEC_CPP_SUPPORT_GUARD_END()

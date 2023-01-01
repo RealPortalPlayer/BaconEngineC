@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    if (SEC_ArgumentHandler_GetIndex(SEC_BUILTINARGUMENTS_HELP, 0) != -1) {
+    if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_HELP, SEC_BUILTINARGUMENTS_HELP_SHORT, 0)) {
         SEC_LOGGER_INFO("Arguments:\n%s\n", SEC_Launcher_GetDefaultHelpList());
         SEC_MessageBox_Display(SEC_Launcher_GetDefaultHelpList(), "Launcher - Info", SEC_MESSAGEBOX_ICON_INFORMATION, SEC_MESSAGEBOX_BUTTON_OK);
         return 0;
@@ -74,33 +74,21 @@ int main(int argc, char** argv) {
 
     SEC_Launcher_CreateConfiguration(&configuration, *results.value);
 
-    if (configuration.code != SEC_LAUNCHER_ERROR_CODE_NULL) { // TODO: Parse Windows error code into string.
+    if (configuration.code != SEC_LAUNCHER_ERROR_CODE_NULL) {
         switch (configuration.code) {
             case SEC_LAUNCHER_ERROR_CODE_BINARY:
-#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
                 SEC_LOGGER_FATAL("Failed to load the binary: %s\n", configuration.errorMessage);
-#elif SEC_OPERATINGSYSTEM_WINDOWS
-                SEC_LOGGER_FATAL("Failed to load the binary: %i\n", configuration.code);
-#endif
                 SEC_MessageBox_Display("Failed to load binary", "Launcher - Fatal Error", SEC_MESSAGEBOX_ICON_ERROR, SEC_MESSAGEBOX_BUTTON_OK);
                 return 1;
 
             case SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL:
             case SEC_LAUNCHER_ERROR_CODE_NAME_NULL:
-#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
                 SEC_LOGGER_FATAL("Failed to get important methods: %s\n", configuration.errorMessage);
-#elif SEC_OPERATINGSYSTEM_WINDOWS
-                SEC_LOGGER_FATAL("Failed to get important methods: %i\n", configuration.code);
-#endif
                 SEC_MessageBox_Display("Failed to get important methods", "Launcher - Fatal Error", SEC_MESSAGEBOX_ICON_ERROR, SEC_MESSAGEBOX_BUTTON_OK);
                 return 1;
 
             case SEC_LAUNCHER_ERROR_CODE_CHDIR:
-#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
                 SEC_LOGGER_FATAL("Failed to set current directory: %s\n", configuration.errorMessage);
-#elif SEC_OPERATINGSYSTEM_WINDOWS
-                SEC_LOGGER_FATAL("Failed to set current directory: %i\n", configuration.code);
-#endif
                 SEC_MessageBox_Display("Failed to access client directory", "Launcher - Fatal Error", SEC_MESSAGEBOX_ICON_ERROR, SEC_MESSAGEBOX_BUTTON_OK);
                 return 1;
 
