@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <SharedEngineCode/Internal/OperatingSystem.h>
@@ -16,6 +16,8 @@
 
 #if SEC_OPERATINGSYSTEM_WINDOWS
 #   include "../Platform/Windows/Windows.h"
+#elif SEC_OPERATINGSYSTEM_APPLE && !defined(BE_DISABLE_METAL)
+#   include "../Platform/Metal/Metal.h"
 #endif
 
 #include "BaconEngine/Debugging/Assert.h"
@@ -68,13 +70,23 @@ void BE_PrivateRenderer_Initialize(void) {
 
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "metal") == 0) {
 #if SEC_OPERATINGSYSTEM_APPLE
-            BE_ASSERT_NOT_IMPLEMENTED();
+#   ifndef BE_DISABLE_METAL
+            SEC_LOGGER_INFO("Using Metal as the renderer");
+            BE_Metal_Initialize();
+#   else
+            SEC_LOGGER_WARN("This binary has Metal disabled, defaulting to text-mode\n");
+            BE_TextMode_Initialize();
+
+            beRendererCurrent = BE_RENDERER_TYPE_TEXT;
+#   endif
 #else
             SEC_LOGGER_WARN("Metal only works on Apple operating systems, defaulting to text-mode\n");
             BE_TextMode_Initialize();
 
             beRendererCurrent = BE_RENDERER_TYPE_TEXT;
 #endif
+
+            return;
         }
 
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "directx") == 0) {
@@ -90,6 +102,8 @@ void BE_PrivateRenderer_Initialize(void) {
 #else
             BE_ASSERT_ALWAYS("No software renderer implementation for your OS\n");
 #endif
+
+            return;
         }
 
         SEC_LOGGER_WARN("Invalid renderer: %s\n", specifiedRenderer);

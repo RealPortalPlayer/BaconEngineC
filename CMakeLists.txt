@@ -123,8 +123,8 @@ if(NOT BE_DISABLE_OPENGL)
     endif()
 endif()
 
-if(NOT BE_DISABLE_METAL AND APPLE) # TODO: Metal
-#    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
+if(NOT BE_DISABLE_METAL AND APPLE)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c -fobjc-arc")
 endif()
 
 if(NOT BE_NO_IDE_FOLDERS)

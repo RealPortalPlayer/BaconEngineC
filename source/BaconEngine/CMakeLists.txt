@@ -28,8 +28,16 @@ if(WIN32)
             Platform/Windows/WindowsRenderer.c)
 endif()
 
-#if(NOT BE_DISABLE_METAL AND APPLE)
-#endif()
+if(NOT BE_DISABLE_METAL AND APPLE)
+    set(BE_SOURCE_FILES ${BE_SOURCE_FILES}
+            # Header files
+            Platform/Metal/Metal.h
+            Platform/Metal/MetalWindow.h
+
+            # Source files
+            Platform/Metal/Metal.c
+            Platform/Metal/MetalWindow.m)
+endif()
 
 add_library(BaconEngine STATIC
         # Header files
