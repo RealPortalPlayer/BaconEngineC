@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <BaconEngine/EntryPoint.h>
@@ -27,9 +27,6 @@ void TestCommand(BE_Command_Context context) {
 int BE_EntryPoint_ClientStart(int argc, char** argv) {
     (void) argc;
     (void) argv;
-
-    int index1;
-    int index2;
 
 //    if (SEC_ArgumentHandler_GetIndexWithShort(SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING_SHORT, SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING_SHORT, 1, &index1, &index2))
 //        SEC_LOGGER_INFO("DUR: %i %i\n", index1, index2);

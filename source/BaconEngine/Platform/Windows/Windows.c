@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <Windows.h>
@@ -43,7 +43,7 @@ void BE_Windows_Initialize(void) {
             &BE_WindowsRenderer_Render,
             &BE_WindowsRenderer_DrawFilledRectangle
         },
-        {}, // TODO: Input
+        {NULL}, // TODO: Input
         &BE_Windows_Destroy,
         &BE_Windows_GetTimer
     ));

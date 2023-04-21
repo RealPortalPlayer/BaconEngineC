@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <SharedEngineCode/ArgumentHandler.h>
@@ -52,7 +52,7 @@ int BE_EngineLayers_GetUIWindowRenderCount(void) {
 }
 
 SEC_Boolean BE_EngineLayers_ConsoleOpener_OnEvent(BE_Event event) {
-    if (event.type != BE_EVENT_TYPE_KEYBOARD_KEY_DOWN || event.keyboard.key != BE_KEYBOARD_KEY_CODE_BACKTICK)
+    if (event.type != BE_EVENT_TYPE_KEYBOARD_KEY_DOWN || event.data.keyboard.key != BE_KEYBOARD_KEY_CODE_BACKTICK)
         return SEC_FALSE;
 
     BE_UI_ToggleWindowFlag(0, BE_UI_WINDOW_FLAG_CLOSED, SEC_FALSE);
@@ -177,7 +177,7 @@ SEC_Boolean BE_EngineLayers_UIRendering_OnEvent(BE_Event event) {
 
         switch (event.type) {
             case BE_EVENT_TYPE_MOUSE_BUTTON_DOWN:
-                if (event.mouse.button.which != BE_MOUSE_BUTTON_TYPE_LEFT)
+                if (event.data.mouse.unionVariables.whichButton != BE_MOUSE_BUTTON_TYPE_LEFT)
                     return SEC_FALSE;
 
 //              if (!SDL_PointInRect(&mousePoint, &(SDL_Rect) {uiWindow->position.x, uiWindow->position.y, (int) uiWindow->size.x, (int) uiWindow->size.y + 24}))
@@ -217,7 +217,7 @@ SEC_Boolean BE_EngineLayers_UIRendering_OnEvent(BE_Event event) {
                 return SEC_TRUE;
 
             case BE_EVENT_TYPE_MOUSE_BUTTON_UP:
-                beEngineLayersMovingUi = event.mouse.button.which != BE_MOUSE_BUTTON_TYPE_LEFT;
+                beEngineLayersMovingUi = event.data.mouse.unionVariables.whichButton != BE_MOUSE_BUTTON_TYPE_LEFT;
                 return SEC_TRUE;
 
             case BE_EVENT_TYPE_MOUSE_MOVED:
@@ -225,8 +225,8 @@ SEC_Boolean BE_EngineLayers_UIRendering_OnEvent(BE_Event event) {
                     continue;
 
                 uiWindow->position = (BE_Vector_2I) {
-                    (int) event.mouse.position.x - beEngineLayersMoveOffset.x,
-                    (int) event.mouse.position.y - beEngineLayersMoveOffset.y
+                    (int) event.data.mouse.position.x - beEngineLayersMoveOffset.x,
+                    (int) event.data.mouse.position.y - beEngineLayersMoveOffset.y
                 };
                 return SEC_TRUE;
 

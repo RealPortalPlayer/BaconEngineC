@@ -1,16 +1,24 @@
 // Purpose: Makes logging easier.
 // Created on: 3/29/22 @ 2:01 AM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <SharedEngineCode/Internal/OperatingSystem.h>
 
 #include "Internal/CppSupport.h"
 #include "Internal/Boolean.h"
+
+#if SEC_OPERATINGSYSTEM_UNIX
+#   define BE_LOGGER_PRINTF_ATTRIBUTE __attribute__((__format__(__printf__, 3, 4)))
+#elif SEC_OPERATINGSYSTEM_WINDOWS
+#   define BE_LOGGER_PRINTF_ATTRIBUTE
+#endif
+
 
 SEC_CPP_SUPPORT_GUARD_START()
 typedef enum {
@@ -24,7 +32,7 @@ typedef enum {
 } SEC_Logger_LogLevels;
 
 SEC_Logger_LogLevels SEC_Logger_GetLogLevel(void);
-void __attribute__((__format__(__printf__, 3, 4))) SEC_Logger_LogImplementation(SEC_Boolean includeHeader, SEC_Logger_LogLevels logLevel, const char* message, ...);
+void BE_LOGGER_PRINTF_ATTRIBUTE SEC_Logger_LogImplementation(SEC_Boolean includeHeader, SEC_Logger_LogLevels logLevel, const char* message, ...);
 void SEC_Logger_LogHeader(FILE* output, SEC_Logger_LogLevels logLevel);
 SEC_Boolean SEC_Logger_IsLevelEnabled(SEC_Logger_LogLevels logLevel);
 

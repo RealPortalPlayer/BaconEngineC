@@ -1,8 +1,7 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <stdlib.h>
-#include <string.h>
 
 #include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Debugging/Assert.h"
@@ -97,7 +96,7 @@ void BE_DynamicArray_Shrink(BE_DynamicArray* array) {
     if (array->size == 0 || array->size == (size_t) array->used || array->frozen)
         return;
 
-    unsigned oldSize = array->size;
+    size_t oldSize = array->size;
 
     array->size = array->used;
 

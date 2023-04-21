@@ -1,11 +1,9 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <SharedEngineCode/ArgumentHandler.h>
 #include <SharedEngineCode/Logger.h>
 #include <string.h>
-#include <SharedEngineCode/Internal/OperatingSystem.h>
-#include <SharedEngineCode/ANSI.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <SharedEngineCode/Threads.h>
 
@@ -17,7 +15,7 @@
 #   include <signal.h>
 #   include <io.h>
 #   define fileno _fileno
-#   define write _write // HACK: This is a stupid idea, but it's the only way to make MSVC shut up.
+#   define write(file, message, size) _write(file, message, (unsigned) size) // HACK: This is a stupid idea, but it's the only way to make MSVC shut up.
 #endif
 
 #include "BaconEngine/Debugging/Assert.h"
@@ -58,14 +56,18 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
 
             signal(SIGSEGV, SIG_DFL);
             raise(SIGSEGV);
-            return;
+            abort();
 
         case SIGINT:
             if (!BE_ClientInformation_IsRunning())
                 return;
 
+            // TODO: Windows?
+#if SEC_OPERATINGSYSTEM_UNIX
             // TODO: Reprint cursor
             siginterrupt(SIGINT, SEC_FALSE);
+#endif
+
             printf(" (type 'exit' to quit)\n");
             return;
 

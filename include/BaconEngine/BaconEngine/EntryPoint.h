@@ -1,7 +1,7 @@
 // Purpose: The entry point for the game engine.
 // Created on: 3/29/22 @ 12:33 AM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <SharedEngineCode/Internal/CppSupport.h>
@@ -28,18 +28,9 @@ SEC_CPP_SUPPORT_GUARD_START()
 #ifdef BACON_ENGINE_LAUNCHER
 int CallLauncherMain(int argc, char** argv);
 
-#   if SEC_OPERATINGSYSTEM_WINDOWS
-#       define WIN32_LEAN_AND_MEAN
-#       include <Windows.h> // FIXME: I really don't want to include this in a header (especially a header like this one), but it seems like the only way.
-#       include <stdlib.h>
-BOOL WINAPI WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR commandLine, int showCommand) {
-    return CallLauncherMain(__argc, __argv);
-}
-#   else
 int main(int argc, char** argv) {
     return CallLauncherMain(argc, argv);
 }
-#   endif
 #endif
 
 int BE_EntryPoint_ClientStart(int argc, char** argv);

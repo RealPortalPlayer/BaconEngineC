@@ -1,7 +1,7 @@
 // Purpose: An event.
 // Created on: 8/15/22 @ 4:57 PM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
@@ -38,7 +38,7 @@ typedef struct {
             union {
                 BE_Vector_2I newPosition;
                 BE_Vector_2I newSize;
-            };
+            } unionVariables;
         } window;
         struct {
             BE_Keyboard_KeyCodes key;
@@ -47,14 +47,10 @@ typedef struct {
         struct {
             BE_Vector_2F position;
             union {
-                struct {
-                    BE_Mouse_ButtonType which;
-                } button;
-                struct {
-                    BE_Vector_2F scrollAmount;
-                } wheel;
-            };
+                BE_Mouse_ButtonType whichButton;
+                BE_Vector_2F wheelScrollAmount;
+            } unionVariables;
         } mouse;
-    };
+    } data;
 } BE_Event;
 SEC_CPP_SUPPORT_GUARD_END()

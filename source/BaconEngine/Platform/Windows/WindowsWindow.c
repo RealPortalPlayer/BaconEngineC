@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <Windows.h>
@@ -37,6 +37,8 @@ void* BE_WindowsWindow_GetInternal(void) {
 
 void BE_WindowsWindow_Create(const char* title, BE_Vector_2U size, int monitor) {
     HINSTANCE instance = GetModuleHandle(0);
+
+    (void) monitor;
 
     WNDCLASSEX windowClass = {
         sizeof(WNDCLASSEX),

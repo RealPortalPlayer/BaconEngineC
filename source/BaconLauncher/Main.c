@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <SharedEngineCode/ArgumentHandler.h>
@@ -6,53 +6,24 @@
 #include <SharedEngineCode/Launcher.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <SharedEngineCode/OSUser.h>
-#include <SharedEngineCode/MessageBox.h>
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <dlfcn.h>
 #elif SEC_OPERATINGSYSTEM_WINDOWS
 #   include <Windows.h>
-#   include <stdlib.h>
-#   include <stdio.h>
-#   define argc __argc
-#   define argv __argv
 #endif
 
-#define LOG_FATAL_LOG_MESSAGE_BOX(message) \
-do {                                       \
-    SEC_LOGGER_FATAL(message "\n");        \
-    SEC_MessageBox_Display(message, "Launcher - Fatal Error", SEC_MESSAGEBOX_ICON_ERROR, SEC_MESSAGEBOX_BUTTON_OK); \
-} while (SEC_FALSE)
-
-#if SEC_OPERATINGSYSTEM_WINDOWS
-BOOL WINAPI WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR commandLine, int showCommand) {
-#else
 int main(int argc, char** argv) {
-#endif
     SEC_ArgumentHandler_Initialize(argc, argv);
-
-#if SEC_OPERATINGSYSTEM_WINDOWS
-    FILE* consoleHandle = NULL;
-
-    if (SEC_ArgumentHandler_GetIndex(SEC_BUILTINARGUMENTS_SHOW_TERMINAL, 0) != -1 && AllocConsole()) {
-        SetConsoleTitle("BaconEngine");
-        freopen_s(&consoleHandle, "CONIN$", "r", stdin);
-        freopen_s(&consoleHandle, "CONOUT$", "w", stderr);
-        freopen_s(&consoleHandle, "CONOUT$", "w", stdout);
-    }
-#endif
-
     SEC_LOGGER_TRACE("Built on: %s\nBuilt for: %s\n", __TIMESTAMP__, SEC_OPERATINGSYSTEM_NAME);
 
     if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_VERSION, SEC_BUILTINARGUMENTS_VERSION_SHORT, 0)) {
         SEC_LOGGER_INFO("Launcher version: 0.1\n");
-        SEC_MessageBox_Display("Version: 0.1", "Launcher - Info", SEC_MESSAGEBOX_ICON_INFORMATION, SEC_MESSAGEBOX_BUTTON_OK);
         return 0;
     }
 
     if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_HELP, SEC_BUILTINARGUMENTS_HELP_SHORT, 0)) {
         SEC_LOGGER_INFO("Arguments:\n%s\n", SEC_Launcher_GetDefaultHelpList());
-        SEC_MessageBox_Display(SEC_Launcher_GetDefaultHelpList(), "Launcher - Info", SEC_MESSAGEBOX_ICON_INFORMATION, SEC_MESSAGEBOX_BUTTON_OK);
         return 0;
     }
 
@@ -64,7 +35,7 @@ int main(int argc, char** argv) {
     SEC_ArgumentHandler_ShortResults results;
 
     if (SEC_ArgumentHandler_GetInfoWithShort(SEC_BUILTINARGUMENTS_CLIENT, SEC_BUILTINARGUMENTS_CLIENT_SHORT, 0, &results) == 0) {
-        LOG_FATAL_LOG_MESSAGE_BOX("No client specified, please check help for more information");
+        SEC_LOGGER_FATAL("No client specified, please check help for more information\n");
         return 1;
     }
 
@@ -77,33 +48,28 @@ int main(int argc, char** argv) {
     if (configuration.code != SEC_LAUNCHER_ERROR_CODE_NULL) {
         switch (configuration.code) {
             case SEC_LAUNCHER_ERROR_CODE_BINARY:
-                SEC_LOGGER_FATAL("Failed to load the binary: %s\n", configuration.errorMessage);
-                SEC_MessageBox_Display("Failed to load binary", "Launcher - Fatal Error", SEC_MESSAGEBOX_ICON_ERROR, SEC_MESSAGEBOX_BUTTON_OK);
+                SEC_LOGGER_FATAL("Failed to load the binary: %s\n", configuration.unionVariables.errorMessage);
                 return 1;
 
             case SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL:
             case SEC_LAUNCHER_ERROR_CODE_NAME_NULL:
-                SEC_LOGGER_FATAL("Failed to get important methods: %s\n", configuration.errorMessage);
-                SEC_MessageBox_Display("Failed to get important methods", "Launcher - Fatal Error", SEC_MESSAGEBOX_ICON_ERROR, SEC_MESSAGEBOX_BUTTON_OK);
+                SEC_LOGGER_FATAL("Failed to get important methods: %s\n", configuration.unionVariables.errorMessage);
                 return 1;
 
             case SEC_LAUNCHER_ERROR_CODE_CHDIR:
-                SEC_LOGGER_FATAL("Failed to set current directory: %s\n", configuration.errorMessage);
-                SEC_MessageBox_Display("Failed to access client directory", "Launcher - Fatal Error", SEC_MESSAGEBOX_ICON_ERROR, SEC_MESSAGEBOX_BUTTON_OK);
+                SEC_LOGGER_FATAL("Failed to set current directory: %s\n", configuration.unionVariables.errorMessage);
                 return 1;
-
 
             default:
                 SEC_LOGGER_FATAL("Unknown error: %i\n", configuration.code);
-                SEC_MessageBox_Display("An unknown error occurred, perhaps your launcher is too old", "Launcher - Unknown Error", SEC_MESSAGEBOX_ICON_ERROR, SEC_MESSAGEBOX_BUTTON_OK);
                 return 1;
         }
     }
 
-    SEC_LOGGER_INFO("Ready, starting '%s'\n", configuration.clientName);
+    SEC_LOGGER_INFO("Ready, starting '%s'\n", configuration.unionVariables.data.clientName);
     SEC_LOGGER_TRACE("Entering engine code\n");
 
-    int returnValue = configuration.Start(argc, argv);
+    int returnValue = configuration.unionVariables.data.Start(argc, argv);
 
     SEC_LOGGER_TRACE("Returned back to launcher\n");
     SEC_LOGGER_TRACE("Freeing binaries\n");
@@ -111,17 +77,9 @@ int main(int argc, char** argv) {
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
     dlclose(configuration.clientBinary);
 #elif SEC_OPERATINGSYSTEM_WINDOWS
-    FreeLibrary(configuration.clientBinary);
+    FreeLibrary(configuration.unionVariables.data.clientBinary);
 #endif
 
     SEC_LOGGER_INFO("Goodbye\n");
-
-#if SEC_OPERATINGSYSTEM_WINDOWS
-    if (consoleHandle != NULL) {
-        fclose(consoleHandle);
-        FreeConsole();
-    }
-#endif
-
     return returnValue;
 }

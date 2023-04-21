@@ -64,7 +64,7 @@ void BE_PrivateRenderer_Initialize(void) {
 
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "vulkan") == 0) {
 #if !SEC_OPERATINGSYSTEM_APPLE
-            vulkan:
+            //vulkan:
             BE_ASSERT_ALWAYS("Renderer not implemented\n");
 #else
             SEC_LOGGER_WARN("Vulkan doesn't support Apple operating systems\n");
@@ -92,7 +92,7 @@ void BE_PrivateRenderer_Initialize(void) {
 
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "directx") == 0) {
 #if SEC_OPERATINGSYSTEM_WINDOWS
-            directx:
+            //directx:
             BE_ASSERT_ALWAYS("Renderer not implemented\n");
 #else
             SEC_LOGGER_WARN("DirectX only works on Microsoft operating systems\n");
@@ -171,10 +171,10 @@ BE_Color_3U BE_Renderer_GetClearColor(void) {
 //}
 
 BE_Vector_2I BE_Renderer_GetCenterPosition(BE_Vector_2I rectanglePosition, BE_Vector_2U rectangleSize, BE_Vector_2U objectSize) {
-    return (BE_Vector_2I) {
+    return SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I,
         rectanglePosition.x + (int) rectangleSize.x / 2 - (int) objectSize.x / 2,
         rectanglePosition.y + (int) rectangleSize.y / 2 - (int) objectSize.y / 2
-    };
+    );
 }
 
 void BE_Renderer_DrawLine(BE_Vector_2I firstPoint, BE_Vector_2I secondPoint, BE_Color_4U color) {

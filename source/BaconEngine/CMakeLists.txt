@@ -115,3 +115,8 @@ if(NOT "${BE_ASAN_SANITIZER}" STREQUAL "")
         target_compile_definitions(BaconEngine PUBLIC BE_ASAN_ENABLED)
     endif()
 endif()
+
+if(MSVC) # I hate MSVC
+    target_compile_definitions(BaconEngine PUBLIC WIN32_LEAN_AND_MEAN -D_CRT_SECURE_NO_WARNINGS)
+    target_compile_options(BaconEngine PUBLIC /wd4204)
+endif()
