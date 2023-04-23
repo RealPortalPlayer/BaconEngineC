@@ -10,6 +10,7 @@
 
 #include "BaconEngine/Storage/DynamicArray.h"
 #include "BaconEngine/Rendering/UI.h"
+#include "../AntiClientGuard.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 typedef struct {

@@ -7,73 +7,60 @@
 #include "SharedEngineCode/Launcher.h"
 #include "SharedEngineCode/Internal/CppSupport.h"
 #include "SharedEngineCode/BuiltInArguments.h"
-
-#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
-#   include <dlfcn.h>
-#   include <unistd.h>
-#   define CHDIR(dir) chdir(dir)
-#   define GET_BINARY(name, options) dlopen(name, options)
-#   define GET_ADDRESS(binary, name) dlsym(binary, name)
-#   define SET_ERROR() configuration->unionVariables.errorMessage = dlerror()
-#elif SEC_OPERATINGSYSTEM_WINDOWS
-#   include <Windows.h>
-#   include <direct.h>
-#   define CHDIR(dir) _chdir(dir)
-#   define GET_BINARY(name, options) LoadLibrary(name)
-#   define GET_ADDRESS(binary, name) GetProcAddress(binary, name)
-#   define SET_ERROR() do { \
-    DWORD id = GetLastError(); \
-    LPSTR message = NULL;   \
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, id, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&message, 0, NULL); \
-    configuration->unionVariables.errorMessage = message; \
-} while (0)
-#   define BINARY_EXTENSION ".dll"
-#endif
-
-#if SEC_OPERATINGSYSTEM_APPLE
-#   define BINARY_EXTENSION ".dylib"
-#elif SEC_OPERATINGSYSTEM_LINUX || SEC_OPERATINGSYSTEM_UNIX || SEC_OPERATINGSYSTEM_SERENITY
-#   define BINARY_EXTENSION ".so"
-#endif
+#include "SharedEngineCode/Internal/PlatformSpecific.h"
+#include "SharedEngineCode/ArgumentHandler.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration, const char* path) {
-    if (CHDIR(path) != 0) {
-        configuration->code = SEC_LAUNCHER_ERROR_CODE_CHDIR;
-        configuration->unionVariables.errorMessage = strerror(errno);
+    {
+        SEC_ArgumentHandler_ShortResults results;
+
+        if (SEC_ArgumentHandler_GetInfoWithShort(SEC_BUILTINARGUMENTS_ENGINE, SEC_BUILTINARGUMENTS_ENGINE_SHORT, SEC_FALSE, &results) != 0)
+            configuration->unionVariables.data.engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY(*results.value, RTLD_NOW);
+        else
+            configuration->unionVariables.data.engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY("./BaconEngine" SEC_PLATFORMSPECIFIC_BINARY_EXTENSION, RTLD_NOW);
+    }
+
+    if (configuration->unionVariables.data.engineBinary == NULL) {
+        configuration->code = SEC_LAUNCHER_ERROR_CODE_BINARY;
+        configuration->unionVariables.errorReason.isEngine = SEC_TRUE;
+
+        SEC_PLATFORMSPECIFIC_GET_ERROR(configuration->unionVariables.errorReason.errorMessage);
         return;
     }
 
-    configuration->unionVariables.data.clientBinary = GET_BINARY("./binary" BINARY_EXTENSION, RTLD_NOW);
+    if (SEC_PLATFORMSPECIFIC_CHDIR(path) != 0) {
+        configuration->code = SEC_LAUNCHER_ERROR_CODE_CHDIR;
+        configuration->unionVariables.errorReason.isEngine = SEC_FALSE;
+        configuration->unionVariables.errorReason.errorMessage = strerror(errno);
+        return;
+    }
+
+    configuration->unionVariables.data.clientBinary = SEC_PLATFORMSPECIFIC_GET_BINARY("./binary" SEC_PLATFORMSPECIFIC_BINARY_EXTENSION, RTLD_NOW);
 
     if (configuration->unionVariables.data.clientBinary == NULL) {
         configuration->code = SEC_LAUNCHER_ERROR_CODE_BINARY;
+        configuration->unionVariables.errorReason.isEngine = SEC_FALSE;
 
-        SET_ERROR();
+        SEC_PLATFORMSPECIFIC_GET_ERROR(configuration->unionVariables.errorReason.errorMessage);
         return;
     }
 
     {
         const char*
-        (*name)(void) = (const char*(*)(void)) GET_ADDRESS(configuration->unionVariables.data.clientBinary, "BE_EntryPoint_GetClientName");
+        (*name)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_GetName");
 
-        if (name == NULL) {
-            configuration->code = SEC_LAUNCHER_ERROR_CODE_NAME_NULL;
-
-            SET_ERROR();
-            return;
-        }
-
-        configuration->unionVariables.data.clientName = name();
+        configuration->unionVariables.data.clientName = name != NULL ? name() : "";
     }
 
-    configuration->unionVariables.data.Start = (int (*)(int, char**)) GET_ADDRESS(configuration->unionVariables.data.clientBinary,
-                                                                                  "BE_EntryPoint_InitializeDynamicLibrary");
+    configuration->unionVariables.data.Start = (int (*)(void*, void*, int, char**)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.engineBinary,
+                                                                                                                     "BE_EntryPoint_StartBaconEngine");
 
     if (configuration->unionVariables.data.Start == NULL) {
         configuration->code = SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL;
+        configuration->unionVariables.errorReason.isEngine = SEC_TRUE;
 
-        SET_ERROR();
+        SEC_PLATFORMSPECIFIC_GET_ERROR(configuration->unionVariables.errorReason.errorMessage);
         return;
     }
 
@@ -106,6 +93,7 @@ const char* SEC_Launcher_GetDefaultHelpList(void) {
 /*#if SEC_OPERATINGSYSTEM_WINDOWS // TODO: Reimplement WinMain, but as a separate executable
            SEC_BUILTINARGUMENTS_SHOW_TERMINAL ": Shows a terminal window, does nothing for non-Windows\n"
 #endif*/
-           SEC_BUILTINARGUMENTS_DISABLE_LOG_HEADER " (" SEC_BUILTINARGUMENTS_DISABLE_LOG_HEADER_SHORT "): Do not log the log level header";
+           SEC_BUILTINARGUMENTS_DISABLE_LOG_HEADER " (" SEC_BUILTINARGUMENTS_DISABLE_LOG_HEADER_SHORT "): Do not log the log level header\n"
+           SEC_BUILTINARGUMENTS_ENGINE " <engine binary> (" SEC_BUILTINARGUMENTS_ENGINE_SHORT "): Use a custom engine binary";
 }
 SEC_CPP_SUPPORT_GUARD_END()

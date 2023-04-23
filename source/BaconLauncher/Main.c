@@ -48,16 +48,15 @@ int main(int argc, char** argv) {
     if (configuration.code != SEC_LAUNCHER_ERROR_CODE_NULL) {
         switch (configuration.code) {
             case SEC_LAUNCHER_ERROR_CODE_BINARY:
-                SEC_LOGGER_FATAL("Failed to load the binary: %s\n", configuration.unionVariables.errorMessage);
+                SEC_LOGGER_FATAL("Failed to load %s binary: %s\n", configuration.unionVariables.errorReason.isEngine ? "engine" : "client", configuration.unionVariables.errorReason.errorMessage);
                 return 1;
 
             case SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL:
-            case SEC_LAUNCHER_ERROR_CODE_NAME_NULL:
-                SEC_LOGGER_FATAL("Failed to get important methods: %s\n", configuration.unionVariables.errorMessage);
+                SEC_LOGGER_FATAL("Failed to get engine entry-point: %s\n", configuration.unionVariables.errorReason.errorMessage);
                 return 1;
 
             case SEC_LAUNCHER_ERROR_CODE_CHDIR:
-                SEC_LOGGER_FATAL("Failed to set current directory: %s\n", configuration.unionVariables.errorMessage);
+                SEC_LOGGER_FATAL("Failed to set current directory: %s\n", configuration.unionVariables.errorReason.errorMessage);
                 return 1;
 
             default:
@@ -66,17 +65,23 @@ int main(int argc, char** argv) {
         }
     }
 
-    SEC_LOGGER_INFO("Ready, starting '%s'\n", configuration.unionVariables.data.clientName);
+    if (configuration.unionVariables.data.clientName[0] != '\0')
+        SEC_LOGGER_INFO("Ready, starting: %s\n", configuration.unionVariables.data.clientName);
+    else
+        SEC_LOGGER_INFO("Ready, starting");
+
     SEC_LOGGER_TRACE("Entering engine code\n");
 
-    int returnValue = configuration.unionVariables.data.Start(argc, argv);
+    int returnValue = SEC_LAUNCHER_START_ENGINE(configuration, argc, argv);
 
     SEC_LOGGER_TRACE("Returned back to launcher\n");
     SEC_LOGGER_TRACE("Freeing binaries\n");
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
-    dlclose(configuration.clientBinary);
+    dlclose(configuration.unionVariables.data.engineBinary);
+    dlclose(configuration.unionVariables.data.clientBinary);
 #elif SEC_OPERATINGSYSTEM_WINDOWS
+    FreeLibrary(configuration.unionVariables.data.engineBinary);
     FreeLibrary(configuration.unionVariables.data.clientBinary);
 #endif
 

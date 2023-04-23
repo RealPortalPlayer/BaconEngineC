@@ -9,6 +9,7 @@
 #include <SharedEngineCode/Internal/CppSupport.h>
 
 #include "BaconEngine/Storage/DynamicArray.h"
+#include "../AntiClientGuard.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 int BE_EngineLayers_GetUIWindowRenderCount(void);

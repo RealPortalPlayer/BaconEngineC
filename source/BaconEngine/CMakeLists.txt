@@ -1,7 +1,7 @@
 project(BaconEngine)
 
 if(NOT BE_DISABLE_OPENGL)
-    set(BE_SOURCE_FILES
+    set(BE_PRIVATE_SOURCE_FILES
             # Header files
             Platform/OpenGL/OpenGL.h
             Platform/OpenGL/OpenGLWindow.h
@@ -16,7 +16,7 @@ if(NOT BE_DISABLE_OPENGL)
 endif()
 
 if(WIN32)
-    set(BE_SOURCE_FILES ${BE_SOURCE_FILES}
+    set(BE_PRIVATE_SOURCE_FILES ${BE_PRIVATE_SOURCE_FILES}
             # Header files
             Platform/Windows/Windows.h
             Platform/Windows/WindowsWindow.h
@@ -29,7 +29,7 @@ if(WIN32)
 endif()
 
 if(NOT BE_DISABLE_METAL AND APPLE)
-    set(BE_SOURCE_FILES ${BE_SOURCE_FILES}
+    set(BE_PRIVATE_SOURCE_FILES ${BE_PRIVATE_SOURCE_FILES}
             # Header files
             Platform/Metal/Metal.h
             Platform/Metal/MetalWindow.h
@@ -39,7 +39,28 @@ if(NOT BE_DISABLE_METAL AND APPLE)
             Platform/Metal/MetalWindow.m)
 endif()
 
-add_library(BaconEngine STATIC
+set(BE_SOURCE_FILES
+        # Header files
+        InterfaceFunctions.h
+
+        # Source files
+        Rendering/Window.c
+        Rendering/Renderer.c
+        ClientInformation.c
+        Console/ArgumentManager.c
+        Console/Console.c
+        Rendering/Layer.c
+        Input/Keyboard.c
+        Storage/DynamicArray.c
+        Storage/DynamicDictionary.c
+        I18N.c
+        Input/Mouse.c
+        Rendering/UI.c
+        DeltaTime.c
+        Debugging/Assert.c
+        Debugging/StrictMode.c)
+
+add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         # Header files
         Console/EngineCommands.h
         EngineMemory.h
@@ -51,31 +72,16 @@ add_library(BaconEngine STATIC
         Console/PrivateConsole.h
         Rendering/PrivateRenderer.h
         Rendering/PrivateWindow.h
+        AntiClientGuard.h
 
         # Source files
-        Rendering/Window.c
-        Rendering/Renderer.c
-        ClientInformation.c
-        Console/ArgumentManager.c
-        Console/Console.c
-        Console/EngineCommands.c
-        Rendering/Layer.c
-        Rendering/EngineLayers.c
-        Rendering/EngineUIs.c
-        Input/Keyboard.c
-        EngineMemory.c
-        Storage/DynamicArray.c
-        Storage/DynamicDictionary.c
-        I18N.c
-        Input/Mouse.c
-        Rendering/UI.c
         EntryPoint.c
+        Console/EngineCommands.c
+        EngineMemory.c
         Platform/SpecificPlatformFunctions.c
-        ${BE_SOURCE_FILES}
         Platform/TextMode/TextMode.c
-        DeltaTime.c
-        Debugging/Assert.c
-        Debugging/StrictMode.c)
+        Rendering/EngineUIs.c
+        Rendering/EngineLayers.c)
 
 if(NOT BE_DISABLE_OPENGL)
     set(BE_LIBRARIES glfw OpenGL::GL glad)
@@ -120,3 +126,21 @@ if(MSVC) # I hate MSVC
     target_compile_definitions(BaconEngine PUBLIC WIN32_LEAN_AND_MEAN -D_CRT_SECURE_NO_WARNINGS)
     target_compile_options(BaconEngine PUBLIC /wd4204)
 endif()
+
+if(NOT BE_DONT_SET_BINARY_OUTPUT_PATH)
+    set_target_properties(BaconEngine PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out")
+endif()
+
+# --- PROJECT SEPARATOR ---
+
+project(BaconEngineClient)
+
+add_library(BaconEngineClient STATIC ${BE_SOURCE_FILES})
+
+target_include_directories(BaconEngineClient PUBLIC ../../include/BaconEngine)
+
+target_compile_definitions(BaconEngineClient PUBLIC BE_CLIENT_BINARY)
+
+# TODO: Should we worry about stuff like pedantic mode?
+
+target_link_libraries(BaconEngineClient LINK_PUBLIC Interface)

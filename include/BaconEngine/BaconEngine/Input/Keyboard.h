@@ -1,13 +1,15 @@
 // Purpose: Every supported keyboard key-code, and their char representation.
 // Created on: 8/15/22 @ 1:59 PM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
+
+#include "BaconEngine/DllExport.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 typedef enum {
@@ -87,9 +89,9 @@ typedef enum {
 /**
  * @return The character that represents the keycode, 0 if there is none
  */
-char BE_Keyboard_ConvertKeyCodeToChar(BE_Keyboard_KeyCodes keyCode);
-SEC_Boolean BE_Keyboard_IsKeyDown(BE_Keyboard_KeyCodes keyCode);
-SEC_Boolean BE_Keyboard_IsKeyPressed(BE_Keyboard_KeyCodes keyCode);
-SEC_Boolean BE_Keyboard_IsEngineKeyCodeValid(BE_Keyboard_KeyCodes keyCode);
-SEC_Boolean BE_Keyboard_IsKeyCodeFromKeyPad(BE_Keyboard_KeyCodes keyCode);
+BE_DLLEXPORT char BE_Keyboard_ConvertKeyCodeToChar(BE_Keyboard_KeyCodes keyCode);
+BE_DLLEXPORT SEC_Boolean BE_Keyboard_IsKeyDown(BE_Keyboard_KeyCodes keyCode);
+BE_DLLEXPORT SEC_Boolean BE_Keyboard_IsKeyPressed(BE_Keyboard_KeyCodes keyCode);
+BE_DLLEXPORT SEC_Boolean BE_Keyboard_IsEngineKeyCodeValid(BE_Keyboard_KeyCodes keyCode);
+BE_DLLEXPORT SEC_Boolean BE_Keyboard_IsKeyCodeFromKeyPad(BE_Keyboard_KeyCodes keyCode);
 SEC_CPP_SUPPORT_GUARD_END()

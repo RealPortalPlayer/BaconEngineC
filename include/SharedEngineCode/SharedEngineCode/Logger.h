@@ -13,7 +13,7 @@
 #include "Internal/CppSupport.h"
 #include "Internal/Boolean.h"
 
-#if SEC_OPERATINGSYSTEM_UNIX
+#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   define BE_LOGGER_PRINTF_ATTRIBUTE __attribute__((__format__(__printf__, 3, 4)))
 #elif SEC_OPERATINGSYSTEM_WINDOWS
 #   define BE_LOGGER_PRINTF_ATTRIBUTE

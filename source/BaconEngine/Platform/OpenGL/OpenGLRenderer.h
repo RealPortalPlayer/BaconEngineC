@@ -10,6 +10,7 @@
 
 #include "BaconEngine/Math/Vector.h"
 #include "BaconEngine/Math/Color.h"
+#include "../../AntiClientGuard.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 BE_Color_3U BE_OpenGLRenderer_GetClearColor(void);

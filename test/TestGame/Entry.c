@@ -1,7 +1,7 @@
 // Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include <BaconEngine/EntryPoint.h>
+#include <Interface/EntryPoint.h>
 #include <BaconEngine/Console/Console.h>
 #include <SharedEngineCode/Logger.h>
 
@@ -24,14 +24,14 @@ void TestCommand(BE_Command_Context context) {
     SEC_LOGGER_INFO("Arguments: %s, %s\n", string, string2);
 }
 
-int BE_EntryPoint_ClientStart(int argc, char** argv) {
+int I_EntryPoint_Start(int argc, char** argv) {
     (void) argc;
     (void) argv;
 
 //    if (SEC_ArgumentHandler_GetIndexWithShort(SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING_SHORT, SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING_SHORT, 1, &index1, &index2))
 //        SEC_LOGGER_INFO("DUR: %i %i\n", index1, index2);
 
-    InitializeTestLayers();
+//    InitializeTestLayers();
     BE_Command_Register("test", "Tests the command handler.", BE_COMMAND_FLAG_NULL,
                         (void (*)(BE_Command_Context)) &TestCommand);
     {
@@ -42,14 +42,10 @@ int BE_EntryPoint_ClientStart(int argc, char** argv) {
     return 0;
 }
 
-int BE_EntryPoint_ClientShutdown(void) {
-    return 0;
-}
-
-SEC_Boolean BE_EntryPoint_ClientSupportsServer(void) {
+SEC_Boolean I_EntryPoint_SupportsServer(void) {
     return SEC_TRUE;
 }
 
-const char* BE_EntryPoint_GetClientName(void) {
+const char* I_EntryPoint_GetName(void) {
     return "Test";
 }

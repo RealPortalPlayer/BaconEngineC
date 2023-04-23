@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <string.h>
@@ -6,9 +6,11 @@
 
 #include "BaconEngine/I18N.h"
 #include "BaconEngine/Debugging/StrictMode.h"
+#include "InterfaceFunctions.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 const char* BE_I18N_Translate(FILE* languageFile, const char* key) {
+#ifndef BE_CLIENT_BINARY
     BE_STRICTMODE_CHECK(key[0] != '\0', key, "Key cannot be empty\n");
     BE_STRICTMODE_CHECK(languageFile != NULL, key, "Language file cannot be null\n");
 
@@ -29,5 +31,9 @@ const char* BE_I18N_Translate(FILE* languageFile, const char* key) {
     SEC_LOGGER_ERROR("Failed to translate: %s\n", key);
 
     return key;
+#else
+    BE_INTERFACEFUNCTION(const char*, FILE*, const char*);
+    return function(languageFile, key);
+#endif
 }
 SEC_CPP_SUPPORT_GUARD_END()

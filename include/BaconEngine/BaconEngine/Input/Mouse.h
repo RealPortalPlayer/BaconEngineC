@@ -1,13 +1,15 @@
 // Purpose: Every supported mouse related stuff.
 // Created on: 8/15/22 @ 10:29 PM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
+
+#include "BaconEngine/DllExport.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 typedef enum {
@@ -18,5 +20,5 @@ typedef enum {
     BE_MOUSE_BUTTON_TYPE_FORTH
 } BE_Mouse_ButtonType;
 
-SEC_Boolean BE_Mouse_IsButtonDown(BE_Mouse_ButtonType button);
+BE_DLLEXPORT SEC_Boolean BE_Mouse_IsButtonDown(BE_Mouse_ButtonType button);
 SEC_CPP_SUPPORT_GUARD_END()

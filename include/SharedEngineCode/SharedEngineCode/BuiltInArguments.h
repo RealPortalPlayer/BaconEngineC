@@ -1,7 +1,7 @@
 // Purpose: Defines for all the built-in arguments.
 // Created on: 9/11/22 @ 12:40 AM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
@@ -42,3 +42,5 @@
 #define SEC_BUILTINARGUMENTS_SHOW_TERMINAL "--show-terminal"
 #define SEC_BUILTINARGUMENTS_DISABLE_LOG_HEADER "--dont-log-header"
 #define SEC_BUILTINARGUMENTS_DISABLE_LOG_HEADER_SHORT "-dlh"
+#define SEC_BUILTINARGUMENTS_ENGINE "--engine"
+#define SEC_BUILTINARGUMENTS_ENGINE_SHORT "-e"

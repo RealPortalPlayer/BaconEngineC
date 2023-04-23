@@ -3,6 +3,7 @@
 
 #include "SharedEngineCode/MessageBox.h"
 #include "SharedEngineCode/Internal/OperatingSystem.h"
+#include "SharedEngineCode/Internal/CppSupport.h"
 
 #if SEC_OPERATINGSYSTEM_WINDOWS
 #   include <Windows.h>
@@ -10,6 +11,7 @@
 
 // TODO: This code is very ugly, and platform specific.
 
+SEC_CPP_SUPPORT_GUARD_START()
 SEC_MessageBox_Results SEC_MessageBox_Display(const char* message, const char* caption, SEC_MessageBox_Icons icon, SEC_MessageBox_Buttons buttons) {
 #if SEC_OPERATINGSYSTEM_WINDOWS
     UINT flags = MB_OK;
@@ -36,3 +38,4 @@ SEC_MessageBox_Results SEC_MessageBox_Display(const char* message, const char* c
     return 0;
 #endif
 }
+SEC_CPP_SUPPORT_GUARD_END()

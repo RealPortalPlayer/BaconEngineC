@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <SharedEngineCode/Logger.h>
@@ -9,10 +9,15 @@
 #include "BaconEngine/Debugging/Assert.h"
 #include "BaconEngine/Rendering/Window.h"
 #include "BaconEngine/Rendering/Renderer.h"
-#include "PrivateWindow.h"
-#include "../Platform/SpecificPlatformFunctions.h"
+#include "../InterfaceFunctions.h"
+
+#ifndef BE_CLIENT_BINARY
+#   include "PrivateWindow.h"
+#   include "../Platform/SpecificPlatformFunctions.h"
+#endif
 
 SEC_CPP_SUPPORT_GUARD_START()
+#ifndef BE_CLIENT_BINARY
 void BE_PrivateWindow_Initialize(const char* windowTitle, BE_Vector_2U windowSize) {
     int monitorNumber = 0;
     {
@@ -39,56 +44,114 @@ void BE_PrivateWindow_Initialize(const char* windowTitle, BE_Vector_2U windowSiz
 void BE_PrivateWindow_Destroy(void) {
     BE_SpecificPlatformFunctions_Get().windowFunctions.CloseWindow();
 }
+#endif
 
 const char* BE_Window_GetTitle(void) {
+#ifndef BE_CLIENT_BINARY
     return BE_SpecificPlatformFunctions_Get().windowFunctions.GetTitle();
+#else
+    BE_INTERFACEFUNCTION(const char*, void);
+    return function();
+#endif
 }
 
 BE_Vector_2U BE_Window_GetSize(void) {
+#ifndef BE_CLIENT_BINARY
     return BE_SpecificPlatformFunctions_Get().windowFunctions.GetSize();
+#else
+    BE_INTERFACEFUNCTION(BE_Vector_2U, void);
+    return function();
+#endif
 }
 
 BE_Vector_2I BE_Window_GetPosition(void) {
+#ifndef BE_CLIENT_BINARY
     return BE_SpecificPlatformFunctions_Get().windowFunctions.GetPosition();
+#else
+    BE_INTERFACEFUNCTION(BE_Vector_2I, void);
+    return function();
+#endif
 }
 
 SEC_Boolean BE_Window_IsVisible(void) {
+#ifndef BE_CLIENT_BINARY
     return BE_SpecificPlatformFunctions_Get().windowFunctions.IsVisible();
+#else
+    BE_INTERFACEFUNCTION(SEC_Boolean, void);
+    return function();
+#endif
 }
 
 SEC_Boolean BE_Window_IsStillOpened(void) {
+#ifndef BE_CLIENT_BINARY
     return BE_SpecificPlatformFunctions_Get().windowFunctions.IsStillOpened();
+#else
+    BE_INTERFACEFUNCTION(SEC_Boolean, void);
+    return function();
+#endif
 }
 
 void BE_Window_SetTitle(const char* newTitle) {
+#ifndef BE_CLIENT_BINARY
     BE_SpecificPlatformFunctions_Get().windowFunctions.SetTitle(newTitle);
+#else
+    BE_INTERFACEFUNCTION(void, const char*)(newTitle);
+#endif
 }
 
 void BE_Window_SetSize(BE_Vector_2U newSize) {
+#ifndef BE_CLIENT_BINARY
     BE_SpecificPlatformFunctions_Get().windowFunctions.SetSize(newSize);
+#else
+    BE_INTERFACEFUNCTION(void, BE_Vector_2U)(newSize);
+#endif
 }
 
 void BE_Window_SetWidth(unsigned newWidth) {
-	BE_Window_SetSize(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2U, newWidth, BE_Window_GetSize().y));
+#ifndef BE_CLIENT_BINARY
+    BE_Window_SetSize(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2U, newWidth, BE_Window_GetSize().y));
+#else
+    BE_INTERFACEFUNCTION(void, unsigned)(newWidth);
+#endif
 }
 
 void BE_Window_SetHeight(unsigned newHeight) {
+#ifndef BE_CLIENT_BINARY
     BE_Window_SetSize(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2U, BE_Window_GetSize().x, newHeight));
+#else
+    BE_INTERFACEFUNCTION(void, unsigned)(newHeight);
+#endif
 }
 
 void BE_Window_SetPosition(BE_Vector_2I newPosition) {
+#ifndef BE_CLIENT_BINARY
     BE_SpecificPlatformFunctions_Get().windowFunctions.SetPosition(newPosition);
+#else
+    BE_INTERFACEFUNCTION(void, BE_Vector_2I)(newPosition);
+#endif
 }
 
 void BE_Window_SetXPosition(int newX) {
+#ifndef BE_CLIENT_BINARY
     BE_Window_SetPosition(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I, newX, BE_Window_GetPosition().y));
+#else
+    BE_INTERFACEFUNCTION(void, int)(newX);
+#endif
 }
 
 void BE_Window_SetYPosition(int newY) {
+#ifndef BE_CLIENT_BINARY
     BE_Window_SetPosition(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I, BE_Window_GetPosition().x, newY));
+#else
+    BE_INTERFACEFUNCTION(void, int)(newY);
+#endif
 }
 
 void BE_Window_SetVisibility(SEC_Boolean visible) {
+#ifndef BE_CLIENT_BINARY
     BE_SpecificPlatformFunctions_Get().windowFunctions.SetVisibility(visible);
+#else
+    BE_INTERFACEFUNCTION(void, SEC_Boolean)(visible);
+#endif
 }
 SEC_CPP_SUPPORT_GUARD_END()

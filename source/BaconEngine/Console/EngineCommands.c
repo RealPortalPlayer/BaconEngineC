@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <string.h>
@@ -15,6 +15,9 @@
 #include "BaconEngine/Rendering/UI.h"
 #include "BaconEngine/Math/Bitwise.h"
 #include "BaconEngine/DeltaTime.h"
+#include "../AntiClientGuard.h"
+
+
 
 SEC_CPP_SUPPORT_GUARD_START()
 void BE_EngineCommands_Help(BE_Command_Context context);

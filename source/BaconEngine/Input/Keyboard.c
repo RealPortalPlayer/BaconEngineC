@@ -1,11 +1,16 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include "BaconEngine/Input/Keyboard.h"
-#include "../Platform/SpecificPlatformFunctions.h"
+#include "../InterfaceFunctions.h"
+
+#ifndef BE_CLIENT_BINARY
+#   include "../Platform/SpecificPlatformFunctions.h"
+#endif
 
 SEC_CPP_SUPPORT_GUARD_START()
-char keyCodesCharArray[BE_KEYBOARD_KEY_CODE_SIZE] = {
+#ifndef BE_CLIENT_BINARY
+static char keyCodesCharArray[BE_KEYBOARD_KEY_CODE_SIZE] = {
     1,
 
     '`', '1', '2',
@@ -43,28 +48,54 @@ char keyCodesCharArray[BE_KEYBOARD_KEY_CODE_SIZE] = {
     0, 0, 0,
     '0', '.'
 };
+#endif
 
 char BE_Keyboard_ConvertKeyCodeToChar(BE_Keyboard_KeyCodes keyCode) {
+#ifndef BE_CLIENT_BINARY
     return (char) (BE_Keyboard_IsEngineKeyCodeValid(keyCode) ? keyCodesCharArray[keyCode] : 0);
+#else
+    BE_INTERFACEFUNCTION(char, BE_Keyboard_KeyCodes);
+    return function(keyCode);
+#endif
 }
 
 SEC_Boolean BE_Keyboard_IsKeyDown(BE_Keyboard_KeyCodes keyCode) {
+#ifndef BE_CLIENT_BINARY
     return BE_Keyboard_IsEngineKeyCodeValid(keyCode) && BE_SpecificPlatformFunctions_Get().inputFunctions.IsKeyDown(keyCode);
+#else
+    BE_INTERFACEFUNCTION(SEC_Boolean, BE_Keyboard_KeyCodes);
+    return function(keyCode);
+#endif
 }
 
 SEC_Boolean BE_Keyboard_IsKeyPressed(BE_Keyboard_KeyCodes keyCode) {
+#ifndef BE_CLIENT_BINARY
     return BE_Keyboard_IsEngineKeyCodeValid(keyCode) && BE_SpecificPlatformFunctions_Get().inputFunctions.IsKeyPressed(keyCode);
+#else
+    BE_INTERFACEFUNCTION(SEC_Boolean, BE_Keyboard_KeyCodes);
+    return function(keyCode);
+#endif
 }
 
 SEC_Boolean BE_Keyboard_IsEngineKeyCodeValid(BE_Keyboard_KeyCodes keyCode) {
+#ifndef BE_CLIENT_BINARY
     return keyCode < BE_KEYBOARD_KEY_CODE_SIZE && keyCodesCharArray[keyCode] != 1;
+#else
+    BE_INTERFACEFUNCTION(SEC_Boolean, BE_Keyboard_KeyCodes);
+    return function(keyCode);
+#endif
 }
 
 SEC_Boolean BE_Keyboard_IsKeyCodeFromKeyPad(BE_Keyboard_KeyCodes keyCode) {
+#ifndef BE_CLIENT_BINARY
     return (keyCode >= BE_KEYBOARD_KEY_CODE_KP_NUM_LOCK && keyCode <= BE_KEYBOARD_KEY_CODE_KP_MINUS) ||
            (keyCode >= BE_KEYBOARD_KEY_CODE_KP_SEVEN && keyCode <= BE_KEYBOARD_KEY_CODE_KP_PLUS) ||
            (keyCode >= BE_KEYBOARD_KEY_CODE_KP_FOUR && keyCode <= BE_KEYBOARD_KEY_CODE_KP_SIX) ||
            (keyCode >= BE_KEYBOARD_KEY_CODE_KP_ONE && keyCode <= BE_KEYBOARD_KEY_CODE_KP_RETURN) ||
            keyCode == BE_KEYBOARD_KEY_CODE_KP_ZERO || keyCode == BE_KEYBOARD_KEY_CODE_KP_PERIOD;
+#else
+    BE_INTERFACEFUNCTION(SEC_Boolean, BE_Keyboard_KeyCodes);
+    return function(keyCode);
+#endif
 }
 SEC_CPP_SUPPORT_GUARD_END()
