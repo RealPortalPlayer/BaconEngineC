@@ -26,8 +26,16 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    void* clientBinary;
+
+#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
+    clientBinary = dlopen(NULL, RTLD_NOW);
+#else
+    clientBinary = GetModuleHandle(NULL);
+#endif
+
     printf("Starting engine\n");
-    return start(engineBinary, SEC_PLATFORMSPECIFIC_GET_BINARY(NULL, RTLD_NOW), argc, argv);
+    return start(engineBinary, clientBinary, argc, argv);
 }
 
 const char* I_EntryPoint_GetName(void) {

@@ -20,6 +20,7 @@
 #   elif SEC_OPERATINGSYSTEM_LINUX || SEC_OPERATINGSYSTEM_UNIX || SEC_OPERATINGSYSTEM_SERENITY
 #       define SEC_PLATFORMSPECIFIC_BINARY_EXTENSION ".so"
 #   endif
+#   define SEC_PLATFORMSPECIFIC_CLOSE_BINARY(binary) dlclose(binary)
 #elif SEC_OPERATINGSYSTEM_WINDOWS
 #   include <Windows.h>
 #   include <direct.h>
@@ -33,4 +34,5 @@
         variable = message;                              \
     } while (0)
 #   define SEC_PLATFORMSPECIFIC_BINARY_EXTENSION ".dll"
+#   define SEC_PLATFORMSPECIFIC_CLOSE_BINARY(binary) FreeLibrary(binary)
 #endif

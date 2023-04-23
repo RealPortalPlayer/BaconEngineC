@@ -17,20 +17,6 @@ SEC_CPP_SUPPORT_GUARD_START()
 int main(int argc, char** argv) {
     SEC_ArgumentHandler_Initialize(argc, argv);
     SEC_LOGGER_TRACE("Built on: %s\nBuilt for: %s\n", __TIMESTAMP__, SEC_OPERATINGSYSTEM_NAME);
-
-    if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_VERSION, SEC_BUILTINARGUMENTS_VERSION_SHORT, 0)) {
-        SEC_LOGGER_INFO("Engine version: 0.1\n");
-        return 0;
-    }
-
-    if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_HELP, SEC_BUILTINARGUMENTS_HELP_SHORT, 0)) {
-        SEC_LOGGER_INFO("Arguments:\n%s\n", SEC_Launcher_GetDefaultHelpList());
-        return 0;
-    }
-
-    if (SEC_OSUser_IsAdmin())
-        SEC_LOGGER_WARN("You're running as root! If a client says you require to be root, then it's probably a virus\n");
-
     SEC_LOGGER_DEBUG("Getting engine\n");
 
     void* engineBinary = NULL;
@@ -43,6 +29,33 @@ int main(int argc, char** argv) {
         else
             engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY("./BaconEngine" SEC_PLATFORMSPECIFIC_BINARY_EXTENSION, RTLD_NOW);
     }
+
+    if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_VERSION, SEC_BUILTINARGUMENTS_VERSION_SHORT, 0)) {
+        SEC_Boolean logNextHeader = SEC_TRUE;
+
+        if (engineBinary != NULL) {
+            const char* (*getVersion)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(engineBinary, "BE_EntryPoint_GetVersion");
+
+            if (getVersion != NULL) {
+                SEC_LOGGER_INFO("Engine version: %s\n", getVersion());
+
+                logNextHeader = SEC_FALSE;
+            }
+
+            SEC_PLATFORMSPECIFIC_CLOSE_BINARY(engineBinary);
+        }
+
+        SEC_Logger_LogImplementation(logNextHeader, SEC_LOGGER_LOG_LEVEL_INFO, "Client was compiled with engine version: %s\n", BE_ENGINE_VERSION);
+        return 0;
+    }
+
+    if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_HELP, SEC_BUILTINARGUMENTS_HELP_SHORT, 0)) {
+        SEC_LOGGER_INFO("Arguments:\n%s\n", SEC_Launcher_GetDefaultHelpList());
+        return 0;
+    }
+
+    if (SEC_OSUser_IsAdmin())
+        SEC_LOGGER_WARN("You're running as root! If a client says you require to be root, then it's probably a virus\n");
 
     if (engineBinary == NULL) {
         const char* errorMessage = NULL;
@@ -64,7 +77,14 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    void* clientBinary = SEC_PLATFORMSPECIFIC_GET_BINARY(NULL, RTLD_NOW);
+    void* clientBinary;
+
+#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
+    clientBinary = dlopen(NULL, RTLD_NOW);
+#else
+    clientBinary = GetModuleHandle(NULL);
+#endif
+
     const char* (*getName)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName");
 
     {
@@ -82,13 +102,7 @@ int main(int argc, char** argv) {
 
     SEC_LOGGER_TRACE("Returned back to launcher\n");
     SEC_LOGGER_TRACE("Freeing engine binary\n");
-
-#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
-    dlclose(engineBinary);
-#elif SEC_OPERATINGSYSTEM_WINDOWS
-    FreeLibrary(engineBinary);
-#endif
-
+    SEC_PLATFORMSPECIFIC_CLOSE_BINARY(engineBinary);
     SEC_LOGGER_INFO("Goodbye\n");
     return returnValue;
 }

@@ -131,6 +131,8 @@ if(NOT BE_DONT_SET_BINARY_OUTPUT_PATH)
     set_target_properties(BaconEngine PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out")
 endif()
 
+target_compile_definitions(BaconEngine PUBLIC BE_ENGINE_VERSION="${BE_ENGINE_VERSION}")
+
 # --- PROJECT SEPARATOR ---
 
 project(BaconEngineClient)

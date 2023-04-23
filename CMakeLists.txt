@@ -5,6 +5,8 @@ set(CMAKE_C_STANDARD 17)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
+set(BE_ENGINE_VERSION 1.0.0-incomplete)
+set(BE_LAUNCHER_VERSION 2.0.0-alpha)
 
 option(BE_DISABLE_OFFICIAL_PROJECTS "Don't compile any of the official projects" OFF)
 option(BE_DISABLE_TEST_PROJECTS "Don't compile any of the test projects" OFF)

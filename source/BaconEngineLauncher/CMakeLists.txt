@@ -2,7 +2,7 @@ project(BaconEngineLauncher C)
 
 add_library(BaconEngineLauncher STATIC Main.c)
 
-target_compile_definitions(BaconEngineLauncher PUBLIC BACON_ENGINE_LAUNCHER)
+target_compile_definitions(BaconEngineLauncher PUBLIC BACON_ENGINE_LAUNCHER BE_ENGINE_VERSION="${BE_ENGINE_VERSION}")
 
 target_link_libraries(BaconEngineLauncher LINK_PUBLIC BaconEngineClient)
 

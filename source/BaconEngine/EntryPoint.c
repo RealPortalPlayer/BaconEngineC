@@ -109,6 +109,10 @@ void BE_EntryPoint_CommandThreadFunction(void) {
     }
 }
 
+BE_DLLEXPORT const char* BE_EntryPoint_GetVersion(void) {
+    return BE_ENGINE_VERSION;
+}
+
 BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* clientBinary, int argc, char** argv) {
     static SEC_Boolean alreadyStarted = SEC_FALSE;
 
@@ -149,6 +153,7 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
     int (*shutdown)(void) = (int (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Shutdown");
     SEC_Boolean (*supportsServer)(void) = (SEC_Boolean (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_SupportsServer");
     const char* (*getName)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName");
+    const char* (*getEngineVersion)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetEngineVersion");
 
     if (start == NULL)
         SEC_LOGGER_DEBUG("Client has no start function\n");
@@ -162,7 +167,14 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
     if (getName == NULL)
         SEC_LOGGER_DEBUG("Client doesn't specify a name, defaulting to nothing\n");
 
-    SEC_LOGGER_INFO("Starting BaconEngine\n");
+    {
+        const char* clientEngineVersion = getEngineVersion != NULL ? getEngineVersion() : BE_ENGINE_VERSION;
+
+        if (strcmp(clientEngineVersion, BE_ENGINE_VERSION) == 0)
+            SEC_LOGGER_INFO("Starting BaconEngine %s\n", BE_ENGINE_VERSION);
+        else
+            SEC_LOGGER_INFO("Starting BaconEngine %s (client was compiled with %s)\n", BE_ENGINE_VERSION, clientEngineVersion);
+    }
 
     if (BE_ClientInformation_IsServerModeEnabled() && (supportsServer == NULL || !supportsServer())) {
         SEC_LOGGER_FATAL("Client does not support servers\n");

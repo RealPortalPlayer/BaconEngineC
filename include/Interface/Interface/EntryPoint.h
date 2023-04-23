@@ -29,6 +29,10 @@ I_DLLEXPORT void I_EntryPoint_InitializeWrapper(void* binary) {
     I_EntryPoint_Initialize(binary);
 }
 
+I_DLLEXPORT const char* I_EntryPoint_GetEngineVersion(void) {
+    return BE_ENGINE_VERSION;
+}
+
 I_DLLEXPORT int I_EntryPoint_Start(int argc, char** argv);
 I_DLLEXPORT int I_EntryPoint_Shutdown(void);
 I_DLLEXPORT SEC_Boolean I_EntryPoint_SupportsServer(void);
