@@ -26,7 +26,7 @@ BE_DLLEXPORT SEC_Boolean BE_DynamicDictionary_AddElementToLast(BE_DynamicDiction
 /**
   * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
   */
-BE_DLLEXPORT SEC_Boolean BE_DynamicDictionary_RemoveFirstElement(BE_DynamicDictionary* dictionary, SEC_Boolean shift);
+BE_DLLEXPORT SEC_Boolean BE_DynamicDictionary_RemoveFirstElement(BE_DynamicDictionary* dictionary);
 
 /**
   * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
@@ -53,7 +53,6 @@ BE_DLLEXPORT void* BE_DynamicDictionary_GetElementKeyViaValue(BE_DynamicDictiona
 BE_DLLEXPORT void* BE_DynamicDictionary_GetElementValueViaKey(BE_DynamicDictionary dictionary, void* key, size_t elementSize);
 BE_DLLEXPORT void BE_DynamicDictionary_GetElementsKeyViaValue(BE_DynamicDictionary dictionary, BE_DynamicDictionary* results, void* value, size_t elementSize);
 BE_DLLEXPORT void BE_DynamicDictionary_GetElementsValueViaKey(BE_DynamicDictionary dictionary, BE_DynamicDictionary* results, void* key, size_t elementSize);
-BE_DLLEXPORT void BE_DynamicDictionary_Shrink(BE_DynamicDictionary* dictionary);
 SEC_CPP_SUPPORT_GUARD_END()
 
 #define BE_DYNAMICDICTIONARY_GET_KEY(type, dictionary, value, elementSize) ((type*) BE_DynamicDictionary_GetElementIndexFromValue(&(dictionary), (value), (elementSize)))

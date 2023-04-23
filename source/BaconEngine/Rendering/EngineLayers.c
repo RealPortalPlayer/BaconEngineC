@@ -110,7 +110,7 @@ void BE_EngineLayers_UIRendering_OnUpdate(BE_Layer_UpdateTypes updateType) {
     // OPTIMIZE: Only render the maximized window.
 
     for (int windowId = uiWindows->used - 1; windowId >= 0; windowId--) {
-        BE_PrivateUI_Window* uiWindow = BE_DYNAMICARRAY_GET_ELEMENT_PTR(BE_PrivateUI_Window, uiWindows, windowId);
+        BE_PrivateUI_Window* uiWindow = BE_DYNAMICARRAY_GET_ELEMENT_POINTER(BE_PrivateUI_Window, uiWindows, windowId);
 
         if (BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_CLOSED))
             continue;
@@ -170,7 +170,7 @@ SEC_Boolean BE_EngineLayers_UIRendering_OnEvent(BE_Event event) {
 //        };
 
     for (int windowId = 0; windowId < renderOrder->used; windowId++) {
-        BE_PrivateUI_Window* uiWindow = BE_DYNAMICARRAY_GET_ELEMENT_PTR(BE_PrivateUI_Window, renderOrder, windowId);
+        BE_PrivateUI_Window* uiWindow = BE_DYNAMICARRAY_GET_ELEMENT_POINTER(BE_PrivateUI_Window, renderOrder, windowId);
 
         if (BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_CLOSED))
             continue;

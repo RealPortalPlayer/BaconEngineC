@@ -55,16 +55,16 @@ SEC_Boolean BE_DynamicDictionary_AddElementToLast(BE_DynamicDictionary* dictiona
 #endif
 }
 
-SEC_Boolean BE_DynamicDictionary_RemoveFirstElement(BE_DynamicDictionary* dictionary, SEC_Boolean shift) {
+SEC_Boolean BE_DynamicDictionary_RemoveFirstElement(BE_DynamicDictionary* dictionary) {
 #ifndef BE_CLIENT_BINARY
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
         return SEC_FALSE;
 
-    return BE_DynamicArray_RemoveFirstElement(&dictionary->keys, shift) &&
-           BE_DynamicArray_RemoveFirstElement(&dictionary->values, shift);
+    return BE_DynamicArray_RemoveFirstElement(&dictionary->keys) &&
+           BE_DynamicArray_RemoveFirstElement(&dictionary->values);
 #else
-    BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicDictionary*, SEC_Boolean shift);
-    return function(dictionary, shift);
+    BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicDictionary*);
+    return function(dictionary);
 #endif
 }
 
@@ -199,20 +199,6 @@ void BE_DynamicDictionary_GetElementsKeyViaValue(BE_DynamicDictionary dictionary
     }
 #else
     BE_INTERFACEFUNCTION(void, BE_DynamicDictionary, BE_DynamicDictionary*, void*, size_t)(dictionary, results, value, elementSize);
-#endif
-}
-
-void BE_DynamicDictionary_Shrink(BE_DynamicDictionary* dictionary) {
-#ifndef BE_CLIENT_BINARY
-    if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
-        return;
-
-    SEC_LOGGER_TRACE("Shrinking dictionary, this is expensive\n");
-
-    BE_DynamicArray_Shrink(&dictionary->keys);
-    BE_DynamicArray_Shrink(&dictionary->values);
-#else
-    BE_INTERFACEFUNCTION(void, BE_DynamicDictionary*)(dictionary);
 #endif
 }
 SEC_CPP_SUPPORT_GUARD_END()

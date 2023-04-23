@@ -49,8 +49,8 @@ SEC_Boolean BE_DynamicArray_AddElementToStart(BE_DynamicArray* array, void* elem
 
     BE_DynamicArray_ReallocateArray(array);
 
-    for (int id = array->used - 1; id > 0; id--)
-        array->internalArray[id] = array->internalArray[id - 1];
+    for (int id = array->used; id >= 0; id--)
+        array->internalArray[id + 1] = array->internalArray[id];
 
     array->internalArray[0] = element;
     array->used++;
@@ -77,20 +77,12 @@ SEC_Boolean BE_DynamicArray_AddElementToLast(BE_DynamicArray* array, void* eleme
 #endif
 }
 
-SEC_Boolean BE_DynamicArray_RemoveFirstElement(BE_DynamicArray* array, SEC_Boolean shift) {
+SEC_Boolean BE_DynamicArray_RemoveFirstElement(BE_DynamicArray* array) {
 #ifndef BE_CLIENT_BINARY
-    if (array->used == 0 || array->frozen)
-        return SEC_FALSE;
-
-    if (!shift) {
-        array->internalArray[0] = NULL;
-        return SEC_TRUE;
-    }
-
-    return BE_DynamicArray_RemoveElementAt(array, 0);
+    return array->used != 0 && !array->frozen ? BE_DynamicArray_RemoveElementAt(array, 0) : SEC_FALSE;
 #else
-    BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicArray*, SEC_Boolean);
-    return function(array, shift);
+    BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicArray*);
+    return function(array);
 #endif
 }
 
@@ -122,22 +114,6 @@ SEC_Boolean BE_DynamicArray_RemoveElementAt(BE_DynamicArray* array, unsigned ind
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicArray*, unsigned);
     return function(array, index);
-#endif
-}
-
-void BE_DynamicArray_Shrink(BE_DynamicArray* array) {
-#ifndef BE_CLIENT_BINARY
-    if (array->size == 0 || array->size == (size_t) array->used || array->frozen)
-        return;
-
-    size_t oldSize = array->size;
-
-    array->size = array->used;
-
-    SEC_LOGGER_TRACE("Shrinking array, this is expensive\n");
-    BE_EngineMemory_ReallocateMemory(array->internalArray, oldSize, array->size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
-#else
-    BE_INTERFACEFUNCTION(void, BE_DynamicArray*)(array);
 #endif
 }
 SEC_CPP_SUPPORT_GUARD_END()

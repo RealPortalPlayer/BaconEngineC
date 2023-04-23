@@ -28,7 +28,7 @@ BE_DLLEXPORT SEC_Boolean BE_DynamicArray_AddElementToLast(BE_DynamicArray* array
 /**
   * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
   */
-BE_DLLEXPORT SEC_Boolean BE_DynamicArray_RemoveFirstElement(BE_DynamicArray* array, SEC_Boolean shift);
+BE_DLLEXPORT SEC_Boolean BE_DynamicArray_RemoveFirstElement(BE_DynamicArray* array);
 
 /**
   * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
@@ -39,11 +39,9 @@ BE_DLLEXPORT SEC_Boolean BE_DynamicArray_RemoveLastElement(BE_DynamicArray* arra
   * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
   */
 BE_DLLEXPORT SEC_Boolean BE_DynamicArray_RemoveElementAt(BE_DynamicArray* array, unsigned int index);
-
-BE_DLLEXPORT void BE_DynamicArray_Shrink(BE_DynamicArray* array);
 SEC_CPP_SUPPORT_GUARD_END()
 
-#define BE_DYNAMICARRAY_GET_ELEMENT(type, array, index) ((type*) (array).internalArray[index])
-#define BE_DYNAMICARRAY_GET_ELEMENT_PTR(type, array, index) ((type*) (array)->internalArray[index])
-#define BE_DYNAMICARRAY_GET_LAST_ELEMENT(type, array) BE_DYNAMICARRAY_GET_ELEMENT(type, (array), (array).used - 1)
-#define BE_DYNAMICARRAY_GET_LAST_ELEMENT_PTR(type, array) BE_DYNAMICARRAY_GET_ELEMENT_PTR(type, array, array->used - 1)
+#define BE_DYNAMICARRAY_GET_ELEMENT_POINTER(type, array, index) ((type*) (array)->internalArray[(index)])
+#define BE_DYNAMICARRAY_GET_ELEMENT(type, array, index) BE_DYNAMICARRAY_GET_ELEMENT_POINTER(type, &array, index)
+#define BE_DYNAMICARRAY_GET_LAST_ELEMENT_POINTER(type, array) BE_DYNAMICARRAY_GET_ELEMENT_POINTER(type, array, array->used - 1)
+#define BE_DYNAMICARRAY_GET_LAST_ELEMENT(type, array) BE_DYNAMICARRAY_GET_ELEMENT(type, array, array.used - 1)
