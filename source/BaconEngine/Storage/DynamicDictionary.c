@@ -141,7 +141,7 @@ int BE_DynamicDictionary_GetElementIndexFromKey(BE_DynamicDictionary dictionary,
 int BE_DynamicDictionary_GetElementIndexFromValue(BE_DynamicDictionary dictionary, void* value, size_t elementSize) {
 #ifndef BE_CLIENT_BINARY
     for (int index = 0; index < dictionary.keys.used; index++) {
-        if (dictionary.keys.internalArray[index] == NULL || memcmp(dictionary.keys.internalArray[index], value, elementSize) != 0)
+        if (dictionary.values.internalArray[index] == NULL || memcmp(dictionary.values.internalArray[index], value, elementSize) != 0)
             continue;
 
         return index;
@@ -192,7 +192,7 @@ void BE_DynamicDictionary_GetElementsValueViaKey(BE_DynamicDictionary dictionary
 void BE_DynamicDictionary_GetElementsKeyViaValue(BE_DynamicDictionary dictionary, BE_DynamicDictionary* results, void* value, size_t elementSize) {
 #ifndef BE_CLIENT_BINARY
     for (int index = 0; index < dictionary.keys.used; index++) {
-        if (dictionary.keys.internalArray[index] == NULL || memcmp(dictionary.keys.internalArray[index], value, elementSize) != 0)
+        if (dictionary.values.internalArray[index] == NULL || memcmp(dictionary.values.internalArray[index], value, elementSize) != 0)
             continue;
 
         BE_DynamicDictionary_AddElementToLast(results, dictionary.keys.internalArray[index], value);
