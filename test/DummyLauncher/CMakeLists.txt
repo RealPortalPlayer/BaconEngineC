@@ -6,4 +6,5 @@ target_link_libraries(DummyLauncher LINK_PRIVATE SharedEngineCode)
 
 if(NOT BE_DONT_SET_BINARY_OUTPUT_PATH)
     set_target_properties(DummyLauncher PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out")
+    set_target_properties(DummyLauncher PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out")
 endif()
