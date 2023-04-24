@@ -13,3 +13,4 @@ void* I_Engine_GetBinary(void) {
 void I_EntryPoint_Initialize(void* binary) {
     iEntryPointEngineBinary = binary;
 }
+SEC_CPP_SUPPORT_GUARD_END()

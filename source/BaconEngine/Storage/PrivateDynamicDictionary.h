@@ -8,7 +8,6 @@
 
 #include <SharedEngineCode/Internal/CppSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
-
 #include "../AntiClientGuard.h"
 #include "BaconEngine/Storage/DynamicDictionary.h"
 

@@ -27,6 +27,8 @@ static SEC_Boolean beConsoleDuplicateCommand = SEC_FALSE;
 static SEC_Boolean beConsoleInitialized = SEC_FALSE;
 static SEC_Boolean beConsoleAddingEngineCommands = SEC_TRUE;
 
+extern void BE_EngineCommands_HelpPrint(BE_Command*);
+
 static BE_PrivateConsole_Command* BE_Console_GetPrivateCommand(const char* name) {
     static BE_PrivateConsole_Command* cachedCommand = NULL;
 
@@ -379,6 +381,25 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         // TODO: Tell client.
         SEC_LOGGER_ERROR("This command requires cheats to be enabled\n");
         goto destroy;
+    }
+
+    if (command->arguments.used != 0) {
+        int requiredArguments = 0;
+
+        for (int i = 0; i < command->arguments.used; i++) {
+            if (!BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, i)->required)
+                break;
+
+            requiredArguments++;
+        }
+
+        if (requiredArguments > arguments.keys.used) {
+            // TODO: Run help command automatically
+            SEC_LOGGER_ERROR("Help: (not enough arguments)\n"
+                             "    %s\n", BE_Console_IsEngineCommand(*command) ? "Engine Command:" : "Client Command:");
+            BE_EngineCommands_HelpPrint(command);
+            goto destroy;
+        }
     }
 
     command->Run(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Command_Context, input, input + argumentStartingIndex, arguments));
