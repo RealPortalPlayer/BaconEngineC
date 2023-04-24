@@ -8,8 +8,8 @@
 
 #include <SharedEngineCode/Internal/CppSupport.h>
 
-#include "BaconEngine/Console/Command.h"
 #include "../AntiClientGuard.h"
+#include "BaconEngine/Console/Command.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 typedef struct {

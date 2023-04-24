@@ -9,6 +9,7 @@
 #include <SharedEngineCode/Internal/CppSupport.h>
 #include <stddef.h>
 
+#include "AntiClientGuard.h"
 #include "BaconEngine/EngineMemoryInformation.h"
 
 SEC_CPP_SUPPORT_GUARD_START()

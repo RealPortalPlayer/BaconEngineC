@@ -8,6 +8,11 @@
 #include "BaconEngine/Storage/DynamicDictionary.h"
 #include "../InterfaceFunctions.h"
 
+#ifndef BE_CLIENT_BINARY
+#   include "PrivateDynamicDictionary.h"
+#   include "PrivateDynamicArray.h"
+#endif
+
 SEC_CPP_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
 static SEC_Boolean BE_DynamicDictionary_UpdateFrozenState(BE_DynamicDictionary* dictionary) {
@@ -28,6 +33,15 @@ SEC_Boolean BE_DynamicDictionary_Create(BE_DynamicDictionary* dictionary, size_t
     return function(dictionary, size);
 #endif
 }
+
+#ifndef BE_CLIENT_BINARY
+SEC_Boolean BE_PrivateDynamicDictionary_Create(BE_DynamicDictionary* dictionary, size_t size) {
+    SEC_Boolean returnValue = BE_PrivateDynamicArray_Create(&dictionary->keys, size) && BE_PrivateDynamicArray_Create(&dictionary->values, size);
+
+    dictionary->frozen = SEC_FALSE;
+    return returnValue;
+}
+#endif
 
 SEC_Boolean BE_DynamicDictionary_AddElementToStart(BE_DynamicDictionary* dictionary, void* key, void* value) {
 #ifndef BE_CLIENT_BINARY

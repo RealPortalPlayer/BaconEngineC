@@ -4,13 +4,14 @@
 #include "BaconEngine/Rendering/UI.h"
 #include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Debugging/Assert.h"
-#include "../EngineMemory.h"
 #include "BaconEngine/Math/Bitwise.h"
 #include "../InterfaceFunctions.h"
 
 #ifndef BE_CLIENT_BINARY
+#   include "../EngineMemory.h"
 #   include "PrivateUI.h"
 #   include "EngineUIs.h"
+#   include "../Storage/PrivateDynamicArray.h"
 #endif
 
 SEC_CPP_SUPPORT_GUARD_START()
@@ -37,7 +38,7 @@ void BE_PrivateUI_Initialize(void) {
 
     beUIInitialized = SEC_TRUE;
 
-    if (!BE_DynamicArray_Create(&beUIWindows, 100) || !BE_DynamicArray_Create(&beUIRenderOrder, 100)) {
+    if (!BE_PrivateDynamicArray_Create(&beUIWindows, 100) || !BE_PrivateDynamicArray_Create(&beUIRenderOrder, 100)) {
         beUIInitialized = SEC_FALSE;
         return;
     }
@@ -68,7 +69,7 @@ int BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector_2I
     uiWindow->size = size;
     uiWindow->currentRenderPosition = beUIRenderOrder.used;
 
-    BE_DynamicArray_Create(&uiWindow->elements, 100);
+    BE_PrivateDynamicArray_Create(&uiWindow->elements, 100);
     BE_DynamicArray_AddElementToLast(&beUIWindows, uiWindow);
     BE_DynamicArray_AddElementToLast(&beUIRenderOrder, uiWindow);
     return (uiWindow->windowId = beUIWindows.used - 1);

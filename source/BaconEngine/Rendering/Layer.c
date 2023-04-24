@@ -1,7 +1,6 @@
 // Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include <BaconEngine/Storage/DynamicArray.h>
 #include <string.h>
 
 #include "BaconEngine/Debugging/StrictMode.h"
@@ -14,6 +13,7 @@
 #   include "BaconEngine/Rendering/Renderer.h"
 #   include "EngineLayers.h"
 #   include "../EngineMemory.h"
+#   include "../Storage/PrivateDynamicArray.h"
 #endif
 
 SEC_CPP_SUPPORT_GUARD_START()
@@ -52,7 +52,7 @@ void BE_PrivateLayer_InitializeLayers(void) {
 
     beLayerInitialized = SEC_TRUE;
 
-    BE_DynamicArray_Create(&beLayerArray, 100);
+    BE_PrivateDynamicArray_Create(&beLayerArray, 100);
     SEC_LOGGER_INFO("Registering engine layers\n");
     BE_EngineLayers_Initialize();
 }

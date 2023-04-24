@@ -6,18 +6,16 @@
 
 #include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Debugging/Assert.h"
-#include "BaconEngine/Storage/DynamicArray.h"
 #include "BaconEngine/Console/Console.h"
 #include "../InterfaceFunctions.h"
 
 #ifndef BE_CLIENT_BINARY
 #   include "EngineCommands.h"
 #   include "PrivateConsole.h"
-#endif
-
-#ifndef BE_CLIENT_BINARY
+#   include "../Storage/PrivateDynamicArray.h"
 #   include "../EngineMemory.h"
 #   include "BaconEngine/Math/Bitwise.h"
+#   include "../Storage/PrivateDynamicDictionary.h"
 #endif
 
 SEC_CPP_SUPPORT_GUARD_START()
@@ -103,8 +101,8 @@ void BE_PrivateConsole_Initialize(void) {
 
     beConsoleInitialized = SEC_TRUE;
 
-    BE_DynamicArray_Create(&beConsoleCommands, 100);
-    BE_DynamicArray_Create(&beConsolePrivateCommands, 100);
+    BE_PrivateDynamicArray_Create(&beConsoleCommands, 100);
+    BE_PrivateDynamicArray_Create(&beConsolePrivateCommands, 100);
 
 #   ifndef BE_NO_ENGINE_COMMANDS
     SEC_LOGGER_INFO("Registering engine commands\n");
@@ -146,7 +144,7 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
     BE_PrivateConsole_Command* privateConsoleCommand = (BE_PrivateConsole_Command*) BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateConsole_Command), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
 
     if (!beConsoleDuplicateCommand)
-        BE_DynamicArray_Create(&privateConsoleCommand->publicCommand.arguments, 10);
+        BE_PrivateDynamicArray_Create(&privateConsoleCommand->publicCommand.arguments, 10);
     else
         privateConsoleCommand->publicCommand.arguments = beConsoleLastCommand->publicCommand.arguments;
 
@@ -226,7 +224,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
     BE_DynamicDictionary arguments;
     size_t inputLength = strlen(input);
 
-    BE_DynamicDictionary_Create(&arguments, 20);
+    BE_PrivateDynamicDictionary_Create(&arguments, 20);
     memset(name, 0, BE_COMMAND_MAX_NAME_LENGTH);
 
     int index;

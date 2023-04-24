@@ -8,8 +8,8 @@
 
 #include <SharedEngineCode/Internal/CppSupport.h>
 
-#include "BaconEngine/Math/Vector.h"
 #include "../AntiClientGuard.h"
+#include "BaconEngine/Math/Vector.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 void BE_PrivateWindow_Initialize(const char* windowTitle, BE_Vector_2U windowSize);

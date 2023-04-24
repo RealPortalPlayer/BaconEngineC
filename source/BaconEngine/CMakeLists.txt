@@ -73,6 +73,8 @@ add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         Rendering/PrivateRenderer.h
         Rendering/PrivateWindow.h
         AntiClientGuard.h
+        Storage/PrivateDynamicArray.h
+        Storage/PrivateDynamicDictionary.h
 
         # Source files
         EntryPoint.c

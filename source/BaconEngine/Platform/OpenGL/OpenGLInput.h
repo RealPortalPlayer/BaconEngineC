@@ -8,9 +8,9 @@
 
 #include <SharedEngineCode/Internal/CppSupport.h>
 
+#include "../../AntiClientGuard.h"
 #include "BaconEngine/Input/Keyboard.h"
 #include "BaconEngine/Input/Mouse.h"
-#include "../../AntiClientGuard.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 SEC_Boolean BE_OpenGLInput_IsKeyDown(BE_Keyboard_KeyCodes keyCode);

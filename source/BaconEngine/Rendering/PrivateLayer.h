@@ -8,8 +8,8 @@
 
 #include <SharedEngineCode/Internal/CppSupport.h>
 
-#include "BaconEngine/Rendering/Layer.h"
 #include "../AntiClientGuard.h"
+#include "BaconEngine/Rendering/Layer.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 void BE_PrivateLayer_InitializeLayers(void);

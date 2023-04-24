@@ -19,6 +19,7 @@ typedef struct {
     size_t size;
     int calledRealloc;
     SEC_Boolean frozen;
+    SEC_Boolean engineMade; // Do not edit, internal use only
 } BE_DynamicArray;
 
 BE_DLLEXPORT SEC_Boolean BE_DynamicArray_Create(BE_DynamicArray* array, size_t size);

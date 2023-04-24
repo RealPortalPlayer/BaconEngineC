@@ -8,9 +8,9 @@
 
 #include <SharedEngineCode/Internal/CppSupport.h>
 
+#include "../AntiClientGuard.h"
 #include "BaconEngine/Storage/DynamicArray.h"
 #include "BaconEngine/Rendering/UI.h"
-#include "../AntiClientGuard.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 typedef struct {

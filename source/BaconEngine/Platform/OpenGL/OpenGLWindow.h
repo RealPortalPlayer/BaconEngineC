@@ -9,8 +9,8 @@
 #include <SharedEngineCode/Internal/CppSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
 
-#include "BaconEngine/Math/Vector.h"
 #include "../../AntiClientGuard.h"
+#include "BaconEngine/Math/Vector.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 void* BE_OpenGLWindow_GetWindow(void);

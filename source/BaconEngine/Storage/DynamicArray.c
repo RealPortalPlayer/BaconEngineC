@@ -6,9 +6,13 @@
 #include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Debugging/Assert.h"
 #include "BaconEngine/Storage/DynamicArray.h"
-#include "../EngineMemory.h"
 #include "BaconEngine/Debugging/Assert.h"
 #include "../InterfaceFunctions.h"
+
+#ifndef BE_CLIENT_BINARY
+#   include "../EngineMemory.h"
+#   include "PrivateDynamicArray.h"
+#endif
 
 SEC_CPP_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
@@ -22,7 +26,10 @@ static void BE_DynamicArray_ReallocateArray(BE_DynamicArray* array) {
     array->size *= 2;
     array->calledRealloc++;
 
-    array->internalArray = BE_EngineMemory_ReallocateMemory(array->internalArray, sizeof(void*) * (array->size / 2), sizeof(void*) * array->size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+    if (array->engineMade)
+        array->internalArray = BE_EngineMemory_ReallocateMemory(array->internalArray, sizeof(void*) * (array->size / 2), sizeof(void*) * array->size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+    else
+        BE_ASSERT((array->internalArray = (void**) realloc(array->internalArray, sizeof(void*) * array->size)) != NULL, "Failed to reallocate %zu bytes of data\n", sizeof(void*) * array->size);
 }
 #endif
 
@@ -31,16 +38,31 @@ SEC_Boolean BE_DynamicArray_Create(BE_DynamicArray* array, size_t size) {
 #ifndef BE_CLIENT_BINARY
     BE_STRICTMODE_CHECK(size != 0, SEC_FALSE, "Invalid size\n");
 
-    array->internalArray = (void**) BE_EngineMemory_AllocateMemory(sizeof(void*) * size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BE_ASSERT((array->internalArray = (void**) malloc(sizeof(void*) * size)) != NULL, "Failed to allocate %zu bytes of data\n", sizeof(void*) * size);
+
     array->used = 0;
     array->size = size;
     array->frozen = SEC_FALSE;
+    array->engineMade = SEC_FALSE;
     return SEC_TRUE;
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicArray*, size_t);
     return function(array, size);
 #endif
 }
+
+#ifndef BE_CLIENT_BINARY
+SEC_Boolean BE_PrivateDynamicArray_Create(BE_DynamicArray* array, size_t size) {
+    BE_ASSERT(size != 0, "Invalid size\n");
+
+    array->internalArray = (void**) BE_EngineMemory_AllocateMemory(sizeof(void*) * size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+    array->used = 0;
+    array->size = size;
+    array->frozen = SEC_FALSE;
+    array->engineMade = SEC_TRUE;
+    return SEC_TRUE;
+}
+#endif
 
 SEC_Boolean BE_DynamicArray_AddElementToStart(BE_DynamicArray* array, void* element) {
 #ifndef BE_CLIENT_BINARY
