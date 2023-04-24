@@ -141,9 +141,9 @@ project(BaconEngineClient)
 add_library(BaconEngineClient STATIC ${BE_SOURCE_FILES})
 
 target_include_directories(BaconEngineClient PUBLIC ../../include/BaconEngine)
-
 target_compile_definitions(BaconEngineClient PUBLIC BE_CLIENT_BINARY)
 
 # TODO: Should we worry about stuff like pedantic mode?
 
 target_link_libraries(BaconEngineClient LINK_PUBLIC Interface)
+add_dependencies(BaconEngineClient BaconEngine)
