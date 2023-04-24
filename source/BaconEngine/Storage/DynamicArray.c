@@ -22,7 +22,7 @@ static void BE_DynamicArray_ReallocateArray(BE_DynamicArray* array) {
     array->size *= 2;
     array->calledRealloc++;
 
-    BE_EngineMemory_ReallocateMemory(array->internalArray, sizeof(void*) * (array->size / 2), sizeof(void*) * array->size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+    array->internalArray = BE_EngineMemory_ReallocateMemory(array->internalArray, sizeof(void*) * (array->size / 2), sizeof(void*) * array->size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 #endif
 

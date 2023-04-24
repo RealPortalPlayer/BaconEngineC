@@ -71,9 +71,10 @@ void* BE_EngineMemory_AllocateMemory(size_t size, BE_EngineMemory_MemoryType mem
     return pointer;
 }
 
-void BE_EngineMemory_ReallocateMemory(void* pointer, size_t oldSize, size_t newSize, BE_EngineMemory_MemoryType memoryType) {
+void* BE_EngineMemory_ReallocateMemory(void* pointer, size_t oldSize, size_t newSize, BE_EngineMemory_MemoryType memoryType) {
     BE_EngineMemory_MemoryTypeInformation* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(
             memoryType);
+    void* newPointer;
 
     if (BE_EngineMemory_AllocDeallocLogsEnabled())
         SEC_LOGGER_TRACE("Reallocating memory\n"
@@ -83,9 +84,10 @@ void BE_EngineMemory_ReallocateMemory(void* pointer, size_t oldSize, size_t newS
 
     BE_ASSERT(pointer != NULL, "Pointer cannot be null\n");
     BE_ASSERT(oldSize > 0 && newSize > 0, "Size cannot be zero or below\n");
-    BE_ASSERT((pointer = realloc(pointer, newSize)) != NULL, "Failed to reallocate %zu bytes of data\n", newSize);
+    BE_ASSERT((newPointer = realloc(pointer, newSize)) != NULL, "Failed to reallocate %zu bytes of data\n", newSize);
 
     memoryTypeInformation->allocatedBytes = memoryTypeInformation->allocatedBytes - oldSize + newSize;
+    return newPointer;
 }
 
 void BE_EngineMemory_DeallocateMemory(void* pointer, size_t oldSize, BE_EngineMemory_MemoryType memoryType) {
