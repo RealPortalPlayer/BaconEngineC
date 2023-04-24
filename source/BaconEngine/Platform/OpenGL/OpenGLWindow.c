@@ -144,7 +144,7 @@ void BE_OpenGLWindow_KeyEvent(GLFWwindow* theWindow, int key, int scanCode, int 
     (void) mods;
     (void) scanCode;
 
-    if (key >= sizeof(glToEngineCodes))
+    if (key >= sizeof(glToEngineCodes) / sizeof(glToEngineCodes[0]))
         return;
 
     BE_Keyboard_KeyCodes keyCode = glToEngineCodes[key];

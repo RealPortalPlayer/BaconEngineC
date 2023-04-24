@@ -31,7 +31,7 @@ int I_EntryPoint_Start(int argc, char** argv) {
 //    if (SEC_ArgumentHandler_GetIndexWithShort(SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING_SHORT, SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING_SHORT, 1, &index1, &index2))
 //        SEC_LOGGER_INFO("DUR: %i %i\n", index1, index2);
 
-//    InitializeTestLayers();
+    InitializeTestLayers();
     BE_Command_Register("test", "Tests the command handler.", BE_COMMAND_FLAG_NULL,
                         (void (*)(BE_Command_Context)) &TestCommand);
     {

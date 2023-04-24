@@ -12,7 +12,7 @@
 #include "DynamicArray.h"
 #include "BaconEngine/DllExport.h"
 
-SEC_CPP_SUPPORT_GUARD_START() // UNTESTED: I'm not sure any of this works.
+SEC_CPP_SUPPORT_GUARD_START()
 typedef struct {
     BE_DynamicArray keys;
     BE_DynamicArray values;

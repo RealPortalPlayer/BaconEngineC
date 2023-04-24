@@ -37,7 +37,6 @@ static void BE_DynamicArray_ReallocateArray(BE_DynamicArray* array) {
 SEC_Boolean BE_DynamicArray_Create(BE_DynamicArray* array, size_t size) {
 #ifndef BE_CLIENT_BINARY
     BE_STRICTMODE_CHECK(size != 0, SEC_FALSE, "Invalid size\n");
-
     BE_ASSERT((array->internalArray = (void**) malloc(sizeof(void*) * size)) != NULL, "Failed to allocate %zu bytes of data\n", sizeof(void*) * size);
 
     array->used = 0;
