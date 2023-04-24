@@ -306,6 +306,8 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
 }
 
 BE_DLLEXPORT void I_EntryPoint_InitializeWrapper(void* engineBinary) {
+    (void*) engineBinary;
+
     BE_ASSERT_ALWAYS("I am not a client\n");
 }
 SEC_CPP_SUPPORT_GUARD_END()
