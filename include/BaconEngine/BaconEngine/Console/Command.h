@@ -45,10 +45,13 @@ typedef struct {
     void (*Run)(BE_Command_Context context);
 } BE_Command;
 
-/**
- * @return The ID for the command, -1 if failed to add.
- */
 BE_DLLEXPORT void BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context));
 BE_DLLEXPORT void BE_Command_AddArgument(const char* name, SEC_Boolean required);
+
+/**
+ * Duplicates the previously added command
+ * @param name Name for the duplicated command
+ * @param description If this is NULL, then it will use the description of the previous command
+ */
 BE_DLLEXPORT void BE_Command_DuplicatePrevious(const char* name, const char* description);
 SEC_CPP_SUPPORT_GUARD_END()

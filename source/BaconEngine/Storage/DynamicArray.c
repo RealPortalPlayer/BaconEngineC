@@ -90,7 +90,6 @@ SEC_Boolean BE_DynamicArray_AddElementToLast(BE_DynamicArray* array, void* eleme
     BE_DynamicArray_ReallocateArray(array);
 
     array->internalArray[array->used++] = element;
-
     return SEC_TRUE;
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicArray*, void*);
