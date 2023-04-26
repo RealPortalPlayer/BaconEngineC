@@ -133,6 +133,8 @@ if(NOT BE_NO_IDE_FOLDERS)
     set_property(GLOBAL PROPERTY FOLDER "Official")
 endif()
 
+add_subdirectory(dependencies/zip)
+
 message(STATUS "Adding meta projects")
 
 add_subdirectory(source/SharedEngineCode)

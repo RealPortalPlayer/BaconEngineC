@@ -58,7 +58,8 @@ set(BE_SOURCE_FILES
         Rendering/UI.c
         DeltaTime.c
         Debugging/Assert.c
-        Debugging/StrictMode.c)
+        Debugging/StrictMode.c
+        Package.c)
 
 add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         # Header files
@@ -100,7 +101,7 @@ if(BE_NO_ENGINE_COMMANDS)
 endif()
 
 target_include_directories(BaconEngine PUBLIC ../../include/BaconEngine)
-target_link_libraries(BaconEngine LINK_PUBLIC SharedEngineCode ${BE_LIBRARIES})
+target_link_libraries(BaconEngine LINK_PUBLIC SharedEngineCode ${BE_LIBRARIES} zip)
 
 if(NOT BE_DISABLE_PEDANTIC_MODE)
     if(MSVC)
@@ -147,5 +148,5 @@ target_compile_definitions(BaconEngineClient PUBLIC BE_CLIENT_BINARY)
 
 # TODO: Should we worry about stuff like pedantic mode?
 
-target_link_libraries(BaconEngineClient LINK_PUBLIC Interface)
+target_link_libraries(BaconEngineClient LINK_PUBLIC Interface zip)
 add_dependencies(BaconEngineClient BaconEngine)

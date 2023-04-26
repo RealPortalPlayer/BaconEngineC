@@ -1,7 +1,7 @@
 Inspirations:
-    Unity Technologies for making an easy-to-use game engine (Unity Engine). BaconEditor is based off their Unity editor.
-    Valve for making a very mod friendly game engine (Source Engine). Most of this game engine (i.e. commands, each client being their own binary) was inspired by their engine.
-    Hazel Engine for getting me into game engine development, this game engine probably wouldn't exist otherwise.
+    Unity Technologies for making an easy-to-use game engine (Unity Engine). BaconEditor is based off their Unity editor
+    Valve for making a very mod friendly game engine (Source Engine). Most of this game engine (i.e. commands, each client being their own binary) was inspired by their engine
+    Hazel Engine for getting me into game engine development, this game engine probably wouldn't exist otherwise
 
 Thanks:
     Microsoft for making their documentation easy to understand
@@ -9,5 +9,7 @@ Thanks:
     GLFW/Glad for making modern OpenGL not a pain to use
     AMD/DICE/Khronos Group for making the powerful Vulkan API
     Apple for making the Metal API (your documentation isn't very good, though)
+    richgel999 for making the miniz library, a ZIP implementation in C
+    kuba-- for making miniz easier to work with via the zip library
 
 If anyone has good documentation on how the Metal API works, then I'll be forever grateful
