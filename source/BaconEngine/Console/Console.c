@@ -169,6 +169,8 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
 
 void BE_Command_AddArgument(const char* name, SEC_Boolean required) {
 #ifndef BE_CLIENT_BINARY
+    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(beConsoleCommands.used != 0, "There is no command to add arguments to\n");
+
     BE_Command* command = BE_DYNAMICARRAY_GET_LAST_ELEMENT(BE_Command, beConsoleCommands);
 
     BE_STRICTMODE_CHECK_NO_RETURN_VALUE(command->arguments.used == 0 ||
@@ -188,7 +190,7 @@ void BE_Command_AddArgument(const char* name, SEC_Boolean required) {
 
 void BE_Command_DuplicatePrevious(const char* name, const char* description) {
 #ifndef BE_CLIENT_BINARY
-    BE_ASSERT(beConsoleCommands.used != 0, "There is no command to duplicate\n");
+    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(beConsoleCommands.used != 0, "There is no command to duplicate\n");
     SEC_LOGGER_TRACE("Duplicating command\n"
                      "Original name: %s\n"
                      "Original description: %s\n"
@@ -202,12 +204,6 @@ void BE_Command_DuplicatePrevious(const char* name, const char* description) {
 
     BE_Command_Register(name, description != NULL ? description : lastCommand->publicCommand.description, lastCommand->publicCommand.flags,
                         lastCommand->publicCommand.Run);
-
-    // FIXME: This is not thread safe.
-//    BE_PrivateConsole_Command* newCommand = BE_DYNAMICARRAY_GET_LAST_ELEMENT(BE_PrivateConsole_Command, beConsolePrivateCommands);
-//
-//    newCommand->publicCommand.arguments = lastCommand->publicCommand.arguments;
-//    newCommand->duplicate = 1;
 #else
     BE_INTERFACEFUNCTION(void, const char*, const char*)(name, description);
 #endif
