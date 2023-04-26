@@ -257,7 +257,9 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
 
     while (BE_ClientInformation_IsRunning()) {
         if (!BE_Window_IsStillOpened()) {
-            BE_ClientInformation_StopRunning();
+            if (BE_ClientInformation_IsRunning())
+                BE_ClientInformation_StopRunning();
+
             break;
         }
 
@@ -306,7 +308,7 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
 }
 
 BE_DLLEXPORT void I_EntryPoint_InitializeWrapper(void* engineBinary) {
-    (void*) engineBinary;
+    (void) engineBinary;
 
     BE_ASSERT_ALWAYS("I am not a client\n");
 }
