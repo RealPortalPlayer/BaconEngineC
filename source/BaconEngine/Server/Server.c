@@ -7,29 +7,48 @@
 #include "BaconEngine/Server/Server.h"
 #include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Server/Client.h"
-#include "PrivateServer.h"
-#include "../EngineMemory.h"
+#include "../InterfaceFunctions.h"
+
+#ifndef BE_CLIENT_BINARY
+#   include "../EngineMemory.h"
+#   include "PrivateServer.h"
+#endif
 
 SEC_CPP_SUPPORT_GUARD_START()
-int beServerSocket = -1;
-unsigned beServerPort;
-BE_Client_Connected** beServerConnected;
-int beServerConnectedAmount;
-int beServerMaxPlayers;
+#ifndef BE_CLIENT_BINARY
+static int beServerSocket = -1;
+static unsigned beServerPort;
+static BE_Client_Connected** beServerConnected;
+static int beServerConnectedAmount;
+static int beServerMaxPlayers;
+#endif
 
-int BE_Server_IsRunning(void) {
+SEC_Boolean BE_Server_IsRunning(void) {
+#ifndef BE_CLIENT_BINARY
     return beServerSocket != -1;
+#else
+    BE_INTERFACEFUNCTION(SEC_Boolean, void);
+    return function();
+#endif
 }
 
 unsigned BE_Server_GetPort(void) {
+#ifndef BE_CLIENT_BINARY
     return beServerPort;
+#else
+    BE_INTERFACEFUNCTION(unsigned, void);
+    return function();
+#endif
 }
 
+#ifndef BE_CLIENT_BINARY
 int BE_PrivateServer_GetSocketDescriptor(void) {
     return beServerSocket;
 }
+#endif
 
 void BE_Server_Start(unsigned port) {
+#ifndef BE_CLIENT_BINARY
     BE_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket == -1, "Server is already running\n");
     BE_STRICTMODE_CHECK_NO_RETURN_VALUE(BE_ClientInformation_IsServerModeEnabled(), "Cannot start a server on a non-server client\n");
     SEC_LOGGER_INFO("Starting server\n");
@@ -55,8 +74,12 @@ void BE_Server_Start(unsigned port) {
     BE_STRICTMODE_CHECK_NO_RETURN_VALUE(bind(beServerSocket, (struct sockaddr*) &serverAddress, sizeof(serverAddress)) == 0,
                                         "Failed to bind to socket: %s\n", strerror(errno));
     BE_STRICTMODE_CHECK_NO_RETURN_VALUE(listen(beServerSocket, 5) == 0, "Failed to listen to socket: %s\n", strerror(errno));
+#else
+    BE_INTERFACEFUNCTION(void, unsigned)(port);
+#endif
 }
 
+#ifndef BE_CLIENT_BINARY
 void BE_PrivateServer_AddConnection(int clientDescriptor) {
     if (beServerMaxPlayers == beServerConnectedAmount) {
         // TODO: Kick client: server full
@@ -69,8 +92,10 @@ void BE_PrivateServer_AddConnection(int clientDescriptor) {
     client->clientDescriptor = clientDescriptor;
     beServerConnected[beServerConnectedAmount++] = client;
 }
+#endif
 
 void BE_Server_Stop(void) {
+#ifndef BE_CLIENT_BINARY
     BE_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket != -1, "Server is not running\n");
     SEC_LOGGER_INFO("Closing server\n");
 
@@ -79,5 +104,8 @@ void BE_Server_Stop(void) {
     BE_EngineMemory_DeallocateMemory(beServerConnected, sizeof(BE_Client_Connected) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
 
     close(beServerSocket);
+#else
+    BE_INTERFACEFUNCTION(void, void)();
+#endif
 }
 SEC_CPP_SUPPORT_GUARD_END()
