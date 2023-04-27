@@ -1,7 +1,7 @@
 // Purpose: Manages the arguments a user sends.
 // Created on: 8/7/22 @ 12:02 PM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
@@ -10,11 +10,12 @@
 #include <stddef.h>
 #include <SharedEngineCode/Internal/Boolean.h>
 
+#include "BaconEngine/DllExport.h"
 #include "BaconEngine/Storage/DynamicDictionary.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-int BE_ArgumentManager_GetInt(BE_DynamicDictionary arguments, const char* name, int defaultValue);
-SEC_Boolean BE_ArgumentManager_GetBoolean(BE_DynamicDictionary arguments, const char* name, SEC_Boolean defaultValue);
-float BE_ArgumentManager_GetFloat(BE_DynamicDictionary arguments, const char* name, float defaultValue);
-const char* BE_ArgumentManager_GetString(BE_DynamicDictionary arguments, const char* name, const char* defaultValue);
+BE_DLLEXPORT int BE_ArgumentManager_GetInt(BE_DynamicDictionary arguments, const char* name, int defaultValue);
+BE_DLLEXPORT SEC_Boolean BE_ArgumentManager_GetBoolean(BE_DynamicDictionary arguments, const char* name, SEC_Boolean defaultValue);
+BE_DLLEXPORT float BE_ArgumentManager_GetFloat(BE_DynamicDictionary arguments, const char* name, float defaultValue);
+BE_DLLEXPORT const char* BE_ArgumentManager_GetString(BE_DynamicDictionary arguments, const char* name, const char* defaultValue);
 SEC_CPP_SUPPORT_GUARD_END()

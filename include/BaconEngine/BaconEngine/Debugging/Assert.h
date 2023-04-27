@@ -1,15 +1,17 @@
 // Purpose: Make assertions easier.
 // Created on: 3/30/22 @ 11:45 PM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <SharedEngineCode/Logger.h>
 
+#include "BaconEngine/DllExport.h"
+
 SEC_CPP_SUPPORT_GUARD_START()
-SEC_Boolean BE_Assert_CheckLogsEnabled(void);
+BE_DLLEXPORT SEC_Boolean BE_Assert_CheckLogsEnabled(void);
 SEC_CPP_SUPPORT_GUARD_END()
 
 #define BE_ASSERT(check, ...) \

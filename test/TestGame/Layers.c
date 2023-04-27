@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <BaconEngine/Rendering/Layer.h>
@@ -33,7 +33,7 @@ void InitializeTestLayers(void) {
 int enabled = 1;
 
 int UIOnEvent(BE_Event event) {
-    if (event.type == BE_EVENT_TYPE_KEYBOARD_KEY_DOWN && event.keyboard.key == BE_KEYBOARD_KEY_CODE_A) {
+    if (event.type == BE_EVENT_TYPE_KEYBOARD_KEY_DOWN && event.data.keyboard.key == BE_KEYBOARD_KEY_CODE_A) {
 //        BE_UI_ToggleWindowRendering((enabled = !enabled));
         return 1;
     }
@@ -70,10 +70,10 @@ int ColorOnEvent(BE_Event event) {
 #ifndef BACON_ENGINE_DISABLE_SDL
     switch (event.type) {
         case BE_EVENT_TYPE_KEYBOARD_KEY_UP:
-            if (event.keyboard.key == BE_KEYBOARD_KEY_CODE_R ||
-                event.keyboard.key == BE_KEYBOARD_KEY_CODE_T ||
-                event.keyboard.key == BE_KEYBOARD_KEY_CODE_Y ||
-                event.keyboard.key == BE_KEYBOARD_KEY_CODE_D)
+            if (event.data.keyboard.key == BE_KEYBOARD_KEY_CODE_R ||
+                event.data.keyboard.key == BE_KEYBOARD_KEY_CODE_T ||
+                event.data.keyboard.key == BE_KEYBOARD_KEY_CODE_Y ||
+                event.data.keyboard.key == BE_KEYBOARD_KEY_CODE_D)
                 return 0;
 
             down = 0;
@@ -92,23 +92,23 @@ int ColorOnEvent(BE_Event event) {
 }
 
 int ColorModifierOnEvent(BE_Event event) {
-    if (event.type == BE_EVENT_TYPE_KEYBOARD_KEY_UP && event.keyboard.key == BE_KEYBOARD_KEY_CODE_R)
+    if (event.type == BE_EVENT_TYPE_KEYBOARD_KEY_UP && event.data.keyboard.key == BE_KEYBOARD_KEY_CODE_R)
         return 1;
 
     if (event.type == BE_EVENT_TYPE_KEYBOARD_KEY_DOWN) {
-        if (event.keyboard.key == BE_KEYBOARD_KEY_CODE_R) {
+        if (event.data.keyboard.key == BE_KEYBOARD_KEY_CODE_R) {
             BE_Layer_Toggle("Color", 0);
 
             return 1;
         }
 
-        if (event.keyboard.key == BE_KEYBOARD_KEY_CODE_T) {
+        if (event.data.keyboard.key == BE_KEYBOARD_KEY_CODE_T) {
             BE_Layer_Toggle("Color", 1);
 
             return 1;
         }
 
-        if (event.keyboard.key == BE_KEYBOARD_KEY_CODE_Y) {
+        if (event.data.keyboard.key == BE_KEYBOARD_KEY_CODE_Y) {
             color.r = rand() % 255;
             color.g = rand() % 255;
             color.b = rand() % 255;
@@ -116,8 +116,8 @@ int ColorModifierOnEvent(BE_Event event) {
             return 1;
         }
 
-        if (event.keyboard.key == BE_KEYBOARD_KEY_CODE_D) {
-            BE_Console_ExecuteCommand("debuginfo", NULL);
+        if (event.data.keyboard.key == BE_KEYBOARD_KEY_CODE_D) {
+            BE_Console_ExecuteCommand("debuginfo");
             return 1;
         }
     }

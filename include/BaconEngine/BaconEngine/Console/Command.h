@@ -1,7 +1,7 @@
 // Purpose: A basic command.
 // Created on: 8/7/22 @ 10:05 AM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
@@ -11,6 +11,7 @@
 
 #include "BaconEngine/Storage/DynamicDictionary.h"
 #include "ArgumentManager.h"
+#include "BaconEngine/DllExport.h"
 #include "BaconEngine/Server/Client.h"
 
 // TODO: Validate that none of the commands go over this limit.
@@ -51,10 +52,13 @@ typedef struct {
     void (*Run)(BE_Command_Context context);
 } BE_Command;
 
+BE_DLLEXPORT void BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context));
+BE_DLLEXPORT void BE_Command_AddArgument(const char* name, SEC_Boolean required);
+
 /**
- * @return The ID for the command, -1 if failed to add.
+ * Duplicates the previously added command
+ * @param name Name for the duplicated command
+ * @param description If this is NULL, then it will use the description of the previous command
  */
-void BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context));
-void BE_Command_AddArgument(const char* name, SEC_Boolean required);
-void BE_Command_DuplicatePrevious(const char* name, const char* description);
+BE_DLLEXPORT void BE_Command_DuplicatePrevious(const char* name, const char* description);
 SEC_CPP_SUPPORT_GUARD_END()

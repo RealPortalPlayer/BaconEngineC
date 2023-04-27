@@ -1,18 +1,23 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include <BaconEngine/Storage/DynamicArray.h>
 #include <string.h>
 
 #include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Debugging/Assert.h"
 #include "BaconEngine/Rendering/Layer.h"
-#include "EngineLayers.h"
-#include "../EngineMemory.h"
-#include "PrivateLayer.h"
-#include "BaconEngine/Rendering/Renderer.h"
+#include "../InterfaceFunctions.h"
+
+#ifndef BE_CLIENT_BINARY
+#   include "PrivateLayer.h"
+#   include "BaconEngine/Rendering/Renderer.h"
+#   include "EngineLayers.h"
+#   include "../EngineMemory.h"
+#   include "../Storage/PrivateDynamicArray.h"
+#endif
 
 SEC_CPP_SUPPORT_GUARD_START()
+#ifndef BE_CLIENT_BINARY
 typedef struct {
     const char* name;
     BE_Layer_Functions functions;
@@ -20,14 +25,14 @@ typedef struct {
     SEC_Boolean enabled;
 } BE_Layer_Internal;
 
-BE_DynamicArray beLayerArray;
-SEC_Boolean beLayerInitialized = SEC_FALSE;
+static BE_DynamicArray beLayerArray;
+static SEC_Boolean beLayerInitialized = SEC_FALSE;
 
-int BE_Layer_NoOperation(void) {
+static int BE_Layer_NoOperation(void) {
     return 0;
 }
 
-BE_Layer_Internal* BE_Layer_InternalGet(const char* name) {
+static BE_Layer_Internal* BE_Layer_InternalGet(const char* name) {
     for (int i = 0; i < (int) beLayerArray.used; i++) {
         if (strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->name, name) != 0)
             continue;
@@ -47,12 +52,15 @@ void BE_PrivateLayer_InitializeLayers(void) {
 
     beLayerInitialized = SEC_TRUE;
 
-    BE_DynamicArray_Create(&beLayerArray, 100);
+    BE_PrivateDynamicArray_Create(&beLayerArray, 100);
     SEC_LOGGER_INFO("Registering engine layers\n");
     BE_EngineLayers_Initialize();
 }
+#endif
+
 
 void BE_Layer_Register(const char* name, SEC_Boolean enabled, BE_Layer_Functions functions) {
+#ifndef BE_CLIENT_BINARY
     if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT)
         return;
 
@@ -71,21 +79,40 @@ void BE_Layer_Register(const char* name, SEC_Boolean enabled, BE_Layer_Functions
     layer->functions.OnStop = functions.OnStop != NULL ? functions.OnStop : (void (*)(void)) &BE_Layer_NoOperation;
 
     BE_DynamicArray_AddElementToLast(&beLayerArray, (void *) layer);
+#else
+    BE_INTERFACEFUNCTION(void, const char*, SEC_Boolean, BE_Layer_Functions)(name, enabled, functions);
+#endif
 }
 
 int BE_Layer_GetAmount(void) {
+#ifndef BE_CLIENT_BINARY
     return beLayerInitialized ? beLayerArray.used : 0;
+#else
+    BE_INTERFACEFUNCTION(int, void);
+    return function();
+#endif
 }
 
 int BE_Layer_GetAllocatedLayersAmount(void) {
+#ifndef BE_CLIENT_BINARY
     return beLayerInitialized ? (int) beLayerArray.size : 0;
+#else
+    BE_INTERFACEFUNCTION(int, void);
+    return function();
+#endif
 }
 
 int BE_Layer_GetLayersReallocationAmount(void) {
+#ifndef BE_CLIENT_BINARY
     return beLayerInitialized ? beLayerArray.calledRealloc : 0;
+#else
+    BE_INTERFACEFUNCTION(int, void);
+    return function();
+#endif
 }
 
 SEC_Boolean BE_Layer_Toggle(const char* name, SEC_Boolean enable) {
+#ifndef BE_CLIENT_BINARY
     BE_Layer_Internal* layer = BE_Layer_InternalGet(name);
 
     if (layer == NULL)
@@ -106,8 +133,13 @@ SEC_Boolean BE_Layer_Toggle(const char* name, SEC_Boolean enable) {
 
     layer->functions.OnToggle(enable); // FIXME: The layer could still be in the middle of an update/event.
     return SEC_TRUE;
+#else
+    BE_INTERFACEFUNCTION(SEC_Boolean, const char*, SEC_Boolean);
+    return function(name, enable);
+#endif
 }
 
+#ifndef BE_CLIENT_BINARY
 void BE_PrivateLayer_OnUpdate(BE_Layer_UpdateTypes updateTypes) {
     if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT)
         return;
@@ -150,17 +182,29 @@ int BE_PrivateLayer_OnEvent(BE_Event event) {
 
     return SEC_FALSE;
 }
+#endif
 
 SEC_Boolean BE_Layer_IsToggled(const char* name) {
+#ifndef BE_CLIENT_BINARY
     BE_Layer_Internal* layer = BE_Layer_InternalGet(name);
 
     return layer != NULL && layer->enabled;
+#else
+    BE_INTERFACEFUNCTION(SEC_Boolean, const char*);
+    return function(name);
+#endif
 }
 
 SEC_Boolean BE_Layer_Exists(const char* name) {
+#ifndef BE_CLIENT_BINARY
     return BE_Layer_InternalGet(name) != NULL;
+#else
+    BE_INTERFACEFUNCTION(SEC_Boolean, const char*);
+    return function(name);
+#endif
 }
 
+#ifndef BE_CLIENT_BINARY
 void BE_PrivateLayer_DestroyLayers(void) {
     if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT)
         return;
@@ -184,4 +228,5 @@ void BE_PrivateLayer_DestroyLayers(void) {
 
     BE_EngineMemory_DeallocateMemory(beLayerArray.internalArray, sizeof(void *) * beLayerArray.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
+#endif
 SEC_CPP_SUPPORT_GUARD_END()

@@ -45,7 +45,10 @@ SEC_Boolean SEC_Thread_Join(SEC_Thread thread) {
 
     return result == 0;
 #elif SEC_OPERATINGSYSTEM_WINDOWS
-    return WaitForSingleObject((HANDLE) thread, INFINITE) == WAIT_OBJECT_0;
+    while (WaitForSingleObject(thread, INFINITE) != WAIT_OBJECT_0)
+        continue;
+
+    return SEC_TRUE;
 #endif
 }
 
@@ -58,8 +61,8 @@ SEC_Boolean SEC_Thread_CreateLock(SEC_Thread_Lock* lock) {
 
     return result == 0;
 #elif SEC_OPERATINGSYSTEM_WINDOWS
-    lock = CreateMutex(NULL, FALSE, NULL);
-    return lock != NULL;
+    *lock = CreateMutex(NULL, FALSE, NULL);
+    return *lock != NULL;
 #endif
 }
 
@@ -72,7 +75,10 @@ SEC_Boolean SEC_Thread_UseLock(SEC_Thread_Lock* lock) {
 
     return result == 0;
 #elif SEC_OPERATINGSYSTEM_WINDOWS
-    return WaitForSingleObject((HANDLE) lock, INFINITE) == WAIT_OBJECT_0;
+    while (WaitForSingleObject(*lock, INFINITE) != WAIT_OBJECT_0)
+        continue;
+
+    return SEC_TRUE;
 #endif
 }
 
@@ -85,7 +91,7 @@ SEC_Boolean SEC_Thread_Unlock(SEC_Thread_Lock* lock) {
 
     return result == 0;
 #elif SEC_OPERATINGSYSTEM_WINDOWS
-    return ReleaseMutex((HANDLE) lock);
+    return ReleaseMutex(*lock);
 #endif
 }
 
@@ -98,7 +104,7 @@ SEC_Boolean SEC_Thread_DestroyLock(SEC_Thread_Lock* lock) {
 
     return result == 0;
 #elif SEC_OPERATINGSYSTEM_WINDOWS
-    return CloseHandle((HANDLE) lock);
+    return CloseHandle(*lock);
 #endif
 }
 SEC_CPP_SUPPORT_GUARD_END()

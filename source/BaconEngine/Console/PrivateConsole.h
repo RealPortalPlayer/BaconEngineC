@@ -1,13 +1,14 @@
 // Purpose: Private console constructor.
 // Created on: 10/12/22 @ 1:30 AM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
 
 #include <SharedEngineCode/Internal/CppSupport.h>
 
+#include "../AntiClientGuard.h"
 #include "BaconEngine/Console/Command.h"
 
 SEC_CPP_SUPPORT_GUARD_START()

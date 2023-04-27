@@ -9,6 +9,7 @@
 #include <SharedEngineCode/Internal/CppSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
 
+#include "../AntiClientGuard.h"
 #include "BaconEngine/Math/Vector.h"
 #include "BaconEngine/Math/Color.h"
 #include "BaconEngine/Input/Keyboard.h"

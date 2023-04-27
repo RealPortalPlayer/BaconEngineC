@@ -8,6 +8,8 @@
 
 #include <SharedEngineCode/Internal/CppSupport.h>
 
+#include "../../AntiClientGuard.h"
+
 SEC_CPP_SUPPORT_GUARD_START()
 void BE_Metal_Initialize(void);
 void BE_Metal_Destroy(void);

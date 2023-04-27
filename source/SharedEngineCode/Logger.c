@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <stdio.h>
@@ -18,8 +18,9 @@
 #   include <unistd.h>
 #elif SEC_OPERATINGSYSTEM_WINDOWS
 #   include <Windows.h>
+#   include <io.h>
 #   define fileno _fileno
-#   define write _write // HACK: This is a stupid idea, but it's the only way to make MSVC shut up.
+#   define write(file, message, size) _write(file, message, (unsigned) size) // HACK: This is a stupid idea, but it's the only way to make MSVC shut up.
 #endif
 
 SEC_CPP_SUPPORT_GUARD_START()

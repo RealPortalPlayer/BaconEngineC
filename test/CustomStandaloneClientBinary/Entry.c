@@ -1,28 +1,43 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include <BaconEngine/EntryPoint.h>
 #include <stdio.h>
+#include <Interface/EntryPoint.h>
+#include <SharedEngineCode/Internal/PlatformSpecific.h>
 
 int main(int argc, char** argv) {
     printf("Hello, World!\n");
     printf("This is a custom launcher\n");
-    printf("Launching engine\n");
-    BE_EntryPoint_StartBaconEngine(argc, argv);
+    printf("Getting engine\n");
+
+    void* engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY("BaconEngine" SEC_PLATFORMSPECIFIC_BINARY_EXTENSION, RTLD_NOW);
+
+    if (engineBinary == NULL) {
+        fprintf(stderr, "Cannot find engine binary\n");
+        return 1;
+    }
+
+    printf("Getting engine entry-point\n");
+
+    int (*start)(void*, void*, int, char**) = (int (*)(void*, void*, int, char**)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(engineBinary, "BE_EntryPoint_StartBaconEngine");
+
+    if (start == NULL) {
+        fprintf(stderr, "Could not found engine entry-point\n");
+        return 1;
+    }
+
+    void* clientBinary;
+
+#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
+    clientBinary = dlopen(NULL, RTLD_NOW);
+#else
+    clientBinary = GetModuleHandle(NULL);
+#endif
+
+    printf("Starting engine\n");
+    return start(engineBinary, clientBinary, argc, argv);
 }
 
-int BE_EntryPoint_ClientStart(int argc, char** argv) {
-    return 0;
-}
-
-int BE_EntryPoint_ClientShutdown(void) {
-    return 0;
-}
-
-SEC_Boolean BE_EntryPoint_ClientSupportsServer(void) {
-    return SEC_FALSE;
-}
-
-const char* BE_EntryPoint_GetClientName(void) {
+const char* I_EntryPoint_GetName(void) {
     return "Standalone Client";
 }

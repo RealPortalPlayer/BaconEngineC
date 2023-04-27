@@ -8,6 +8,7 @@
 
 #include <SharedEngineCode/Internal/CppSupport.h>
 
+#include "../../AntiClientGuard.h"
 #include "BaconEngine/Math/Vector.h"
 #include "BaconEngine/Math/Color.h"
 

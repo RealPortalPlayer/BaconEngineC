@@ -7,30 +7,38 @@
 
 #include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Rendering/Renderer.h"
-#include "../Platform/SpecificPlatformFunctions.h"
-#include "../Platform/TextMode/TextMode.h"
 
-#ifndef BE_DISABLE_OPENGL
-#   include "../Platform/OpenGL/OpenGL.h"
-#endif
-
-#if SEC_OPERATINGSYSTEM_WINDOWS
-#   include "../Platform/Windows/Windows.h"
-#elif SEC_OPERATINGSYSTEM_APPLE && !defined(BE_DISABLE_METAL)
-#   include "../Platform/Metal/Metal.h"
+#ifndef BE_CLIENT_BINARY
+#   include "../Platform/SpecificPlatformFunctions.h"
+#   include "../Platform/TextMode/TextMode.h"
+#   ifndef BE_DISABLE_OPENGL
+#      include "../Platform/OpenGL/OpenGL.h"
+#   endif
+#   if SEC_OPERATINGSYSTEM_WINDOWS
+#      include "../Platform/Windows/Windows.h"
+#   elif SEC_OPERATINGSYSTEM_APPLE && !defined(BE_DISABLE_METAL)
+#      include "../Platform/Metal/Metal.h"
+#   endif
 #endif
 
 #include "BaconEngine/Debugging/Assert.h"
+#include "../InterfaceFunctions.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-BE_Renderer_Types beRendererCurrent;
-int renderCalls = 0;
+#ifndef BE_CLIENT_BINARY
+static BE_Renderer_Types beRendererCurrent;
+static int renderCalls = 0;
+#endif
 
 void BE_Renderer_SetClearColor(BE_Color_3U color) {
+#ifndef BE_CLIENT_BINARY
     BE_SpecificPlatformFunctions_Get().rendererFunctions.SetClearColor(color);
+#else
+    BE_INTERFACEFUNCTION(void, BE_Color_3U)(color);
+#endif
 }
 
-// TODO: Make this private.
+#ifndef BE_CLIENT_BINARY
 void BE_PrivateRenderer_Initialize(void) {
     static SEC_Boolean initialized = SEC_FALSE;
 
@@ -49,55 +57,55 @@ void BE_PrivateRenderer_Initialize(void) {
 
     if (specifiedRenderer != NULL) {
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "opengl") == 0) {
-#ifndef BE_DISABLE_OPENGL
-            opengl:
+#   ifndef BE_DISABLE_OPENGL
+//            opengl:
             SEC_LOGGER_INFO("Using OpenGL as the renderer\n");
             BE_OpenGL_Initialize();
 
             beRendererCurrent = BE_RENDERER_TYPE_OPENGL;
-#else
+#   else
             SEC_LOGGER_WARN("This binary has OpenGL disabled\n");
             goto textmode;
-#endif
+#   endif
             return;
         }
 
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "vulkan") == 0) {
-#if !SEC_OPERATINGSYSTEM_APPLE
-            vulkan:
+#   if !SEC_OPERATINGSYSTEM_APPLE
+//            vulkan:
             BE_ASSERT_ALWAYS("Renderer not implemented\n");
-#else
+#   else
             SEC_LOGGER_WARN("Vulkan doesn't support Apple operating systems\n");
             goto textmode;
-#endif
+#   endif
         }
 
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "metal") == 0) {
-#if SEC_OPERATINGSYSTEM_APPLE
-#   ifndef BE_DISABLE_METAL
-            metal:
+#   if SEC_OPERATINGSYSTEM_APPLE
+#       ifndef BE_DISABLE_METAL
+//            metal:
             SEC_LOGGER_INFO("Using Metal as the renderer");
             BE_Metal_Initialize();
-#   else
+#       else
             SEC_LOGGER_WARN("This binary has Metal disabled\n");
             goto textmode;
-#   endif
-#else
+#       endif
+#   else
             SEC_LOGGER_WARN("Metal only works on Apple operating systems\n");
             goto textmode;
-#endif
+#   endif
 
             return;
         }
 
         if (SEC_StringExtension_CompareCaseless(specifiedRenderer, "directx") == 0) {
-#if SEC_OPERATINGSYSTEM_WINDOWS
-            directx:
+#   if SEC_OPERATINGSYSTEM_WINDOWS
+//            directx:
             BE_ASSERT_ALWAYS("Renderer not implemented\n");
-#else
+#   else
             SEC_LOGGER_WARN("DirectX only works on Microsoft operating systems\n");
             goto textmode;
-#endif
+#   endif
             return;
         }
 
@@ -105,49 +113,55 @@ void BE_PrivateRenderer_Initialize(void) {
             SEC_LOGGER_INFO("Using software rendering\n");
             SEC_LOGGER_WARN("This is going to lag; use a better renderer\n");
 
-#if SEC_OPERATINGSYSTEM_WINDOWS
+#   if SEC_OPERATINGSYSTEM_WINDOWS
             BE_Windows_Initialize();
-#else
+#   else
             BE_ASSERT_ALWAYS("No software renderer implementation for your OS\n");
-#endif
+#   endif
             return;
         }
 
         SEC_LOGGER_WARN("Invalid renderer: %s\n", specifiedRenderer);
     }
 
-#if SEC_OPERATINGSYSTEM_APPLE
-#   if !defined(BE_DISABLE_METAL)
-
-    goto metal;
-#   elif !defined(BE_DISABLE_OPENGL)
-    SEC_LOGGER_WARN("This binary does not have Metal enabled\n");
-    goto opengl;
-#   else
-    SEC_LOGGER_WARN("This binary doesn't support any renderers for your OS");
+    // TODO: Automatically select renderer
     goto textmode;
-#   endif
-#elif SEC_OPERATINGSYSTEM_LINUX
-    goto vulkan;
-#elif SSEC_OPERATINGSYSTEM_WINDOWS
-    goto directx;
+}
+#endif
+
+void BE_Renderer_ClearScreen(void) {
+#ifndef BE_CLIENT_BINARY
+    BE_SpecificPlatformFunctions_Get().rendererFunctions.ClearScreen();
+#else
+    BE_INTERFACEFUNCTION(void, void)();
 #endif
 }
 
-void BE_Renderer_ClearScreen(void) {
-    BE_SpecificPlatformFunctions_Get().rendererFunctions.ClearScreen();
-}
-
 int BE_Renderer_GetCalls(void) {
+#ifndef BE_CLIENT_BINARY
     return renderCalls;
+#else
+    BE_INTERFACEFUNCTION(int, void);
+    return function();
+#endif
 }
 
 BE_Renderer_Types BE_Renderer_GetCurrentType(void) {
+#ifndef BE_CLIENT_BINARY
     return beRendererCurrent;
+#else
+    BE_INTERFACEFUNCTION(BE_Renderer_Types, void);
+    return function();
+#endif
 }
 
 BE_Color_3U BE_Renderer_GetClearColor(void) {
+#ifndef BE_CLIENT_BINARY
     return BE_SpecificPlatformFunctions_Get().rendererFunctions.GetClearColor();
+#else
+    BE_INTERFACEFUNCTION(BE_Color_3U, void);
+    return function();
+#endif
 }
 
 //BE_Vector_2U BE_Renderer_GetFontSize(TTF_Font* font, const char* text) {
@@ -171,10 +185,15 @@ BE_Color_3U BE_Renderer_GetClearColor(void) {
 //}
 
 BE_Vector_2I BE_Renderer_GetCenterPosition(BE_Vector_2I rectanglePosition, BE_Vector_2U rectangleSize, BE_Vector_2U objectSize) {
-    return (BE_Vector_2I) {
+#ifndef BE_CLIENT_BINARY
+    return SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I,
         rectanglePosition.x + (int) rectangleSize.x / 2 - (int) objectSize.x / 2,
         rectanglePosition.y + (int) rectangleSize.y / 2 - (int) objectSize.y / 2
-    };
+    );
+#else
+    BE_INTERFACEFUNCTION(BE_Vector_2I, BE_Vector_2I, BE_Vector_2U, BE_Vector_2U);
+    return function(rectanglePosition, rectangleSize, objectSize);
+#endif
 }
 
 void BE_Renderer_DrawLine(BE_Vector_2I firstPoint, BE_Vector_2I secondPoint, BE_Color_4U color) {
@@ -219,7 +238,11 @@ void BE_Renderer_DrawPoint(BE_Vector_2I position, BE_Color_4U color) {
 }
 
 void BE_Renderer_DrawRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U color) {
+#ifndef BE_CLIENT_BINARY
     BE_SpecificPlatformFunctions_Get().rendererFunctions.DrawFilledRectangle(position, size, color);
+#else
+    BE_INTERFACEFUNCTION(void, BE_Vector_2I, BE_Vector_2U, BE_Color_4U)(position, size, color);
+#endif
 }
 
 void BE_Renderer_FillRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U color) {
@@ -251,9 +274,12 @@ void BE_Renderer_FillRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Colo
 }
 
 void BE_Renderer_DrawBorderedRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U borderColor, BE_Color_4U fillColor, int borderPadding) {
+    (void) position;
+    (void) size;
     (void) borderColor;
+    (void) fillColor;
     (void) borderPadding; // TODO: Padding.
-    BE_Renderer_DrawRectangle(position, size, fillColor);
+//    BE_Renderer_DrawRectangle(position, size, fillColor);
 //  return 0;
 //  return BE_Renderer_DrawRectangle((BE_Vector_2I) {position.x - borderPadding, position.y - borderPadding},
 //                                   (BE_Vector_2U) {size.x + borderPadding * 2, size.y + borderPadding * 2},

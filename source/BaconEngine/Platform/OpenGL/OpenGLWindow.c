@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <glad/glad.h>
@@ -142,8 +142,9 @@ void* BE_OpenGLWindow_GetWindow(void) {
 void BE_OpenGLWindow_KeyEvent(GLFWwindow* theWindow, int key, int scanCode, int action, int mods) {
     (void) theWindow;
     (void) mods;
+    (void) scanCode;
 
-    if (key >= sizeof(glToEngineCodes))
+    if (key >= sizeof(glToEngineCodes) / sizeof(glToEngineCodes[0]))
         return;
 
     BE_Keyboard_KeyCodes keyCode = glToEngineCodes[key];
@@ -153,8 +154,10 @@ void BE_OpenGLWindow_KeyEvent(GLFWwindow* theWindow, int key, int scanCode, int 
 
     BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = action != GLFW_RELEASE ? BE_EVENT_TYPE_KEYBOARD_KEY_DOWN : BE_EVENT_TYPE_KEYBOARD_KEY_UP,
-        .keyboard = {
-            .key = keyCode
+        .data = {
+            .keyboard = {
+                .key = keyCode
+            }
         }
     ));
 }
@@ -169,10 +172,12 @@ void BE_OpenGLWindow_MouseButtonEvent(GLFWwindow* theWindow, int button, int act
     glfwGetCursorPos(window, &x, &y);
     BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = action != GLFW_RELEASE ? BE_EVENT_TYPE_MOUSE_BUTTON_DOWN : BE_EVENT_TYPE_MOUSE_BUTTON_UP,
-        .mouse = {
-            .position = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2F, (float) x, (float) y),
-            .button = {
-                button
+        .data = {
+            .mouse = {
+                .position = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2F, (float) x, (float) y),
+                .unionVariables = {
+                    .whichButton = button
+                }
             }
         }
     ));
@@ -183,8 +188,10 @@ void BE_OpenGLWindow_CursorPositionMovedEvent(GLFWwindow* theWindow, double x, d
 
     BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = BE_EVENT_TYPE_MOUSE_MOVED,
-        .mouse = {
-            .position = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2F, (float) x, (float) y)
+        .data = {
+            .mouse = {
+                .position = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2F, (float) x, (float) y)
+            }
         }
     ));
 }
@@ -206,10 +213,12 @@ void BE_OpenGLWindow_ScrollEvent(GLFWwindow* theWindow, double x, double y) {
     glfwGetCursorPos(window, &xPos, &yPos);
     BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = BE_EVENT_TYPE_MOUSE_WHEEL,
-        .mouse = {
-            .position = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2F, (float) xPos, (float) yPos),
-            .wheel = {
-                .scrollAmount = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2F, (float) x, (float) y)
+        .data = {
+            .mouse = {
+                .position = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2F, (float) xPos, (float) yPos),
+                .unionVariables = {
+                    .wheelScrollAmount = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2F, (float) x, (float) y)
+                }
             }
         }
     ));
@@ -244,8 +253,12 @@ void BE_OpenGLWindow_MovedEvent(GLFWwindow* theWindow, int x, int y) {
 
     BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = BE_EVENT_TYPE_WINDOW_MOVED,
-        .window = {
-            .newPosition = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I, x, y)
+        .data = {
+            .window = {
+                .unionVariables = {
+                    .newPosition = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I, x, y)
+                }
+            }
         }
     ));
 }
@@ -256,8 +269,12 @@ void BE_OpenGLWindow_ResizedEvent(GLFWwindow* theWindow, int width, int height) 
     glViewport(0, 0, width, height);
     BE_PrivateLayer_OnEvent(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = BE_EVENT_TYPE_WINDOW_RESIZED,
-        .window = {
-            .newSize = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I, width, height)
+        .data = {
+            .window = {
+                .unionVariables = {
+                    .newSize = SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I, width, height)
+                }
+            }
         }
     ));
 }
@@ -269,7 +286,7 @@ void BE_OpenGLWindow_Create(const char* title, BE_Vector_2U size, int monitor) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-#if SEC_OPERATINGSYSTEM_MAC // TODO: Should this apply for other Apple operating systems, for example, iOS?
+#if SEC_OPERATINGSYSTEM_APPLE
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 

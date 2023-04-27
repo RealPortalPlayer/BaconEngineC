@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <SharedEngineCode/ArgumentHandler.h>
@@ -6,6 +6,7 @@
 #include <SharedEngineCode/Launcher.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <SharedEngineCode/OSUser.h>
+#include <SharedEngineCode/Internal/PlatformSpecific.h>
 
 #if SEC_OPERATINGSYSTEM_WINDOWS
 #   include <stdio.h>
@@ -13,27 +14,38 @@
 #endif
 
 SEC_CPP_SUPPORT_GUARD_START()
-int BE_EntryPoint_StartBaconEngine(int, char**);
-const char* BE_EntryPoint_GetClientName(void);
-
-int CallLauncherMain(int argc, char** argv) {
+int main(int argc, char** argv) {
     SEC_ArgumentHandler_Initialize(argc, argv);
-
-#if SEC_OPERATINGSYSTEM_WINDOWS
-    FILE* consoleHandle;
-
-    if (SEC_ArgumentHandler_GetIndex(SEC_BUILTINARGUMENTS_SHOW_TERMINAL, 0) != -1 && AllocConsole()) {
-        SetConsoleTitle("BaconEngine");
-        freopen_s(&consoleHandle, "CONIN$", "r", stdin);
-        freopen_s(&consoleHandle, "CONOUT$", "w", stderr);
-        freopen_s(&consoleHandle, "CONOUT$", "w", stdout);
-    }
-#endif
-
     SEC_LOGGER_TRACE("Built on: %s\nBuilt for: %s\n", __TIMESTAMP__, SEC_OPERATINGSYSTEM_NAME);
+    SEC_LOGGER_DEBUG("Getting engine\n");
+
+    void* engineBinary = NULL;
+
+    {
+        SEC_ArgumentHandler_ShortResults results;
+
+        if (SEC_ArgumentHandler_GetInfoWithShort(SEC_BUILTINARGUMENTS_ENGINE, SEC_BUILTINARGUMENTS_ENGINE_SHORT, SEC_FALSE, &results) != 0)
+            engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY(*results.value, RTLD_NOW);
+        else
+            engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY("./BaconEngine" SEC_PLATFORMSPECIFIC_BINARY_EXTENSION, RTLD_NOW);
+    }
 
     if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_VERSION, SEC_BUILTINARGUMENTS_VERSION_SHORT, 0)) {
-        SEC_LOGGER_INFO("Engine version: 0.1\n");
+        SEC_Boolean logNextHeader = SEC_TRUE;
+
+        if (engineBinary != NULL) {
+            const char* (*getVersion)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(engineBinary, "BE_EntryPoint_GetVersion");
+
+            if (getVersion != NULL) {
+                SEC_LOGGER_INFO("Engine version: %s\n", getVersion());
+
+                logNextHeader = SEC_FALSE;
+            }
+
+            SEC_PLATFORMSPECIFIC_CLOSE_BINARY(engineBinary);
+        }
+
+        SEC_Logger_LogImplementation(logNextHeader, SEC_LOGGER_LOG_LEVEL_INFO, "Client was compiled with engine version: %s\n", BE_ENGINE_VERSION);
         return 0;
     }
 
@@ -45,20 +57,53 @@ int CallLauncherMain(int argc, char** argv) {
     if (SEC_OSUser_IsAdmin())
         SEC_LOGGER_WARN("You're running as root! If a client says you require to be root, then it's probably a virus\n");
 
-    SEC_LOGGER_INFO("Ready, starting '%s'\n", BE_EntryPoint_GetClientName());
-    SEC_LOGGER_TRACE("Entering engine code\n");
+    if (engineBinary == NULL) {
+        const char* errorMessage = NULL;
 
-    int returnValue = BE_EntryPoint_StartBaconEngine(argc, argv);
-
-    SEC_LOGGER_INFO("Goodbye\n");
-
-#if SEC_OPERATINGSYSTEM_WINDOWS
-    if (consoleHandle != NULL) {
-        fclose(consoleHandle);
-        FreeConsole();
+        SEC_PLATFORMSPECIFIC_GET_ERROR(errorMessage);
+        SEC_LOGGER_FATAL("Failed to get engine binary: %s\n", errorMessage);
+        return 1;
     }
+
+    SEC_LOGGER_DEBUG("Getting engine entry-point\n");
+
+    int (*start)(void*, void*, int, char**) = (int (*)(void*, void*, int, char**)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(engineBinary, "BE_EntryPoint_StartBaconEngine");
+
+    if (start == NULL) {
+        const char* errorMessage = NULL;
+
+        SEC_PLATFORMSPECIFIC_GET_ERROR(errorMessage);
+        SEC_LOGGER_FATAL("Failed to get engine entry-point: %s\n", errorMessage);
+        return 1;
+    }
+
+    void* clientBinary;
+
+#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
+    clientBinary = dlopen(NULL, RTLD_NOW);
+#else
+    clientBinary = GetModuleHandle(NULL);
 #endif
 
+    const char* (*getName)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName");
+
+    {
+        const char* name = getName != NULL ? getName() : "";
+
+        if (name[0] != '\0')
+            SEC_LOGGER_INFO("Ready, starting: %s\n", name);
+        else
+            SEC_LOGGER_INFO("Ready, starting");
+    }
+
+    SEC_LOGGER_TRACE("Entering engine code\n");
+
+    int returnValue = start(engineBinary, clientBinary, argc, argv);
+
+    SEC_LOGGER_TRACE("Returned back to launcher\n");
+    SEC_LOGGER_TRACE("Freeing engine binary\n");
+    SEC_PLATFORMSPECIFIC_CLOSE_BINARY(engineBinary);
+    SEC_LOGGER_INFO("Goodbye\n");
     return returnValue;
 }
 SEC_CPP_SUPPORT_GUARD_END()

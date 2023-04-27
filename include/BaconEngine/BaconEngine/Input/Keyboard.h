@@ -1,7 +1,7 @@
 // Purpose: Every supported keyboard key-code, and their char representation.
 // Created on: 8/15/22 @ 1:59 PM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
@@ -9,8 +9,13 @@
 #include <SharedEngineCode/Internal/CppSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
 
+#include "BaconEngine/DllExport.h"
+
 SEC_CPP_SUPPORT_GUARD_START()
 typedef enum {
+    /**
+     * Not a real key
+     */
     BE_KEYBOARD_KEY_CODE_NULL,
 
     BE_KEYBOARD_KEY_CODE_ESCAPE,      BE_KEYBOARD_KEY_CODE_F1,          BE_KEYBOARD_KEY_CODE_F2,
@@ -36,7 +41,7 @@ typedef enum {
     BE_KEYBOARD_KEY_CODE_E,        BE_KEYBOARD_KEY_CODE_R,         BE_KEYBOARD_KEY_CODE_T,
     BE_KEYBOARD_KEY_CODE_Y,        BE_KEYBOARD_KEY_CODE_U,         BE_KEYBOARD_KEY_CODE_I,
     BE_KEYBOARD_KEY_CODE_O,        BE_KEYBOARD_KEY_CODE_P,         BE_KEYBOARD_KEY_CODE_LBRACKET,
-    BE_KEYBOARD_KEY_CODE_RBRACKET, BE_KEYBOARD_KEY_CODE_BACKSLASH, BE_KEYBOARD_KEY_CODE_DELETE /** Not the same as the Apple delete key */,
+    BE_KEYBOARD_KEY_CODE_RBRACKET, BE_KEYBOARD_KEY_CODE_BACKSLASH, BE_KEYBOARD_KEY_CODE_DELETE /** Not the same as the Apple delete key, use BE_KEYBOARD_KEY_CODE_BACKSPACE instead */,
     BE_KEYBOARD_KEY_CODE_END,      BE_KEYBOARD_KEY_CODE_PAGE_DOWN, BE_KEYBOARD_KEY_CODE_KP_SEVEN,
     BE_KEYBOARD_KEY_CODE_KP_EIGHT, BE_KEYBOARD_KEY_CODE_KP_NINE,   BE_KEYBOARD_KEY_CODE_KP_PLUS,
 
@@ -87,9 +92,9 @@ typedef enum {
 /**
  * @return The character that represents the keycode, 0 if there is none
  */
-char BE_Keyboard_ConvertKeyCodeToChar(BE_Keyboard_KeyCodes keyCode);
-SEC_Boolean BE_Keyboard_IsKeyDown(BE_Keyboard_KeyCodes keyCode);
-SEC_Boolean BE_Keyboard_IsKeyPressed(BE_Keyboard_KeyCodes keyCode);
-SEC_Boolean BE_Keyboard_IsEngineKeyCodeValid(BE_Keyboard_KeyCodes keyCode);
-SEC_Boolean BE_Keyboard_IsKeyCodeFromKeyPad(BE_Keyboard_KeyCodes keyCode);
+BE_DLLEXPORT char BE_Keyboard_ConvertKeyCodeToChar(BE_Keyboard_KeyCodes keyCode);
+BE_DLLEXPORT SEC_Boolean BE_Keyboard_IsKeyDown(BE_Keyboard_KeyCodes keyCode);
+BE_DLLEXPORT SEC_Boolean BE_Keyboard_IsKeyPressed(BE_Keyboard_KeyCodes keyCode);
+BE_DLLEXPORT SEC_Boolean BE_Keyboard_IsEngineKeyCodeValid(BE_Keyboard_KeyCodes keyCode);
+BE_DLLEXPORT SEC_Boolean BE_Keyboard_IsKeyCodeFromKeyPad(BE_Keyboard_KeyCodes keyCode);
 SEC_CPP_SUPPORT_GUARD_END()

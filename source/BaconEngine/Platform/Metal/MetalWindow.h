@@ -10,6 +10,7 @@
 #include <SharedEngineCode/Internal/Boolean.h>
 
 #include "BaconEngine/Math/Vector.h"
+#include "../../AntiClientGuard.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 void* BE_MetalWindow_GetWindow(void);

@@ -1,7 +1,7 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include <BaconEngine/EntryPoint.h>
+#include <Interface/EntryPoint.h>
 
 int BE_EntryPoint_ClientStart(int argc, char** argv) {
 //    BE_UI_RegisterWindow("Clients", (BE_Vector_2I) {300, 300}, (BE_Vector_2U) {380, 450},
@@ -14,14 +14,6 @@ int BE_EntryPoint_ClientStart(int argc, char** argv) {
     return 0;
 }
 
-int BE_EntryPoint_ClientShutdown(void) {
-    return 0;
-}
-
-BE_ENTRYPOINT_EXPOSE_FUNC SEC_Boolean BE_EntryPoint_ClientSupportsServer(void) {
-    return SEC_FALSE;
-}
-
-BE_ENTRYPOINT_EXPOSE_FUNC const char* BE_EntryPoint_GetClientName(void) {
+const char* I_EntryPoint_GetName(void) {
     return "BaconLauncher";
 }

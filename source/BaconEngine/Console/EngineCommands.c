@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <string.h>
@@ -199,7 +199,7 @@ void BE_EngineCommands_Cheats(BE_Command_Context context) {
     BE_ClientInformation_SetCheats(value);
     SEC_LOGGER_INFO("Cheats are now %s\n", BE_ClientInformation_IsCheatsEnabled() ? "enabled" : "disabled");
 
-    if (!BE_ArgumentManager_GetBoolean(context.arguments, "silence", 0))
+    if (BE_ArgumentManager_GetBoolean(context.arguments, "silence", 0))
         return;
 
     // TODO: Broadcast to users.

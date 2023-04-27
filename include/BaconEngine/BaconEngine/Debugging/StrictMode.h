@@ -1,7 +1,7 @@
 // Purpose: Does some strict checking.
 // Created on: 7/29/22 @ 3:42 PM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <SharedEngineCode/ArgumentHandler.h>
@@ -12,9 +12,10 @@
 #include <SharedEngineCode/Internal/Boolean.h>
 
 #include "BaconEngine/ClientInformation.h"
+#include "BaconEngine/DllExport.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
-SEC_Boolean BE_StrictMode_CheckLogsEnabled(void);
+BE_DLLEXPORT SEC_Boolean BE_StrictMode_CheckLogsEnabled(void);
 SEC_CPP_SUPPORT_GUARD_END()
 
 #define BE_STRICTMODE_CHECK(check, returnValue, ...) \
