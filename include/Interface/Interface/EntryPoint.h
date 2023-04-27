@@ -23,10 +23,10 @@
 #endif
 
 SEC_CPP_SUPPORT_GUARD_START()
-void I_EntryPoint_Initialize(void* binary);
+void I_EntryPoint_Initialize(void* binary, int argc, char** argv);
 
-I_DLLEXPORT void I_EntryPoint_InitializeWrapper(void* binary) {
-    I_EntryPoint_Initialize(binary);
+I_DLLEXPORT void I_EntryPoint_InitializeWrapper(void* binary, int argc, char** argv) {
+    I_EntryPoint_Initialize(binary, argc, argv);
 }
 
 I_DLLEXPORT const char* I_EntryPoint_GetEngineVersion(void) {

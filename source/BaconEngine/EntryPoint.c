@@ -132,7 +132,7 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
     // FIXME: Compilation errors here due to pedantic mode in Linux
 
     {
-        void (*initialize)(void*) = (void (*)(void*)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_InitializeWrapper");
+        void (*initialize)(void*, int, char**) = (void (*)(void*, int, char**)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_InitializeWrapper");
 
         if (initialize == NULL) {
             SEC_LOGGER_FATAL("Unable to find interface initializer\n");
@@ -144,7 +144,7 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
             abort();
         }
 
-        initialize(engineBinary);
+        initialize(engineBinary, argc, argv);
     }
 
     SEC_LOGGER_DEBUG("Getting client functions\n");
