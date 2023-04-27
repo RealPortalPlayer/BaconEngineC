@@ -96,8 +96,8 @@ int BE_Console_GetCommandReallocationAmount(void) {
 #endif
 }
 
-void BE_PrivateConsole_Initialize(void) {
 #ifndef BE_CLIENT_BINARY
+void BE_PrivateConsole_Initialize(void) {
     BE_ASSERT(!beConsoleInitialized, "Already initialized the console\n");
     SEC_LOGGER_INFO("Initializing console\n");
 
@@ -112,10 +112,8 @@ void BE_PrivateConsole_Initialize(void) {
 #   endif
 
     beConsoleAddingEngineCommands = SEC_FALSE;
-#else
-    BE_INTERFACEFUNCTION(void, void)();
-#endif
 }
+#endif
 
 // TODO: Verify arguments
 void BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context)) {

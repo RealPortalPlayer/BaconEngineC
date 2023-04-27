@@ -17,8 +17,6 @@
 #include "BaconEngine/DeltaTime.h"
 #include "../AntiClientGuard.h"
 
-
-
 SEC_CPP_SUPPORT_GUARD_START()
 void BE_EngineCommands_Help(BE_Command_Context context);
 void BE_EngineCommands_Cheats(BE_Command_Context context);
@@ -202,7 +200,7 @@ void BE_EngineCommands_Cheats(BE_Command_Context context) {
     BE_ClientInformation_SetCheats(value);
     SEC_LOGGER_INFO("Cheats are now %s\n", BE_ClientInformation_IsCheatsEnabled() ? "enabled" : "disabled");
 
-    if (!BE_ArgumentManager_GetBoolean(context.arguments, "silence", 0))
+    if (BE_ArgumentManager_GetBoolean(context.arguments, "silence", 0))
         return;
 
     // TODO: Broadcast to users.
