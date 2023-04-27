@@ -15,7 +15,6 @@
 #include "BaconEngine/Rendering/UI.h"
 #include "BaconEngine/Math/Bitwise.h"
 #include "BaconEngine/DeltaTime.h"
-#include "../AntiClientGuard.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 void BE_EngineCommands_Help(BE_Command_Context context);

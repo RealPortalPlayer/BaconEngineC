@@ -19,7 +19,6 @@
 #   define BE_LOGGER_PRINTF_ATTRIBUTE
 #endif
 
-
 SEC_CPP_SUPPORT_GUARD_START()
 typedef enum {
     SEC_LOGGER_LOG_LEVEL_FATAL,

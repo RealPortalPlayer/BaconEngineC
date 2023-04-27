@@ -258,7 +258,6 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
     if (command->arguments.used != 0) {
         // TODO: This is dumb, figure out a way to do this without allocating memory.
         // TODO: Make the argument max length constant.
-        // FIXME: This causes a memory leak if the command stops the client.
         char* argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char) * 1024, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
         int current = 0;
         int quotePosition = -1;
@@ -271,6 +270,12 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         memset(argument, 0, 1024);
 
         for (int writer = 0; index < (int) inputLength && current < command->arguments.used; index++) {
+            if (added) {
+                argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char) * 1024, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+
+                memset(argument, 0, 1024);
+            }
+
             added = SEC_FALSE;
 
             if (quoteAdded && input[index] == ' ')
@@ -284,11 +289,8 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
                 BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, current++)->name, argument);
 
-                argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char) * 1024, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
                 added = SEC_TRUE;
                 trimmed = SEC_FALSE;
-
-                memset(argument, 0, 1024);
                 continue;
             }
 
@@ -347,14 +349,16 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
             goto destroy;
         }
 
-        if (argument[0] != '\0') {
-            BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, current)->name, argument);
+        if (!added) {
+            if (argument[0] != '\0') {
+                BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, current)->name, argument);
 
-            added = SEC_TRUE;
+                added = SEC_TRUE;
+            }
+
+            if (!added)
+                BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * 1024, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
         }
-
-        if (!added)
-            BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * 1024, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
     }
 
     if (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY)) {
@@ -390,7 +394,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         if (requiredArguments > arguments.keys.used) {
             // TODO: Run help command automatically
             SEC_LOGGER_ERROR("Help: (not enough arguments)\n"
-                             "    %s\n", BE_Console_IsEngineCommand(*command) ? "Engine Command:" : "Client Command:");
+                             "    %s Command:\n", BE_Console_IsEngineCommand(*command) ? "Engine" : "Client");
             BE_EngineCommands_HelpPrint(command);
             goto destroy;
         }
