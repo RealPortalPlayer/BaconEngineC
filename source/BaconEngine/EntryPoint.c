@@ -32,7 +32,6 @@
 #include "Console/PrivateConsole.h"
 #include "Rendering/PrivateRenderer.h"
 #include "BaconEngine/Console/Console.h"
-#include "BaconEngine/DllExport.h"
 
 SEC_CPP_SUPPORT_GUARD_START()
 void BE_EntryPoint_SignalDetected(int receivedSignal) {
@@ -129,10 +128,16 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
 
     SEC_LOGGER_DEBUG("Getting client interface initializer\n");
 
-    // FIXME: Compilation errors here due to pedantic mode in Linux
-
     {
-        void (*initialize)(void*, int, char**) = (void (*)(void*, int, char**)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_InitializeWrapper");
+        typedef void (*ClientInitialize)(void*, int, char**);
+
+        ClientInitialize initialize;
+
+#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
+        *(void**) &initialize = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_InitializeWrapper");
+#elif SEC_OPERATINGSYSTEM_WINDOWS
+        initialize = (ClientInitialize) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Start");
+#endif
 
         if (initialize == NULL) {
             SEC_LOGGER_FATAL("Unable to find interface initializer\n");
@@ -149,11 +154,31 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
 
     SEC_LOGGER_DEBUG("Getting client functions\n");
 
-    int (*start)(int, char**) = (int (*)(int, char**)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Start");
-    int (*shutdown)(void) = (int (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Shutdown");
-    SEC_Boolean (*supportsServer)(void) = (SEC_Boolean (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_SupportsServer");
-    const char* (*getName)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName");
-    const char* (*getEngineVersion)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetEngineVersion");
+    typedef int (*ClientStart)(int, char**);
+    typedef int (*ClientShutdown)(void);
+    typedef SEC_Boolean (*ClientSupportsServer)(void);
+    typedef const char* (*ClientGetName)(void);
+    typedef const char* (*ClientGetEngineVersion)(void);
+
+    ClientStart start;
+    ClientShutdown shutdown;
+    ClientSupportsServer supportsServer;
+    ClientGetName getName;
+    ClientGetEngineVersion getEngineVersion;
+
+#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
+    *(void**) &start = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Start");
+    *(void**) &shutdown = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Shutdown");
+    *(void**) &supportsServer = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName");
+    *(void**) &getName = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName");
+    *(void**) &getEngineVersion = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetEngineVersion");
+#elif SEC_OPERATINGSYSTEM_WINDOWS
+    start = (ClientStart) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Start");
+    shutdown = (ClientShutdown) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Shutdown");
+    supportsServer = (ClientSupportsServer) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName");
+    getName = (ClientGetName) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName");
+    getEngineVersion = (ClientGetEngineVersion) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetEngineVersion");
+#endif
 
     if (start == NULL)
         SEC_LOGGER_DEBUG("Client has no start function\n");
