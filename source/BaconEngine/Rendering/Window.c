@@ -16,9 +16,9 @@
 #   include "../Platform/SpecificPlatformFunctions.h"
 #endif
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
-void BE_PrivateWindow_Initialize(const char* windowTitle, BE_Vector_2U windowSize) {
+void BE_PrivateWindow_Initialize(const char* windowTitle, BE_Vector2_Unsigned windowSize) {
     int monitorNumber = 0;
     {
         const char* preParsedMonitor = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_MONITOR, 0);
@@ -55,20 +55,20 @@ const char* BE_Window_GetTitle(void) {
 #endif
 }
 
-BE_Vector_2U BE_Window_GetSize(void) {
+BE_Vector2_Unsigned BE_Window_GetSize(void) {
 #ifndef BE_CLIENT_BINARY
     return BE_SpecificPlatformFunctions_Get().windowFunctions.GetSize();
 #else
-    BE_INTERFACEFUNCTION(BE_Vector_2U, void);
+    BE_INTERFACEFUNCTION(BE_Vector2_Unsigned, void);
     return function();
 #endif
 }
 
-BE_Vector_2I BE_Window_GetPosition(void) {
+BE_Vector2_Integer BE_Window_GetPosition(void) {
 #ifndef BE_CLIENT_BINARY
     return BE_SpecificPlatformFunctions_Get().windowFunctions.GetPosition();
 #else
-    BE_INTERFACEFUNCTION(BE_Vector_2I, void);
+    BE_INTERFACEFUNCTION(BE_Vector2_Integer, void);
     return function();
 #endif
 }
@@ -99,17 +99,17 @@ void BE_Window_SetTitle(const char* newTitle) {
 #endif
 }
 
-void BE_Window_SetSize(BE_Vector_2U newSize) {
+void BE_Window_SetSize(BE_Vector2_Unsigned newSize) {
 #ifndef BE_CLIENT_BINARY
     BE_SpecificPlatformFunctions_Get().windowFunctions.SetSize(newSize);
 #else
-    BE_INTERFACEFUNCTION(void, BE_Vector_2U)(newSize);
+    BE_INTERFACEFUNCTION(void, BE_Vector2_Unsigned)(newSize);
 #endif
 }
 
 void BE_Window_SetWidth(unsigned newWidth) {
 #ifndef BE_CLIENT_BINARY
-    BE_Window_SetSize(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2U, newWidth, BE_Window_GetSize().y));
+    BE_Window_SetSize(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, newWidth, BE_Window_GetSize().y));
 #else
     BE_INTERFACEFUNCTION(void, unsigned)(newWidth);
 #endif
@@ -117,23 +117,23 @@ void BE_Window_SetWidth(unsigned newWidth) {
 
 void BE_Window_SetHeight(unsigned newHeight) {
 #ifndef BE_CLIENT_BINARY
-    BE_Window_SetSize(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2U, BE_Window_GetSize().x, newHeight));
+    BE_Window_SetSize(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, BE_Window_GetSize().x, newHeight));
 #else
     BE_INTERFACEFUNCTION(void, unsigned)(newHeight);
 #endif
 }
 
-void BE_Window_SetPosition(BE_Vector_2I newPosition) {
+void BE_Window_SetPosition(BE_Vector2_Integer newPosition) {
 #ifndef BE_CLIENT_BINARY
     BE_SpecificPlatformFunctions_Get().windowFunctions.SetPosition(newPosition);
 #else
-    BE_INTERFACEFUNCTION(void, BE_Vector_2I)(newPosition);
+    BE_INTERFACEFUNCTION(void, BE_Vector2_Integer)(newPosition);
 #endif
 }
 
 void BE_Window_SetXPosition(int newX) {
 #ifndef BE_CLIENT_BINARY
-    BE_Window_SetPosition(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I, newX, BE_Window_GetPosition().y));
+    BE_Window_SetPosition(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer, newX, BE_Window_GetPosition().y));
 #else
     BE_INTERFACEFUNCTION(void, int)(newX);
 #endif
@@ -141,7 +141,7 @@ void BE_Window_SetXPosition(int newX) {
 
 void BE_Window_SetYPosition(int newY) {
 #ifndef BE_CLIENT_BINARY
-    BE_Window_SetPosition(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I, BE_Window_GetPosition().x, newY));
+    BE_Window_SetPosition(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer, BE_Window_GetPosition().x, newY));
 #else
     BE_INTERFACEFUNCTION(void, int)(newY);
 #endif
@@ -154,4 +154,4 @@ void BE_Window_SetVisibility(SEC_Boolean visible) {
     BE_INTERFACEFUNCTION(void, SEC_Boolean)(visible);
 #endif
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

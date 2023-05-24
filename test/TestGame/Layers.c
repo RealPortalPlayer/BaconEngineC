@@ -10,7 +10,7 @@
 #include "Layers.h"
 
 int down = 0;
-BE_Color_3I color = {0, 0, 0};
+BE_Color3_Integer color = {0, 0, 0};
 
 void ColorOnUpdate(BE_Layer_UpdateTypes updateType);
 int ColorOnEvent(BE_Event event);
@@ -63,7 +63,7 @@ void ColorOnUpdate(BE_Layer_UpdateTypes updateType) {
     color.g = MIN(255, MAX(color.g, 0));
     color.b = MIN(255, MAX(color.b, 0));
 
-    BE_Renderer_SetClearColor((BE_Color_3U) {color.r, color.g, color.b});
+    BE_Renderer_SetClearColor((BE_Color3_Unsigned) {color.r, color.g, color.b});
 }
 
 int ColorOnEvent(BE_Event event) {

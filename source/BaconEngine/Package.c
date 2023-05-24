@@ -4,7 +4,7 @@
 #include "BaconEngine/Package.h"
 #include "InterfaceFunctions.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 BE_Package BE_Package_Open(const char* fileName) {
 #ifndef BE_CLIENT_BINARY
     return zip_open(fileName, ZIP_DEFAULT_COMPRESSION_LEVEL, 'r');
@@ -33,4 +33,4 @@ void BE_Package_Close(BE_Package package) {
 #endif
 }
 
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

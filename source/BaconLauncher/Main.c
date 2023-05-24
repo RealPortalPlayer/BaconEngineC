@@ -5,7 +5,7 @@
 #include <SharedEngineCode/Logger.h>
 #include <SharedEngineCode/Launcher.h>
 #include <SharedEngineCode/BuiltInArguments.h>
-#include <SharedEngineCode/OSUser.h>
+#include <SharedEngineCode/User.h>
 #include <SharedEngineCode/Internal/PlatformSpecific.h>
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
@@ -27,7 +27,9 @@ int main(int argc, char** argv) {
         {
             SEC_ArgumentHandler_ShortResults results;
 
-            if (SEC_ArgumentHandler_GetInfoWithShort(SEC_BUILTINARGUMENTS_ENGINE, SEC_BUILTINARGUMENTS_ENGINE_SHORT, SEC_FALSE, &results) != 0)
+            if (SEC_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_ENGINE,
+                                                            SEC_BUILTINARGUMENTS_ENGINE_SHORT, SEC_BOOLEAN_FALSE,
+                                                            &results) != 0)
                 engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY(*results.value, RTLD_NOW);
             else
                 engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY("./BaconEngine" SEC_PLATFORMSPECIFIC_BINARY_EXTENSION, RTLD_NOW);
@@ -37,7 +39,7 @@ int main(int argc, char** argv) {
             const char* (*getVersion)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(engineBinary, "BE_EntryPoint_GetVersion");
 
             if (getVersion != NULL)
-                SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "Engine version: %s\n", getVersion());
+                SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "Engine version: %s\n", getVersion());
 
             SEC_PLATFORMSPECIFIC_CLOSE_BINARY(engineBinary);
         }
@@ -45,8 +47,9 @@ int main(int argc, char** argv) {
         void* clientBinary = NULL;
         SEC_ArgumentHandler_ShortResults results;
 
-        if (SEC_ArgumentHandler_GetInfoWithShort(SEC_BUILTINARGUMENTS_CLIENT, SEC_BUILTINARGUMENTS_CLIENT_SHORT, 0, &results) == 0 ||
-            SEC_PLATFORMSPECIFIC_CHDIR(*results.value) != 0)
+        if (SEC_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_CLIENT, SEC_BUILTINARGUMENTS_CLIENT_SHORT,
+                                                        0, &results) == 0 ||
+            SEC_PLATFORMSPECIFIC_CHANGE_DIRECTORY(*results.value) != 0)
             return 0;
 
         clientBinary = SEC_PLATFORMSPECIFIC_GET_BINARY("./binary" SEC_PLATFORMSPECIFIC_BINARY_EXTENSION, RTLD_NOW);
@@ -57,7 +60,7 @@ int main(int argc, char** argv) {
         const char* (*getVersion)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetEngineVersion");
 
         if (getVersion != NULL)
-            SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "Client was compiled with engine version: %s\n", getVersion());
+            SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "Client was compiled with engine version: %s\n", getVersion());
 
         SEC_PLATFORMSPECIFIC_CLOSE_BINARY(clientBinary);
         return 0;
@@ -68,12 +71,13 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    if (SEC_OSUser_IsAdmin())
+    if (SEC_User_IsAdministrator())
         SEC_LOGGER_WARN("You're running as root! If a client says you require to be root, then it's probably a virus\n");
 
     SEC_ArgumentHandler_ShortResults results;
 
-    if (SEC_ArgumentHandler_GetInfoWithShort(SEC_BUILTINARGUMENTS_CLIENT, SEC_BUILTINARGUMENTS_CLIENT_SHORT, 0, &results) == 0) {
+    if (SEC_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_CLIENT, SEC_BUILTINARGUMENTS_CLIENT_SHORT, 0,
+                                                    &results) == 0) {
         SEC_LOGGER_FATAL("No client specified, please check help for more information\n");
         return 1;
     }

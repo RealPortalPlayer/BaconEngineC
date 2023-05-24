@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
 
 #include "../AntiClientGuard.h"
@@ -15,28 +15,28 @@
 #include "BaconEngine/Input/Keyboard.h"
 #include "BaconEngine/Input/Mouse.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef struct {
     struct {
-        void (*CreateWindow)(const char* title, BE_Vector_2U size, int monitor);
+        void (*CreateWindow)(const char* title, BE_Vector2_Unsigned size, int monitor);
         const char* (*GetTitle)(void);
-        BE_Vector_2U (*GetSize)(void);
-        BE_Vector_2I (*GetPosition)(void);
+        BE_Vector2_Unsigned (*GetSize)(void);
+        BE_Vector2_Integer (*GetPosition)(void);
         SEC_Boolean (*IsVisible)(void);
         SEC_Boolean (*IsStillOpened)(void);
         void (*SetTitle)(const char* title);
-        void (*SetSize)(BE_Vector_2U newSize);
-        void (*SetPosition)(BE_Vector_2I position);
+        void (*SetSize)(BE_Vector2_Unsigned newSize);
+        void (*SetPosition)(BE_Vector2_Integer position);
         void (*SetVisibility)(SEC_Boolean visible);
         void (*CloseWindow)(void);
         void (*UpdateEvents)(void);
     } windowFunctions;
     struct {
         void (*ClearScreen)(void);
-        void (*SetClearColor)(BE_Color_3U color);
-        BE_Color_3U (*GetClearColor)(void);
+        void (*SetClearColor)(BE_Color3_Unsigned color);
+        BE_Color3_Unsigned (*GetClearColor)(void);
         void (*Render)(void);
-        void (*DrawFilledRectangle)(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U color);
+        void (*DrawFilledRectangle)(BE_Vector2_Integer position, BE_Vector2_Unsigned size, BE_Color4_Unsigned color);
     } rendererFunctions;
     struct {
         SEC_Boolean (*IsKeyDown)(BE_Keyboard_KeyCodes keyCode);
@@ -50,4 +50,4 @@ typedef struct {
 BE_SpecificPlatformFunctions BE_SpecificPlatformFunctions_Get(void);
 
 void BE_SpecificPlatformFunctions_Initialize(BE_SpecificPlatformFunctions functions);
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

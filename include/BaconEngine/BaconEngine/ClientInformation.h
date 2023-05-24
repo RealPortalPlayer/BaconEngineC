@@ -6,17 +6,17 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
 
-#include "DllExport.h"
+#include "BinaryExport.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
-BE_DLLEXPORT SEC_Boolean BE_ClientInformation_IsRunning(void);
-BE_DLLEXPORT SEC_Boolean BE_ClientInformation_IsCheatsEnabled(void);
-BE_DLLEXPORT SEC_Boolean BE_ClientInformation_IsServerModeEnabled(void);
-BE_DLLEXPORT SEC_Boolean BE_ClientInformation_IsStrictModeEnabled(void);
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BE_BINARYEXPORT SEC_Boolean BE_ClientInformation_IsRunning(void);
+BE_BINARYEXPORT SEC_Boolean BE_ClientInformation_IsCheatsEnabled(void);
+BE_BINARYEXPORT SEC_Boolean BE_ClientInformation_IsServerModeEnabled(void);
+BE_BINARYEXPORT SEC_Boolean BE_ClientInformation_IsStrictModeEnabled(void);
 
-BE_DLLEXPORT void BE_ClientInformation_StopRunning(void);
-BE_DLLEXPORT void BE_ClientInformation_SetCheats(SEC_Boolean enable);
-SEC_CPP_SUPPORT_GUARD_END()
+BE_BINARYEXPORT void BE_ClientInformation_StopRunning(void);
+BE_BINARYEXPORT void BE_ClientInformation_SetCheats(SEC_Boolean enable);
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

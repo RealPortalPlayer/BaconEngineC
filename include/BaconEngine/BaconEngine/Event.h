@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 
 #include "BaconEngine/Math/Vector.h"
 #include "BaconEngine/Input/Keyboard.h"
 #include "BaconEngine/Input/Mouse.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     BE_EVENT_TYPE_KEYBOARD_KEY_DOWN,
     BE_EVENT_TYPE_KEYBOARD_KEY_UP,
@@ -36,8 +36,8 @@ typedef struct {
     union {
         struct {
             union {
-                BE_Vector_2I newPosition;
-                BE_Vector_2I newSize;
+                BE_Vector2_Integer newPosition;
+                BE_Vector2_Integer newSize;
             } unionVariables;
         } window;
         struct {
@@ -45,12 +45,12 @@ typedef struct {
             unsigned repeat;
         } keyboard;
         struct {
-            BE_Vector_2F position;
+            BE_Vector2_Float position;
             union {
                 BE_Mouse_ButtonType whichButton;
-                BE_Vector_2F wheelScrollAmount;
+                BE_Vector2_Float wheelScrollAmount;
             } unionVariables;
         } mouse;
     } data;
 } BE_Event;
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

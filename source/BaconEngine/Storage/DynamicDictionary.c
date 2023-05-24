@@ -13,7 +13,7 @@
 #   include "PrivateDynamicArray.h"
 #endif
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
 static SEC_Boolean BE_DynamicDictionary_UpdateFrozenState(BE_DynamicDictionary* dictionary) {
     dictionary->keys.frozen = dictionary->frozen;
@@ -26,7 +26,7 @@ SEC_Boolean BE_DynamicDictionary_Create(BE_DynamicDictionary* dictionary, size_t
 #ifndef BE_CLIENT_BINARY
     SEC_Boolean returnValue = BE_DynamicArray_Create(&dictionary->keys, size) && BE_DynamicArray_Create(&dictionary->values, size);
 
-    dictionary->frozen = SEC_FALSE;
+    dictionary->frozen = SEC_BOOLEAN_FALSE;
     return returnValue;
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicDictionary*, size_t);
@@ -38,7 +38,7 @@ SEC_Boolean BE_DynamicDictionary_Create(BE_DynamicDictionary* dictionary, size_t
 SEC_Boolean BE_PrivateDynamicDictionary_Create(BE_DynamicDictionary* dictionary, size_t size) {
     SEC_Boolean returnValue = BE_PrivateDynamicArray_Create(&dictionary->keys, size) && BE_PrivateDynamicArray_Create(&dictionary->values, size);
 
-    dictionary->frozen = SEC_FALSE;
+    dictionary->frozen = SEC_BOOLEAN_FALSE;
     return returnValue;
 }
 #endif
@@ -46,7 +46,7 @@ SEC_Boolean BE_PrivateDynamicDictionary_Create(BE_DynamicDictionary* dictionary,
 SEC_Boolean BE_DynamicDictionary_AddElementToStart(BE_DynamicDictionary* dictionary, void* key, void* value) {
 #ifndef BE_CLIENT_BINARY
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
-        return SEC_FALSE;
+        return SEC_BOOLEAN_FALSE;
 
     return BE_DynamicArray_AddElementToStart(&dictionary->keys, key) &&
            BE_DynamicArray_AddElementToStart(&dictionary->values, value);
@@ -59,7 +59,7 @@ SEC_Boolean BE_DynamicDictionary_AddElementToStart(BE_DynamicDictionary* diction
 SEC_Boolean BE_DynamicDictionary_AddElementToLast(BE_DynamicDictionary* dictionary, void* key, void* value) {
 #ifndef BE_CLIENT_BINARY
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
-        return SEC_FALSE;
+        return SEC_BOOLEAN_FALSE;
 
     return BE_DynamicArray_AddElementToLast(&dictionary->keys, key) &&
            BE_DynamicArray_AddElementToLast(&dictionary->values, value);
@@ -72,7 +72,7 @@ SEC_Boolean BE_DynamicDictionary_AddElementToLast(BE_DynamicDictionary* dictiona
 SEC_Boolean BE_DynamicDictionary_RemoveFirstElement(BE_DynamicDictionary* dictionary) {
 #ifndef BE_CLIENT_BINARY
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
-        return SEC_FALSE;
+        return SEC_BOOLEAN_FALSE;
 
     return BE_DynamicArray_RemoveFirstElement(&dictionary->keys) &&
            BE_DynamicArray_RemoveFirstElement(&dictionary->values);
@@ -85,7 +85,7 @@ SEC_Boolean BE_DynamicDictionary_RemoveFirstElement(BE_DynamicDictionary* dictio
 SEC_Boolean BE_DynamicDictionary_RemoveLastElement(BE_DynamicDictionary* dictionary) {
 #ifndef BE_CLIENT_BINARY
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
-        return SEC_FALSE;
+        return SEC_BOOLEAN_FALSE;
 
     return BE_DynamicArray_RemoveLastElement(&dictionary->keys) &&
            BE_DynamicArray_RemoveLastElement(&dictionary->values);
@@ -98,7 +98,7 @@ SEC_Boolean BE_DynamicDictionary_RemoveLastElement(BE_DynamicDictionary* diction
 SEC_Boolean BE_DynamicDictionary_RemoveElementAt(BE_DynamicDictionary* dictionary, unsigned index) {
 #ifndef BE_CLIENT_BINARY
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
-        return SEC_FALSE;
+        return SEC_BOOLEAN_FALSE;
 
     return BE_DynamicArray_RemoveElementAt(&dictionary->keys, index) &&
            BE_DynamicArray_RemoveElementAt(&dictionary->values, index);
@@ -111,11 +111,11 @@ SEC_Boolean BE_DynamicDictionary_RemoveElementAt(BE_DynamicDictionary* dictionar
 SEC_Boolean BE_DynamicDictionary_RemoveElementViaKey(BE_DynamicDictionary* dictionary, void* key, size_t elementSize) {
 #ifndef BE_CLIENT_BINARY
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
-        return SEC_FALSE;
+        return SEC_BOOLEAN_FALSE;
 
     int index = BE_DynamicDictionary_GetElementIndexFromKey(*dictionary, key, elementSize);
 
-    return index != -1 ? BE_DynamicDictionary_RemoveElementAt(dictionary, index) : SEC_FALSE;
+    return index != -1 ? BE_DynamicDictionary_RemoveElementAt(dictionary, index) : SEC_BOOLEAN_FALSE;
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicDictionary*, void*, size_t);
     return function(dictionary, key, elementSize);
@@ -125,11 +125,11 @@ SEC_Boolean BE_DynamicDictionary_RemoveElementViaKey(BE_DynamicDictionary* dicti
 SEC_Boolean BE_DynamicDictionary_RemoveElementViaValue(BE_DynamicDictionary* dictionary, void* value, size_t elementSize) {
 #ifndef BE_CLIENT_BINARY
     if (BE_DynamicDictionary_UpdateFrozenState(dictionary))
-        return SEC_FALSE;
+        return SEC_BOOLEAN_FALSE;
 
     int index = BE_DynamicDictionary_GetElementIndexFromValue(*dictionary, value, elementSize);
 
-    return index != -1 ? BE_DynamicDictionary_RemoveElementAt(dictionary, index) : SEC_FALSE;
+    return index != -1 ? BE_DynamicDictionary_RemoveElementAt(dictionary, index) : SEC_BOOLEAN_FALSE;
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicDictionary*, void*, size_t);
     return function(dictionary, value, elementSize);
@@ -215,4 +215,4 @@ void BE_DynamicDictionary_GetElementsKeyViaValue(BE_DynamicDictionary dictionary
     BE_INTERFACEFUNCTION(void, BE_DynamicDictionary, BE_DynamicDictionary*, void*, size_t)(dictionary, results, value, elementSize);
 #endif
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

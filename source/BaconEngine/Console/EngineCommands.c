@@ -16,7 +16,7 @@
 #include "BaconEngine/Math/Bitwise.h"
 #include "BaconEngine/DeltaTime.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 void BE_EngineCommands_Help(BE_Command_Context context);
 void BE_EngineCommands_Cheats(BE_Command_Context context);
 void BE_EngineCommands_Stop(void);
@@ -32,11 +32,11 @@ void BE_EngineCommands_Echo(BE_Command_Context context);
 void BE_EngineCommands_Crash(void);
 
 void BE_EngineCommands_Initialize(void) {
-    static SEC_Boolean initialized = SEC_FALSE;
+    static SEC_Boolean initialized = SEC_BOOLEAN_FALSE;
 
     BE_ASSERT(!initialized, "Engine commands are already initialized\n");
 
-    initialized = SEC_TRUE;
+    initialized = SEC_BOOLEAN_TRUE;
 
     BE_Command_Register("help", "Shows information about each command.", BE_COMMAND_FLAG_NULL, &BE_EngineCommands_Help);
     {
@@ -104,27 +104,27 @@ void BE_EngineCommands_HelpPrint(BE_Command* command) {
         (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
         return;
 
-    SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "        %s", command->name);
-    SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, " - ");
-    SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "%s",
+    SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "        %s", command->name);
+    SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, " - ");
+    SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "%s",
                                  command->description);
 
     if (command->flags != BE_COMMAND_FLAG_NULL)
-        SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_DEBUG, " - flags: %i",
+        SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_DEBUG, " - flags: %i",
                                      command->flags);
 
     for (int argumentId = 0; argumentId < command->arguments.used; argumentId++) {
         BE_Command_Argument* argument = BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, argumentId);
 
-        SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "%s", argumentId != 0 ? " " : " - args: ");
+        SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "%s", argumentId != 0 ? " " : " - args: ");
 
         if (argument->required)
-            SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "<%s>", argument->name);
+            SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "<%s>", argument->name);
         else
-            SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "[%s]", argument->name);
+            SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "[%s]", argument->name);
     }
 
-    SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "\n");
+    SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "\n");
 }
 
 void BE_EngineCommands_Help(BE_Command_Context context) {
@@ -161,7 +161,7 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
         if (commandIdClient == -1 || showClient == 0)
             return;
 
-        SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "    Client Commands:\n");
+        SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "    Client Commands:\n");
 
         for (; commandIdClient < BE_Console_GetCommandAmount(); commandIdClient++)
             BE_EngineCommands_HelpPrint(BE_Console_GetCommands()[commandIdClient]);
@@ -285,4 +285,4 @@ void BE_EngineCommands_Echo(BE_Command_Context context) {
 void BE_EngineCommands_Crash(void) {
     raise(SIGSEGV);
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

@@ -1,15 +1,15 @@
 // Purpose: Helps with argument handling.
 // Created on: 3/28/22 @ 9:21 PM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
 
-#include "Internal/CppSupport.h"
+#include "Internal/CPlusPlusSupport.h"
 #include "Internal/Boolean.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef struct {
     /**
      * Will be the pointer to argumentValue.
@@ -43,8 +43,8 @@ int SEC_ArgumentHandler_GetIndex(const char* argument, SEC_Boolean ignoreDontPar
   */
 char* SEC_ArgumentHandler_GetValue(const char* argument, SEC_Boolean ignoreDontParse);
 
-int SEC_ArgumentHandler_GetInfoWithShort(const char* argument, const char* shortArgument, SEC_Boolean ignoreDontParse,
-                                         SEC_ArgumentHandler_ShortResults* results);
+int SEC_ArgumentHandler_GetInformationWithShort(const char* argument, const char* shortArgument, SEC_Boolean ignoreDontParse,
+                                                SEC_ArgumentHandler_ShortResults* results);
 
 SEC_Boolean SEC_ArgumentHandler_ContainsArgumentOrShort(const char* argument, const char* shortArgument, SEC_Boolean ignoreDontParse);
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

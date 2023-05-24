@@ -10,10 +10,10 @@
 
 #ifndef BE_CLIENT_BINARY
 #   if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
-#       define BE_DLLEXPORT __attribute__((visibility("default")))
+#       define BE_BINARYEXPORT __attribute__((visibility("default")))
 #   elif SEC_OPERATINGSYSTEM_WINDOWS
-#       define BE_DLLEXPORT __declspec(dllexport)
+#       define BE_BINARYEXPORT __declspec(dllexport)
 #   endif
 #else
-#   define BE_DLLEXPORT
+#   define BE_BINARYEXPORT
 #endif

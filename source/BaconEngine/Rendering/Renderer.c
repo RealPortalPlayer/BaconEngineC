@@ -24,23 +24,23 @@
 #include "BaconEngine/Debugging/Assert.h"
 #include "../InterfaceFunctions.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
 static BE_Renderer_Types beRendererCurrent;
 static int renderCalls = 0;
 #endif
 
-void BE_Renderer_SetClearColor(BE_Color_3U color) {
+void BE_Renderer_SetClearColor(BE_Color3_Unsigned color) {
 #ifndef BE_CLIENT_BINARY
     BE_SpecificPlatformFunctions_Get().rendererFunctions.SetClearColor(color);
 #else
-    BE_INTERFACEFUNCTION(void, BE_Color_3U)(color);
+    BE_INTERFACEFUNCTION(void, BE_Color3_Unsigned)(color);
 #endif
 }
 
 #ifndef BE_CLIENT_BINARY
 void BE_PrivateRenderer_Initialize(void) {
-    static SEC_Boolean initialized = SEC_FALSE;
+    static SEC_Boolean initialized = SEC_BOOLEAN_FALSE;
 
     BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized rendererFunctions\n");
 
@@ -155,24 +155,24 @@ BE_Renderer_Types BE_Renderer_GetCurrentType(void) {
 #endif
 }
 
-BE_Color_3U BE_Renderer_GetClearColor(void) {
+BE_Color3_Unsigned BE_Renderer_GetClearColor(void) {
 #ifndef BE_CLIENT_BINARY
     return BE_SpecificPlatformFunctions_Get().rendererFunctions.GetClearColor();
 #else
-    BE_INTERFACEFUNCTION(BE_Color_3U, void);
+    BE_INTERFACEFUNCTION(BE_Color3_Unsigned, void);
     return function();
 #endif
 }
 
-//BE_Vector_2U BE_Renderer_GetFontSize(TTF_Font* font, const char* text) {
+//BE_Vector2_Unsigned BE_Renderer_GetFontSize(TTF_Font* font, const char* text) {
 //  (void) font;
 //  (void) text;
 //
-//  BE_Vector_2U size = (BE_Vector_2U) {5, 5};
+//  BE_Vector2_Unsigned size = (BE_Vector2_Unsigned) {5, 5};
 //
 //#ifndef BACON_ENGINE_DISABLE_SDL_TTF
 //  if (font != NULL) {
-//      BE_Vector_2U textSize = {0, 0};
+//      BE_Vector2_Unsigned textSize = {0, 0};
 //
 //      TTF_SizeText(font, text, (int*) &textSize.x, (int*) &textSize.y);
 //
@@ -184,19 +184,19 @@ BE_Color_3U BE_Renderer_GetClearColor(void) {
 //  return size;
 //}
 
-BE_Vector_2I BE_Renderer_GetCenterPosition(BE_Vector_2I rectanglePosition, BE_Vector_2U rectangleSize, BE_Vector_2U objectSize) {
+BE_Vector2_Integer BE_Renderer_GetCenterPosition(BE_Vector2_Integer rectanglePosition, BE_Vector2_Unsigned rectangleSize, BE_Vector2_Unsigned objectSize) {
 #ifndef BE_CLIENT_BINARY
-    return SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I,
+    return SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer,
         rectanglePosition.x + (int) rectangleSize.x / 2 - (int) objectSize.x / 2,
         rectanglePosition.y + (int) rectangleSize.y / 2 - (int) objectSize.y / 2
     );
 #else
-    BE_INTERFACEFUNCTION(BE_Vector_2I, BE_Vector_2I, BE_Vector_2U, BE_Vector_2U);
+    BE_INTERFACEFUNCTION(BE_Vector2_Integer, BE_Vector2_Integer, BE_Vector2_Unsigned, BE_Vector2_Unsigned);
     return function(rectanglePosition, rectangleSize, objectSize);
 #endif
 }
 
-void BE_Renderer_DrawLine(BE_Vector_2I firstPoint, BE_Vector_2I secondPoint, BE_Color_4U color) {
+void BE_Renderer_DrawLine(BE_Vector2_Integer firstPoint, BE_Vector2_Integer secondPoint, BE_Color4_Unsigned color) {
     (void) firstPoint;
     (void) secondPoint;
     (void) color;
@@ -217,7 +217,7 @@ void BE_Renderer_DrawLine(BE_Vector_2I firstPoint, BE_Vector_2I secondPoint, BE_
 //#endif
     }
 
-void BE_Renderer_DrawPoint(BE_Vector_2I position, BE_Color_4U color) {
+void BE_Renderer_DrawPoint(BE_Vector2_Integer position, BE_Color4_Unsigned color) {
     (void) position;
     (void) color;
 
@@ -237,15 +237,15 @@ void BE_Renderer_DrawPoint(BE_Vector_2I position, BE_Color_4U color) {
 //#endif
 }
 
-void BE_Renderer_DrawRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U color) {
+void BE_Renderer_DrawRectangle(BE_Vector2_Integer position, BE_Vector2_Unsigned size, BE_Color4_Unsigned color) {
 #ifndef BE_CLIENT_BINARY
     BE_SpecificPlatformFunctions_Get().rendererFunctions.DrawFilledRectangle(position, size, color);
 #else
-    BE_INTERFACEFUNCTION(void, BE_Vector_2I, BE_Vector_2U, BE_Color_4U)(position, size, color);
+    BE_INTERFACEFUNCTION(void, BE_Vector2_Integer, BE_Vector2_Unsigned, BE_Color4_Unsigned)(position, size, color);
 #endif
 }
 
-void BE_Renderer_FillRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U color) {
+void BE_Renderer_FillRectangle(BE_Vector2_Integer position, BE_Vector2_Unsigned size, BE_Color4_Unsigned color) {
     (void) position;
     (void) size;
     (void) color;
@@ -273,7 +273,7 @@ void BE_Renderer_FillRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Colo
 //#endif
 }
 
-void BE_Renderer_DrawBorderedRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U borderColor, BE_Color_4U fillColor, int borderPadding) {
+void BE_Renderer_DrawBorderedRectangle(BE_Vector2_Integer position, BE_Vector2_Unsigned size, BE_Color4_Unsigned borderColor, BE_Color4_Unsigned fillColor, int borderPadding) {
     (void) position;
     (void) size;
     (void) borderColor;
@@ -281,9 +281,9 @@ void BE_Renderer_DrawBorderedRectangle(BE_Vector_2I position, BE_Vector_2U size,
     (void) borderPadding; // TODO: Padding.
 //    BE_Renderer_DrawRectangle(position, size, fillColor);
 //  return 0;
-//  return BE_Renderer_DrawRectangle((BE_Vector_2I) {position.x - borderPadding, position.y - borderPadding},
-//                                   (BE_Vector_2U) {size.x + borderPadding * 2, size.y + borderPadding * 2},
+//  return BE_Renderer_DrawRectangle((BE_Vector2_Integer) {position.x - borderPadding, position.y - borderPadding},
+//                                   (BE_Vector2_Unsigned) {size.x + borderPadding * 2, size.y + borderPadding * 2},
 //                                   borderColor) &&
 //         BE_Renderer_FillRectangle(position, size, fillColor);
     }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

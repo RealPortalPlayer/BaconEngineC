@@ -8,7 +8,7 @@
 #include "BaconEngine/Console/ArgumentManager.h"
 #include "../InterfaceFunctions.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
 static int BE_ArgumentManager_EqualsStringBoolean(char* value) {
     if (SEC_StringExtension_CompareCaseless(value, "true") == 0)
@@ -18,7 +18,7 @@ static int BE_ArgumentManager_EqualsStringBoolean(char* value) {
 }
 #endif
 
-int BE_ArgumentManager_GetInt(BE_DynamicDictionary arguments, const char* name, int defaultValue) {
+int BE_ArgumentManager_GetInteger(BE_DynamicDictionary arguments, const char* name, int defaultValue) {
 #ifndef BE_CLIENT_BINARY
     if (arguments.keys.size != 0) {
         char* value = (char*) BE_ArgumentManager_GetString(arguments, name, "");
@@ -45,7 +45,7 @@ int BE_ArgumentManager_GetInt(BE_DynamicDictionary arguments, const char* name, 
 
 SEC_Boolean BE_ArgumentManager_GetBoolean(BE_DynamicDictionary arguments, const char* name, int defaultValue) {
 #ifndef BE_CLIENT_BINARY
-    return BE_ArgumentManager_GetInt(arguments, name, defaultValue) >= 1;
+    return BE_ArgumentManager_GetInteger(arguments, name, defaultValue) >= 1;
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicDictionary, const char*, int);
     return function(arguments, name, defaultValue);
@@ -88,4 +88,4 @@ const char* BE_ArgumentManager_GetString(BE_DynamicDictionary arguments, const c
     return function(arguments, name, defaultValue);
 #endif
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

@@ -6,18 +6,18 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
 
 #include "BaconEngine/Storage/DynamicDictionary.h"
 #include "ArgumentManager.h"
-#include "BaconEngine/DllExport.h"
+#include "BaconEngine/BinaryExport.h"
 
 // TODO: Validate that none of the commands go over this limit.
 
 #define BE_COMMAND_MAX_NAME_LENGTH 1024
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     BE_COMMAND_FLAG_NULL,
     BE_COMMAND_FLAG_CHEATS_ONLY,
@@ -45,13 +45,13 @@ typedef struct {
     void (*Run)(BE_Command_Context context);
 } BE_Command;
 
-BE_DLLEXPORT void BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context));
-BE_DLLEXPORT void BE_Command_AddArgument(const char* name, SEC_Boolean required);
+BE_BINARYEXPORT void BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context));
+BE_BINARYEXPORT void BE_Command_AddArgument(const char* name, SEC_Boolean required);
 
 /**
  * Duplicates the previously added command
  * @param name Name for the duplicated command
  * @param description If this is NULL, then it will use the description of the previous command
  */
-BE_DLLEXPORT void BE_Command_DuplicatePrevious(const char* name, const char* description);
-SEC_CPP_SUPPORT_GUARD_END()
+BE_BINARYEXPORT void BE_Command_DuplicatePrevious(const char* name, const char* description);
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

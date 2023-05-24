@@ -7,7 +7,7 @@
 #include "BaconEngine/Debugging/Assert.h"
 #include "../InterfaceFunctions.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 SEC_Boolean BE_Assert_CheckLogsEnabled(void) {
 #ifndef BE_CLIENT_BINARY
     static int enabled = -1;
@@ -21,4 +21,4 @@ SEC_Boolean BE_Assert_CheckLogsEnabled(void) {
     return function();
 #endif
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

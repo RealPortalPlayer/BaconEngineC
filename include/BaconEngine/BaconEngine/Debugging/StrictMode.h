@@ -12,11 +12,11 @@
 #include <SharedEngineCode/Internal/Boolean.h>
 
 #include "BaconEngine/ClientInformation.h"
-#include "BaconEngine/DllExport.h"
+#include "BaconEngine/BinaryExport.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
-BE_DLLEXPORT SEC_Boolean BE_StrictMode_CheckLogsEnabled(void);
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BE_BINARYEXPORT SEC_Boolean BE_StrictMode_CheckLogsEnabled(void);
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()
 
 #define BE_STRICTMODE_CHECK(check, returnValue, ...) \
 do {                                                 \
@@ -26,13 +26,13 @@ do {                                                 \
             SEC_Logger_LogLevels level = SEC_LOGGER_LOG_LEVEL_FATAL; \
             if (!BE_ClientInformation_IsStrictModeEnabled()) \
                 level = SEC_LOGGER_LOG_LEVEL_ERROR;  \
-            SEC_Logger_LogImplementation(SEC_TRUE, level, "Strict Check Failed\nCode: %s\nMessage: ", #check); \
-            SEC_Logger_LogImplementation(SEC_FALSE, level, __VA_ARGS__);  \
+            SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, level, "Strict Check Failed\nCode: %s\nMessage: ", #check); \
+            SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, level, __VA_ARGS__);  \
             if (BE_ClientInformation_IsStrictModeEnabled()) \
                 abort();                             \
             else                                     \
                 return returnValue;                  \
         }                                            \
-} while (SEC_FALSE)
+} while (SEC_BOOLEAN_FALSE)
 
 #define BE_STRICTMODE_CHECK_NO_RETURN_VALUE(check, ...) BE_STRICTMODE_CHECK(check, , __VA_ARGS__)

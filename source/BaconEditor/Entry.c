@@ -23,14 +23,14 @@ void CloseProjectCommand(BE_Command_Context context) {
 int I_EntryPoint_Start(int argc, char** argv) {
     BE_Command_Register("create_project", "Creates a new project", BE_COMMAND_FLAG_NULL, &CreateProjectCommand);
     {
-        BE_Command_AddArgument("name", SEC_TRUE);
-        BE_Command_AddArgument("standalone", SEC_TRUE);
-        BE_Command_AddArgument("location", SEC_TRUE);
+        BE_Command_AddArgument("name", SEC_BOOLEAN_TRUE);
+        BE_Command_AddArgument("standalone", SEC_BOOLEAN_TRUE);
+        BE_Command_AddArgument("location", SEC_BOOLEAN_TRUE);
     }
 
     BE_Command_Register("open_project", "Opens a project", BE_COMMAND_FLAG_NULL, &OpenProjectCommand);
     {
-        BE_Command_AddArgument("location", SEC_TRUE);
+        BE_Command_AddArgument("location", SEC_BOOLEAN_TRUE);
     }
 
     BE_Command_Register("close_project", "Closes the currently opened project", BE_COMMAND_FLAG_NULL, &CloseProjectCommand);

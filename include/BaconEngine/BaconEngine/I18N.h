@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <stdio.h>
 
-#include "DllExport.h"
+#include "BinaryExport.h"
 
 // TODO: Variables.
 
-SEC_CPP_SUPPORT_GUARD_START()
-BE_DLLEXPORT const char* BE_I18N_Translate(FILE* languageFile, const char* key);
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BE_BINARYEXPORT const char* BE_I18N_Translate(FILE* languageFile, const char* key);
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

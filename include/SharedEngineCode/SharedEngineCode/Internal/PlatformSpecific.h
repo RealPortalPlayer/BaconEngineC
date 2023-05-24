@@ -11,7 +11,7 @@
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <dlfcn.h>
 #   include <unistd.h>
-#   define SEC_PLATFORMSPECIFIC_CHDIR(dir) chdir(dir)
+#   define SEC_PLATFORMSPECIFIC_CHANGE_DIRECTORY(directory) chdir(directory)
 #   define SEC_PLATFORMSPECIFIC_GET_BINARY(name, options) dlopen(name, options)
 #   define SEC_PLATFORMSPECIFIC_GET_ADDRESS(binary, name) dlsym(binary, name)
 #   define SEC_PLATFORMSPECIFIC_GET_ERROR(variable) variable = dlerror()
@@ -24,7 +24,7 @@
 #elif SEC_OPERATINGSYSTEM_WINDOWS
 #   include <Windows.h>
 #   include <direct.h>
-#   define SEC_PLATFORMSPECIFIC_CHDIR(dir) _chdir(dir)
+#   define SEC_PLATFORMSPECIFIC_CHANGE_DIRECTORY(directory) _chdir(directory)
 #   define SEC_PLATFORMSPECIFIC_GET_BINARY(name, options) LoadLibrary(name)
 #   define SEC_PLATFORMSPECIFIC_GET_ADDRESS(binary, name) GetProcAddress(binary, name)
 #   define SEC_PLATFORMSPECIFIC_GET_ERROR(variable) do { \

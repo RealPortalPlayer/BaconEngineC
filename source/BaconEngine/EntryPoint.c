@@ -33,7 +33,7 @@
 #include "Rendering/PrivateRenderer.h"
 #include "BaconEngine/Console/Console.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 void BE_EntryPoint_SignalDetected(int receivedSignal) {
     switch (receivedSignal) {
         case SIGSEGV:
@@ -61,7 +61,7 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
             // TODO: Windows?
 #if SEC_OPERATINGSYSTEM_UNIX
             // TODO: Reprint cursor
-            siginterrupt(SIGINT, SEC_FALSE);
+            siginterrupt(SIGINT, SEC_BOOLEAN_FALSE);
 #endif
 
             printf(" (type 'exit' to quit)\n");
@@ -73,7 +73,7 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
 }
 
 void BE_EntryPoint_CommandThreadFunction(void) {
-    SEC_Boolean printedCursor = SEC_FALSE;
+    SEC_Boolean printedCursor = SEC_BOOLEAN_FALSE;
 
     // FIXME: Find out why this is not working on Serenity.
     // TODO: Find fcntl replacement for Windows.
@@ -90,9 +90,9 @@ void BE_EntryPoint_CommandThreadFunction(void) {
         memset(input, 0, 4024);
 
         if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT && !printedCursor) {
-            SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "%s ", BE_ClientInformation_IsCheatsEnabled() ? "#" : "$");
+            SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "%s ", BE_ClientInformation_IsCheatsEnabled() ? "#" : "$");
 
-            printedCursor = SEC_TRUE;
+            printedCursor = SEC_BOOLEAN_TRUE;
         }
 
         fgets(input, sizeof(input), stdin); // TODO: Arrow keys to go back in history.
@@ -104,22 +104,22 @@ void BE_EntryPoint_CommandThreadFunction(void) {
 
         BE_Console_ExecuteCommand(input);
 
-        printedCursor = SEC_FALSE;
+        printedCursor = SEC_BOOLEAN_FALSE;
     }
 }
 
-BE_DLLEXPORT const char* BE_EntryPoint_GetVersion(void) {
+BE_BINARYEXPORT const char* BE_EntryPoint_GetVersion(void) {
     return BE_ENGINE_VERSION;
 }
 
-BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* clientBinary, int argc, char** argv) {
-    static SEC_Boolean alreadyStarted = SEC_FALSE;
+BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* clientBinary, int argc, char** argv) {
+    static SEC_Boolean alreadyStarted = SEC_BOOLEAN_FALSE;
 
     SEC_ArgumentHandler_Initialize(argc, argv);
     BE_STRICTMODE_CHECK(!alreadyStarted, 1, "Reinitializing the engine is not supported\n");
     SEC_LOGGER_TRACE("Entered engine code\n");
 
-    alreadyStarted = SEC_TRUE;
+    alreadyStarted = SEC_BOOLEAN_TRUE;
 
 #ifndef BE_ASAN_ENABLED
     SEC_LOGGER_DEBUG("Registering important signals\n");
@@ -246,7 +246,7 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
             }
         }
 
-        BE_PrivateWindow_Initialize(getName != NULL ? getName() : "", SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2U, (unsigned) width, (unsigned) height));
+        BE_PrivateWindow_Initialize(getName != NULL ? getName() : "", SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, (unsigned) width, (unsigned) height));
     }
 
     BE_PrivateUI_Initialize();
@@ -332,9 +332,9 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
     return 0;
 }
 
-BE_DLLEXPORT void I_EntryPoint_InitializeWrapper(void* engineBinary) {
+BE_BINARYEXPORT void I_EntryPoint_InitializeWrapper(void* engineBinary) {
     (void) engineBinary;
 
     BE_ASSERT_ALWAYS("I am not a client\n");
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

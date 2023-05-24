@@ -39,7 +39,7 @@ int I_EntryPoint_Start(int argc, char** argv) {
         if (BE_Package_GetFile(package, "Test.txt", &buffer, &size)) {
             SEC_LOGGER_INFO("File contents: ");
             fwrite(buffer, 1, size, stdout);
-            SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "\n");
+            SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "\n");
             free(buffer);
         } else
             SEC_LOGGER_ERROR("Failed to open file: Test.txt\n");
@@ -58,7 +58,7 @@ int I_EntryPoint_Start(int argc, char** argv) {
 }
 
 SEC_Boolean I_EntryPoint_SupportsServer(void) {
-    return SEC_TRUE;
+    return SEC_BOOLEAN_TRUE;
 }
 
 const char* I_EntryPoint_GetName(void) {

@@ -7,12 +7,12 @@
 #pragma once
 
 #include <stddef.h>
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
 
-#include "BaconEngine/DllExport.h"
+#include "BaconEngine/BinaryExport.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef struct {
     void** internalArray;
     int used;
@@ -22,25 +22,25 @@ typedef struct {
     SEC_Boolean engineMade; // Do not edit, internal use only
 } BE_DynamicArray;
 
-BE_DLLEXPORT SEC_Boolean BE_DynamicArray_Create(BE_DynamicArray* array, size_t size);
-BE_DLLEXPORT SEC_Boolean BE_DynamicArray_AddElementToStart(BE_DynamicArray* array, void* element);
-BE_DLLEXPORT SEC_Boolean BE_DynamicArray_AddElementToLast(BE_DynamicArray* array, void* element);
+BE_BINARYEXPORT SEC_Boolean BE_DynamicArray_Create(BE_DynamicArray* array, size_t size);
+BE_BINARYEXPORT SEC_Boolean BE_DynamicArray_AddElementToStart(BE_DynamicArray* array, void* element);
+BE_BINARYEXPORT SEC_Boolean BE_DynamicArray_AddElementToLast(BE_DynamicArray* array, void* element);
 
 /**
   * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
   */
-BE_DLLEXPORT SEC_Boolean BE_DynamicArray_RemoveFirstElement(BE_DynamicArray* array);
+BE_BINARYEXPORT SEC_Boolean BE_DynamicArray_RemoveFirstElement(BE_DynamicArray* array);
 
 /**
   * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
   */
-BE_DLLEXPORT SEC_Boolean BE_DynamicArray_RemoveLastElement(BE_DynamicArray* array);
+BE_BINARYEXPORT SEC_Boolean BE_DynamicArray_RemoveLastElement(BE_DynamicArray* array);
 
 /**
   * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
   */
-BE_DLLEXPORT SEC_Boolean BE_DynamicArray_RemoveElementAt(BE_DynamicArray* array, unsigned int index);
-SEC_CPP_SUPPORT_GUARD_END()
+BE_BINARYEXPORT SEC_Boolean BE_DynamicArray_RemoveElementAt(BE_DynamicArray* array, unsigned int index);
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()
 
 #define BE_DYNAMICARRAY_GET_ELEMENT_POINTER(type, array, index) ((type*) (array)->internalArray[(index)])
 #define BE_DYNAMICARRAY_GET_ELEMENT(type, array, index) BE_DYNAMICARRAY_GET_ELEMENT_POINTER(type, &array, index)

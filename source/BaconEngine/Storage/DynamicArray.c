@@ -14,7 +14,7 @@
 #   include "PrivateDynamicArray.h"
 #endif
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
 static void BE_DynamicArray_ReallocateArray(BE_DynamicArray* array) {
     if (array->size != (size_t) array->used)
@@ -36,14 +36,14 @@ static void BE_DynamicArray_ReallocateArray(BE_DynamicArray* array) {
 // TODO: Make a public one that does not use engine memory.
 SEC_Boolean BE_DynamicArray_Create(BE_DynamicArray* array, size_t size) {
 #ifndef BE_CLIENT_BINARY
-    BE_STRICTMODE_CHECK(size != 0, SEC_FALSE, "Invalid size\n");
+    BE_STRICTMODE_CHECK(size != 0, SEC_BOOLEAN_FALSE, "Invalid size\n");
     BE_ASSERT((array->internalArray = (void**) malloc(sizeof(void*) * size)) != NULL, "Failed to allocate %zu bytes of data\n", sizeof(void*) * size);
 
     array->used = 0;
     array->size = size;
-    array->frozen = SEC_FALSE;
-    array->engineMade = SEC_FALSE;
-    return SEC_TRUE;
+    array->frozen = SEC_BOOLEAN_FALSE;
+    array->engineMade = SEC_BOOLEAN_FALSE;
+    return SEC_BOOLEAN_TRUE;
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicArray*, size_t);
     return function(array, size);
@@ -57,16 +57,16 @@ SEC_Boolean BE_PrivateDynamicArray_Create(BE_DynamicArray* array, size_t size) {
     array->internalArray = (void**) BE_EngineMemory_AllocateMemory(sizeof(void*) * size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
     array->used = 0;
     array->size = size;
-    array->frozen = SEC_FALSE;
-    array->engineMade = SEC_TRUE;
-    return SEC_TRUE;
+    array->frozen = SEC_BOOLEAN_FALSE;
+    array->engineMade = SEC_BOOLEAN_TRUE;
+    return SEC_BOOLEAN_TRUE;
 }
 #endif
 
 SEC_Boolean BE_DynamicArray_AddElementToStart(BE_DynamicArray* array, void* element) {
 #ifndef BE_CLIENT_BINARY
     if (array->frozen)
-        return SEC_FALSE;
+        return SEC_BOOLEAN_FALSE;
 
     BE_DynamicArray_ReallocateArray(array);
 
@@ -75,7 +75,7 @@ SEC_Boolean BE_DynamicArray_AddElementToStart(BE_DynamicArray* array, void* elem
 
     array->internalArray[0] = element;
     array->used++;
-    return SEC_TRUE;
+    return SEC_BOOLEAN_TRUE;
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicArray*, void*);
     return function(array, element);
@@ -85,12 +85,12 @@ SEC_Boolean BE_DynamicArray_AddElementToStart(BE_DynamicArray* array, void* elem
 SEC_Boolean BE_DynamicArray_AddElementToLast(BE_DynamicArray* array, void* element) {
 #ifndef BE_CLIENT_BINARY
     if (array->frozen)
-        return SEC_FALSE;
+        return SEC_BOOLEAN_FALSE;
 
     BE_DynamicArray_ReallocateArray(array);
 
     array->internalArray[array->used++] = element;
-    return SEC_TRUE;
+    return SEC_BOOLEAN_TRUE;
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicArray*, void*);
     return function(array, element);
@@ -99,7 +99,7 @@ SEC_Boolean BE_DynamicArray_AddElementToLast(BE_DynamicArray* array, void* eleme
 
 SEC_Boolean BE_DynamicArray_RemoveFirstElement(BE_DynamicArray* array) {
 #ifndef BE_CLIENT_BINARY
-    return array->used != 0 && !array->frozen ? BE_DynamicArray_RemoveElementAt(array, 0) : SEC_FALSE;
+    return array->used != 0 && !array->frozen ? BE_DynamicArray_RemoveElementAt(array, 0) : SEC_BOOLEAN_FALSE;
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicArray*);
     return function(array);
@@ -109,10 +109,10 @@ SEC_Boolean BE_DynamicArray_RemoveFirstElement(BE_DynamicArray* array) {
 SEC_Boolean BE_DynamicArray_RemoveLastElement(BE_DynamicArray* array) {
 #ifndef BE_CLIENT_BINARY
     if (array->used == 0 || array->frozen)
-        return SEC_FALSE;
+        return SEC_BOOLEAN_FALSE;
 
     array->internalArray[--array->used] = NULL;
-    return SEC_TRUE;
+    return SEC_BOOLEAN_TRUE;
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicArray*);
     return function(array);
@@ -122,7 +122,7 @@ SEC_Boolean BE_DynamicArray_RemoveLastElement(BE_DynamicArray* array) {
 SEC_Boolean BE_DynamicArray_RemoveElementAt(BE_DynamicArray* array, unsigned index) {
 #ifndef BE_CLIENT_BINARY
     if ((int) index >= array->used || array->frozen)
-        return SEC_FALSE;
+        return SEC_BOOLEAN_FALSE;
 
     BE_DynamicArray_ReallocateArray(array);
 
@@ -130,10 +130,10 @@ SEC_Boolean BE_DynamicArray_RemoveElementAt(BE_DynamicArray* array, unsigned ind
         array->internalArray[id] = array->internalArray[id + 1];
 
     array->used--;
-    return SEC_TRUE;
+    return SEC_BOOLEAN_TRUE;
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicArray*, unsigned);
     return function(array, index);
 #endif
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

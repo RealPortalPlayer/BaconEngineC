@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <zip.h>
 #include <SharedEngineCode/Internal/Boolean.h>
 
-#include "BaconEngine/DllExport.h"
+#include "BaconEngine/BinaryExport.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef struct zip_t* BE_Package;
 
 /**
@@ -23,7 +23,7 @@ typedef struct zip_t* BE_Package;
  * "Languages.package" will open the file named that from the directory above
  * @note Absolute paths **should** work, but isn't recommended
  */
-BE_DLLEXPORT BE_Package BE_Package_Open(const char* fileName);
+BE_BINARYEXPORT BE_Package BE_Package_Open(const char* fileName);
 
 /**
  * @param filePath Path inside of the package file to the file you want
@@ -36,6 +36,6 @@ BE_DLLEXPORT BE_Package BE_Package_Open(const char* fileName);
  * @note When you're done with the buffer, remember to call "free" on it to prevent memory leaks
  * @warning The buffer will not be NULL terminated, and as such, will be dangerous to call functions that expect a NULL terminated string
  */
-BE_DLLEXPORT SEC_Boolean BE_Package_GetFile(BE_Package package, const char* filePath, void** buffer, size_t* bufferSize);
-BE_DLLEXPORT void BE_Package_Close(BE_Package package);
-SEC_CPP_SUPPORT_GUARD_END()
+BE_BINARYEXPORT SEC_Boolean BE_Package_GetFile(BE_Package package, const char* filePath, void** buffer, size_t* bufferSize);
+BE_BINARYEXPORT void BE_Package_Close(BE_Package package);
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

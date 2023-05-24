@@ -1,8 +1,8 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include "SharedEngineCode/Internal/OperatingSystem.h"
-#include "SharedEngineCode/OSUser.h"
+#include "SharedEngineCode/User.h"
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <unistd.h>
@@ -13,8 +13,8 @@
 #   include <stdio.h>
 #endif
 
-SEC_CPP_SUPPORT_GUARD_START()
-SEC_Boolean SEC_OSUser_IsAdmin(void) {
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+SEC_Boolean SEC_User_IsAdministrator(void) {
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
     return getuid() == 0;
 #elif SEC_OPERATINGSYSTEM_WINDOWS
@@ -25,7 +25,7 @@ SEC_Boolean SEC_OSUser_IsAdmin(void) {
 
     if (admin) {
         if (!CheckTokenMembership(NULL, adminGroup, &admin))
-            admin = SEC_FALSE;
+            admin = SEC_BOOLEAN_FALSE;
 
         FreeSid(adminGroup);
     }
@@ -34,7 +34,7 @@ SEC_Boolean SEC_OSUser_IsAdmin(void) {
 #endif
 }
 
-const char* SEC_OSUser_GetUsername(void) {
+const char* SEC_User_GetName(void) {
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
     struct passwd* password = getpwuid(getuid());
 
@@ -43,4 +43,4 @@ const char* SEC_OSUser_GetUsername(void) {
     return ""; // TODO: Windows.
 #endif
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

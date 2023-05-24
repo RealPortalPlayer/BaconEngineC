@@ -18,14 +18,14 @@
 #   include "../Storage/PrivateDynamicDictionary.h"
 #endif
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
 static BE_DynamicArray beConsolePrivateCommands;
 static BE_DynamicArray beConsoleCommands;
 static BE_PrivateConsole_Command* beConsoleLastCommand;
-static SEC_Boolean beConsoleDuplicateCommand = SEC_FALSE;
-static SEC_Boolean beConsoleInitialized = SEC_FALSE;
-static SEC_Boolean beConsoleAddingEngineCommands = SEC_TRUE;
+static SEC_Boolean beConsoleDuplicateCommand = SEC_BOOLEAN_FALSE;
+static SEC_Boolean beConsoleInitialized = SEC_BOOLEAN_FALSE;
+static SEC_Boolean beConsoleAddingEngineCommands = SEC_BOOLEAN_TRUE;
 
 extern void BE_EngineCommands_HelpPrint(BE_Command*);
 
@@ -101,7 +101,7 @@ void BE_PrivateConsole_Initialize(void) {
     BE_ASSERT(!beConsoleInitialized, "Already initialized the console\n");
     SEC_LOGGER_INFO("Initializing console\n");
 
-    beConsoleInitialized = SEC_TRUE;
+    beConsoleInitialized = SEC_BOOLEAN_TRUE;
 
     BE_PrivateDynamicArray_Create(&beConsoleCommands, 100);
     BE_PrivateDynamicArray_Create(&beConsolePrivateCommands, 100);
@@ -111,7 +111,7 @@ void BE_PrivateConsole_Initialize(void) {
     BE_EngineCommands_Initialize();
 #   endif
 
-    beConsoleAddingEngineCommands = SEC_FALSE;
+    beConsoleAddingEngineCommands = SEC_BOOLEAN_FALSE;
 }
 #endif
 
@@ -159,7 +159,7 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
     BE_DynamicArray_AddElementToLast(&beConsolePrivateCommands, (void*) privateConsoleCommand);
     BE_DynamicArray_AddElementToLast(&beConsoleCommands, (void*) &privateConsoleCommand->publicCommand);
 
-    beConsoleDuplicateCommand = SEC_FALSE;
+    beConsoleDuplicateCommand = SEC_BOOLEAN_FALSE;
 #else
     BE_INTERFACEFUNCTION(void, const char*, const char*, BE_Command_Flags, void (*)(BE_Command_Context))(name, description, flags, Run);
 #endif
@@ -196,7 +196,7 @@ void BE_Command_DuplicatePrevious(const char* name, const char* description) {
                      "New description: %s\n", beConsoleLastCommand->publicCommand.name, beConsoleLastCommand->publicCommand.description, name,
                      description != NULL ? description : beConsoleLastCommand->publicCommand.description);
 
-    beConsoleDuplicateCommand = SEC_TRUE;
+    beConsoleDuplicateCommand = SEC_BOOLEAN_TRUE;
 
     BE_PrivateConsole_Command* lastCommand = beConsoleLastCommand;
 
@@ -227,7 +227,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
     int argumentStartingIndex;
 
     {
-        SEC_Boolean trimmed = SEC_FALSE;
+        SEC_Boolean trimmed = SEC_BOOLEAN_FALSE;
         int writer = 0;
 
         for (index = 0; index < (int) inputLength; index++) {
@@ -242,7 +242,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
             if (index >= BE_COMMAND_MAX_NAME_LENGTH)
                 break;
 
-            trimmed = SEC_TRUE;
+            trimmed = SEC_BOOLEAN_TRUE;
             name[writer++] = input[index];
         }
     }
@@ -261,11 +261,11 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         char* argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char) * 1024, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
         int current = 0;
         int quotePosition = -1;
-        SEC_Boolean doubleQuote = SEC_FALSE;
-        SEC_Boolean escaped = SEC_FALSE;
-        SEC_Boolean added = SEC_FALSE;
-        SEC_Boolean trimmed = SEC_FALSE;
-        SEC_Boolean quoteAdded = SEC_FALSE;
+        SEC_Boolean doubleQuote = SEC_BOOLEAN_FALSE;
+        SEC_Boolean escaped = SEC_BOOLEAN_FALSE;
+        SEC_Boolean added = SEC_BOOLEAN_FALSE;
+        SEC_Boolean trimmed = SEC_BOOLEAN_FALSE;
+        SEC_Boolean quoteAdded = SEC_BOOLEAN_FALSE;
 
         memset(argument, 0, 1024);
 
@@ -276,12 +276,12 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
                 memset(argument, 0, 1024);
             }
 
-            added = SEC_FALSE;
+            added = SEC_BOOLEAN_FALSE;
 
             if (quoteAdded && input[index] == ' ')
                 continue;
 
-            quoteAdded = SEC_FALSE;
+            quoteAdded = SEC_BOOLEAN_FALSE;
 
             if (writer >= 1024) {
                 publish_argument:
@@ -289,8 +289,8 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
                 BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, current++)->name, argument);
 
-                added = SEC_TRUE;
-                trimmed = SEC_FALSE;
+                added = SEC_BOOLEAN_TRUE;
+                trimmed = SEC_BOOLEAN_FALSE;
                 continue;
             }
 
@@ -298,7 +298,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
                 goto publish_argument;
 
             if (input[index] == '\\' && !escaped) {
-                escaped = SEC_TRUE;
+                escaped = SEC_BOOLEAN_TRUE;
                 continue;
             }
 
@@ -310,7 +310,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
                 if (!doubleQuote) {
                     quotePosition = -1;
-                    quoteAdded = SEC_TRUE;
+                    quoteAdded = SEC_BOOLEAN_TRUE;
 
                     goto publish_argument;
                 }
@@ -319,23 +319,23 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
             if (input[index] == '"' && !escaped) {
                 if (quotePosition == -1) {
                     quotePosition = index;
-                    doubleQuote = SEC_TRUE;
+                    doubleQuote = SEC_BOOLEAN_TRUE;
                     continue;
                 }
 
                 if (doubleQuote) {
                     quotePosition = -1;
-                    doubleQuote = SEC_FALSE;
-                    quoteAdded = SEC_TRUE;
+                    doubleQuote = SEC_BOOLEAN_FALSE;
+                    quoteAdded = SEC_BOOLEAN_TRUE;
 
                     goto publish_argument;
                 }
             }
 
-            trimmed = SEC_TRUE;
+            trimmed = SEC_BOOLEAN_TRUE;
             argument[writer++] = input[index];
             // TODO: Should we throw a parse error if someone tries to escape a normal character, or should we just assume they meant to use a backslash
-            escaped = SEC_FALSE;
+            escaped = SEC_BOOLEAN_FALSE;
         }
 
         // FIXME: This doesn't trigger at times when it probably should
@@ -353,7 +353,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
             if (argument[0] != '\0') {
                 BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, current)->name, argument);
 
-                added = SEC_TRUE;
+                added = SEC_BOOLEAN_TRUE;
             }
 
             if (!added)
@@ -400,7 +400,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         }
     }
 
-    command->Run(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Command_Context, input, input + argumentStartingIndex, arguments));
+    command->Run(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Command_Context, input, input + argumentStartingIndex, arguments));
 
     destroy:
     for (int argumentId = 0; argumentId < arguments.keys.used; argumentId++)
@@ -427,7 +427,7 @@ void BE_PrivateConsole_Destroy(void) {
     BE_ASSERT(beConsoleInitialized, "Console are not initialized\n");
     SEC_LOGGER_INFO("Destroying console\n");
 
-    beConsoleInitialized = SEC_FALSE;
+    beConsoleInitialized = SEC_BOOLEAN_FALSE;
 
     for (int commandId = 0; commandId < beConsoleCommands.used; commandId++) {
         BE_PrivateConsole_Command* command = BE_DYNAMICARRAY_GET_ELEMENT(BE_PrivateConsole_Command, beConsoleCommands, commandId);
@@ -446,4 +446,4 @@ void BE_PrivateConsole_Destroy(void) {
     BE_EngineMemory_DeallocateMemory(beConsoleCommands.internalArray, sizeof(void*) * beConsoleCommands.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 #endif
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

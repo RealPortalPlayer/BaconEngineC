@@ -9,10 +9,10 @@
 #include <limits.h>
 
 #include "Internal/OperatingSystem.h"
-#include "Internal/CppSupport.h"
+#include "Internal/CPlusPlusSupport.h"
 #include "Internal/Boolean.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     SEC_LAUNCHER_ERROR_CODE_NULL, // No error.
     SEC_LAUNCHER_ERROR_CODE_BINARY, // Errored while opening binary file.
@@ -42,7 +42,7 @@ const char* SEC_Launcher_GetDefaultHelpList(void);
   * @return The initialized configuration file. NULL if malloc fails.
   */
 void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration, const char* path);
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()
 
 #define SEC_LAUNCHER_START_ENGINE_POINTER(configuration, argc, argv) (configuration)->unionVariables.data.Start((configuration)->unionVariables.data.engineBinary, (configuration)->unionVariables.data.clientBinary, argc, argv)
 #define SEC_LAUNCHER_START_ENGINE(configuration, argc, argv) SEC_LAUNCHER_START_ENGINE_POINTER(&configuration, argc, argv)

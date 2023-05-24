@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <glad/glad.h>
@@ -7,8 +7,8 @@
 #include "OpenGLRenderer.h"
 #include "OpenGLWindow.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
-BE_Color_3U clearColor;
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BE_Color3_Unsigned clearColor;
 const char* vertexShaderCode = "#version 330 core\n"
                                "layout (location = 0) in vec3 position;\n"
                                "void main() {\n"
@@ -92,11 +92,11 @@ void BE_OpenGLRenderer_ClearScreen(void) {
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void BE_OpenGLRenderer_SetClearColor(BE_Color_3U color) {
+void BE_OpenGLRenderer_SetClearColor(BE_Color3_Unsigned color) {
     clearColor = color;
 }
 
-BE_Color_3U BE_OpenGLRenderer_GetClearColor(void) {
+BE_Color3_Unsigned BE_OpenGLRenderer_GetClearColor(void) {
     return clearColor;
 }
 
@@ -104,10 +104,10 @@ void BE_OpenGLRenderer_Render(void) {
     glfwSwapBuffers(BE_OpenGLWindow_GetWindow());
 }
 
-void BE_OpenGLRenderer_DrawFilledRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U color) {
+void BE_OpenGLRenderer_DrawFilledRectangle(BE_Vector2_Integer position, BE_Vector2_Unsigned size, BE_Color4_Unsigned color) {
     (void) position;
     (void) size;
     (void) color;
     // TODO: Implementation.
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

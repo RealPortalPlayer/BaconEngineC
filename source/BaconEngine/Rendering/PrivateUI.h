@@ -6,19 +6,19 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 
 #include "../AntiClientGuard.h"
 #include "BaconEngine/Storage/DynamicArray.h"
 #include "BaconEngine/Rendering/UI.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef struct {
     const char* name;
     BE_DynamicArray elements;
     BE_UI_WindowFlags flags;
-    BE_Vector_2I position;
-    BE_Vector_2U size;
+    BE_Vector2_Integer position;
+    BE_Vector2_Unsigned size;
     int currentRenderPosition;
     int windowId;
 } BE_PrivateUI_Window;
@@ -28,4 +28,4 @@ const BE_DynamicArray* BE_PrivateUI_GetRenderWindows(void);
 
 void BE_PrivateUI_Initialize(void);
 void BE_PrivateUI_Destroy(void);
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
 #include "../AntiClientGuard.h"
 #include "BaconEngine/Storage/DynamicDictionary.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 SEC_Boolean BE_PrivateDynamicDictionary_Create(BE_DynamicDictionary* dictionary, size_t size);
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

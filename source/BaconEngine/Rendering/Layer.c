@@ -16,7 +16,7 @@
 #   include "../Storage/PrivateDynamicArray.h"
 #endif
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
 typedef struct {
     const char* name;
@@ -26,7 +26,7 @@ typedef struct {
 } BE_Layer_Internal;
 
 static BE_DynamicArray beLayerArray;
-static SEC_Boolean beLayerInitialized = SEC_FALSE;
+static SEC_Boolean beLayerInitialized = SEC_BOOLEAN_FALSE;
 
 static int BE_Layer_NoOperation(void) {
     return 0;
@@ -50,7 +50,7 @@ void BE_PrivateLayer_InitializeLayers(void) {
     BE_ASSERT(!beLayerInitialized, "Already initialized the layer stack\n");
     SEC_LOGGER_INFO("Initializing layer stack\n");
 
-    beLayerInitialized = SEC_TRUE;
+    beLayerInitialized = SEC_BOOLEAN_TRUE;
 
     BE_PrivateDynamicArray_Create(&beLayerArray, 100);
     SEC_LOGGER_INFO("Registering engine layers\n");
@@ -71,7 +71,7 @@ void BE_Layer_Register(const char* name, SEC_Boolean enabled, BE_Layer_Functions
 
     layer->name = name;
     layer->enabled = enabled;
-    layer->calledStart = SEC_FALSE;
+    layer->calledStart = SEC_BOOLEAN_FALSE;
     layer->functions.OnStart = functions.OnStart != NULL ? functions.OnStart : (void (*)(void)) &BE_Layer_NoOperation;
     layer->functions.OnUpdate = functions.OnUpdate != NULL ? functions.OnUpdate : (void (*)(BE_Layer_UpdateTypes)) &BE_Layer_NoOperation;
     layer->functions.OnToggle = functions.OnToggle != NULL ? functions.OnToggle : (void (*)(int)) &BE_Layer_NoOperation;
@@ -116,23 +116,23 @@ SEC_Boolean BE_Layer_Toggle(const char* name, SEC_Boolean enable) {
     BE_Layer_Internal* layer = BE_Layer_InternalGet(name);
 
     if (layer == NULL)
-        return SEC_FALSE;
+        return SEC_BOOLEAN_FALSE;
 
     if (!layer->calledStart) {
         layer->functions.OnStart();
 
-        layer->calledStart = SEC_TRUE;
+        layer->calledStart = SEC_BOOLEAN_TRUE;
     }
 
     if (layer->enabled == enable)
-        return SEC_FALSE;
+        return SEC_BOOLEAN_FALSE;
 
     SEC_LOGGER_DEBUG("%s %s\n", enable ? "Enabling" : "Disabling", name);
 
     layer->enabled = enable;
 
     layer->functions.OnToggle(enable); // FIXME: The layer could still be in the middle of an update/event.
-    return SEC_TRUE;
+    return SEC_BOOLEAN_TRUE;
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, const char*, SEC_Boolean);
     return function(name, enable);
@@ -153,7 +153,7 @@ void BE_PrivateLayer_OnUpdate(BE_Layer_UpdateTypes updateTypes) {
         if (!layer->calledStart) {
             layer->functions.OnStart();
 
-            layer->calledStart = SEC_TRUE;
+            layer->calledStart = SEC_BOOLEAN_TRUE;
         }
 
         layer->functions.OnUpdate(updateTypes);
@@ -170,17 +170,17 @@ int BE_PrivateLayer_OnEvent(BE_Event event) {
         if (!layer->calledStart) {
             layer->functions.OnStart();
 
-            layer->calledStart = SEC_TRUE;
+            layer->calledStart = SEC_BOOLEAN_TRUE;
         }
 
         if (!layer->functions.OnEvent(event))
             continue;
 
         SEC_LOGGER_TRACE("%s layer stopped the event line\n", layer->name);
-        return SEC_TRUE;
+        return SEC_BOOLEAN_TRUE;
     }
 
-    return SEC_FALSE;
+    return SEC_BOOLEAN_FALSE;
 }
 #endif
 
@@ -212,7 +212,7 @@ void BE_PrivateLayer_DestroyLayers(void) {
     BE_ASSERT(beLayerInitialized, "Layers are already destroyed\n");
     SEC_LOGGER_INFO("Destroying layer stack\n");
 
-    beLayerInitialized = SEC_FALSE;
+    beLayerInitialized = SEC_BOOLEAN_FALSE;
 
     for (int i = 0; i < beLayerArray.used; i++) {
         BE_Layer_Internal* layer = BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i);
@@ -229,4 +229,4 @@ void BE_PrivateLayer_DestroyLayers(void) {
     BE_EngineMemory_DeallocateMemory(beLayerArray.internalArray, sizeof(void *) * beLayerArray.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 #endif
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

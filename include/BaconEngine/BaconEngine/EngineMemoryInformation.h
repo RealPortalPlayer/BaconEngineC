@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <stddef.h>
 
-#include "DllExport.h"
+#include "BinaryExport.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef struct {
     size_t allocatedBytes;
     size_t allocatedAmount;
@@ -24,6 +24,6 @@ typedef struct {
     BE_EngineMemory_MemoryTypeInformation layer;
 } BE_EngineMemory_MemoryInformation;
 
-BE_DLLEXPORT BE_EngineMemory_MemoryInformation BE_EngineMemory_GetMemoryInformation(void);
-BE_DLLEXPORT size_t BE_EngineMemory_GetAllocatedBytes(void);
-SEC_CPP_SUPPORT_GUARD_END()
+BE_BINARYEXPORT BE_EngineMemory_MemoryInformation BE_EngineMemory_GetMemoryInformation(void);
+BE_BINARYEXPORT size_t BE_EngineMemory_GetAllocatedBytes(void);
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

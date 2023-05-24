@@ -5,17 +5,18 @@
 #include <errno.h>
 
 #include "SharedEngineCode/Launcher.h"
-#include "SharedEngineCode/Internal/CppSupport.h"
+#include "SharedEngineCode/Internal/CPlusPlusSupport.h"
 #include "SharedEngineCode/BuiltInArguments.h"
 #include "SharedEngineCode/Internal/PlatformSpecific.h"
 #include "SharedEngineCode/ArgumentHandler.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration, const char* path) {
     {
         SEC_ArgumentHandler_ShortResults results;
 
-        if (SEC_ArgumentHandler_GetInfoWithShort(SEC_BUILTINARGUMENTS_ENGINE, SEC_BUILTINARGUMENTS_ENGINE_SHORT, SEC_FALSE, &results) != 0)
+        if (SEC_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_ENGINE, SEC_BUILTINARGUMENTS_ENGINE_SHORT,
+                                                        SEC_BOOLEAN_FALSE, &results) != 0)
             configuration->unionVariables.data.engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY(*results.value, RTLD_NOW);
         else
             configuration->unionVariables.data.engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY("./BaconEngine" SEC_PLATFORMSPECIFIC_BINARY_EXTENSION, RTLD_NOW);
@@ -23,15 +24,15 @@ void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration,
 
     if (configuration->unionVariables.data.engineBinary == NULL) {
         configuration->code = SEC_LAUNCHER_ERROR_CODE_BINARY;
-        configuration->unionVariables.errorReason.isEngine = SEC_TRUE;
+        configuration->unionVariables.errorReason.isEngine = SEC_BOOLEAN_TRUE;
 
         SEC_PLATFORMSPECIFIC_GET_ERROR(configuration->unionVariables.errorReason.errorMessage);
         return;
     }
 
-    if (SEC_PLATFORMSPECIFIC_CHDIR(path) != 0) {
+    if (SEC_PLATFORMSPECIFIC_CHANGE_DIRECTORY(path) != 0) {
         configuration->code = SEC_LAUNCHER_ERROR_CODE_CHDIR;
-        configuration->unionVariables.errorReason.isEngine = SEC_FALSE;
+        configuration->unionVariables.errorReason.isEngine = SEC_BOOLEAN_FALSE;
         configuration->unionVariables.errorReason.errorMessage = strerror(errno);
         return;
     }
@@ -40,7 +41,7 @@ void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration,
 
     if (configuration->unionVariables.data.clientBinary == NULL) {
         configuration->code = SEC_LAUNCHER_ERROR_CODE_BINARY;
-        configuration->unionVariables.errorReason.isEngine = SEC_FALSE;
+        configuration->unionVariables.errorReason.isEngine = SEC_BOOLEAN_FALSE;
 
         SEC_PLATFORMSPECIFIC_GET_ERROR(configuration->unionVariables.errorReason.errorMessage);
         return;
@@ -58,7 +59,7 @@ void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration,
 
     if (configuration->unionVariables.data.Start == NULL) {
         configuration->code = SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL;
-        configuration->unionVariables.errorReason.isEngine = SEC_TRUE;
+        configuration->unionVariables.errorReason.isEngine = SEC_BOOLEAN_TRUE;
 
         SEC_PLATFORMSPECIFIC_GET_ERROR(configuration->unionVariables.errorReason.errorMessage);
         return;
@@ -93,4 +94,4 @@ const char* SEC_Launcher_GetDefaultHelpList(void) {
            SEC_BUILTINARGUMENTS_DISABLE_LOG_HEADER " (" SEC_BUILTINARGUMENTS_DISABLE_LOG_HEADER_SHORT "): Do not log the log level header\n"
            SEC_BUILTINARGUMENTS_ENGINE " <engine binary> (" SEC_BUILTINARGUMENTS_ENGINE_SHORT "): Use a custom engine binary";
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

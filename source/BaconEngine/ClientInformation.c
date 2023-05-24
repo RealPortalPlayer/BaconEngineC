@@ -8,10 +8,10 @@
 #include "BaconEngine/ClientInformation.h"
 #include "InterfaceFunctions.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
-static SEC_Boolean beClientInformationRunning = SEC_TRUE;
-static SEC_Boolean beClientInformationCheats = SEC_FALSE;
+static SEC_Boolean beClientInformationRunning = SEC_BOOLEAN_TRUE;
+static SEC_Boolean beClientInformationCheats = SEC_BOOLEAN_FALSE;
 #endif
 
 SEC_Boolean BE_ClientInformation_IsRunning(void) {
@@ -67,7 +67,7 @@ void BE_ClientInformation_StopRunning(void) {
         return;
     }
 
-    beClientInformationRunning = SEC_FALSE;
+    beClientInformationRunning = SEC_BOOLEAN_FALSE;
 #else
     BE_INTERFACEFUNCTION(void, void)();
 #endif
@@ -80,4 +80,4 @@ void BE_ClientInformation_SetCheats(SEC_Boolean enable) {
     BE_INTERFACEFUNCTION(void, SEC_Boolean)(enable);
 #endif
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

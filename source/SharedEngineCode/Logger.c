@@ -8,7 +8,7 @@
 
 #include "SharedEngineCode/Logger.h"
 #include "SharedEngineCode/ANSI.h"
-#include "SharedEngineCode/Internal/CppSupport.h"
+#include "SharedEngineCode/Internal/CPlusPlusSupport.h"
 #include "SharedEngineCode/ArgumentHandler.h"
 #include "SharedEngineCode/BuiltInArguments.h"
 #include "SharedEngineCode/StringExtension.h"
@@ -23,7 +23,7 @@
 #   define write(file, message, size) _write(file, message, (unsigned) size) // HACK: This is a stupid idea, but it's the only way to make MSVC shut up.
 #endif
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 SEC_Logger_LogLevels secLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_INFO;
 SEC_Thread_Lock secLoggerLock; // FIXME: This causes a memory leak
 
@@ -39,8 +39,8 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
                                                                       SEC_BUILTINARGUMENTS_ALWAYS_USE_STDOUT_SHORT, 0);
 
     {
-        static SEC_Boolean initialized = SEC_FALSE;
-        static SEC_Boolean initializing = SEC_FALSE;
+        static SEC_Boolean initialized = SEC_BOOLEAN_FALSE;
+        static SEC_Boolean initializing = SEC_BOOLEAN_FALSE;
 
         if (!initialized) {
             if (initializing) {
@@ -56,13 +56,13 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
                 abort();
             }
 
-            initializing = SEC_TRUE;
+            initializing = SEC_BOOLEAN_TRUE;
 
             {
                 SEC_ArgumentHandler_ShortResults results;
 
-                if (SEC_ArgumentHandler_GetInfoWithShort(SEC_BUILTINARGUMENTS_LOG_LEVEL,
-                                                         SEC_BUILTINARGUMENTS_LOG_LEVEL_SHORT, 0, &results) != 0) {
+                if (SEC_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_LOG_LEVEL,
+                                                                SEC_BUILTINARGUMENTS_LOG_LEVEL_SHORT, 0, &results) != 0) {
                     if (SEC_StringExtension_CompareCaseless(*results.value, "null") == 0)
                         secLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_NULL;
                     else if (SEC_StringExtension_CompareCaseless(*results.value, "trace") == 0 ||
@@ -88,8 +88,8 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
                 }
             }
 
-            initialized = SEC_TRUE;
-            initializing = SEC_FALSE;
+            initialized = SEC_BOOLEAN_TRUE;
+            initializing = SEC_BOOLEAN_FALSE;
         }
     }
 
@@ -100,7 +100,7 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
         return;
     }
 
-    static SEC_Boolean antiRecursiveLog = SEC_FALSE;
+    static SEC_Boolean antiRecursiveLog = SEC_BOOLEAN_FALSE;
     FILE* output = stdout;
 
     if (!alwaysUseStdout && (logLevel == SEC_LOGGER_LOG_LEVEL_ERROR || logLevel == SEC_LOGGER_LOG_LEVEL_FATAL))
@@ -114,7 +114,7 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
         abort();
     }
 
-    antiRecursiveLog = SEC_TRUE;
+    antiRecursiveLog = SEC_BOOLEAN_TRUE;
 
     if (includeHeader)
         SEC_Logger_LogHeader(output, logLevel);
@@ -125,7 +125,7 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
     vfprintf(output, message, arguments);
     va_end(arguments);
 
-    antiRecursiveLog = SEC_FALSE;
+    antiRecursiveLog = SEC_BOOLEAN_FALSE;
 
     SEC_Thread_Unlock(&secLoggerLock);
 }
@@ -215,4 +215,4 @@ void SEC_Logger_SetLogLevel(SEC_Logger_LogLevels logLevel) {
 
     secLoggerCurrentLogLevel = logLevel;
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

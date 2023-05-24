@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <SharedEngineCode/ArgumentHandler.h>
@@ -7,7 +7,7 @@
 #include "BaconEngine/Debugging/Assert.h"
 #include "EngineMemory.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 BE_EngineMemory_MemoryInformation beEngineMemoryInformation = {
         {0, 0},
         {0, 0},
@@ -106,4 +106,4 @@ void BE_EngineMemory_DeallocateMemory(void* pointer, size_t oldSize, BE_EngineMe
     memoryTypeInformation->allocatedBytes -= oldSize;
     memoryTypeInformation->allocatedAmount--;
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

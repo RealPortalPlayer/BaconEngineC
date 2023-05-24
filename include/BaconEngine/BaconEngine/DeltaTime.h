@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 
-#include "DllExport.h"
+#include "BinaryExport.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
-BE_DLLEXPORT double BE_DeltaTime_GetMilliseconds(void);
-BE_DLLEXPORT double BE_DeltaTime_GetSeconds(void);
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BE_BINARYEXPORT double BE_DeltaTime_GetMilliseconds(void);
+BE_BINARYEXPORT double BE_DeltaTime_GetSeconds(void);
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

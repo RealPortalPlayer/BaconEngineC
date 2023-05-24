@@ -8,7 +8,7 @@
 #include "BaconEngine/Debugging/StrictMode.h"
 #include "InterfaceFunctions.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 const char* BE_I18N_Translate(FILE* languageFile, const char* key) {
 #ifndef BE_CLIENT_BINARY
     BE_STRICTMODE_CHECK(key[0] != '\0', key, "Key cannot be empty\n");
@@ -36,4 +36,4 @@ const char* BE_I18N_Translate(FILE* languageFile, const char* key) {
     return function(languageFile, key);
 #endif
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

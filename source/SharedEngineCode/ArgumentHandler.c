@@ -1,13 +1,13 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <string.h>
 
 #include "SharedEngineCode/ArgumentHandler.h"
-#include "SharedEngineCode/Internal/CppSupport.h"
+#include "SharedEngineCode/Internal/CPlusPlusSupport.h"
 #include "SharedEngineCode/BuiltInArguments.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 int addedArgumentsCount;
 char** argumentVector;
 
@@ -52,8 +52,8 @@ char* SEC_ArgumentHandler_GetValue(const char* argument, int ignoreDontParse) {
     return index != -1 && index != addedArgumentsCount - 1 ? argumentVector[index + 1] : NULL;
 }
 
-int SEC_ArgumentHandler_GetInfoWithShort(const char* argument, const char* shortArgument, int ignoreDontParse,
-                                         SEC_ArgumentHandler_ShortResults* results) {
+int SEC_ArgumentHandler_GetInformationWithShort(const char* argument, const char* shortArgument, SEC_Boolean ignoreDontParse,
+                                                SEC_ArgumentHandler_ShortResults* results) {
     int returnResult = 0;
 
     results->argumentIndex = SEC_ArgumentHandler_GetIndex(argument, ignoreDontParse);
@@ -80,4 +80,4 @@ int SEC_ArgumentHandler_ContainsArgumentOrShort(const char* argument, const char
     return SEC_ArgumentHandler_GetIndex(argument, ignoreDontParse) != -1 ||
            SEC_ArgumentHandler_GetIndex(shortArgument, ignoreDontParse) != -1;
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <SharedEngineCode/Internal/OperatingSystem.h>
 
-#include "Internal/CppSupport.h"
+#include "Internal/CPlusPlusSupport.h"
 #include "Internal/Boolean.h"
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
@@ -19,7 +19,7 @@
 #   define BE_LOGGER_PRINTF_ATTRIBUTE
 #endif
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     SEC_LOGGER_LOG_LEVEL_FATAL,
     SEC_LOGGER_LOG_LEVEL_ERROR,
@@ -36,11 +36,11 @@ void SEC_Logger_LogHeader(FILE* output, SEC_Logger_LogLevels logLevel);
 SEC_Boolean SEC_Logger_IsLevelEnabled(SEC_Logger_LogLevels logLevel);
 
 void SEC_Logger_SetLogLevel(SEC_Logger_LogLevels logLevel);
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()
 
-#define SEC_LOGGER_TRACE(...) SEC_Logger_LogImplementation(SEC_TRUE, SEC_LOGGER_LOG_LEVEL_TRACE, __VA_ARGS__)
-#define SEC_LOGGER_DEBUG(...) SEC_Logger_LogImplementation(SEC_TRUE, SEC_LOGGER_LOG_LEVEL_DEBUG, __VA_ARGS__)
-#define SEC_LOGGER_INFO(...) SEC_Logger_LogImplementation(SEC_TRUE, SEC_LOGGER_LOG_LEVEL_INFO, __VA_ARGS__)
-#define SEC_LOGGER_WARN(...) SEC_Logger_LogImplementation(SEC_TRUE, SEC_LOGGER_LOG_LEVEL_WARN, __VA_ARGS__)
-#define SEC_LOGGER_ERROR(...) SEC_Logger_LogImplementation(SEC_TRUE, SEC_LOGGER_LOG_LEVEL_ERROR, __VA_ARGS__)
-#define SEC_LOGGER_FATAL(...) SEC_Logger_LogImplementation(SEC_TRUE, SEC_LOGGER_LOG_LEVEL_FATAL, __VA_ARGS__)
+#define SEC_LOGGER_TRACE(...) SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, SEC_LOGGER_LOG_LEVEL_TRACE, __VA_ARGS__)
+#define SEC_LOGGER_DEBUG(...) SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, SEC_LOGGER_LOG_LEVEL_DEBUG, __VA_ARGS__)
+#define SEC_LOGGER_INFO(...) SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, SEC_LOGGER_LOG_LEVEL_INFO, __VA_ARGS__)
+#define SEC_LOGGER_WARN(...) SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, SEC_LOGGER_LOG_LEVEL_WARN, __VA_ARGS__)
+#define SEC_LOGGER_ERROR(...) SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, SEC_LOGGER_LOG_LEVEL_ERROR, __VA_ARGS__)
+#define SEC_LOGGER_FATAL(...) SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, SEC_LOGGER_LOG_LEVEL_FATAL, __VA_ARGS__)

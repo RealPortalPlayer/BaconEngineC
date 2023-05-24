@@ -1,12 +1,12 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include "SharedEngineCode/Internal/CppSupport.h"
+#include "SharedEngineCode/Internal/CPlusPlusSupport.h"
 #include "SharedEngineCode/ANSI.h"
 #include "SharedEngineCode/ArgumentHandler.h"
 #include "SharedEngineCode/BuiltInArguments.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 const char* ansiCodesCharArray[SEC_ANSI_CODE_SIZE] = {
     "\033[1m", "\033[4m", "\033[5m", "\033[7m",
     "\033[m",
@@ -31,4 +31,4 @@ SEC_Boolean SEC_ANSI_IsEnabled(void) {
 const char* SEC_ANSI_ConvertCodeToString(SEC_ANSI_Codes ansi) {
     return SEC_ANSI_IsEnabled() && ansi < SEC_ANSI_CODE_SIZE ? ansiCodesCharArray[ansi] : "";
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

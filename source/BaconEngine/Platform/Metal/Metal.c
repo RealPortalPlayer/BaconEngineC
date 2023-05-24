@@ -5,9 +5,9 @@
 #include "../SpecificPlatformFunctions.h"
 #include "MetalWindow.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 void BE_Metal_Initialize(void) {
-    BE_SpecificPlatformFunctions_Initialize(SEC_CPP_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions,
+    BE_SpecificPlatformFunctions_Initialize(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions,
         {
             &BE_MetalWindow_Create,
             &BE_MetalWindow_GetTitle,
@@ -44,4 +44,4 @@ void BE_Metal_Initialize(void) {
 void BE_Metal_Destroy(void) {
 
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

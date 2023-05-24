@@ -14,7 +14,7 @@
 #   include "../Storage/PrivateDynamicArray.h"
 #endif
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
 static BE_DynamicArray beUIWindows;
 static SEC_Boolean beUIInitialized;
@@ -36,10 +36,10 @@ const BE_DynamicArray* BE_PrivateUI_GetRenderWindows(void) {
 void BE_PrivateUI_Initialize(void) {
     BE_ASSERT(!beUIInitialized, "The UI system was already initialized\n");
 
-    beUIInitialized = SEC_TRUE;
+    beUIInitialized = SEC_BOOLEAN_TRUE;
 
     if (!BE_PrivateDynamicArray_Create(&beUIWindows, 100) || !BE_PrivateDynamicArray_Create(&beUIRenderOrder, 100)) {
-        beUIInitialized = SEC_FALSE;
+        beUIInitialized = SEC_BOOLEAN_FALSE;
         return;
     }
 
@@ -47,11 +47,11 @@ void BE_PrivateUI_Initialize(void) {
 }
 #endif
 
-int BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector_2I position, BE_Vector_2U size) {
+int BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector2_Integer position, BE_Vector2_Unsigned size) {
 #ifndef BE_CLIENT_BINARY
     BE_ASSERT(beUIInitialized, "UI system is not initialized\n");
 
-    beUIInitialized = SEC_TRUE;
+    beUIInitialized = SEC_BOOLEAN_TRUE;
 
     BE_PrivateUI_Window* uiWindow = (BE_PrivateUI_Window*) BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateUI_Window),
                                                                                           BE_ENGINEMEMORY_MEMORY_TYPE_UI);
@@ -74,7 +74,7 @@ int BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector_2I
     BE_DynamicArray_AddElementToLast(&beUIRenderOrder, uiWindow);
     return (uiWindow->windowId = beUIWindows.used - 1);
 #else
-    BE_INTERFACEFUNCTION(int, const char*, BE_UI_WindowFlags, BE_Vector_2I, BE_Vector_2U);
+    BE_INTERFACEFUNCTION(int, const char*, BE_UI_WindowFlags, BE_Vector2_Integer, BE_Vector2_Unsigned);
     return function(name, flags, position, size);
 #endif
 }
@@ -99,10 +99,10 @@ SEC_Boolean BE_UI_ToggleWindowFlag(int windowId, BE_UI_WindowFlags flag, SEC_Boo
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
     if (uiWindow == NULL || BE_BITWISE_IS_BIT_SET(uiWindow->flags, flag) == toggle)
-        return SEC_FALSE;
+        return SEC_BOOLEAN_FALSE;
 
     BE_BITWISE_TOGGLE_BIT(uiWindow->flags, flag);
-    return SEC_TRUE;
+    return SEC_BOOLEAN_TRUE;
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, int, BE_UI_WindowFlags, SEC_Boolean);
     return function(windowId, flag, toggle);
@@ -153,7 +153,7 @@ SEC_Boolean BE_UI_SetActiveWindow(int windowId) {
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
     if (uiWindow == NULL || beUIRenderOrder.used <= 1 || uiWindow->currentRenderPosition == 0)
-        return SEC_FALSE;
+        return SEC_BOOLEAN_FALSE;
 
     BE_PrivateUI_Window* activeWindow = BE_DYNAMICARRAY_GET_ELEMENT(BE_PrivateUI_Window, beUIRenderOrder, 0);
 
@@ -161,7 +161,7 @@ SEC_Boolean BE_UI_SetActiveWindow(int windowId) {
     beUIRenderOrder.internalArray[uiWindow->currentRenderPosition] = activeWindow;
     activeWindow->currentRenderPosition = uiWindow->currentRenderPosition;
     uiWindow->currentRenderPosition = 0;
-    return SEC_TRUE;
+    return SEC_BOOLEAN_TRUE;
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, int);
     return function(windowId);
@@ -200,7 +200,7 @@ void BE_PrivateUI_Destroy(void) {
     BE_ASSERT(beUIInitialized, "UI system has already been destroyed\n");
     BE_ASSERT(!BE_ClientInformation_IsRunning(), "Cannot destroy UI system while still running\n");
 
-    beUIInitialized = SEC_FALSE;
+    beUIInitialized = SEC_BOOLEAN_FALSE;
 
     for (int windowId = 0; windowId < beUIWindows.used; windowId++) {
         BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
@@ -216,4 +216,4 @@ void BE_PrivateUI_Destroy(void) {
     BE_EngineMemory_DeallocateMemory(beUIWindows.internalArray, sizeof(void*) * beUIWindows.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 #endif
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

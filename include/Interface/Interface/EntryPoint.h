@@ -12,7 +12,7 @@
 
 #define I_INCLUDED_THE_ENTRY_POINT
 
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
 #include <SharedEngineCode/Internal/OperatingSystem.h>
 
@@ -22,7 +22,7 @@
 #   define I_DLLEXPORT __declspec(dllexport)
 #endif
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 void I_EntryPoint_Initialize(void* binary, int argc, char** argv);
 
 I_DLLEXPORT void I_EntryPoint_InitializeWrapper(void* binary, int argc, char** argv) {
@@ -37,4 +37,4 @@ I_DLLEXPORT int I_EntryPoint_Start(int argc, char** argv);
 I_DLLEXPORT int I_EntryPoint_Shutdown(void);
 I_DLLEXPORT SEC_Boolean I_EntryPoint_SupportsServer(void);
 I_DLLEXPORT const char* I_EntryPoint_GetName(void);
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

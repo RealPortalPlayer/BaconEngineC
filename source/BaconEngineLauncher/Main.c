@@ -5,7 +5,7 @@
 #include <SharedEngineCode/Logger.h>
 #include <SharedEngineCode/Launcher.h>
 #include <SharedEngineCode/BuiltInArguments.h>
-#include <SharedEngineCode/OSUser.h>
+#include <SharedEngineCode/User.h>
 #include <SharedEngineCode/Internal/PlatformSpecific.h>
 
 #if SEC_OPERATINGSYSTEM_WINDOWS
@@ -13,7 +13,7 @@
 #   include <Windows.h>
 #endif
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 int main(int argc, char** argv) {
     SEC_ArgumentHandler_Initialize(argc, argv);
     SEC_LOGGER_TRACE("Built on: %s\nBuilt for: %s\n", __TIMESTAMP__, SEC_OPERATINGSYSTEM_NAME);
@@ -24,14 +24,15 @@ int main(int argc, char** argv) {
     {
         SEC_ArgumentHandler_ShortResults results;
 
-        if (SEC_ArgumentHandler_GetInfoWithShort(SEC_BUILTINARGUMENTS_ENGINE, SEC_BUILTINARGUMENTS_ENGINE_SHORT, SEC_FALSE, &results) != 0)
+        if (SEC_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_ENGINE, SEC_BUILTINARGUMENTS_ENGINE_SHORT,
+                                                        SEC_BOOLEAN_FALSE, &results) != 0)
             engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY(*results.value, RTLD_NOW);
         else
             engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY("./BaconEngine" SEC_PLATFORMSPECIFIC_BINARY_EXTENSION, RTLD_NOW);
     }
 
     if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_VERSION, SEC_BUILTINARGUMENTS_VERSION_SHORT, 0)) {
-        SEC_Boolean logNextHeader = SEC_TRUE;
+        SEC_Boolean logNextHeader = SEC_BOOLEAN_TRUE;
 
         if (engineBinary != NULL) {
             const char* (*getVersion)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(engineBinary, "BE_EntryPoint_GetVersion");
@@ -39,7 +40,7 @@ int main(int argc, char** argv) {
             if (getVersion != NULL) {
                 SEC_LOGGER_INFO("Engine version: %s\n", getVersion());
 
-                logNextHeader = SEC_FALSE;
+                logNextHeader = SEC_BOOLEAN_FALSE;
             }
 
             SEC_PLATFORMSPECIFIC_CLOSE_BINARY(engineBinary);
@@ -54,7 +55,7 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    if (SEC_OSUser_IsAdmin())
+    if (SEC_User_IsAdministrator())
         SEC_LOGGER_WARN("You're running as root! If a client says you require to be root, then it's probably a virus\n");
 
     if (engineBinary == NULL) {
@@ -106,4 +107,4 @@ int main(int argc, char** argv) {
     SEC_LOGGER_INFO("Goodbye\n");
     return returnValue;
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

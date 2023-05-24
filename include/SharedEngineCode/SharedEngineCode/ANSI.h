@@ -1,15 +1,15 @@
 // Purpose: Defines for every ANSI code.
 // Created on: 3/29/22 @ 11:27 AM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
 
-#include "Internal/CppSupport.h"
+#include "Internal/CPlusPlusSupport.h"
 #include "Internal/Boolean.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     SEC_ANSI_CODE_BOLD,
     SEC_ANSI_CODE_UNDERLINE,
@@ -52,4 +52,4 @@ typedef enum {
 
 SEC_Boolean SEC_ANSI_IsEnabled(void);
 const char* SEC_ANSI_ConvertCodeToString(SEC_ANSI_Codes ansi);
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

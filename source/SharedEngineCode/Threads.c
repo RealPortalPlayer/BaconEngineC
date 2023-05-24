@@ -1,4 +1,4 @@
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <errno.h>
@@ -13,7 +13,7 @@
 
 #include "SharedEngineCode/Threads.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 SEC_Thread SEC_Thread_GetCurrent(void) {
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
     return pthread_self();
@@ -48,7 +48,7 @@ SEC_Boolean SEC_Thread_Join(SEC_Thread thread) {
     while (WaitForSingleObject(thread, INFINITE) != WAIT_OBJECT_0)
         continue;
 
-    return SEC_TRUE;
+    return SEC_BOOLEAN_TRUE;
 #endif
 }
 
@@ -78,7 +78,7 @@ SEC_Boolean SEC_Thread_UseLock(SEC_Thread_Lock* lock) {
     while (WaitForSingleObject(*lock, INFINITE) != WAIT_OBJECT_0)
         continue;
 
-    return SEC_TRUE;
+    return SEC_BOOLEAN_TRUE;
 #endif
 }
 
@@ -107,4 +107,4 @@ SEC_Boolean SEC_Thread_DestroyLock(SEC_Thread_Lock* lock) {
     return CloseHandle(*lock);
 #endif
 }
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()
