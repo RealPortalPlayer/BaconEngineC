@@ -115,7 +115,6 @@ void BE_PrivateConsole_Initialize(void) {
 }
 #endif
 
-// TODO: Verify arguments
 void BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context)) {
 #ifndef BE_CLIENT_BINARY
     for (int i = 0; i < (int) beConsoleCommands.used; i++)

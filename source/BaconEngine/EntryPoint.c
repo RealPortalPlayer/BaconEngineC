@@ -136,7 +136,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* cli
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
         *(void**) &initialize = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_InitializeWrapper");
 #elif SEC_OPERATINGSYSTEM_WINDOWS
-        initialize = (ClientInitialize) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Start");
+        initialize = (ClientInitialize) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_InitializeWrapper");
 #endif
 
         if (initialize == NULL) {

@@ -15,6 +15,7 @@
 #   define BE_INTERFACEFUNCTION(returnType, ...) \
     static returnType (*function)(__VA_ARGS__) = NULL; \
     if (function == NULL) {                      \
+        SEC_LOGGER_DEBUG("Getting function from engine: %s\n", __func__); \
         function = (returnType (*)(__VA_ARGS__)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(I_Engine_GetBinary(), __func__); \
         if (function == NULL) {                  \
             const char* errorMessage = NULL;     \
