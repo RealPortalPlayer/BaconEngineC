@@ -8,9 +8,9 @@
 #   include <unistd.h>
 #   include <pwd.h>
 #elif SEC_OPERATINGSYSTEM_WINDOWS
-#   define WIN32_LEAN_AND_MEAN
 #   include <Windows.h>
 #   include <stdio.h>
+#   include <lmcons.h>
 #endif
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
@@ -40,7 +40,13 @@ const char* SEC_User_GetName(void) {
 
     return password != NULL ? password->pw_name : "";
 #elif SEC_OPERATINGSYSTEM_WINDOWS
-    return ""; // TODO: Windows.
+    static TCHAR buffer[UNLEN + 1] = {'\0'};
+    DWORD size = UNLEN + 1;
+    
+    if (buffer[0] == '\0')
+        GetUserName(buffer, &size);
+
+    return buffer;
 #endif
 }
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()
