@@ -8,8 +8,8 @@
 #include "SharedEngineCode/BuiltInArguments.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-int addedArgumentsCount;
-char** argumentVector;
+static int addedArgumentsCount;
+static char** argumentVector;
 
 void SEC_ArgumentHandler_Initialize(int argc, char** argv) {
     addedArgumentsCount = argc;
@@ -24,7 +24,7 @@ char** SEC_ArgumentHandler_GetVector(void) {
     return argumentVector;
 }
 
-int SEC_ArgumentHandler_GetArgumentIndexImplementation(const char* argument) {
+static int SEC_ArgumentHandler_GetArgumentIndexImplementation(const char* argument) {
     for (int i = 1; i < addedArgumentsCount; i++) {
         if (strcmp(argumentVector[i], argument) != 0)
             continue;
