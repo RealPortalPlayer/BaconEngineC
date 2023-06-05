@@ -65,12 +65,14 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
                                                                 SEC_BUILTINARGUMENTS_LOG_LEVEL_SHORT, 0, &results) != 0) {
                     if (SEC_StringExtension_CompareCaseless(*results.value, "null") == 0)
                         secLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_NULL;
+#ifdef BE_ALLOW_DEBUG_LOGS
                     else if (SEC_StringExtension_CompareCaseless(*results.value, "trace") == 0 ||
                              SEC_StringExtension_CompareCaseless(*results.value, "trc") == 0)
                         secLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_TRACE;
                     else if (SEC_StringExtension_CompareCaseless(*results.value, "debug") == 0 ||
                              SEC_StringExtension_CompareCaseless(*results.value, "dbg") == 0)
                         secLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_DEBUG;
+#endif
                     else if (SEC_StringExtension_CompareCaseless(*results.value, "warn") == 0 ||
                              SEC_StringExtension_CompareCaseless(*results.value, "wrn") == 0)
                         secLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_WARN;
@@ -123,6 +125,7 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
 
     va_start(arguments, message);
     vfprintf(output, message, arguments);
+    fflush(output); // HACK
     va_end(arguments);
 
     antiRecursiveLog = SEC_BOOLEAN_FALSE;
@@ -146,6 +149,7 @@ void SEC_Logger_LogHeader(FILE* output, SEC_Logger_LogLevels logLevel) {
 
 #define SEC_LOGGER_SAFE_PUTS(message) write(fileno(output), message, strlen(message))
     switch (logLevel) {
+#ifdef BE_ALLOW_DEBUG_LOGS
         case SEC_LOGGER_LOG_LEVEL_TRACE:
             if (SEC_ANSI_IsEnabled())
                 SEC_LOGGER_SAFE_PUTS(SEC_ANSI_ConvertCodeToString(SEC_ANSI_CODE_BRIGHT_FOREGROUND_BLUE));
@@ -159,6 +163,7 @@ void SEC_Logger_LogHeader(FILE* output, SEC_Logger_LogLevels logLevel) {
 
             SEC_LOGGER_SAFE_PUTS("[DBG] ");
             break;
+#endif
 
         case SEC_LOGGER_LOG_LEVEL_INFO:
             if (SEC_ANSI_IsEnabled())

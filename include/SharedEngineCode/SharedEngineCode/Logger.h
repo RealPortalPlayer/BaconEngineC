@@ -25,8 +25,10 @@ typedef enum {
     SEC_LOGGER_LOG_LEVEL_ERROR,
     SEC_LOGGER_LOG_LEVEL_WARN,
     SEC_LOGGER_LOG_LEVEL_INFO,
+#ifdef BE_ALLOW_DEBUG_LOGS
     SEC_LOGGER_LOG_LEVEL_DEBUG,
     SEC_LOGGER_LOG_LEVEL_TRACE,
+#endif
     SEC_LOGGER_LOG_LEVEL_NULL
 } SEC_Logger_LogLevels;
 
@@ -38,8 +40,13 @@ SEC_Boolean SEC_Logger_IsLevelEnabled(SEC_Logger_LogLevels logLevel);
 void SEC_Logger_SetLogLevel(SEC_Logger_LogLevels logLevel);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()
 
-#define SEC_LOGGER_TRACE(...) SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, SEC_LOGGER_LOG_LEVEL_TRACE, __VA_ARGS__)
-#define SEC_LOGGER_DEBUG(...) SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, SEC_LOGGER_LOG_LEVEL_DEBUG, __VA_ARGS__)
+#ifdef BE_ALLOW_DEBUG_LOGS
+#   define SEC_LOGGER_TRACE(...) SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, SEC_LOGGER_LOG_LEVEL_TRACE, __VA_ARGS__)
+#   define SEC_LOGGER_DEBUG(...) SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, SEC_LOGGER_LOG_LEVEL_DEBUG, __VA_ARGS__)
+#else
+#   define SEC_LOGGER_TRACE(...)
+#   define SEC_LOGGER_DEBUG(...)
+#endif
 #define SEC_LOGGER_INFO(...) SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, SEC_LOGGER_LOG_LEVEL_INFO, __VA_ARGS__)
 #define SEC_LOGGER_WARN(...) SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, SEC_LOGGER_LOG_LEVEL_WARN, __VA_ARGS__)
 #define SEC_LOGGER_ERROR(...) SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, SEC_LOGGER_LOG_LEVEL_ERROR, __VA_ARGS__)

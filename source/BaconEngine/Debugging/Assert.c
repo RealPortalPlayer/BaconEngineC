@@ -10,12 +10,16 @@
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 SEC_Boolean BE_Assert_CheckLogsEnabled(void) {
 #ifndef BE_CLIENT_BINARY
+#   ifdef BE_ALLOW_DEBUG_LOGS
     static int enabled = -1;
 
     if (enabled == -1)
         enabled = !SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_DONT_PRINT_ASSERT_CHECKS, SEC_BUILTINARGUMENTS_DONT_PRINT_ASSERT_CHECKS_SHORT, 0);
 
     return enabled;
+#   else
+    return SEC_BOOLEAN_FALSE;
+#   endif
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, void);
     return function();

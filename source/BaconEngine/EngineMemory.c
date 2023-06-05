@@ -15,13 +15,17 @@ BE_EngineMemory_MemoryInformation beEngineMemoryInformation = {
         {0, 0}
 };
 
-SEC_Boolean BE_EngineMemory_AllocDeallocLogsEnabled(void) {
+SEC_Boolean BE_EngineMemory_AllocateDeallocateLogsEnabled(void) {
+#ifdef BE_ALLOW_DEBUG_LOGS
     static int enabled = -1;
 
     if (enabled == -1)
         enabled = !SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOC, SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOC_SHORT, 0);
 
     return enabled;
+#else
+    return SEC_BOOLEAN_FALSE;
+#endif
 }
 
 BE_EngineMemory_MemoryInformation BE_EngineMemory_GetMemoryInformation(void) {
@@ -57,7 +61,7 @@ void* BE_EngineMemory_AllocateMemory(size_t size, BE_EngineMemory_MemoryType mem
     BE_EngineMemory_MemoryTypeInformation* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(
             memoryType);
 
-    if (BE_EngineMemory_AllocDeallocLogsEnabled())
+    if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
         SEC_LOGGER_TRACE("Allocating memory\n"
                          "Size: %zu\n"
                          "Type: %i\n", size, memoryType);
@@ -76,7 +80,7 @@ void* BE_EngineMemory_ReallocateMemory(void* pointer, size_t oldSize, size_t new
             memoryType);
     void* newPointer;
 
-    if (BE_EngineMemory_AllocDeallocLogsEnabled())
+    if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
         SEC_LOGGER_TRACE("Reallocating memory\n"
                          "Old Size: %zu\n"
                          "New Size: %zu\n"
@@ -94,7 +98,7 @@ void BE_EngineMemory_DeallocateMemory(void* pointer, size_t oldSize, BE_EngineMe
     BE_EngineMemory_MemoryTypeInformation* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(
             memoryType);
 
-    if (BE_EngineMemory_AllocDeallocLogsEnabled())
+    if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
         SEC_LOGGER_TRACE("Deallocating memory\n"
                          "Size: %zu\n"
                          "Type: %i\n", oldSize, memoryType);

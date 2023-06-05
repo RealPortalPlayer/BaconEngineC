@@ -109,9 +109,11 @@ void BE_EngineCommands_HelpPrint(BE_Command* command) {
     SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "%s",
                                  command->description);
 
+#ifdef BE_ALLOW_DEBUG_LOGS
     if (command->flags != BE_COMMAND_FLAG_NULL)
         SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_DEBUG, " - flags: %i",
                                      command->flags);
+#endif
 
     for (int argumentId = 0; argumentId < command->arguments.used; argumentId++) {
         BE_Command_Argument* argument = BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, argumentId);
