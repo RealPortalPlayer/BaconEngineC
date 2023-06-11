@@ -8,25 +8,25 @@
 #include "SharedEngineCode/BuiltInArguments.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-static int addedArgumentsCount;
-static char** argumentVector;
+static int secArgumentHandlerAddedArgumentsCount;
+static char** secArgumentHandlerArgumentVector;
 
 void SEC_ArgumentHandler_Initialize(int argc, char** argv) {
-    addedArgumentsCount = argc;
-    argumentVector = argv;
+    secArgumentHandlerAddedArgumentsCount = argc;
+    secArgumentHandlerArgumentVector = argv;
 }
 
 int SEC_ArgumentHandler_GetCount(void) {
-    return addedArgumentsCount;
+    return secArgumentHandlerAddedArgumentsCount;
 }
 
 char** SEC_ArgumentHandler_GetVector(void) {
-    return argumentVector;
+    return secArgumentHandlerArgumentVector;
 }
 
 static int SEC_ArgumentHandler_GetArgumentIndexImplementation(const char* argument) {
-    for (int i = 1; i < addedArgumentsCount; i++) {
-        if (strcmp(argumentVector[i], argument) != 0)
+    for (int i = 1; i < secArgumentHandlerAddedArgumentsCount; i++) {
+        if (strcmp(secArgumentHandlerArgumentVector[i], argument) != 0)
             continue;
 
         return i;
@@ -49,7 +49,7 @@ int SEC_ArgumentHandler_GetIndex(const char* argument, int ignoreDontParse) {
 char* SEC_ArgumentHandler_GetValue(const char* argument, int ignoreDontParse) {
     int index = SEC_ArgumentHandler_GetIndex(argument, ignoreDontParse);
 
-    return index != -1 && index != addedArgumentsCount - 1 ? argumentVector[index + 1] : NULL;
+    return index != -1 && index != secArgumentHandlerAddedArgumentsCount - 1 ? secArgumentHandlerArgumentVector[index + 1] : NULL;
 }
 
 int SEC_ArgumentHandler_GetInformationWithShort(const char* argument, const char* shortArgument, SEC_Boolean ignoreDontParse,
@@ -59,15 +59,15 @@ int SEC_ArgumentHandler_GetInformationWithShort(const char* argument, const char
     results->argumentIndex = SEC_ArgumentHandler_GetIndex(argument, ignoreDontParse);
     results->shortIndex = SEC_ArgumentHandler_GetIndex(shortArgument, ignoreDontParse);
 
-    if (results->argumentIndex != -1 && results->argumentIndex != addedArgumentsCount - 1) {
-        results->argumentValue = argumentVector[results->argumentIndex + 1];
+    if (results->argumentIndex != -1 && results->argumentIndex != secArgumentHandlerAddedArgumentsCount - 1) {
+        results->argumentValue = secArgumentHandlerArgumentVector[results->argumentIndex + 1];
         results->value = &results->argumentValue;
         results->index = &results->argumentIndex;
         returnResult++;
     }
 
-    if (results->shortIndex != -1 && results->shortIndex != addedArgumentsCount - 1) {
-        results->shortValue = argumentVector[results->shortIndex + 1];
+    if (results->shortIndex != -1 && results->shortIndex != secArgumentHandlerAddedArgumentsCount - 1) {
+        results->shortValue = secArgumentHandlerArgumentVector[results->shortIndex + 1];
         results->value = &results->shortValue;
         results->index = &results->shortIndex;
         returnResult++;
