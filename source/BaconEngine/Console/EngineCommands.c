@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <signal.h>
+#include <SharedEngineCode/Paths.h>
 
 #include "BaconEngine/Debugging/Assert.h"
 #include "EngineCommands.h"
@@ -219,6 +220,12 @@ void BE_EngineCommands_DebugInfo(void) {
                     "UI: %i rendered (%i/%i, %i realloc)\n"
                     "Layer: %i/%i (%i realloc)\n"
                     "Renderer: %i calls\n"
+                    "Paths:\n"
+                    "   Launcher directory: %s\n"
+                    "   Engine directory: %s\n"
+                    "   Client directory: %s\n"
+                    "   Engine binary path: %s\n"
+                    "   Client binary path: %s\n"
                     "Engine Memory: %zu bytes\n"
                     "    Command: %zu allocated, %zu bytes\n"
                     "    UI: %zu allocated, %zu bytes\n"
@@ -229,6 +236,11 @@ void BE_EngineCommands_DebugInfo(void) {
                     BE_EngineLayers_GetUIWindowRenderCount(), BE_UI_GetWindowAmount(), BE_UI_GetAllocatedWindowsAmount(), BE_UI_GetWindowReallocationAmount(), // UI
                     BE_Layer_GetAmount(), BE_Layer_GetAllocatedLayersAmount(), BE_Layer_GetLayersReallocationAmount(), // Layer
                     BE_Renderer_GetCalls(), // Renderer
+                    SEC_Paths_GetLauncherDirectory(), // Launcher directory
+                    SEC_Paths_GetEngineDirectory(), // Engine directory
+                    SEC_Paths_GetClientDirectory(), // Client directory
+                    SEC_Paths_GetEngineBinaryPath(), // Engine binary path
+                    SEC_Paths_GetClientBinaryPath(), // Client binary path
                     BE_EngineMemory_GetAllocatedBytes(), // Engine memory
                     memoryInformation.command.allocatedAmount, memoryInformation.command.allocatedBytes, // Command memory
                     memoryInformation.ui.allocatedAmount, memoryInformation.ui.allocatedBytes, // UI memory

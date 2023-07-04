@@ -14,11 +14,8 @@ static const char* secPathsClientDirectory;
 static const char* secPathsEngineDirectory;
 
 static void SEC_Paths_Append(char** result, const char* string1, const char* string2) {
-    size_t size = strlen(string1) + strlen(string2) + 1;
+    *result = malloc(sizeof(char) * (strlen(string1) + strlen(string2) + 1));
     
-    *result = malloc(sizeof(char) * size);
-    (*result)[size] = '\0';
-
     strcpy(*result, string1);
     strcat(*result, string2);
 }

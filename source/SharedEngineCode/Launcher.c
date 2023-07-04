@@ -1,8 +1,6 @@
 // Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include <errno.h>
-
 #include "SharedEngineCode/Launcher.h"
 #include "SharedEngineCode/Internal/CPlusPlusSupport.h"
 #include "SharedEngineCode/BuiltInArguments.h"

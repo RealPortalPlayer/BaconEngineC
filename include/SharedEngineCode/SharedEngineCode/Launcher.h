@@ -48,7 +48,7 @@ void SEC_Launcher_InitializeEngine(SEC_Launcher_Configuration* configuration);
 
 /**
  * Initializes client binary
- * @note SEc_Launcher_CreateConfiguration does this for you
+ * @note SEC_Launcher_CreateConfiguration does this for you
  * @warning Relies that the client path is set
  */
 void SEC_Launcher_InitializeClient(SEC_Launcher_Configuration* configuration);
