@@ -7,6 +7,7 @@
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <SharedEngineCode/Threads.h>
 #include <SharedEngineCode/Internal/PlatformSpecific.h>
+#include <SharedEngineCode/Paths.h>
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <unistd.h>
@@ -112,10 +113,13 @@ BE_BINARYEXPORT const char* BE_EntryPoint_GetVersion(void) {
     return BE_ENGINE_VERSION;
 }
 
-BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* clientBinary, int argc, char** argv) {
+BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const char* launcherPath, const char* enginePath, const char* clientPath, void* engineBinary, void* clientBinary, int argc, char** argv) {
     static SEC_Boolean alreadyStarted = SEC_BOOLEAN_FALSE;
 
     SEC_ArgumentHandler_Initialize(argc, argv);
+    SEC_Paths_SetLauncherPath(launcherPath);
+    SEC_Paths_SetEnginePath(enginePath);
+    SEC_Paths_SetClientPath(clientPath);
     BE_STRICTMODE_CHECK(!alreadyStarted, 1, "Reinitializing the engine is not supported\n");
     SEC_LOGGER_TRACE("Entered engine code\n");
 
@@ -129,7 +133,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* cli
     SEC_LOGGER_DEBUG("Getting client interface initializer\n");
 
     {
-        typedef void (*ClientInitialize)(void*, int, char**);
+        typedef void (*ClientInitialize)(const char*, const char*, const char*, void*, int, char**);
 
         ClientInitialize initialize;
 
@@ -149,7 +153,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* cli
             abort();
         }
 
-        initialize(engineBinary, argc, argv);
+        initialize(launcherPath, enginePath, clientPath, engineBinary, argc, argv);
     }
 
     SEC_LOGGER_DEBUG("Getting client functions\n");
@@ -169,13 +173,13 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* cli
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
     *(void**) &start = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Start");
     *(void**) &shutdown = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Shutdown");
-    *(void**) &supportsServer = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName");
+    *(void**) &supportsServer = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_SupportsServer");
     *(void**) &getName = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName");
     *(void**) &getEngineVersion = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetEngineVersion");
 #elif SEC_OPERATINGSYSTEM_WINDOWS
     start = (ClientStart) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Start");
     shutdown = (ClientShutdown) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Shutdown");
-    supportsServer = (ClientSupportsServer) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName");
+    supportsServer = (ClientSupportsServer) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_SupportsServer");
     getName = (ClientGetName) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName");
     getEngineVersion = (ClientGetEngineVersion) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetEngineVersion");
 #endif
@@ -277,8 +281,6 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* cli
     SEC_Thread_Create(&commandThread, &BE_EntryPoint_CommandThreadFunction);
 
     double deltaStart = 0;
-
-    // TODO: Command running inside of terminal.
 
     while (BE_ClientInformation_IsRunning()) {
         if (!BE_Window_IsStillOpened()) {

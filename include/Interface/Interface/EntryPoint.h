@@ -17,24 +17,24 @@
 #include <SharedEngineCode/Internal/OperatingSystem.h>
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
-#   define I_DLLEXPORT __attribute__((visibility("default")))
+#   define I_BINARYEXPORT __attribute__((visibility("default")))
 #elif SEC_OPERATINGSYSTEM_WINDOWS
-#   define I_DLLEXPORT __declspec(dllexport)
+#   define I_BINARYEXPORT __declspec(dllexport)
 #endif
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-void I_EntryPoint_Initialize(void* binary, int argc, char** argv);
+void I_EntryPoint_Initialize(const char* launcherPath, const char* enginePath, const char* clientPath, void* binary, int argc, char** argv);
 
-I_DLLEXPORT void I_EntryPoint_InitializeWrapper(void* binary, int argc, char** argv) {
-    I_EntryPoint_Initialize(binary, argc, argv);
+I_BINARYEXPORT void I_EntryPoint_InitializeWrapper(const char* launcherPath, const char* enginePath, const char* clientPath, void* binary, int argc, char** argv) {
+    I_EntryPoint_Initialize(launcherPath, enginePath, clientPath, binary, argc, argv);
 }
 
-I_DLLEXPORT const char* I_EntryPoint_GetEngineVersion(void) {
+I_BINARYEXPORT const char* I_EntryPoint_GetEngineVersion(void) {
     return BE_ENGINE_VERSION;
 }
 
-I_DLLEXPORT int I_EntryPoint_Start(int argc, char** argv);
-I_DLLEXPORT int I_EntryPoint_Shutdown(void);
-I_DLLEXPORT SEC_Boolean I_EntryPoint_SupportsServer(void);
-I_DLLEXPORT const char* I_EntryPoint_GetName(void);
+I_BINARYEXPORT int I_EntryPoint_Start(int argc, char** argv);
+I_BINARYEXPORT int I_EntryPoint_Shutdown(void);
+I_BINARYEXPORT SEC_Boolean I_EntryPoint_SupportsServer(void);
+I_BINARYEXPORT const char* I_EntryPoint_GetName(void);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()

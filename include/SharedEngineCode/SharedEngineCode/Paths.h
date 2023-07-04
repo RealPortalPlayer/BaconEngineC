@@ -1,0 +1,31 @@
+// Purpose: Manage important paths for the engine
+// Created on: 6/30/2023 @ 10:39 AM
+
+// Copyright (c) 2023, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
+#pragma once
+
+#include "SharedEngineCode/Internal/CPlusPlusSupport.h"
+
+SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+const char* SEC_Paths_GetLauncherDirectory();
+const char* SEC_Paths_GetEngineDirectory();
+const char* SEC_Paths_GetClientDirectory();
+const char* SEC_Paths_GetEngineBinaryPath();
+const char* SEC_Paths_GetClientBinaryPath();
+
+/**
+ * @note Call free on result once finished to prevent memory leaks
+ */
+void SEC_Paths_GetItemInsideEngineDirectory(char** result, const char* file);
+
+/**
+ * @note Call free on result once finished to prevent memory leaks
+ */
+void SEC_Paths_GetItemInsideClientDirectory(char** result, const char* file);
+
+void SEC_Paths_SetLauncherPath(const char* path);
+void SEC_Paths_SetClientPath(const char* path);
+void SEC_Paths_SetEnginePath(const char* path);
+SEC_CPLUSPLUS_SUPPORT_GUARD_END()

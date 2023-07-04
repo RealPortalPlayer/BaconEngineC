@@ -11,13 +11,13 @@
 #include "Internal/OperatingSystem.h"
 #include "Internal/CPlusPlusSupport.h"
 #include "Internal/Boolean.h"
+#include "Paths.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     SEC_LAUNCHER_ERROR_CODE_NULL, // No error.
     SEC_LAUNCHER_ERROR_CODE_BINARY, // Errored while opening binary file.
-    SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL, // Errored attempting to load the entry point.
-    SEC_LAUNCHER_ERROR_CODE_CHDIR // Errored while changing directories.
+    SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL // Errored attempting to load the entry point.
 } SEC_Launcher_ErrorCodes;
 
 typedef struct SEC_Launcher_Configuration {
@@ -31,19 +31,31 @@ typedef struct SEC_Launcher_Configuration {
             const char* clientName;
             void* engineBinary;
             void* clientBinary;
-            int (*Start)(void*, void*, int, char**);
+            int (*Start)(const char*, const char*, const char*, void*, void*, int, char**);
         } data;
     } unionVariables;
 } SEC_Launcher_Configuration;
 
 const char* SEC_Launcher_GetDefaultHelpList(void);
+void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration, const char* path);
 
 /**
-  * @return The initialized configuration file. NULL if malloc fails.
-  */
-void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration, const char* path);
+ * Initializes engine binary, and gets entry-point for engine
+ * @note SEC_Launcher_CreateConfiguration does this for you
+ * @warning Relies that the engine path is set
+ */
+void SEC_Launcher_InitializeEngine(SEC_Launcher_Configuration* configuration);
+
+/**
+ * Initializes client binary
+ * @note SEc_Launcher_CreateConfiguration does this for you
+ * @warning Relies that the client path is set
+ */
+void SEC_Launcher_InitializeClient(SEC_Launcher_Configuration* configuration);
+
+void SEC_Launcher_SetEnginePath(void);
+void SEC_Launcher_SetLauncherPath(void);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()
 
-#define SEC_LAUNCHER_START_ENGINE_POINTER(configuration, argc, argv) (configuration)->unionVariables.data.Start((configuration)->unionVariables.data.engineBinary, (configuration)->unionVariables.data.clientBinary, argc, argv)
+#define SEC_LAUNCHER_START_ENGINE_POINTER(configuration, argc, argv) (configuration)->unionVariables.data.Start(SEC_Paths_GetLauncherDirectory(), SEC_Paths_GetEngineDirectory(), SEC_Paths_GetClientDirectory(), (configuration)->unionVariables.data.engineBinary, (configuration)->unionVariables.data.clientBinary, argc, argv)
 #define SEC_LAUNCHER_START_ENGINE(configuration, argc, argv) SEC_LAUNCHER_START_ENGINE_POINTER(&configuration, argc, argv)
-

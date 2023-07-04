@@ -18,51 +18,51 @@ int main(int argc, char** argv) {
     SEC_ArgumentHandler_Initialize(argc, argv);
     SEC_LOGGER_TRACE("Built on: %s\nBuilt for: %s\n", __TIMESTAMP__, SEC_OPERATINGSYSTEM_NAME);
 
+    SEC_Launcher_Configuration configuration = {
+        .code = SEC_LAUNCHER_ERROR_CODE_NULL
+    };
+
+    SEC_ArgumentHandler_ShortResults results;
+    int clientInformationResults = SEC_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_CLIENT, SEC_BUILTINARGUMENTS_CLIENT_SHORT, 0,
+                                                                               &results);
+
     if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_VERSION, SEC_BUILTINARGUMENTS_VERSION_SHORT, 0)) {
         SEC_LOGGER_INFO("Launcher version: %s\n"
                         "Built with engine version: %s\n", BE_LAUNCHER_VERSION, BE_ENGINE_VERSION);
 
-        void* engineBinary = NULL;
+        SEC_Launcher_SetLauncherPath();
+        SEC_Launcher_SetEnginePath();
+        
+        if (clientInformationResults != 0)
+            SEC_Paths_SetClientPath(*results.value);
+        
+        SEC_Launcher_InitializeEngine(&configuration);
 
-        {
-            SEC_ArgumentHandler_ShortResults results;
-
-            if (SEC_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_ENGINE,
-                                                            SEC_BUILTINARGUMENTS_ENGINE_SHORT, SEC_BOOLEAN_FALSE,
-                                                            &results) != 0)
-                engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY(*results.value, RTLD_NOW);
-            else
-                engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY("./BaconEngine" SEC_PLATFORMSPECIFIC_BINARY_EXTENSION, RTLD_NOW);
-        }
-
-        if (engineBinary != NULL) {
-            const char* (*getVersion)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(engineBinary, "BE_EntryPoint_GetVersion");
+        if (configuration.code == SEC_LAUNCHER_ERROR_CODE_NULL) {
+            const char* (*getVersion)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.engineBinary, "BE_EntryPoint_GetVersion");
 
             if (getVersion != NULL)
                 SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "Engine version: %s\n", getVersion());
 
-            SEC_PLATFORMSPECIFIC_CLOSE_BINARY(engineBinary);
+            SEC_PLATFORMSPECIFIC_CLOSE_BINARY(configuration.unionVariables.data.engineBinary);
         }
+        
+        if (clientInformationResults == 0)
+            return 0;
+        
+        configuration.code = SEC_LAUNCHER_ERROR_CODE_NULL;
 
-        void* clientBinary = NULL;
-        SEC_ArgumentHandler_ShortResults results;
-
-        if (SEC_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_CLIENT, SEC_BUILTINARGUMENTS_CLIENT_SHORT,
-                                                        0, &results) == 0 ||
-            SEC_PLATFORMSPECIFIC_CHANGE_DIRECTORY(*results.value) != 0)
+        SEC_Launcher_InitializeClient(&configuration);
+        
+        if (configuration.code != SEC_LAUNCHER_ERROR_CODE_NULL)
             return 0;
 
-        clientBinary = SEC_PLATFORMSPECIFIC_GET_BINARY("./binary" SEC_PLATFORMSPECIFIC_BINARY_EXTENSION, RTLD_NOW);
-
-        if (clientBinary == NULL)
-            return 0;
-
-        const char* (*getVersion)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetEngineVersion");
+        const char* (*getVersion)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.clientBinary, "I_EntryPoint_GetEngineVersion");
 
         if (getVersion != NULL)
             SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "Client was compiled with engine version: %s\n", getVersion());
 
-        SEC_PLATFORMSPECIFIC_CLOSE_BINARY(clientBinary);
+        SEC_PLATFORMSPECIFIC_CLOSE_BINARY(configuration.unionVariables.data.clientBinary);
         return 0;
     }
 
@@ -74,17 +74,10 @@ int main(int argc, char** argv) {
     if (SEC_User_IsAdministrator())
         SEC_LOGGER_WARN("You're running as root! If a client says you require to be root, then it's probably a virus\n");
 
-    SEC_ArgumentHandler_ShortResults results;
-
-    if (SEC_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_CLIENT, SEC_BUILTINARGUMENTS_CLIENT_SHORT, 0,
-                                                    &results) == 0) {
+    if (clientInformationResults == 0) {
         SEC_LOGGER_FATAL("No client specified, please check help for more information\n");
         return 1;
     }
-
-    SEC_Launcher_Configuration configuration = {
-        .code = SEC_LAUNCHER_ERROR_CODE_NULL
-    };
 
     SEC_Launcher_CreateConfiguration(&configuration, *results.value);
 
@@ -96,10 +89,6 @@ int main(int argc, char** argv) {
 
             case SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL:
                 SEC_LOGGER_FATAL("Failed to get engine entry-point: %s\n", configuration.unionVariables.errorReason.errorMessage);
-                return 1;
-
-            case SEC_LAUNCHER_ERROR_CODE_CHDIR:
-                SEC_LOGGER_FATAL("Failed to set current directory: %s\n", configuration.unionVariables.errorReason.errorMessage);
                 return 1;
 
             default:

@@ -1,7 +1,6 @@
 // Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include <string.h>
 #include <errno.h>
 
 #include "SharedEngineCode/Launcher.h"
@@ -12,60 +11,18 @@
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration, const char* path) {
-    {
-        SEC_ArgumentHandler_ShortResults results;
-
-        if (SEC_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_ENGINE, SEC_BUILTINARGUMENTS_ENGINE_SHORT,
-                                                        SEC_BOOLEAN_FALSE, &results) != 0)
-            configuration->unionVariables.data.engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY(*results.value, RTLD_NOW);
-        else
-            configuration->unionVariables.data.engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY("./BaconEngine" SEC_PLATFORMSPECIFIC_BINARY_EXTENSION, RTLD_NOW);
-    }
-
-    if (configuration->unionVariables.data.engineBinary == NULL) {
-        configuration->code = SEC_LAUNCHER_ERROR_CODE_BINARY;
-        configuration->unionVariables.errorReason.isEngine = SEC_BOOLEAN_TRUE;
-
-        SEC_PLATFORMSPECIFIC_GET_ERROR(configuration->unionVariables.errorReason.errorMessage);
-        return;
-    }
-
-    if (SEC_PLATFORMSPECIFIC_CHANGE_DIRECTORY(path) != 0) {
-        configuration->code = SEC_LAUNCHER_ERROR_CODE_CHDIR;
-        configuration->unionVariables.errorReason.isEngine = SEC_BOOLEAN_FALSE;
-        configuration->unionVariables.errorReason.errorMessage = strerror(errno);
-        return;
-    }
-
-    configuration->unionVariables.data.clientBinary = SEC_PLATFORMSPECIFIC_GET_BINARY("./binary" SEC_PLATFORMSPECIFIC_BINARY_EXTENSION, RTLD_NOW);
-
-    if (configuration->unionVariables.data.clientBinary == NULL) {
-        configuration->code = SEC_LAUNCHER_ERROR_CODE_BINARY;
-        configuration->unionVariables.errorReason.isEngine = SEC_BOOLEAN_FALSE;
-
-        SEC_PLATFORMSPECIFIC_GET_ERROR(configuration->unionVariables.errorReason.errorMessage);
-        return;
-    }
-
-    {
-        const char*
-        (*name)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_GetName");
-
-        configuration->unionVariables.data.clientName = name != NULL ? name() : "";
-    }
-
-    configuration->unionVariables.data.Start = (int (*)(void*, void*, int, char**)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.engineBinary,
-                                                                                                                     "BE_EntryPoint_StartBaconEngine");
-
-    if (configuration->unionVariables.data.Start == NULL) {
-        configuration->code = SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL;
-        configuration->unionVariables.errorReason.isEngine = SEC_BOOLEAN_TRUE;
-
-        SEC_PLATFORMSPECIFIC_GET_ERROR(configuration->unionVariables.errorReason.errorMessage);
-        return;
-    }
-
+    SEC_Launcher_SetLauncherPath();
+    SEC_Launcher_SetEnginePath();
+    SEC_Paths_SetClientPath(path);
+    
     configuration->code = SEC_LAUNCHER_ERROR_CODE_NULL;
+
+    SEC_Launcher_InitializeEngine(configuration);
+    
+    if (configuration->code != SEC_LAUNCHER_ERROR_CODE_NULL)
+        return;
+
+    SEC_Launcher_InitializeClient(configuration);
 }
 
 const char* SEC_Launcher_GetDefaultHelpList(void) {
@@ -99,5 +56,69 @@ const char* SEC_Launcher_GetDefaultHelpList(void) {
 #endif
            SEC_BUILTINARGUMENTS_DISABLE_LOG_HEADER " (" SEC_BUILTINARGUMENTS_DISABLE_LOG_HEADER_SHORT "): Do not log the log level header\n"
            SEC_BUILTINARGUMENTS_ENGINE " <engine binary> (" SEC_BUILTINARGUMENTS_ENGINE_SHORT "): Use a custom engine binary";
+}
+
+void SEC_Launcher_InitializeEngine(SEC_Launcher_Configuration* configuration) {
+    configuration->unionVariables.data.engineBinary = SEC_PLATFORMSPECIFIC_GET_BINARY(SEC_Paths_GetEngineBinaryPath(), RTLD_NOW);
+
+    if (configuration->unionVariables.data.engineBinary == NULL) {
+        configuration->code = SEC_LAUNCHER_ERROR_CODE_BINARY;
+        configuration->unionVariables.errorReason.isEngine = SEC_BOOLEAN_TRUE;
+
+        SEC_PLATFORMSPECIFIC_GET_ERROR(configuration->unionVariables.errorReason.errorMessage);
+        return;
+    }
+
+    configuration->unionVariables.data.Start = (int (*)(const char*, const char*, const char*, void*, void*, int, char**)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.engineBinary,
+                                                                                                                                                            "BE_EntryPoint_StartBaconEngine");
+
+    if (configuration->unionVariables.data.Start != NULL)
+        return;
+
+    configuration->code = SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL;
+    configuration->unionVariables.errorReason.isEngine = SEC_BOOLEAN_TRUE;
+
+    SEC_PLATFORMSPECIFIC_GET_ERROR(configuration->unionVariables.errorReason.errorMessage);
+}
+
+
+void SEC_Launcher_InitializeClient(SEC_Launcher_Configuration* configuration) {
+    configuration->unionVariables.data.clientBinary = SEC_PLATFORMSPECIFIC_GET_BINARY(SEC_Paths_GetClientBinaryPath(), RTLD_NOW);
+
+    if (configuration->unionVariables.data.clientBinary == NULL) {
+        configuration->code = SEC_LAUNCHER_ERROR_CODE_BINARY;
+        configuration->unionVariables.errorReason.isEngine = SEC_BOOLEAN_FALSE;
+
+        SEC_PLATFORMSPECIFIC_GET_ERROR(configuration->unionVariables.errorReason.errorMessage);
+        return;
+    }
+    
+    const char* (*getName)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_GetName");
+
+    configuration->unionVariables.data.clientName = getName != NULL ? getName() : "";
+}
+
+void SEC_Launcher_SetEnginePath(void) {
+    SEC_ArgumentHandler_ShortResults results;
+
+    if (SEC_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_ENGINE, SEC_BUILTINARGUMENTS_ENGINE_SHORT,
+                                                    SEC_BOOLEAN_FALSE, &results) != 0)
+        SEC_Paths_SetEnginePath(*results.value);
+    else
+        SEC_Paths_SetEnginePath("Engines/Official");
+}
+
+void SEC_Launcher_SetLauncherPath(void) {
+#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
+    char directory[PATH_MAX];
+    
+    getcwd(directory, PATH_MAX);
+#else
+    static char directory[MAX_PATH];
+
+    GetCurrentDirectory(MAX_PATH, directory);
+#endif
+
+    SEC_Paths_SetLauncherPath(directory);
 }
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()

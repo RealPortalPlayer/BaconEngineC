@@ -1,6 +1,6 @@
 project(SharedEngineCode)
 
-add_library(SharedEngineCode STATIC ArgumentHandler.c Launcher.c Logger.c ANSI.c User.c StringExtension.c MessageBox.c Threads.c)
+add_library(SharedEngineCode STATIC ArgumentHandler.c Launcher.c Logger.c ANSI.c User.c StringExtension.c MessageBox.c Threads.c Paths.c)
 
 target_include_directories(SharedEngineCode PUBLIC ../../include/SharedEngineCode)
 
