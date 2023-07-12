@@ -9,11 +9,11 @@
 #include "SharedEngineCode/Internal/CPlusPlusSupport.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-const char* SEC_Paths_GetLauncherDirectory();
-const char* SEC_Paths_GetEngineDirectory();
-const char* SEC_Paths_GetClientDirectory();
-const char* SEC_Paths_GetEngineBinaryPath();
-const char* SEC_Paths_GetClientBinaryPath();
+const char* SEC_Paths_GetLauncherDirectory(void);
+const char* SEC_Paths_GetEngineDirectory(void);
+const char* SEC_Paths_GetClientDirectory(void);
+const char* SEC_Paths_GetEngineBinaryPath(void);
+const char* SEC_Paths_GetClientBinaryPath(void);
 
 /**
  * @note Call free on result once finished to prevent memory leaks

@@ -50,21 +50,21 @@ if (createdPath == NULL) {                   \
 return createdPath
 
 
-const char* SEC_Paths_GetLauncherDirectory() {
+const char* SEC_Paths_GetLauncherDirectory(void) {
     SEC_PATHS_GETDIRECTORY("/", secPathsLauncherDirectory);
 }
 
-const char* SEC_Paths_GetEngineDirectory() {
+const char* SEC_Paths_GetEngineDirectory(void) {
     SEC_PATHS_GETDIRECTORY(secPathsLauncherDirectory, secPathsEngineDirectory);
 }
 
-const char* SEC_Paths_GetClientDirectory() {
+const char* SEC_Paths_GetClientDirectory(void) {
     SEC_PATHS_GETDIRECTORY(secPathsLauncherDirectory, secPathsClientDirectory);
 }
 
 #undef SEC_PATHS_GETDIRECTORY
 
-const char* SEC_Paths_GetEngineBinaryPath() {
+const char* SEC_Paths_GetEngineBinaryPath(void) {
     static char* binaryPath = NULL;
     
     if (binaryPath == NULL)
@@ -73,7 +73,7 @@ const char* SEC_Paths_GetEngineBinaryPath() {
     return binaryPath;
 }
 
-const char* SEC_Paths_GetClientBinaryPath() {
+const char* SEC_Paths_GetClientBinaryPath(void) {
     static char* binaryPath = NULL;
 
     if (binaryPath == NULL) // FIXME: Assuming the binary name can cause problems for standalone builds
