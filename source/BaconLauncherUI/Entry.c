@@ -3,7 +3,7 @@
 
 #include <Interface/EntryPoint.h>
 
-int BE_EntryPoint_ClientStart(int argc, char** argv) {
+int I_EntryPoint_Start(int argc, char** argv) {
 //    BE_UI_RegisterWindow("Clients", (BE_Vector2_Integer) {300, 300}, (BE_Vector2_Unsigned) {380, 450},
 //                         BE_UI_WINDOW_FLAG_NO_MAXIMIZE | BE_UI_WINDOW_FLAG_NO_CLOSE);
 //    BE_UI_FinishRegisteringWindow();
@@ -12,6 +12,14 @@ int BE_EntryPoint_ClientStart(int argc, char** argv) {
 //    BE_UI_FinishRegisteringWindow();
 
     return 0;
+}
+
+int I_EntryPoint_Shutdown(void) {
+    return 0;
+}
+
+SEC_Boolean I_EntryPoint_SupportsServer(void) {
+    return SEC_BOOLEAN_FALSE;
 }
 
 const char* I_EntryPoint_GetName(void) {
