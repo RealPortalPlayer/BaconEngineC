@@ -39,9 +39,10 @@ int main(int argc, char** argv) {
         SEC_Launcher_InitializeEngine(&configuration);
 
         if (configuration.code == SEC_LAUNCHER_ERROR_CODE_NULL) {
-            const char* (*getVersion)(void);
+            typedef const char* (*GetVersion)(void);
+            GetVersion getVersion;
 
-            SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(const char (*)(void), getVersion, "BE_EntryPoint_GetVersion");
+            SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(GetVersion, getVersion, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.engineBinary, "BE_EntryPoint_GetVersion"));
             
             if (getVersion != NULL)
                 SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "Engine version: %s\n", getVersion());
@@ -59,9 +60,10 @@ int main(int argc, char** argv) {
         if (configuration.code != SEC_LAUNCHER_ERROR_CODE_NULL)
             return 0;
 
-        const char* (*getVersion)(void);
+        typedef const char* (*GetVersion)(void);
+        GetVersion getVersion;
 
-        SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(const char* (*)(void), getVersion, "I_EntryPoint_GetEngineVersion");
+        SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(GetVersion, getVersion, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.clientBinary, "I_EntryPoint_GetEngineVersion"));
         
         if (getVersion != NULL)
             SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "Client was compiled with engine version: %s\n", getVersion());
