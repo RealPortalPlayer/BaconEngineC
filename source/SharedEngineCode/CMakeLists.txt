@@ -1,6 +1,17 @@
 project(SharedEngineCode)
 
-add_library(SharedEngineCode STATIC ArgumentHandler.c Launcher.c Logger.c ANSI.c User.c MessageBox.c Threads.c Paths.c String.c)
+set(BE_SOURCE_FILES
+        ArgumentHandler.c 
+        Launcher.c 
+        Logger.c
+        ANSI.c
+        User.c
+        MessageBox.c
+        Threads.c
+        Paths.c
+        String.c)
+
+add_library(SharedEngineCode STATIC ${BE_SOURCE_FILES})
 
 if(NOT BE_DISABLE_PEDANTIC_MODE)
     if(MSVC)
@@ -15,3 +26,5 @@ target_include_directories(SharedEngineCode PUBLIC ../../include/SharedEngineCod
 if(MSVC)
     target_compile_definitions(SharedEngineCode PUBLIC -D_CRT_SECURE_NO_WARNINGS)
 endif()
+
+include(SharedEngineCodeStandalone.cmake)

@@ -138,3 +138,4 @@ endif()
 target_compile_definitions(BaconEngine PUBLIC BE_ENGINE_VERSION="${BE_ENGINE_VERSION}")
 
 include(BaconEngineClient.cmake)
+include(BaconEngineClientStandalone.cmake)
