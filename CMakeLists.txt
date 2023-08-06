@@ -21,12 +21,6 @@ option(BE_ALLOW_DEBUG_LOGS "Always allow debug logs, even for release builds" OF
 set(BE_GLFW_PATH "" CACHE STRING "Use GLFW from the specified path instead of trying to find it")
 set(BE_ASAN_SANITIZER "" CACHE STRING "Set what ASAN sanitizer to use")
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-    add_compile_definitions(DEBUG BE_ALLOW_DEBUG_LOGS)
-elseif(BE_ALLOW_DEBUG_LOGS)
-    add_compile_definitions(BE_ALLOW_DEBUG_LOGS)
-endif()
-
 macro(engine_project)
     cmake_parse_arguments(PARSED "STANDALONE" "NAME" "SOURCES" ${ARGN})
 
@@ -132,6 +126,12 @@ if(NOT BE_NO_IDE_FOLDERS)
 endif()
 
 add_subdirectory(dependencies/zip)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    add_compile_definitions(DEBUG BE_ALLOW_DEBUG_LOGS)
+elseif(BE_ALLOW_DEBUG_LOGS)
+    add_compile_definitions(BE_ALLOW_DEBUG_LOGS)
+endif()
 
 message(STATUS "Adding meta projects")
 
