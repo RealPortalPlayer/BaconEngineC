@@ -63,27 +63,27 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
 
                 if (SEC_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_LOG_LEVEL,
                                                                 SEC_BUILTINARGUMENTS_LOG_LEVEL_SHORT, 0, &results) != 0) {
-                    if (SEC_String_Equals(*results.value, "null", SEC_BOOLEAN_TRUE) == 0)
+                    if (SEC_String_Equals(*results.value, "null", SEC_BOOLEAN_TRUE))
                         secLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_NULL;
 #ifdef BE_ALLOW_DEBUG_LOGS
-                    else if (SEC_String_Equals(*results.value, "trace", SEC_BOOLEAN_TRUE) == 0 ||
-                            SEC_String_Equals(*results.value, "trc", SEC_BOOLEAN_TRUE) == 0)
+                    else if (SEC_String_Equals(*results.value, "trace", SEC_BOOLEAN_TRUE) ||
+                             SEC_String_Equals(*results.value, "trc", SEC_BOOLEAN_TRUE))
                         secLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_TRACE;
-                    else if (SEC_String_Equals(*results.value, "debug", SEC_BOOLEAN_TRUE) == 0 ||
-                            SEC_String_Equals(*results.value, "dbg", SEC_BOOLEAN_TRUE) == 0)
+                    else if (SEC_String_Equals(*results.value, "debug", SEC_BOOLEAN_TRUE) ||
+                             SEC_String_Equals(*results.value, "dbg", SEC_BOOLEAN_TRUE))
                         secLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_DEBUG;
 #endif
-                    else if (SEC_String_Equals(*results.value, "warn", SEC_BOOLEAN_TRUE) == 0 ||
-                            SEC_String_Equals(*results.value, "wrn", SEC_BOOLEAN_TRUE) == 0)
+                    else if (SEC_String_Equals(*results.value, "warn", SEC_BOOLEAN_TRUE) ||
+                             SEC_String_Equals(*results.value, "wrn", SEC_BOOLEAN_TRUE))
                         secLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_WARN;
-                    else if (SEC_String_Equals(*results.value, "error", SEC_BOOLEAN_TRUE) == 0 ||
-                            SEC_String_Equals(*results.value, "err", SEC_BOOLEAN_TRUE) == 0)
+                    else if (SEC_String_Equals(*results.value, "error", SEC_BOOLEAN_TRUE) ||
+                             SEC_String_Equals(*results.value, "err", SEC_BOOLEAN_TRUE))
                         secLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_ERROR;
-                    else if (SEC_String_Equals(*results.value, "fatal", SEC_BOOLEAN_TRUE) == 0 ||
-                            SEC_String_Equals(*results.value, "ftl", SEC_BOOLEAN_TRUE) == 0)
+                    else if (SEC_String_Equals(*results.value, "fatal", SEC_BOOLEAN_TRUE) ||
+                             SEC_String_Equals(*results.value, "ftl", SEC_BOOLEAN_TRUE))
                         secLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_FATAL;
-                    else if (SEC_String_Equals(*results.value, "info", SEC_BOOLEAN_TRUE) != 0 &&
-                            SEC_String_Equals(*results.value, "inf", SEC_BOOLEAN_TRUE) != 0) {
+                    else if (SEC_String_Equals(*results.value, "info", SEC_BOOLEAN_TRUE) &&
+                             SEC_String_Equals(*results.value, "inf", SEC_BOOLEAN_TRUE)) {
                         SEC_Logger_LogHeader(stderr, SEC_LOGGER_LOG_LEVEL_ERROR);
                         printf("Invalid log type: %s\n", *results.value);
                     }

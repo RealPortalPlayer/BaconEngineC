@@ -45,7 +45,7 @@ void BE_PrivateRenderer_Initialize(void) {
 
     const char* specifiedRenderer = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_RENDERER, 0);
 
-    if (BE_ClientInformation_IsServerModeEnabled() || (specifiedRenderer != NULL && SEC_String_Equals(specifiedRenderer, "text", SEC_BOOLEAN_TRUE) == 0)) {
+    if (BE_ClientInformation_IsServerModeEnabled() || (specifiedRenderer != NULL && SEC_String_Equals(specifiedRenderer, "text", SEC_BOOLEAN_TRUE))) {
         textmode:
         SEC_LOGGER_INFO("Using no renderer\n");
         BE_TextMode_Initialize();
@@ -55,7 +55,7 @@ void BE_PrivateRenderer_Initialize(void) {
     }
 
     if (specifiedRenderer != NULL) {
-        if (SEC_String_Equals(specifiedRenderer, "opengl", SEC_BOOLEAN_TRUE) == 0) {
+        if (SEC_String_Equals(specifiedRenderer, "opengl", SEC_BOOLEAN_TRUE)) {
 #   ifndef BE_DISABLE_OPENGL
 //            opengl:
             SEC_LOGGER_INFO("Using OpenGL as the renderer\n");
@@ -69,7 +69,7 @@ void BE_PrivateRenderer_Initialize(void) {
             return;
         }
 
-        if (SEC_String_Equals(specifiedRenderer, "vulkan", SEC_BOOLEAN_TRUE) == 0) {
+        if (SEC_String_Equals(specifiedRenderer, "vulkan", SEC_BOOLEAN_TRUE)) {
 #   if !SEC_OPERATINGSYSTEM_APPLE
 //            vulkan:
             BE_ASSERT_ALWAYS("Renderer not implemented\n");
@@ -79,7 +79,7 @@ void BE_PrivateRenderer_Initialize(void) {
 #   endif
         }
 
-        if (SEC_String_Equals(specifiedRenderer, "metal", SEC_BOOLEAN_TRUE) == 0) {
+        if (SEC_String_Equals(specifiedRenderer, "metal", SEC_BOOLEAN_TRUE)) {
 #   if SEC_OPERATINGSYSTEM_APPLE
 #       ifndef BE_DISABLE_METAL
 //            metal:
@@ -97,7 +97,7 @@ void BE_PrivateRenderer_Initialize(void) {
             return;
         }
 
-        if (SEC_String_Equals(specifiedRenderer, "directx", SEC_BOOLEAN_TRUE) == 0) {
+        if (SEC_String_Equals(specifiedRenderer, "directx", SEC_BOOLEAN_TRUE)) {
 #   if SEC_OPERATINGSYSTEM_WINDOWS
 //            directx:
             BE_ASSERT_ALWAYS("Renderer not implemented\n");
@@ -108,7 +108,7 @@ void BE_PrivateRenderer_Initialize(void) {
             return;
         }
 
-        if (SEC_String_Equals(specifiedRenderer, "software", SEC_BOOLEAN_TRUE) == 0) {
+        if (SEC_String_Equals(specifiedRenderer, "software", SEC_BOOLEAN_TRUE)) {
             SEC_LOGGER_INFO("Using software rendering\n");
             SEC_LOGGER_WARN("This is going to lag; use a better renderer\n");
 
