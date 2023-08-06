@@ -20,7 +20,41 @@ typedef enum {
     SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL // Errored attempting to load the entry point.
 } SEC_Launcher_ErrorCodes;
 
-typedef int (*SEC_Launcher_ClientStart)(const char*, const char*, const char*, void*, void*, int, char**);
+typedef void (*SEC_Launcher_ClientInitialize)(const char*, const char*, const char*, void*, int, char**);
+typedef int (*SEC_Launcher_ClientStart)(int, char**);
+typedef int (*SEC_Launcher_ClientShutdown)(void);
+typedef SEC_Boolean (*SEC_Launcher_ClientSupportsServer)(void);
+typedef const char* (*SEC_Launcher_ClientGetName)(void);
+typedef const char* (*SEC_Launcher_ClientGetEngineVersion)(void);
+
+// Do NOT edit this structure. Not even to move the variables around.
+// Do NOT edit the typedef's these variables use.
+// Doing so will break compatibility with older versions of the engine.
+// If you absolutely need to add something, add it to the end of the structure.
+typedef struct {
+    int argc;
+    char** argv;
+    const char* launcherPath;
+    const char* enginePath;
+    const char* clientPath;
+    void* engineBinary;
+    SEC_Launcher_ClientInitialize clientInitialize;
+    SEC_Launcher_ClientStart clientStart;
+    SEC_Launcher_ClientShutdown clientShutdown;
+    SEC_Launcher_ClientSupportsServer clientSupportsServer;
+    SEC_Launcher_ClientGetName clientGetName;
+    SEC_Launcher_ClientGetEngineVersion clientGetEngineVersion;
+} SEC_Launcher_EngineDetails;
+
+typedef struct {
+    SEC_Boolean success;
+    union {
+        int returnCode; // Set if success
+        const char* errorMessage; // Set if it didn't succeed
+    } unionVariables;
+} SEC_Launcher_StartEngineResults;
+
+typedef int (*SEC_Launcher_EngineStart)(const SEC_Launcher_EngineDetails*);
 
 typedef struct SEC_Launcher_Configuration {
     SEC_Launcher_ErrorCodes code;
@@ -33,7 +67,7 @@ typedef struct SEC_Launcher_Configuration {
             const char* clientName;
             void* engineBinary;
             void* clientBinary;
-            SEC_Launcher_ClientStart Start;
+            SEC_Launcher_EngineStart Start;
         } data;
     } unionVariables;
 } SEC_Launcher_Configuration;
@@ -55,9 +89,8 @@ void SEC_Launcher_InitializeEngine(SEC_Launcher_Configuration* configuration);
  */
 void SEC_Launcher_InitializeClient(SEC_Launcher_Configuration* configuration);
 
+SEC_Launcher_StartEngineResults SEC_Launcher_StartEngine(const SEC_Launcher_Configuration* configuration);
+
 void SEC_Launcher_SetEnginePath(void);
 void SEC_Launcher_SetLauncherPath(void);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()
-
-#define SEC_LAUNCHER_START_ENGINE_POINTER(configuration, argc, argv) (configuration)->unionVariables.data.Start(SEC_Paths_GetLauncherDirectory(), SEC_Paths_GetEngineDirectory(), SEC_Paths_GetClientDirectory(), (configuration)->unionVariables.data.engineBinary, (configuration)->unionVariables.data.clientBinary, argc, argv)
-#define SEC_LAUNCHER_START_ENGINE(configuration, argc, argv) SEC_LAUNCHER_START_ENGINE_POINTER(&configuration, argc, argv)

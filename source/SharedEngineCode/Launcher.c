@@ -6,6 +6,7 @@
 #include "SharedEngineCode/BuiltInArguments.h"
 #include "SharedEngineCode/Internal/PlatformSpecific.h"
 #include "SharedEngineCode/ArgumentHandler.h"
+#include "SharedEngineCode/ArgumentHandler.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration, const char* path) {
@@ -67,7 +68,7 @@ void SEC_Launcher_InitializeEngine(SEC_Launcher_Configuration* configuration) {
         return;
     }
 
-    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(SEC_Launcher_ClientStart, configuration->unionVariables.data.Start, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.engineBinary, "BE_EntryPoint_StartBaconEngine"));
+    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(SEC_Launcher_EngineStart, configuration->unionVariables.data.Start, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.engineBinary, "BE_EntryPoint_StartBaconEngine"));
 
     if (configuration->unionVariables.data.Start != NULL)
         return;
@@ -95,6 +96,53 @@ void SEC_Launcher_InitializeClient(SEC_Launcher_Configuration* configuration) {
     SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(const char* (*)(void), getName, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_GetName"));
 
     configuration->unionVariables.data.clientName = getName != NULL ? getName() : "";
+}
+
+SEC_Launcher_StartEngineResults SEC_Launcher_StartEngine(const SEC_Launcher_Configuration* configuration) {
+    SEC_Launcher_ClientInitialize clientInitialize;
+
+    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(SEC_Launcher_ClientInitialize, clientInitialize,
+                                                  SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_InitializeWrapper"));
+    
+    if (clientInitialize == NULL) {
+        SEC_Launcher_StartEngineResults results = SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(SEC_Launcher_StartEngineResults, SEC_BOOLEAN_FALSE);
+
+        SEC_PLATFORMSPECIFIC_GET_ERROR(results.unionVariables.errorMessage);
+        
+        return results;
+    }
+
+    SEC_Launcher_ClientStart clientStart;
+    SEC_Launcher_ClientShutdown clientShutdown;
+    SEC_Launcher_ClientSupportsServer clientSupportsServer;
+    SEC_Launcher_ClientGetName clientGetName;
+    SEC_Launcher_ClientGetEngineVersion clientGetEngineVersion;
+
+    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(SEC_Launcher_ClientStart, clientStart, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_Start"));
+    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(SEC_Launcher_ClientShutdown, clientShutdown, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_Shutdown"));
+    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(SEC_Launcher_ClientSupportsServer, clientSupportsServer, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_SupportsServer"));
+    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(SEC_Launcher_ClientGetName, clientGetName, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_GetName"));
+    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(SEC_Launcher_ClientGetEngineVersion, clientGetEngineVersion, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_GetEngineVersion"));
+
+    SEC_Launcher_EngineDetails details = SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(SEC_Launcher_EngineDetails,
+                                             SEC_ArgumentHandler_GetCount(),
+                                             SEC_ArgumentHandler_GetVector(),
+                                             SEC_Paths_GetLauncherDirectory(),
+                                             SEC_Paths_GetEngineDirectory(),
+                                             SEC_Paths_GetClientDirectory(),
+                                             configuration->unionVariables.data.engineBinary,
+                                             clientInitialize,
+                                             clientStart,
+                                             clientShutdown,
+                                             clientSupportsServer,
+                                             clientGetName,
+                                             clientGetEngineVersion
+                                         );
+    
+    SEC_Launcher_StartEngineResults results = SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(SEC_Launcher_StartEngineResults, SEC_BOOLEAN_TRUE);
+    
+    results.unionVariables.returnCode = configuration->unionVariables.data.Start(&details);
+    return results;
 }
 
 void SEC_Launcher_SetEnginePath(void) {

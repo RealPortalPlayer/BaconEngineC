@@ -110,12 +110,17 @@ int main(int argc, char** argv) {
 
     SEC_LOGGER_TRACE("Entering engine code\n");
 
-    int returnValue = SEC_LAUNCHER_START_ENGINE(configuration, argc, argv);
+    SEC_Launcher_StartEngineResults engineResults = SEC_Launcher_StartEngine(&configuration);
+
+    if (!engineResults.success) {
+        SEC_LOGGER_FATAL("Failed to start engine: %s\n", engineResults.unionVariables.errorMessage);
+        return 1;
+    }
 
     SEC_LOGGER_TRACE("Returned back to launcher\n");
     SEC_LOGGER_TRACE("Freeing binaries\n");
     SEC_PLATFORMSPECIFIC_CLOSE_BINARY(configuration.unionVariables.data.engineBinary);
     SEC_PLATFORMSPECIFIC_CLOSE_BINARY(configuration.unionVariables.data.clientBinary);
     SEC_LOGGER_INFO("Goodbye\n");
-    return returnValue;
+    return engineResults.unionVariables.returnCode;
 }

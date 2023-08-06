@@ -8,6 +8,7 @@
 #include <SharedEngineCode/Threads.h>
 #include <SharedEngineCode/Internal/PlatformSpecific.h>
 #include <SharedEngineCode/Paths.h>
+#include <SharedEngineCode/Launcher.h>
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <unistd.h>
@@ -113,13 +114,13 @@ BE_BINARYEXPORT const char* BE_EntryPoint_GetVersion(void) {
     return BE_ENGINE_VERSION;
 }
 
-BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const char* launcherPath, const char* enginePath, const char* clientPath, void* engineBinary, void* clientBinary, int argc, char** argv) {
+BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDetails* engineDetails) {
     static SEC_Boolean alreadyStarted = SEC_BOOLEAN_FALSE;
 
-    SEC_ArgumentHandler_Initialize(argc, argv);
-    SEC_Paths_SetLauncherPath(launcherPath);
-    SEC_Paths_SetEnginePath(enginePath);
-    SEC_Paths_SetClientPath(clientPath);
+    SEC_ArgumentHandler_Initialize(engineDetails->argc, engineDetails->argv);
+    SEC_Paths_SetLauncherPath(engineDetails->launcherPath);
+    SEC_Paths_SetEnginePath(engineDetails->enginePath);
+    SEC_Paths_SetClientPath(engineDetails->clientPath);
     BE_STRICTMODE_CHECK(!alreadyStarted, 1, "Reinitializing the engine is not supported\n");
     SEC_LOGGER_TRACE("Entered engine code\n");
 
@@ -130,62 +131,24 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const char* launcherPath, con
     signal(SIGSEGV, BE_EntryPoint_SignalDetected);
 #endif
 
-    SEC_LOGGER_DEBUG("Getting client interface initializer\n");
-
-    {
-        typedef void (*ClientInitialize)(const char*, const char*, const char*, void*, int, char**);
-
-        ClientInitialize initialize;
-
-        SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(ClientInitialize, initialize, SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_InitializeWrapper"));
-
-        if (initialize == NULL) {
-            SEC_LOGGER_FATAL("Unable to find interface initializer\n");
-
-            const char* errorMessage = NULL;
-
-            SEC_PLATFORMSPECIFIC_GET_ERROR(errorMessage);
-            SEC_LOGGER_FATAL("%s\n", errorMessage);
-            abort();
-        }
-
-        initialize(launcherPath, enginePath, clientPath, engineBinary, argc, argv);
-    }
-
-    SEC_LOGGER_DEBUG("Getting client functions\n");
-
-    typedef int (*ClientStart)(int, char**);
-    typedef int (*ClientShutdown)(void);
-    typedef SEC_Boolean (*ClientSupportsServer)(void);
-    typedef const char* (*ClientGetName)(void);
-    typedef const char* (*ClientGetEngineVersion)(void);
-
-    ClientStart start;
-    ClientShutdown shutdown;
-    ClientSupportsServer supportsServer;
-    ClientGetName getName;
-    ClientGetEngineVersion getEngineVersion;
-
-    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(ClientStart, start, SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Start"));
-    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(ClientShutdown, shutdown, SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Shutdown"));
-    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(ClientSupportsServer, supportsServer, SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_SupportsServer"));
-    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(ClientGetName, getName, SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName"));
-    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(ClientGetEngineVersion, getEngineVersion, SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetEngineVersion"));
+    SEC_LOGGER_DEBUG("Initializing client interface\n");
     
-    if (start == NULL)
+    engineDetails->clientInitialize(engineDetails->launcherPath, engineDetails->enginePath, engineDetails->clientPath, engineDetails->engineBinary, engineDetails->argc, engineDetails->argv);
+    
+    if (engineDetails->clientStart == NULL)
         SEC_LOGGER_DEBUG("Client has no start function\n");
 
-    if (shutdown == NULL)
+    if (engineDetails->clientShutdown == NULL)
         SEC_LOGGER_DEBUG("Client has no shutdown function\n");
 
-    if (supportsServer == NULL)
+    if (engineDetails->clientSupportsServer == NULL)
         SEC_LOGGER_DEBUG("Client doesn't specify if it supports servers, assuming it doesn't\n");
 
-    if (getName == NULL)
+    if (engineDetails->clientGetName == NULL)
         SEC_LOGGER_DEBUG("Client doesn't specify a name, defaulting to nothing\n");
 
     {
-        const char* clientEngineVersion = getEngineVersion != NULL ? getEngineVersion() : BE_ENGINE_VERSION;
+        const char* clientEngineVersion = engineDetails->clientGetEngineVersion != NULL ? engineDetails->clientGetEngineVersion() : BE_ENGINE_VERSION;
 
         if (strcmp(clientEngineVersion, BE_ENGINE_VERSION) == 0)
             SEC_LOGGER_INFO("Starting BaconEngine %s\n", BE_ENGINE_VERSION);
@@ -193,7 +156,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const char* launcherPath, con
             SEC_LOGGER_INFO("Starting BaconEngine %s (client was compiled with %s)\n", BE_ENGINE_VERSION, clientEngineVersion);
     }
 
-    if (BE_ClientInformation_IsServerModeEnabled() && (supportsServer == NULL || !supportsServer())) {
+    if (BE_ClientInformation_IsServerModeEnabled() && (engineDetails->clientSupportsServer == NULL || !engineDetails->clientSupportsServer())) {
         SEC_LOGGER_FATAL("Client does not support servers\n");
         return 1;
     }
@@ -238,12 +201,12 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const char* launcherPath, con
             }
         }
 
-        BE_PrivateWindow_Initialize(getName != NULL ? getName() : "", SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, (unsigned) width, (unsigned) height));
+        BE_PrivateWindow_Initialize(engineDetails->clientGetName != NULL ? engineDetails->clientGetName() : "", SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, (unsigned) width, (unsigned) height));
     }
 
     BE_PrivateUI_Initialize();
     BE_PrivateConsole_Initialize();
-    BE_ASSERT(start == NULL || start(argc, argv) == 0, "Client start returned non-zero\n");
+    BE_ASSERT(engineDetails->clientStart == NULL || engineDetails->clientStart(engineDetails->argc, engineDetails->argv) == 0, "Client start returned non-zero\n");
 
     {
         const char* preParsedExitCode = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_EXIT, 0);
@@ -293,7 +256,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const char* launcherPath, con
     }
 
     SEC_LOGGER_TRACE("Client loop ended, shutting down\n");
-    BE_ASSERT(shutdown == NULL || shutdown() == 0, "Client shutdown returned non-zero\n");
+    BE_ASSERT(engineDetails->clientShutdown == NULL || engineDetails->clientShutdown() == 0, "Client shutdown returned non-zero\n");
     SEC_LOGGER_INFO("Waiting for thread shutdown (press CTRL+C if frozen)\n");
     SEC_Thread_Join(commandThread);
     SEC_LOGGER_DEBUG("Command thread ended\n");

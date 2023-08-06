@@ -13,6 +13,16 @@
 #   include <Windows.h>
 #endif
 
+// TODO: Find a way to make it so the developers don't need to declare these
+//       That's probably impossible, though
+
+void I_EntryPoint_InitializeWrapper(const char*, const char*, const char*, void*, int, char**);
+const char* I_EntryPoint_GetEngineVersion(void);
+int I_EntryPoint_Start(int, char**);
+int I_EntryPoint_Shutdown(void);
+SEC_Boolean I_EntryPoint_SupportsServer(void);
+const char* I_EntryPoint_GetName(void);
+
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 int main(int argc, char** argv) {
     SEC_ArgumentHandler_Initialize(argc, argv);
@@ -25,6 +35,7 @@ int main(int argc, char** argv) {
     
     SEC_Launcher_SetLauncherPath();
     SEC_Launcher_SetEnginePath();
+    SEC_Paths_SetClientPath(SEC_Paths_GetLauncherDirectory());
     SEC_Launcher_InitializeEngine(&configuration);
 
     if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_VERSION, SEC_BUILTINARGUMENTS_VERSION_SHORT, 0)) {
@@ -79,12 +90,27 @@ int main(int argc, char** argv) {
         if (getName != NULL)
             SEC_LOGGER_INFO("Ready, starting: %s\n", getName());
         else
-            SEC_LOGGER_INFO("Ready, starting");
+            SEC_LOGGER_INFO("Ready, starting\n");
     }
     
     SEC_LOGGER_TRACE("Entering engine code\n");
 
-    int returnValue = configuration.unionVariables.data.Start(SEC_Paths_GetLauncherDirectory(), SEC_Paths_GetEngineDirectory(), SEC_Paths_GetLauncherDirectory(), configuration.unionVariables.data.engineBinary, configuration.unionVariables.data.clientBinary, argc, argv);
+    SEC_Launcher_EngineDetails engineDetails = {
+        argc,
+        argv,
+        SEC_Paths_GetLauncherDirectory(),
+        SEC_Paths_GetEngineDirectory(),
+        SEC_Paths_GetClientDirectory(),
+        configuration.unionVariables.data.engineBinary,
+        &I_EntryPoint_InitializeWrapper,
+        &I_EntryPoint_Start,
+        &I_EntryPoint_Shutdown,
+        &I_EntryPoint_SupportsServer,
+        &I_EntryPoint_GetName,
+        &I_EntryPoint_GetEngineVersion
+    };
+    
+    int returnValue = configuration.unionVariables.data.Start(&engineDetails);
 
     SEC_LOGGER_TRACE("Returned back to launcher\n");
     SEC_LOGGER_TRACE("Freeing engine binary\n");
