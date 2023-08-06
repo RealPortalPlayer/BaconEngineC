@@ -31,8 +31,10 @@ int main(int argc, char** argv) {
         SEC_LOGGER_INFO("Based on launcher version: %s\n", BE_LAUNCHER_VERSION);
         
         if (configuration.code == SEC_LAUNCHER_ERROR_CODE_NULL) {
-            const char* (*getVersion)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.engineBinary, "BE_EntryPoint_GetVersion");
+            const char* (*getVersion)(void);
 
+            SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(const char* (*)(void), getVersion, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.engineBinary, "BE_EntryPoint_GetVersion"));
+            
             if (getVersion != NULL)
                 SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "Engine version: %s\n", getVersion());
 
@@ -70,7 +72,9 @@ int main(int argc, char** argv) {
     configuration.unionVariables.data.clientBinary = SEC_PLATFORMSPECIFIC_GET_BINARY(NULL, RTLD_NOW);
 
     {
-        const char* (*getName)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.clientBinary, "I_EntryPoint_GetName");
+        const char* (*getName)(void);
+
+        SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(const char* (*)(void), getName, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.clientBinary, "I_EntryPoint_GetName"));
         
         if (getName != NULL)
             SEC_LOGGER_INFO("Ready, starting: %s\n", getName());

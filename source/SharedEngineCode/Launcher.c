@@ -25,7 +25,7 @@ void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration,
 
 const char* SEC_Launcher_GetDefaultHelpList(void) {
     return SEC_BUILTINARGUMENTS_HELP " (" SEC_BUILTINARGUMENTS_HELP_SHORT "): Shows information about each argument\n"
-#ifndef BACON_ENGINE_LAUNCHER
+#ifndef BE_STANDALONE_CLIENT
            SEC_BUILTINARGUMENTS_CLIENT " <path> (" SEC_BUILTINARGUMENTS_CLIENT_SHORT "): Specifies what client you want to run\n"
 #endif
            SEC_BUILTINARGUMENTS_SERVER " (" SEC_BUILTINARGUMENTS_SERVER_SHORT "): Starts the client as a server instance\n"
@@ -67,8 +67,7 @@ void SEC_Launcher_InitializeEngine(SEC_Launcher_Configuration* configuration) {
         return;
     }
 
-    configuration->unionVariables.data.Start = (int (*)(const char*, const char*, const char*, void*, void*, int, char**)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.engineBinary,
-                                                                                                                                                            "BE_EntryPoint_StartBaconEngine");
+    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(SEC_Launcher_ClientStart, configuration->unionVariables.data.Start, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.engineBinary, "BE_EntryPoint_StartBaconEngine"));
 
     if (configuration->unionVariables.data.Start != NULL)
         return;
@@ -91,7 +90,9 @@ void SEC_Launcher_InitializeClient(SEC_Launcher_Configuration* configuration) {
         return;
     }
     
-    const char* (*getName)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_GetName");
+    const char* (*getName)(void);
+
+    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(const char* (*)(void), getName, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_GetName"));
 
     configuration->unionVariables.data.clientName = getName != NULL ? getName() : "";
 }

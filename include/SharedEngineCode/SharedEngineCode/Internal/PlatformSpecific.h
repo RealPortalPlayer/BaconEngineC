@@ -21,7 +21,8 @@
 #       define SEC_PLATFORMSPECIFIC_BINARY_EXTENSION ".so"
 #   endif
 #   define SEC_PLATFORMSPECIFIC_CLOSE_BINARY(binary) dlclose(binary)
-#elif SEC_OPERATINGSYSTEM_WINDOWS
+#   define SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(type, variable, value) *(void**) &variable = value
+ #elif SEC_OPERATINGSYSTEM_WINDOWS
 #   include <Windows.h>
 #   include <direct.h>
 #   define SEC_PLATFORMSPECIFIC_CHANGE_DIRECTORY(directory) _chdir(directory)
@@ -35,4 +36,5 @@
     } while (0)
 #   define SEC_PLATFORMSPECIFIC_BINARY_EXTENSION ".dll"
 #   define SEC_PLATFORMSPECIFIC_CLOSE_BINARY(binary) FreeLibrary(binary)
+#   define SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(type, variable, value) variable = (type) value
 #endif

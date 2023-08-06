@@ -20,6 +20,8 @@ typedef enum {
     SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL // Errored attempting to load the entry point.
 } SEC_Launcher_ErrorCodes;
 
+typedef int (*SEC_Launcher_ClientStart)(const char*, const char*, const char*, void*, void*, int, char**);
+
 typedef struct SEC_Launcher_Configuration {
     SEC_Launcher_ErrorCodes code;
     union {
@@ -31,7 +33,7 @@ typedef struct SEC_Launcher_Configuration {
             const char* clientName;
             void* engineBinary;
             void* clientBinary;
-            int (*Start)(const char*, const char*, const char*, void*, void*, int, char**);
+            SEC_Launcher_ClientStart Start;
         } data;
     } unionVariables;
 } SEC_Launcher_Configuration;

@@ -137,11 +137,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const char* launcherPath, con
 
         ClientInitialize initialize;
 
-#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
-        *(void**) &initialize = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_InitializeWrapper");
-#elif SEC_OPERATINGSYSTEM_WINDOWS
-        initialize = (ClientInitialize) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_InitializeWrapper");
-#endif
+        SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(ClientInitialize, initialize, SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_InitializeWrapper"));
 
         if (initialize == NULL) {
             SEC_LOGGER_FATAL("Unable to find interface initializer\n");
@@ -170,20 +166,12 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const char* launcherPath, con
     ClientGetName getName;
     ClientGetEngineVersion getEngineVersion;
 
-#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
-    *(void**) &start = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Start");
-    *(void**) &shutdown = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Shutdown");
-    *(void**) &supportsServer = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_SupportsServer");
-    *(void**) &getName = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName");
-    *(void**) &getEngineVersion = SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetEngineVersion");
-#elif SEC_OPERATINGSYSTEM_WINDOWS
-    start = (ClientStart) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Start");
-    shutdown = (ClientShutdown) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Shutdown");
-    supportsServer = (ClientSupportsServer) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_SupportsServer");
-    getName = (ClientGetName) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName");
-    getEngineVersion = (ClientGetEngineVersion) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetEngineVersion");
-#endif
-
+    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(ClientStart, start, SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Start"));
+    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(ClientShutdown, shutdown, SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Shutdown"));
+    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(ClientSupportsServer, supportsServer, SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_SupportsServer"));
+    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(ClientGetName, getName, SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName"));
+    SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(ClientGetEngineVersion, getEngineVersion, SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetEngineVersion"));
+    
     if (start == NULL)
         SEC_LOGGER_DEBUG("Client has no start function\n");
 

@@ -16,7 +16,7 @@
     static returnType (*function)(__VA_ARGS__) = NULL; \
     if (function == NULL) {                      \
         SEC_LOGGER_DEBUG("Getting function from engine: %s\n", __func__); \
-        function = (returnType (*)(__VA_ARGS__)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(I_Engine_GetBinary(), __func__); \
+        SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(returnType (*)(__VA_ARGS__), function, SEC_PLATFORMSPECIFIC_GET_ADDRESS(I_Engine_GetBinary(), __func__)); \
         if (function == NULL) {                  \
             const char* errorMessage = NULL;     \
             SEC_PLATFORMSPECIFIC_GET_ERROR(errorMessage); \
@@ -26,5 +26,5 @@
             abort();                             \
         }                                        \
     }                                            \
-    function
+    (void) function
 #endif
