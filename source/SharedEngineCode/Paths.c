@@ -23,13 +23,18 @@ static SEC_Boolean SEC_Paths_IsAbsolute(const char* path) {
 }
 
 #define SEC_PATHS_GETDIRECTORY(path) \
-static char* createdPath = NULL;             \
-if (createdPath == NULL) {                   \
-    createdPath = SEC_String_Copy(secPathsLauncherDirectory); \
-    SEC_String_Append(&createdPath, "/");    \
-    SEC_String_Append(&createdPath, path);   \
-    SEC_String_Append(&createdPath, "/");    \
-}                                            \
+static char* createdPath = NULL;     \
+if (createdPath == NULL) {           \
+    if (!SEC_Paths_IsAbsolute(path)) { \
+        createdPath = SEC_String_Copy(secPathsLauncherDirectory); \
+        SEC_String_Append(&createdPath, "/"); \
+        SEC_String_Append(&createdPath, path); \
+        SEC_String_Append(&createdPath, "/"); \
+    } else {                         \
+        createdPath = SEC_String_Copy(path); \
+        SEC_String_Append(&createdPath, "/"); \
+    }                                \
+}                                    \
 return createdPath;
 
 const char* SEC_Paths_GetLauncherDirectory(void) {
