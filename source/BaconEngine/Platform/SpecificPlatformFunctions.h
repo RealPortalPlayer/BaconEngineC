@@ -8,6 +8,7 @@
 
 #include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
+#include <SharedEngineCode/String.h>
 
 #include "../AntiClientGuard.h"
 #include "BaconEngine/Math/Vector.h"

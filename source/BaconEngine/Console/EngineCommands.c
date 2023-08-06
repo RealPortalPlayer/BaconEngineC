@@ -231,7 +231,7 @@ void BE_EngineCommands_DebugInfo(void) {
                     "    UI: %zu allocated, %zu bytes\n"
                     "    DynamicArray: %zu allocated, %zu bytes\n"
                     "    Layer: %zu allocated, %zu bytes\n",
-                    BE_DeltaTime_GetSeconds(), BE_DeltaTime_GetMilliseconds(),
+                    BE_DeltaTime_GetSeconds(), BE_DeltaTime_GetMilliseconds(), // DeltaTime
                     BE_Console_GetCommandAmount(), BE_Console_GetAllocatedCommandsAmount(), BE_Console_GetCommandReallocationAmount(), // Command
                     BE_EngineLayers_GetUIWindowRenderCount(), BE_UI_GetWindowAmount(), BE_UI_GetAllocatedWindowsAmount(), BE_UI_GetWindowReallocationAmount(), // UI
                     BE_Layer_GetAmount(), BE_Layer_GetAllocatedLayersAmount(), BE_Layer_GetLayersReallocationAmount(), // Layer

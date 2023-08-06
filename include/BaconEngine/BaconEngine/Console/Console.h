@@ -7,6 +7,7 @@
 #pragma once
 
 #include <SharedEngineCode/Internal/CPlusPlusSupport.h>
+#include <SharedEngineCode/String.h>
 
 #include "Command.h"
 #include "BaconEngine/BinaryExport.h"

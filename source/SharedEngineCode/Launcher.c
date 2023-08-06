@@ -108,7 +108,7 @@ void SEC_Launcher_SetEnginePath(void) {
 
 void SEC_Launcher_SetLauncherPath(void) {
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
-    char directory[PATH_MAX];
+    static char directory[PATH_MAX];
     
     getcwd(directory, PATH_MAX);
 #else

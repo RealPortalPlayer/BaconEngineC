@@ -11,7 +11,7 @@
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 const char* BE_I18N_Translate(FILE* languageFile, const char* key) {
 #ifndef BE_CLIENT_BINARY
-    BE_STRICTMODE_CHECK(key[0] != '\0', key, "Key cannot be empty\n");
+    BE_STRICTMODE_CHECK(strlen(key) != 0, key, "Key cannot be empty\n");
     BE_STRICTMODE_CHECK(languageFile != NULL, key, "Language file cannot be null\n");
 
     //char* line = NULL;

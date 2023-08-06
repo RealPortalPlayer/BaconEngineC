@@ -15,6 +15,7 @@
 #include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
 #include <SharedEngineCode/Internal/OperatingSystem.h>
+#include <SharedEngineCode/String.h>
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   define I_BINARYEXPORT __attribute__((visibility("default")))

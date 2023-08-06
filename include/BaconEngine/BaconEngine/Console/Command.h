@@ -8,6 +8,7 @@
 
 #include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
+#include <SharedEngineCode/String.h>
 
 #include "BaconEngine/Storage/DynamicDictionary.h"
 #include "ArgumentManager.h"
@@ -33,7 +34,7 @@ typedef struct { // TODO: Client
 } BE_Command_Context;
 
 typedef struct {
-    const char* name;
+    char* name;
     SEC_Boolean required;
 } BE_Command_Argument;
 

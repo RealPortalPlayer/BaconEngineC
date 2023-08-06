@@ -9,6 +9,7 @@
 #include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <stddef.h>
 #include <SharedEngineCode/Internal/Boolean.h>
+#include <SharedEngineCode/String.h>
 
 #include "BaconEngine/BinaryExport.h"
 #include "BaconEngine/Storage/DynamicDictionary.h"

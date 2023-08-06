@@ -34,7 +34,7 @@ static int BE_Layer_NoOperation(void) {
 
 static BE_Layer_Internal* BE_Layer_InternalGet(const char* name) {
     for (int i = 0; i < (int) beLayerArray.used; i++) {
-        if (strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->name, name) != 0)
+        if (!SEC_String_Equals(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->name, name, SEC_BOOLEAN_FALSE))
             continue;
 
         return beLayerArray.internalArray[i];
@@ -65,7 +65,7 @@ void BE_Layer_Register(const char* name, SEC_Boolean enabled, BE_Layer_Functions
         return;
 
     for (int i = 0; i < (int) beLayerArray.used; i++)
-        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->name, name) != 0, "The layer '%s' is already registered\n", name);
+        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!SEC_String_Equals(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->name, name, SEC_BOOLEAN_FALSE), "The layer '%s' is already registered\n", name);
 
     BE_Layer_Internal* layer = (BE_Layer_Internal*) BE_EngineMemory_AllocateMemory(sizeof(BE_Layer_Internal), BE_ENGINEMEMORY_MEMORY_TYPE_LAYER);
 

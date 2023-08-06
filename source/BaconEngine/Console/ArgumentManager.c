@@ -3,25 +3,24 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <SharedEngineCode/StringExtension.h>
 
 #include "BaconEngine/Console/ArgumentManager.h"
 #include "../InterfaceFunctions.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
-static int BE_ArgumentManager_EqualsStringBoolean(char* value) {
-    if (SEC_StringExtension_CompareCaseless(value, "true") == 0)
+static int BE_ArgumentManager_EqualsStringBoolean(const char* value) {
+    if (SEC_String_Equals(value, "true", SEC_BOOLEAN_TRUE))
         return 2;
 
-    return SEC_StringExtension_CompareCaseless(value, "false") == 0 ? 1 : 0;
+    return SEC_String_Equals(value, "false", SEC_BOOLEAN_TRUE) ? 1 : 0;
 }
 #endif
 
 int BE_ArgumentManager_GetInteger(BE_DynamicDictionary arguments, const char* name, int defaultValue) {
 #ifndef BE_CLIENT_BINARY
     if (arguments.keys.size != 0) {
-        char* value = (char*) BE_ArgumentManager_GetString(arguments, name, "");
+        const char* value = BE_ArgumentManager_GetString(arguments, name, "");
         {
             int parsedValue = BE_ArgumentManager_EqualsStringBoolean(value);
 
@@ -30,7 +29,7 @@ int BE_ArgumentManager_GetInteger(BE_DynamicDictionary arguments, const char* na
         }
 
         char* errored;
-        int parsedValue = (int) strtol(value, &errored, 0); // FIXME: This isn't a good idea.
+        int parsedValue = (int) strtol(value, &errored, 0);
 
         if (errored == NULL || strlen(errored) == 0)
             return parsedValue;
@@ -55,7 +54,7 @@ SEC_Boolean BE_ArgumentManager_GetBoolean(BE_DynamicDictionary arguments, const 
 float BE_ArgumentManager_GetFloat(BE_DynamicDictionary arguments, const char* name, float defaultValue) {
 #ifndef BE_CLIENT_BINARY
     if (arguments.keys.size != 0) {
-        char* value = (char*) BE_ArgumentManager_GetString(arguments, name, "");
+        const char* value = BE_ArgumentManager_GetString(arguments, name, "");
         {
             int parsedValue = BE_ArgumentManager_EqualsStringBoolean(value);
 
@@ -79,8 +78,7 @@ float BE_ArgumentManager_GetFloat(BE_DynamicDictionary arguments, const char* na
 
 const char* BE_ArgumentManager_GetString(BE_DynamicDictionary arguments, const char* name, const char* defaultValue) {
 #ifndef BE_CLIENT_BINARY
-    const char* value = BE_DynamicDictionary_GetElementValueViaKey(arguments, (void *) name,
-                                                                   sizeof(char) * strlen(name) + 1);
+    const char* value = BE_DynamicDictionary_GetElementValueViaKey(arguments, (void*) name, sizeof(char));
 
     return value != NULL ? value : defaultValue;
 #else

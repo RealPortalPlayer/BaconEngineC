@@ -17,14 +17,14 @@ typedef struct {
      * no matter what.
      * Short arguments has a higher priority than normal arguments.
      */
-    char** value;
+    const char** value;
 
     /**
      * Same for value, but for the indexes instead.
      */
     int* index;
-    char* argumentValue;
-    char* shortValue;
+    const char* argumentValue;
+    const char* shortValue;
     int argumentIndex;
     int shortIndex;
 } SEC_ArgumentHandler_ShortResults;
@@ -41,7 +41,7 @@ int SEC_ArgumentHandler_GetIndex(const char* argument, SEC_Boolean ignoreDontPar
 /**
   * @return The value next to the argument if found, NULL if not.
   */
-char* SEC_ArgumentHandler_GetValue(const char* argument, SEC_Boolean ignoreDontParse);
+const char* SEC_ArgumentHandler_GetValue(const char* argument, SEC_Boolean ignoreDontParse);
 
 int SEC_ArgumentHandler_GetInformationWithShort(const char* argument, const char* shortArgument, SEC_Boolean ignoreDontParse,
                                                 SEC_ArgumentHandler_ShortResults* results);

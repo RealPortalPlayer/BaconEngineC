@@ -176,7 +176,7 @@ void BE_Command_AddArgument(const char* name, SEC_Boolean required) {
 
     BE_Command_Argument* argument = BE_EngineMemory_AllocateMemory(sizeof(BE_Command_Argument), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
 
-    argument->name = name;
+    argument->name = SEC_String_Copy(name);
     argument->required = required;
 
     BE_DynamicArray_AddElementToLast(&command->arguments, (void*) argument);
@@ -206,6 +206,7 @@ void BE_Command_DuplicatePrevious(const char* name, const char* description) {
 #endif
 }
 
+// TODO: Make use of the new SEC_String functions
 void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 #ifndef BE_CLIENT_BINARY
     // Do not put any logs outside an if check.
@@ -337,7 +338,6 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
             escaped = SEC_BOOLEAN_FALSE;
         }
 
-        // FIXME: This doesn't trigger at times when it probably should
         if (quotePosition != -1) {
             SEC_LOGGER_ERROR("Parsing error: unescaped %s quote at %i\n", doubleQuote ? "double" : "single", quotePosition);
             goto destroy;
@@ -391,7 +391,6 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         }
 
         if (requiredArguments > arguments.keys.used) {
-            // TODO: Run help command automatically
             SEC_LOGGER_ERROR("Help: (not enough arguments)\n"
                              "    %s Command:\n", BE_Console_IsEngineCommand(*command) ? "Engine" : "Client");
             BE_EngineCommands_HelpPrint(command);

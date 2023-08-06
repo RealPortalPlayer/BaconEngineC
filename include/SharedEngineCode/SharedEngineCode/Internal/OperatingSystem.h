@@ -1,7 +1,7 @@
 // Purpose: OS specific definitions.
 // Created on: 4/1/22 @ 7:25 PM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
@@ -71,7 +71,7 @@
 #   undef SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   define SEC_OPERATINGSYSTEM_SERENITY 1
 #   define SEC_OPERATINGSYSTEM_POSIX_COMPLIANT 1
-#   define SEC_OPERATINGSYSTEM_NAME "Serenity OS"
+#   define SEC_OPERATINGSYSTEM_NAME "SerenityOS"
 #elif defined(__unix__)
 #   undef SEC_OPERATINGSYSTEM_UNIX
 #   undef SEC_OPERATINGSYSTEM_POSIX_COMPLIANT

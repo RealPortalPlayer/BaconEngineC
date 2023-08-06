@@ -8,6 +8,7 @@
 
 #include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <stdio.h>
+#include <SharedEngineCode/String.h>
 
 #include "BinaryExport.h"
 

@@ -46,7 +46,7 @@ int SEC_ArgumentHandler_GetIndex(const char* argument, int ignoreDontParse) {
     return ignoreDontParse || dontParse == -1 || index < dontParse ? index : -1;
 }
 
-char* SEC_ArgumentHandler_GetValue(const char* argument, int ignoreDontParse) {
+const char* SEC_ArgumentHandler_GetValue(const char* argument, int ignoreDontParse) {
     int index = SEC_ArgumentHandler_GetIndex(argument, ignoreDontParse);
 
     return index != -1 && index != secArgumentHandlerAddedArgumentsCount - 1 ? secArgumentHandlerArgumentVector[index + 1] : NULL;
