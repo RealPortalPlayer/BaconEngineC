@@ -56,6 +56,7 @@ const char* SEC_Paths_GetEngineBinaryPath(void) {
     
     if (binaryPath == NULL) {
         binaryPath = malloc(sizeof(char));
+        binaryPath[0] = '\0';
         
         SEC_Paths_GetItemInsideEngineDirectory(&binaryPath, "BaconEngine" SEC_PLATFORMSPECIFIC_BINARY_EXTENSION);
     }
@@ -68,6 +69,7 @@ const char* SEC_Paths_GetClientBinaryPath(void) {
 
     if (binaryPath == NULL) {
         binaryPath = malloc(sizeof(char));
+        binaryPath[0] = '\0';
 
         SEC_Paths_GetItemInsideClientDirectory(&binaryPath, "Binary" SEC_PLATFORMSPECIFIC_BINARY_EXTENSION);
     }
