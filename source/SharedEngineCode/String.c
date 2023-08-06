@@ -1,6 +1,12 @@
 // Copyright (c) 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
+#include "SharedEngineCode/Internal/OperatingSystem.h"
+
+#if SEC_OPERATINGSYSTEM_WINDOWS
+#   include <Windows.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -61,7 +67,7 @@ SEC_Boolean SEC_String_StartsWith(const char* string, const char* compare, SEC_B
     if (stringLength < compareLength)
         return SEC_BOOLEAN_FALSE;
 
-    for (int i = 0; i < compareLength; i++) {
+    for (size_t i = 0; i < compareLength; i++) {
         char character1 = string[i];
         char character2 = compare[i];
 
@@ -119,14 +125,14 @@ SEC_Boolean SEC_String_EndsWith(const char* string, const char* compare, SEC_Boo
 }
 
 char* SEC_String_ToLower(char* string) {
-    for (int i = 0; i < strlen(string); i++)
+    for (size_t i = 0; i < strlen(string); i++)
         string[i] = (char) tolower(string[i]);
     
     return string;
 }
 
 char* SEC_String_ToUpper(char* string) {
-    for (int i = 0; i < strlen(string); i++)
+    for (size_t i = 0; i < strlen(string); i++)
         string[i] = (char) toupper(string[i]);
     
     return string;
@@ -144,7 +150,7 @@ SEC_Boolean SEC_String_Contains(const char* string, const char* compare, SEC_Boo
     SEC_Boolean started = SEC_BOOLEAN_FALSE;
     size_t compareIndex = 0;
 
-    for (int i = 0; i < stringLength; i++) {
+    for (size_t i = 0; i < stringLength; i++) {
         char character1 = string[i];
         char character2 = compare[compareIndex];
 
@@ -175,7 +181,7 @@ SEC_Boolean SEC_String_Equals(const char* string, const char* compare, SEC_Boole
     if (!caseless)
         return strcmp(string, compare) == 0;
 
-    int i = 0;
+    size_t i = 0;
     size_t compareLength = strlen(compare);
     
     for (; i < strlen(string); i++) {
