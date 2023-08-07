@@ -35,7 +35,7 @@ static int SEC_ArgumentHandler_GetArgumentIndexImplementation(const char* argume
     return -1;
 }
 
-int SEC_ArgumentHandler_GetIndex(const char* argument, int ignoreDontParse) {
+int SEC_ArgumentHandler_GetIndex(const char* argument, SEC_Boolean ignoreDontParse) {
     static int dontParse = -2;
 
     if (dontParse == -2)
@@ -76,7 +76,7 @@ int SEC_ArgumentHandler_GetInformationWithShort(const char* argument, const char
     return returnResult;
 }
 
-int SEC_ArgumentHandler_ContainsArgumentOrShort(const char* argument, const char* shortArgument, int ignoreDontParse) {
+int SEC_ArgumentHandler_ContainsArgumentOrShort(const char* argument, const char* shortArgument, SEC_Boolean ignoreDontParse) {
     return SEC_ArgumentHandler_GetIndex(argument, ignoreDontParse) != -1 ||
            SEC_ArgumentHandler_GetIndex(shortArgument, ignoreDontParse) != -1;
 }
