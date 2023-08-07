@@ -38,22 +38,20 @@ char* SEC_String_Append(char** target, const char* stringToAppend) {
 
 char* SEC_String_Prepend(char** target, const char* stringToPrepend) {
     size_t targetLength = strlen(*target);
-    char* oldString = malloc(sizeof(char) * (targetLength + 1));
-
-    if (oldString == NULL)
+    size_t stringToPrependLength = strlen(stringToPrepend);
+    char* reallocatedString = realloc(*target, sizeof(char) * (targetLength + stringToPrependLength));
+    
+    if (reallocatedString == NULL)
         return NULL;
+    
+    *target = reallocatedString;
 
-    strcpy(oldString, *target);
-    free(*target);
+    for (size_t i = targetLength; i > 0 ; i--)
+        (*target)[i + stringToPrependLength - 1] = (*target)[i - 1];
 
-    *target = malloc(sizeof(char) * (targetLength + strlen(stringToPrepend) + 1));
-
-    if (*target == NULL)
-        return NULL;
-
-    strcpy(*target, stringToPrepend);
-    strcat(*target, oldString);
-    free(oldString);
+    memcpy(*target, stringToPrepend, stringToPrependLength);
+    
+    (*target)[targetLength + stringToPrependLength] = 0;
     return *target;
 }
 
@@ -209,24 +207,18 @@ char* SEC_String_AppendCharacter(char** target, char character) {
 
 char* SEC_String_PrependCharacter(char** target, char character) {
     size_t targetLength = strlen(*target);
-    char* oldString = malloc(sizeof(char) * (targetLength + 1));
+    char* reallocatedString = realloc(*target, sizeof(char) * (targetLength + 1));
     
-    if (oldString == NULL)
+    if (reallocatedString == NULL)
         return NULL;
-
-    strcpy(oldString, *target);
-    free(*target);
     
-    *target = malloc(sizeof(char) * (targetLength + 1));
-    
-    if (*target == NULL)
-        return NULL;
+    *target = reallocatedString;
 
-    memset(*target, 0, targetLength + 1);
-    
-    *target[0] = character;
+    for (size_t i = targetLength; i > 0 ; i--)
+        (*target)[i] = (*target)[i - 1];
 
-    strcat(*target, oldString);
+    (*target)[0] = character;
+    (*target)[targetLength + 1] = 0;
     return *target;
 }
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()

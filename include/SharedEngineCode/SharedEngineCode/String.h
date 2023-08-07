@@ -30,12 +30,21 @@ char* SEC_String_Append(char** target, const char* stringToAppend);
 /**
  * @return The string target
  * @note Returns NULL if it fails to allocate memory
- * @warning This function assumes you used malloc
  */
 char* SEC_String_Prepend(char** target, const char* stringToPrepend);
 
 char* SEC_String_ToLower(char* string);
 char* SEC_String_ToUpper(char* string);
+
+/**
+ * @return The string target
+ * @note Returns NULL if it fails to allocate memory
+ */
 char* SEC_String_AppendCharacter(char** target, char character);
+
+/**
+ * @return The string target
+ * @note Returns NULL if it fails to allocate memory
+ */
 char* SEC_String_PrependCharacter(char** target, char character);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()
