@@ -210,7 +210,6 @@ void BE_Command_DuplicatePrevious(const char* name, const char* description) {
 #endif
 }
 
-// TODO: Make use of the new SEC_String functions
 void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 #ifndef BE_CLIENT_BINARY
     // Do not put any logs outside an if check.
@@ -219,20 +218,20 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
     if (input == NULL || input[0] == '\0')
         return;
 
-    char name[BE_COMMAND_MAX_NAME_LENGTH];
+    char* name = BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
     BE_Command* command = NULL;
     BE_DynamicDictionary arguments;
     size_t inputLength = strlen(input);
-
+    
+    name[0] = 0;
+    
     BE_PrivateDynamicDictionary_Create(&arguments, 20);
-    memset(name, 0, BE_COMMAND_MAX_NAME_LENGTH);
 
     int index;
     int argumentStartingIndex;
 
     {
         SEC_Boolean trimmed = SEC_BOOLEAN_FALSE;
-        int writer = 0;
 
         for (index = 0; index < (int) inputLength; index++) {
             if (input[index] == ' ') {
@@ -242,12 +241,11 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
                 index++;
                 break;
             }
-
-            if (index >= BE_COMMAND_MAX_NAME_LENGTH)
-                break;
-
+            
             trimmed = SEC_BOOLEAN_TRUE;
-            name[writer++] = input[index];
+
+            SEC_String_AppendCharacter(&name, input[index]);
+            BE_EngineMemory_AddSize(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
         }
     }
 
@@ -260,8 +258,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
     }
 
     if (command->arguments.used != 0) {
-        // TODO: This is dumb, figure out a way to do this without allocating memory.
-        char* argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char) * BE_CONSOLE_MAX_ARGUMENT_LENGTH, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+        char* argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
         int current = 0;
         int quotePosition = -1;
         SEC_Boolean doubleQuote = SEC_BOOLEAN_FALSE;
@@ -270,13 +267,13 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         SEC_Boolean trimmed = SEC_BOOLEAN_FALSE;
         SEC_Boolean quoteAdded = SEC_BOOLEAN_FALSE;
 
-        memset(argument, 0, BE_CONSOLE_MAX_ARGUMENT_LENGTH);
+        argument[0] = 0;
 
-        for (int writer = 0; index < (int) inputLength && current < command->arguments.used; index++) {
+        for (; index < (int) inputLength && current < command->arguments.used; index++) {
             if (added) {
                 argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char) * BE_CONSOLE_MAX_ARGUMENT_LENGTH, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
 
-                memset(argument, 0, BE_CONSOLE_MAX_ARGUMENT_LENGTH);
+                argument[0] = 0;
             }
 
             added = SEC_BOOLEAN_FALSE;
@@ -286,19 +283,14 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
             quoteAdded = SEC_BOOLEAN_FALSE;
 
-            if (writer >= BE_CONSOLE_MAX_ARGUMENT_LENGTH) {
+            if (input[index] == ' ' && trimmed && quotePosition == -1 && !escaped) {
                 publish_argument:
-                writer = 0;
-
                 BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, current++)->name, argument);
 
                 added = SEC_BOOLEAN_TRUE;
                 trimmed = SEC_BOOLEAN_FALSE;
                 continue;
             }
-
-            if (input[index] == ' ' && trimmed && quotePosition == -1 && !escaped)
-                goto publish_argument;
 
             if (input[index] == '\\' && !escaped) {
                 escaped = SEC_BOOLEAN_TRUE;
@@ -336,7 +328,10 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
             }
 
             trimmed = SEC_BOOLEAN_TRUE;
-            argument[writer++] = input[index];
+
+            SEC_String_AppendCharacter(&argument, input[index]);
+            BE_EngineMemory_AddSize(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+            
             // TODO: Should we throw a parse error if someone tries to escape a normal character, or should we just assume they meant to use a backslash
             escaped = SEC_BOOLEAN_FALSE;
         }
@@ -359,7 +354,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
             }
 
             if (!added)
-                BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * BE_CONSOLE_MAX_ARGUMENT_LENGTH, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+                BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * (strlen(argument) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
         }
     }
 
@@ -404,8 +399,10 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
     command->Run(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Command_Context, input, input + argumentStartingIndex, arguments));
 
     destroy:
+    BE_EngineMemory_DeallocateMemory(name, sizeof(char) * (strlen(name) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+    
     for (int argumentId = 0; argumentId < arguments.keys.used; argumentId++)
-        BE_EngineMemory_DeallocateMemory(arguments.values.internalArray[argumentId], sizeof(char) * BE_CONSOLE_MAX_ARGUMENT_LENGTH, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+        BE_EngineMemory_DeallocateMemory(arguments.values.internalArray[argumentId], sizeof(char) * (strlen(arguments.values.internalArray[argumentId]) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
 
     BE_EngineMemory_DeallocateMemory(arguments.keys.internalArray, sizeof(void*) * arguments.keys.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
     BE_EngineMemory_DeallocateMemory(arguments.values.internalArray, sizeof(void*) * arguments.keys.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);

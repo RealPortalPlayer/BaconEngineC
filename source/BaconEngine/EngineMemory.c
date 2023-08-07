@@ -95,8 +95,7 @@ void* BE_EngineMemory_ReallocateMemory(void* pointer, size_t oldSize, size_t new
 }
 
 void BE_EngineMemory_DeallocateMemory(void* pointer, size_t oldSize, BE_EngineMemory_MemoryType memoryType) {
-    BE_EngineMemory_MemoryTypeInformation* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(
-            memoryType);
+    BE_EngineMemory_MemoryTypeInformation* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(memoryType);
 
     if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
         SEC_LOGGER_TRACE("Deallocating memory\n"
@@ -109,5 +108,23 @@ void BE_EngineMemory_DeallocateMemory(void* pointer, size_t oldSize, BE_EngineMe
 
     memoryTypeInformation->allocatedBytes -= oldSize;
     memoryTypeInformation->allocatedAmount--;
+}
+
+void BE_EngineMemory_AddSize(size_t size, BE_EngineMemory_MemoryType memoryType) {
+    if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
+        SEC_LOGGER_TRACE("Adding to allocated bytes\n"
+                         "Size: %zu\n"
+                         "Type: %i\n", size, memoryType);
+    
+    BE_EngineMemory_GetMemoryTypeInformation(memoryType)->allocatedBytes += size;
+}
+
+void BE_EngineMemory_RemoveSize(size_t size, BE_EngineMemory_MemoryType memoryType) {
+    if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
+        SEC_LOGGER_TRACE("Removing from allocated bytes\n"
+                         "Size: %zu\n"
+                         "Type: %i\n", size, memoryType);
+    
+    BE_EngineMemory_GetMemoryTypeInformation(memoryType)->allocatedBytes -= size;
 }
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()
