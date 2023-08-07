@@ -175,6 +175,27 @@ SEC_Boolean SEC_String_Contains(const char* string, const char* compare, SEC_Boo
     return started;
 }
 
+SEC_Boolean SEC_String_ContainsCharacter(const char* string, char compare, SEC_Boolean caseless) {
+    size_t stringLength = strlen(string);
+    
+    if (stringLength == 0)
+        return SEC_BOOLEAN_FALSE;
+
+    for (size_t i = 0; i < stringLength; i++) {
+        char character = string[i];
+        
+        if (caseless)
+            character = (char) tolower(character);
+        
+        if (character != compare)
+            continue;
+
+        return SEC_BOOLEAN_TRUE;
+    }
+    
+    return SEC_BOOLEAN_FALSE;
+}
+
 SEC_Boolean SEC_String_Equals(const char* string, const char* compare, SEC_Boolean caseless) {
     if (!caseless)
         return strcmp(string, compare) == 0;

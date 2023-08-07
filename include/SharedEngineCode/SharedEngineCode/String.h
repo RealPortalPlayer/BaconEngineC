@@ -15,6 +15,7 @@ SEC_Boolean SEC_String_Contains(const char* string, const char* compare, SEC_Boo
 SEC_Boolean SEC_String_Equals(const char* string, const char* compare, SEC_Boolean caseless);
 SEC_Boolean SEC_String_StartsWith(const char* string, const char* compare, SEC_Boolean caseless);
 SEC_Boolean SEC_String_EndsWith(const char* string, const char* compare, SEC_Boolean caseless);
+SEC_Boolean SEC_String_ContainsCharacter(const char* string, char compare, SEC_Boolean caseless);
 
 /**
  * @note Returns NULL if it fails to allocate memory
