@@ -11,6 +11,11 @@
 #include "Internal/Boolean.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+SEC_Boolean SEC_String_Contains(const char* string, const char* compare, SEC_Boolean caseless);
+SEC_Boolean SEC_String_Equals(const char* string, const char* compare, SEC_Boolean caseless);
+SEC_Boolean SEC_String_StartsWith(const char* string, const char* compare, SEC_Boolean caseless);
+SEC_Boolean SEC_String_EndsWith(const char* string, const char* compare, SEC_Boolean caseless);
+
 /**
  * @note Returns NULL if it fails to allocate memory
  */
@@ -29,10 +34,8 @@ char* SEC_String_Append(char** target, const char* stringToAppend);
  */
 char* SEC_String_Prepend(char** target, const char* stringToPrepend);
 
-SEC_Boolean SEC_String_StartsWith(const char* string, const char* compare, SEC_Boolean caseless);
-SEC_Boolean SEC_String_EndsWith(const char* string, const char* compare, SEC_Boolean caseless);
 char* SEC_String_ToLower(char* string);
 char* SEC_String_ToUpper(char* string);
-SEC_Boolean SEC_String_Contains(const char* string, const char* compare, SEC_Boolean caseless);
-SEC_Boolean SEC_String_Equals(const char* string, const char* compare, SEC_Boolean caseless);
+char* SEC_String_AppendCharacter(char** target, char character);
+char* SEC_String_PrependCharacter(char** target, char character);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()

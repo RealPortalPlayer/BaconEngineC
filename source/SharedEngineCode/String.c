@@ -37,8 +37,8 @@ char* SEC_String_Append(char** target, const char* stringToAppend) {
 }
 
 char* SEC_String_Prepend(char** target, const char* stringToPrepend) {
-    size_t finalLength = strlen(*target) + strlen(stringToPrepend);
-    char* oldString = malloc(sizeof(char) * (strlen(*target) + 1));
+    size_t targetLength = strlen(*target);
+    char* oldString = malloc(sizeof(char) * (targetLength + 1));
 
     if (oldString == NULL)
         return NULL;
@@ -46,7 +46,7 @@ char* SEC_String_Prepend(char** target, const char* stringToPrepend) {
     strcpy(oldString, *target);
     free(*target);
 
-    *target = malloc(sizeof(char) * (finalLength + 1));
+    *target = malloc(sizeof(char) * (targetLength + strlen(stringToPrepend) + 1));
 
     if (*target == NULL)
         return NULL;
@@ -192,5 +192,41 @@ SEC_Boolean SEC_String_Equals(const char* string, const char* compare, SEC_Boole
     }
 
     return i == compareLength;
+}
+
+char* SEC_String_AppendCharacter(char** target, char character) {
+    size_t targetLength = strlen(*target);
+    char* reallocatedString = realloc(*target, sizeof(char) * (targetLength + 1));
+    
+    if (reallocatedString == NULL)
+        return NULL;
+    
+    *target = reallocatedString;
+    (*target)[targetLength] = character;
+    (*target)[targetLength + 1] = 0;
+    return *target;
+}
+
+char* SEC_String_PrependCharacter(char** target, char character) {
+    size_t targetLength = strlen(*target);
+    char* oldString = malloc(sizeof(char) * (targetLength + 1));
+    
+    if (oldString == NULL)
+        return NULL;
+
+    strcpy(oldString, *target);
+    free(*target);
+    
+    *target = malloc(sizeof(char) * (targetLength + 1));
+    
+    if (*target == NULL)
+        return NULL;
+
+    memset(*target, 0, targetLength + 1);
+    
+    *target[0] = character;
+
+    strcat(*target, oldString);
+    return *target;
 }
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()
