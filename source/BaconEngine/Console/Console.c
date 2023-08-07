@@ -18,8 +18,6 @@
 #   include "../Storage/PrivateDynamicDictionary.h"
 #endif
 
-#define BE_CONSOLE_MAX_ARGUMENT_LENGTH 1024
-
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
 static BE_DynamicArray beConsolePrivateCommands;
@@ -119,8 +117,6 @@ void BE_PrivateConsole_Initialize(void) {
 
 void BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context)) {
 #ifndef BE_CLIENT_BINARY
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(strlen(name) < BE_COMMAND_MAX_NAME_LENGTH, "The command name '%s' is too long\n", name);
-    
     for (int i = 0; i < (int) beConsoleCommands.used; i++)
         BE_STRICTMODE_CHECK_NO_RETURN_VALUE(strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Command, beConsoleCommands, i)->name, name) != 0,
                             "The command '%s' is already registered\n", name);
@@ -271,7 +267,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
         for (; index < (int) inputLength && current < command->arguments.used; index++) {
             if (added) {
-                argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char) * BE_CONSOLE_MAX_ARGUMENT_LENGTH, BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+                argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
 
                 argument[0] = 0;
             }
