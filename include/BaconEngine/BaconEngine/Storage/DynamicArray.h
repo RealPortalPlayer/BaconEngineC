@@ -22,6 +22,11 @@ typedef struct {
     SEC_Boolean engineMade; // Do not edit, internal use only
 } BE_DynamicArray;
 
+/**
+ * @return The index if the element was found, -1 if not
+ */
+BE_BINARYEXPORT int BE_DynamicArray_GetIndexForElement(BE_DynamicArray* array, void* element, size_t elementSize);
+
 BE_BINARYEXPORT SEC_Boolean BE_DynamicArray_Create(BE_DynamicArray* array, size_t size);
 BE_BINARYEXPORT SEC_Boolean BE_DynamicArray_AddElementToStart(BE_DynamicArray* array, void* element);
 BE_BINARYEXPORT SEC_Boolean BE_DynamicArray_AddElementToLast(BE_DynamicArray* array, void* element);

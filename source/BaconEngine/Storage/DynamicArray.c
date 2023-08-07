@@ -34,6 +34,22 @@ static void BE_DynamicArray_ReallocateArray(BE_DynamicArray* array) {
 }
 #endif
 
+BE_BINARYEXPORT int BE_DynamicArray_GetIndexForElement(BE_DynamicArray* array, void* element, size_t elementSize) {
+#ifndef BE_CLIENT_BINARY
+    for (int i = 0; i < array->used; i++) {
+        if (memcmp(array->internalArray[i], element, elementSize) != 0)
+            continue;
+        
+        return i;
+    }
+
+    return -1;
+#else
+    BE_INTERFACEFUNCTION(int, BE_DynamicArray*, void*, size_t);
+    return function(array, element, elementSize);
+#endif
+}
+
 SEC_Boolean BE_DynamicArray_Create(BE_DynamicArray* array, size_t size) {
 #ifndef BE_CLIENT_BINARY
     BE_STRICTMODE_CHECK(size != 0, SEC_BOOLEAN_FALSE, "Invalid size\n");
@@ -140,21 +156,21 @@ SEC_Boolean BE_DynamicArray_RemoveElementAt(BE_DynamicArray* array, unsigned ind
 BE_BINARYEXPORT SEC_Boolean BE_DynamicArray_RemoveMatchedElement(BE_DynamicArray* array, void* element, size_t elementSize, SEC_Boolean repeat) {
 #ifndef BE_CLIENT_BINARY
     SEC_Boolean removedOne = SEC_BOOLEAN_FALSE;
-    
+
     for (int i = 0; i < array->used; i++) {
-        if (memcmp(array->internalArray[i], element, elementSize) != 0)
+        int elementId = BE_DynamicArray_GetIndexForElement(array, element, elementSize);
+
+        if (elementId == -1)
             continue;
 
         BE_DynamicArray_RemoveElementAt(array, i);
 
-        removedOne = SEC_BOOLEAN_TRUE;
-        
         if (repeat)
             continue;
-        
+
         return SEC_BOOLEAN_TRUE;
     }
-    
+
     return removedOne;
 #else
     BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicArray*, void*, size_t, SEC_Boolean);
