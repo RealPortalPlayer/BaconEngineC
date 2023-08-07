@@ -40,6 +40,11 @@ BE_BINARYEXPORT SEC_Boolean BE_DynamicArray_RemoveLastElement(BE_DynamicArray* a
   * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
   */
 BE_BINARYEXPORT SEC_Boolean BE_DynamicArray_RemoveElementAt(BE_DynamicArray* array, unsigned int index);
+
+/**
+  * @note This doesn't free any memory, you have to do that yourself to prevent memory leaks.
+  */
+BE_BINARYEXPORT SEC_Boolean BE_DynamicArray_RemoveMatchedElement(BE_DynamicArray* array, void* element, size_t elementSize, SEC_Boolean repeat);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()
 
 #define BE_DYNAMICARRAY_GET_ELEMENT_POINTER(type, array, index) ((type*) (array)->internalArray[(index)])
