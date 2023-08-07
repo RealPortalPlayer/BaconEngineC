@@ -14,8 +14,6 @@
 #include "ArgumentManager.h"
 #include "BaconEngine/BinaryExport.h"
 
-// TODO: Validate that none of the commands go over this limit.
-
 #define BE_COMMAND_MAX_NAME_LENGTH 1024
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()

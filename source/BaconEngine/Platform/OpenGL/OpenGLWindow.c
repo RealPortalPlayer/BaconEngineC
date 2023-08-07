@@ -316,12 +316,12 @@ const char* BE_OpenGLWindow_GetTitle(void) {
 }
 
 BE_Vector2_Unsigned BE_OpenGLWindow_GetSize(void) {
-    unsigned width;
-    unsigned height;
+    int width;
+    int height;
 
-    glfwGetWindowSize(window, (int*) &width, (int*) &height); // FIXME: Converting a unsigned pointer to a int pointer is undefined behaviour.
+    glfwGetWindowSize(window, &width, &height);
 
-    return SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, width, height);
+    return SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, (unsigned) width, (unsigned) height);
 }
 
 BE_Vector2_Integer BE_OpenGLWindow_GetPosition(void) {

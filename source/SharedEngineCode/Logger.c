@@ -25,7 +25,7 @@
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 static SEC_Logger_LogLevels secLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_INFO;
-static SEC_Thread_Lock secLoggerLock; // FIXME: This causes a memory leak
+static SEC_Thread_Lock secLoggerLock;
 
 SEC_Logger_LogLevels SEC_Logger_GetLogLevel(void) {
     return secLoggerCurrentLogLevel;

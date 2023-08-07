@@ -66,13 +66,20 @@ void BE_WindowsWindow_Create(const char* title, BE_Vector2_Unsigned size, int mo
 }
 
 const char* BE_WindowsWindow_GetTitle(void) {
-    char* title;
+    static char* title = NULL;
     int length = GetWindowTextLength(beWindowsWindowHandle);
 
-    // FIXME: Is this a memory leak?
-    title = VirtualAlloc(NULL, length + 1, MEM_COMMIT, PAGE_READWRITE);
+    {
+        char* newTitle = VirtualAlloc(NULL, length + 1, MEM_COMMIT, PAGE_READWRITE);
 
-    GetWindowText(beWindowsWindowHandle, title, length + 1);
+        GetWindowText(beWindowsWindowHandle, newTitle, length + 1);
+
+        if (title == NULL || strcmp(title, newTitle) != 0)
+            title = newTitle;
+        else
+            VirtualFree(newTitle, 0, MEM_RELEASE);
+    }
+    
 
     return title;
 }

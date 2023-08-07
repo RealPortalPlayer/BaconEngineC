@@ -33,7 +33,6 @@ static void BE_DynamicArray_ReallocateArray(BE_DynamicArray* array) {
 }
 #endif
 
-// TODO: Make a public one that does not use engine memory.
 SEC_Boolean BE_DynamicArray_Create(BE_DynamicArray* array, size_t size) {
 #ifndef BE_CLIENT_BINARY
     BE_STRICTMODE_CHECK(size != 0, SEC_BOOLEAN_FALSE, "Invalid size\n");
