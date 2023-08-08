@@ -25,5 +25,4 @@ void* BE_EngineMemory_ReallocateMemory(void* pointer, size_t oldSize, size_t new
 void BE_EngineMemory_DeallocateMemory(void* pointer, size_t oldSize, BE_EngineMemory_MemoryType memoryType);
 void BE_EngineMemory_AddSize(size_t size, BE_EngineMemory_MemoryType memoryType);
 void BE_EngineMemory_RemoveSize(size_t size, BE_EngineMemory_MemoryType memoryType);
-
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()

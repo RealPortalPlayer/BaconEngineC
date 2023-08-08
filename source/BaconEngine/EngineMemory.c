@@ -8,7 +8,7 @@
 #include "EngineMemory.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-BE_EngineMemory_MemoryInformation beEngineMemoryInformation = {
+BE_EngineMemoryInformation beEngineMemoryInformation = {
         {0, 0},
         {0, 0},
         {0, 0},
@@ -28,16 +28,16 @@ SEC_Boolean BE_EngineMemory_AllocateDeallocateLogsEnabled(void) {
 #endif
 }
 
-BE_EngineMemory_MemoryInformation BE_EngineMemory_GetMemoryInformation(void) {
+BE_EngineMemoryInformation BE_EngineMemoryInformation_Get(void) {
     return beEngineMemoryInformation;
 }
 
-size_t BE_EngineMemory_GetAllocatedBytes(void) {
+size_t BE_EngineMemoryInformation_GetAllocatedBytes(void) {
     return beEngineMemoryInformation.command.allocatedBytes + beEngineMemoryInformation.ui.allocatedBytes +
            beEngineMemoryInformation.dynamicArray.allocatedBytes + beEngineMemoryInformation.layer.allocatedBytes;
 }
 
-BE_EngineMemory_MemoryTypeInformation* BE_EngineMemory_GetMemoryTypeInformation(BE_EngineMemory_MemoryType memoryType) {
+BE_EngineMemoryInformation_MemoryType* BE_EngineMemory_GetMemoryTypeInformation(BE_EngineMemory_MemoryType memoryType) {
     switch (memoryType) {
         case BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND:
             return &beEngineMemoryInformation.command;
@@ -58,7 +58,7 @@ BE_EngineMemory_MemoryTypeInformation* BE_EngineMemory_GetMemoryTypeInformation(
 
 void* BE_EngineMemory_AllocateMemory(size_t size, BE_EngineMemory_MemoryType memoryType) {
     void* pointer;
-    BE_EngineMemory_MemoryTypeInformation* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(
+    BE_EngineMemoryInformation_MemoryType* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(
             memoryType);
 
     if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
@@ -76,7 +76,7 @@ void* BE_EngineMemory_AllocateMemory(size_t size, BE_EngineMemory_MemoryType mem
 }
 
 void* BE_EngineMemory_ReallocateMemory(void* pointer, size_t oldSize, size_t newSize, BE_EngineMemory_MemoryType memoryType) {
-    BE_EngineMemory_MemoryTypeInformation* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(
+    BE_EngineMemoryInformation_MemoryType* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(
             memoryType);
     void* newPointer;
 
@@ -95,7 +95,7 @@ void* BE_EngineMemory_ReallocateMemory(void* pointer, size_t oldSize, size_t new
 }
 
 void BE_EngineMemory_DeallocateMemory(void* pointer, size_t oldSize, BE_EngineMemory_MemoryType memoryType) {
-    BE_EngineMemory_MemoryTypeInformation* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(memoryType);
+    BE_EngineMemoryInformation_MemoryType* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(memoryType);
 
     if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
         SEC_LOGGER_TRACE("Deallocating memory\n"

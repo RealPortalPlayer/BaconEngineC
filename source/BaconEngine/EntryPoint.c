@@ -271,8 +271,8 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     if (BE_PrivateDefaultPackage_IsOpen())
         BE_PrivateDefaultPackage_Close();
 
-    if (BE_EngineMemory_GetAllocatedBytes() > 0) {
-        BE_EngineMemory_MemoryInformation memoryInformation = BE_EngineMemory_GetMemoryInformation();
+    if (BE_EngineMemoryInformation_GetAllocatedBytes() > 0) {
+        BE_EngineMemoryInformation memoryInformation = BE_EngineMemoryInformation_Get();
 
         SEC_LOGGER_WARN("Memory leak detected:\n"
                         "Leaked: %zu bytes\n"
@@ -280,7 +280,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
                         "UI: %zu allocated, %zu bytes\n"
                         "DynamicArray: %zu allocated, %zu bytes\n"
                         "Layer: %zu allocated, %zu bytes\n",
-                        BE_EngineMemory_GetAllocatedBytes(),
+                        BE_EngineMemoryInformation_GetAllocatedBytes(),
                         memoryInformation.command.allocatedAmount, memoryInformation.command.allocatedBytes,
                         memoryInformation.ui.allocatedAmount, memoryInformation.ui.allocatedBytes,
                         memoryInformation.dynamicArray.allocatedAmount, memoryInformation.dynamicArray.allocatedBytes,

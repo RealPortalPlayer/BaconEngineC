@@ -213,7 +213,7 @@ void BE_EngineCommands_Stop(void) {
 }
 
 void BE_EngineCommands_DebugInfo(void) {
-    BE_EngineMemory_MemoryInformation memoryInformation = BE_EngineMemory_GetMemoryInformation();
+    BE_EngineMemoryInformation memoryInformation = BE_EngineMemoryInformation_Get();
 
     SEC_LOGGER_INFO("DeltaTime: %f seconds (%f milliseconds)\n"
                     "Command: %i/%i (%i realloc)\n"
@@ -241,7 +241,7 @@ void BE_EngineCommands_DebugInfo(void) {
                     SEC_Paths_GetClientDirectory(), // Client directory
                     SEC_Paths_GetEngineBinaryPath(), // Engine binary path
                     SEC_Paths_GetClientBinaryPath(), // Client binary path
-                    BE_EngineMemory_GetAllocatedBytes(), // Engine memory
+                    BE_EngineMemoryInformation_GetAllocatedBytes(), // Engine memory
                     memoryInformation.command.allocatedAmount, memoryInformation.command.allocatedBytes, // Command memory
                     memoryInformation.ui.allocatedAmount, memoryInformation.ui.allocatedBytes, // UI memory
                     memoryInformation.dynamicArray.allocatedAmount, memoryInformation.dynamicArray.allocatedBytes, // DynamicArray memory
