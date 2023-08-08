@@ -25,7 +25,7 @@ BE_Color3_Unsigned BE_TextMode_Color3NoOperation(void) {
 
 void BE_TextMode_Initialize(void) {
     BE_SpecificPlatformFunctions_Initialize(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions,
-                                                                                {
+        {
             (void (*)(const char *, BE_Vector2_Unsigned, int)) &BE_TextMode_PtrNoOperation,
             (const char *(*)(void)) &BE_TextMode_PtrNoOperation,
             &BE_TextMode_Vector2NoOperation,
@@ -39,20 +39,20 @@ void BE_TextMode_Initialize(void) {
             (void (*)(void)) &BE_TextMode_IntNoOperation,
             (void (*)(void)) &BE_TextMode_IntNoOperation
         },
-                                                                                {
+        {
             (void (*)(void)) &BE_TextMode_IntNoOperation,
             (void (*)(BE_Color3_Unsigned)) &BE_TextMode_IntNoOperation,
             (BE_Color3_Unsigned (*)(void)) &BE_TextMode_Color3NoOperation,
             (void (*)(void)) &BE_TextMode_IntNoOperation,
             (void (*)(BE_Vector2_Integer, BE_Vector2_Unsigned, BE_Color4_Unsigned)) &BE_TextMode_IntNoOperation,
         },
-                                                                                {
+        {
             (SEC_Boolean (*)(BE_Keyboard_KeyCodes)) &BE_TextMode_IntNoOperation,
             (SEC_Boolean (*)(BE_Keyboard_KeyCodes)) &BE_TextMode_IntNoOperation,
             (SEC_Boolean (*)(BE_Mouse_ButtonType)) &BE_TextMode_IntNoOperation
         },
-                                                                                (void (*)(void)) &BE_TextMode_IntNoOperation,
-                                                                                (double (*)(void)) &BE_TextMode_IntNoOperation
+        (void (*)(void)) &BE_TextMode_IntNoOperation,
+        (double (*)(void)) &BE_TextMode_IntNoOperation
     ));
 }
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()

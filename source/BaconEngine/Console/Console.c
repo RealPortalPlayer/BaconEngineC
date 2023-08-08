@@ -292,33 +292,23 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
                 escaped = SEC_BOOLEAN_TRUE;
                 continue;
             }
-
-            if (input[index] == '\'' && !escaped) {
+            
+            if ((input[index] == '\'' || input[index] == '"') && !escaped) {
                 if (quotePosition == -1) {
+                    if (argument[0] != 0) {
+                        index--;
+                        goto publish_argument;
+                    }
+
                     quotePosition = index;
+                    doubleQuote = input[index] == '"';
                     continue;
                 }
 
-                if (!doubleQuote) {
-                    quotePosition = -1;
-                    quoteAdded = SEC_BOOLEAN_TRUE;
-
-                    goto publish_argument;
-                }
-            }
-
-            if (input[index] == '"' && !escaped) {
-                if (quotePosition == -1) {
-                    quotePosition = index;
-                    doubleQuote = SEC_BOOLEAN_TRUE;
-                    continue;
-                }
-
-                if (doubleQuote) {
+                if (doubleQuote == (input[index] == '"')) {
                     quotePosition = -1;
                     doubleQuote = SEC_BOOLEAN_FALSE;
                     quoteAdded = SEC_BOOLEAN_TRUE;
-
                     goto publish_argument;
                 }
             }

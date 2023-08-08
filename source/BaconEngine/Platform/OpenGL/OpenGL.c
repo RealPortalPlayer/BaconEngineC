@@ -28,7 +28,7 @@ void BE_OpenGL_Initialize(void) {
     BE_ASSERT(glfwInit(), "Failed to initialize GLFW\n");
     glfwSetErrorCallback(&BE_OpenGL_Error);
     BE_SpecificPlatformFunctions_Initialize(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions,
-                                                                                {
+        {
             &BE_OpenGLWindow_Create,
             &BE_OpenGLWindow_GetTitle,
             &BE_OpenGLWindow_GetSize,
@@ -42,20 +42,20 @@ void BE_OpenGL_Initialize(void) {
             &BE_OpenGLWindow_Close,
             &BE_OpenGLWindow_UpdateEvents
         },
-                                                                                {
+        {
             &BE_OpenGLRenderer_ClearScreen,
             &BE_OpenGLRenderer_SetClearColor,
             &BE_OpenGLRenderer_GetClearColor,
             &BE_OpenGLRenderer_Render,
             &BE_OpenGLRenderer_DrawFilledRectangle
         },
-                                                                                {
+        {
             &BE_OpenGLInput_IsKeyDown,
             &BE_OpenGLInput_IsKeyPressed,
             &BE_OpenGLInput_IsMouseDown
         },
-                                                                                &BE_OpenGL_Destroy,
-                                                                                &BE_OpenGL_GetTimer
+        &BE_OpenGL_Destroy,
+        &BE_OpenGL_GetTimer
     ));
 
     beOpenGLInitialized = SEC_BOOLEAN_TRUE;
