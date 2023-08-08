@@ -293,7 +293,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
                 continue;
             }
 
-            if (input[index] == '\\') {
+            if (input[index] == '\\' && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING)) {
                 if (!escaped) {
                     escaped = SEC_BOOLEAN_TRUE;
                     continue;
@@ -328,7 +328,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
             trimmed = SEC_BOOLEAN_TRUE;
 
-            if (escaped && !validEscapeCharacter) {
+            if (escaped && !validEscapeCharacter && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING)) {
                 SEC_LOGGER_ERROR("Parsing error: invalid escape character '%c', use double backslashes instead of one\n", input[index]);
                 BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * (strlen(argument) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
                 goto destroy;
@@ -340,12 +340,12 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
             escaped = SEC_BOOLEAN_FALSE;
         }
 
-        if (quotePosition != -1) {
+        if (quotePosition != -1 && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING)) {
             SEC_LOGGER_ERROR("Parsing error: unescaped %s quote at %i\n", doubleQuote ? "double" : "single", quotePosition);
             goto destroy;
         }
 
-        if (escaped) {
+        if (escaped && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING)) {
             SEC_LOGGER_ERROR("Parsing error: stray escape character\n");
             goto destroy;
         }

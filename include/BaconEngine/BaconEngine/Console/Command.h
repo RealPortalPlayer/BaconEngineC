@@ -17,10 +17,34 @@
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     BE_COMMAND_FLAG_NULL,
+    
+    /**
+     * Requires cheats enabled to run this command.
+     * Clients can have cheats fake enabled, so don't trust any output from client-sided cheat commands
+     */
     BE_COMMAND_FLAG_CHEATS_ONLY,
+    
+    /**
+     * Can only be ran on the server, clients cannot run this command
+     */
     BE_COMMAND_FLAG_SERVER_ONLY = (1 << 1),
+    
+    /**
+     * Servers cannot run this command
+     */
     BE_COMMAND_FLAG_CLIENT_ONLY = (1 << 2),
-    BE_COMMAND_FLAGS_RAN_ON_SERVER = (1 << 3)
+    
+    /**
+     * The command is ran on the server.
+     * Useful for cheats only commands
+     */
+    BE_COMMAND_FLAGS_RAN_ON_SERVER = (1 << 3),
+    
+    /**
+     * Don't apply backslash, or quote parsing.
+     * Also disables any parsing errors
+     */
+    BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING = (1 << 4)
 } BE_Command_Flags;
 
 typedef struct { // TODO: Client

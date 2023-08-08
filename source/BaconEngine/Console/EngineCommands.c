@@ -61,7 +61,7 @@ void BE_EngineCommands_Initialize(void) {
     BE_Command_Register("debuginfo", "Get debugging information.", BE_COMMAND_FLAG_NULL,
                         (void (*)(BE_Command_Context)) &BE_EngineCommands_DebugInfo);
 
-    BE_Command_Register("say", "Say something as the server.", BE_COMMAND_FLAG_SERVER_ONLY, &BE_EngineCommands_Say);
+    BE_Command_Register("say", "Say something as the server.", BE_COMMAND_FLAG_SERVER_ONLY | BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING, &BE_EngineCommands_Say);
     {
         BE_Command_AddArgument( "message", 1);
     }
@@ -91,7 +91,7 @@ void BE_EngineCommands_Initialize(void) {
         BE_Command_AddArgument("command", 1);
     }
 
-    BE_Command_Register("echo", "Print text into console.", BE_COMMAND_FLAG_NULL, &BE_EngineCommands_Echo);
+    BE_Command_Register("echo", "Print text into console.", BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING, &BE_EngineCommands_Echo);
     {
         BE_Command_AddArgument("message", 0);
     }
