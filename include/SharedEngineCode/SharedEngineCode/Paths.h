@@ -6,7 +6,8 @@
 
 #pragma once
 
-#include "SharedEngineCode/Internal/CPlusPlusSupport.h"
+#include "Internal/CPlusPlusSupport.h"
+#include "Internal/Boolean.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 const char* SEC_Paths_GetLauncherDirectory(void);
@@ -17,13 +18,15 @@ const char* SEC_Paths_GetClientBinaryPath(void);
 
 /**
  * @note Call free on result once finished to prevent memory leaks
+ * @return False if it failed to allocate memory
  */
-void SEC_Paths_GetItemInsideEngineDirectory(char** result, const char* file);
+SEC_Boolean SEC_Paths_GetItemInsideEngineDirectory(char** result, const char* file);
 
 /**
  * @note Call free on result once finished to prevent memory leaks
+ * @return False if it failed to allocate memory
  */
-void SEC_Paths_GetItemInsideClientDirectory(char** result, const char* file);
+SEC_Boolean SEC_Paths_GetItemInsideClientDirectory(char** result, const char* file);
 
 void SEC_Paths_SetLauncherPath(const char* path);
 void SEC_Paths_SetClientPath(const char* path);

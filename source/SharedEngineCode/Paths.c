@@ -77,14 +77,14 @@ const char* SEC_Paths_GetClientBinaryPath(void) {
     return binaryPath;
 }
 
-void SEC_Paths_GetItemInsideEngineDirectory(char** result, const char* file) {
-    SEC_String_Append(result, SEC_Paths_GetEngineDirectory());
-    SEC_String_Append(result, file);
+SEC_Boolean SEC_Paths_GetItemInsideEngineDirectory(char** result, const char* file) {
+    return SEC_String_Append(result, SEC_Paths_GetEngineDirectory()) != NULL &&
+           SEC_String_Append(result, file) != NULL;
 }
 
-void SEC_Paths_GetItemInsideClientDirectory(char** result, const char* file) {
-    SEC_String_Append(result, SEC_Paths_GetClientDirectory());
-    SEC_String_Append(result, file);
+SEC_Boolean SEC_Paths_GetItemInsideClientDirectory(char** result, const char* file) {
+    return SEC_String_Append(result, SEC_Paths_GetClientDirectory()) != NULL &&
+           SEC_String_Append(result, file) != NULL;
 }
 
 void SEC_Paths_SetLauncherPath(const char* path) {
