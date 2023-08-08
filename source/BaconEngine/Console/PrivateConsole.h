@@ -16,6 +16,7 @@ typedef struct {
     BE_Command publicCommand;
     SEC_Boolean engineCommand;
     SEC_Boolean duplicate;
+    int requiredArgumentCount;
 } BE_PrivateConsole_Command;
 
 void BE_PrivateConsole_Initialize(void);

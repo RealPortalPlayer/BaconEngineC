@@ -168,10 +168,10 @@ void BE_Command_AddArgument(const char* name, SEC_Boolean required) {
 #ifndef BE_CLIENT_BINARY
     BE_STRICTMODE_CHECK_NO_RETURN_VALUE(beConsoleCommands.used != 0, "There is no command to add arguments to\n");
 
-    BE_Command* command = BE_DYNAMICARRAY_GET_LAST_ELEMENT(BE_Command, beConsoleCommands);
+    BE_PrivateConsole_Command* command = BE_DYNAMICARRAY_GET_LAST_ELEMENT(BE_PrivateConsole_Command, beConsolePrivateCommands);
 
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(command->arguments.used == 0 ||
-                                        BE_DYNAMICARRAY_GET_LAST_ELEMENT(BE_Command_Argument, command->arguments)->required ||
+    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(command->publicCommand.arguments.used == 0 ||
+                                        BE_DYNAMICARRAY_GET_LAST_ELEMENT(BE_Command_Argument, command->publicCommand.arguments)->required ||
                                         !required, "Required arguments cannot be added after an optional argument\n");
 
     BE_Command_Argument* argument = BE_EngineMemory_AllocateMemory(sizeof(BE_Command_Argument), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
@@ -179,7 +179,10 @@ void BE_Command_AddArgument(const char* name, SEC_Boolean required) {
     argument->name = SEC_String_Copy(name);
     argument->required = required;
 
-    BE_DynamicArray_AddElementToLast(&command->arguments, (void*) argument);
+    if (required)
+        command->requiredArgumentCount++;
+
+    BE_DynamicArray_AddElementToLast(&command->publicCommand.arguments, (void*) argument);
 #else
     BE_INTERFACEFUNCTION(void, const char*, SEC_Boolean)(name, required);
 #endif
@@ -215,7 +218,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         return;
 
     char* name = BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
-    BE_Command* command = NULL;
+    BE_PrivateConsole_Command* command = NULL;
     BE_DynamicDictionary arguments;
     size_t inputLength = strlen(input);
     
@@ -245,7 +248,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         }
     }
 
-    command = BE_Console_GetCommand(name);
+    command = BE_Console_GetPrivateCommand(name);
     argumentStartingIndex = index;
 
     if (command == NULL) { // TODO: Tell the client.
@@ -253,7 +256,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         goto destroy;
     }
 
-    if (command->arguments.used != 0) {
+    if (command->publicCommand.arguments.used != 0) {
         char* argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
         int current = 0;
         int quotePosition = -1;
@@ -265,7 +268,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
         argument[0] = 0;
 
-        for (; index < (int) inputLength && current < command->arguments.used; index++) {
+        for (; index < (int) inputLength && current < command->publicCommand.arguments.used; index++) {
             if (added) {
                 argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
 
@@ -281,7 +284,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
             if (input[index] == ' ' && quotePosition == -1 && !escaped) {
                 publish_argument:
-                BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, current++)->name, argument);
+                BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->publicCommand.arguments, current++)->name, argument);
 
                 added = SEC_BOOLEAN_TRUE;
                 trimmed = SEC_BOOLEAN_FALSE;
@@ -334,7 +337,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
         if (!added) {
             if (argument[0] != '\0') {
-                BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, current)->name, argument);
+                BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->publicCommand.arguments, current)->name, argument);
 
                 added = SEC_BOOLEAN_TRUE;
             }
@@ -344,7 +347,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         }
     }
 
-    if (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY)) {
+    if (BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAG_SERVER_ONLY)) {
         // TODO: Kick client.
 
         if (!BE_ClientInformation_IsServerModeEnabled()) {
@@ -353,36 +356,25 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         }
     }
 
-    if (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()) {
+    if (BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()) {
         SEC_LOGGER_ERROR("This command can only be ran by a client\n"); // TODO: Kick client if the client is the one who ran it.
         goto destroy;
     }
 
-    if ((command->flags & BE_COMMAND_FLAG_CHEATS_ONLY) != 0 && !BE_ClientInformation_IsCheatsEnabled()) {
+    if ((command->publicCommand.flags & BE_COMMAND_FLAG_CHEATS_ONLY) != 0 && !BE_ClientInformation_IsCheatsEnabled()) {
         // TODO: Tell client.
         SEC_LOGGER_ERROR("This command requires cheats to be enabled\n");
         goto destroy;
     }
 
-    if (command->arguments.used != 0) {
-        int requiredArguments = 0;
-
-        for (int i = 0; i < command->arguments.used; i++) {
-            if (!BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, i)->required)
-                break;
-
-            requiredArguments++;
-        }
-
-        if (requiredArguments > arguments.keys.used) {
-            SEC_LOGGER_ERROR("Help: (not enough arguments)\n"
-                             "    %s Command:\n", BE_Console_IsEngineCommand(*command) ? "Engine" : "Client");
-            BE_EngineCommands_HelpPrint(command);
-            goto destroy;
-        }
+    if (command->requiredArgumentCount > arguments.keys.used) {
+        SEC_LOGGER_ERROR("Help: (not enough arguments)\n"
+                         "    %s Command:\n", command->engineCommand ? "Engine" : "Client");
+        BE_EngineCommands_HelpPrint(&command->publicCommand);
+        goto destroy;
     }
 
-    command->Run(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Command_Context, input, input + argumentStartingIndex, arguments));
+    command->publicCommand.Run(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Command_Context, input, input + argumentStartingIndex, arguments));
 
     destroy:
     BE_EngineMemory_DeallocateMemory(name, sizeof(char) * (strlen(name) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
