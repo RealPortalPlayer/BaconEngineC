@@ -269,6 +269,8 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         argument[0] = 0;
 
         for (; index < (int) inputLength && current < command->publicCommand.arguments.used; index++) {
+            SEC_Boolean validEscapeCharacter = SEC_BOOLEAN_FALSE;
+            
             if (added) {
                 argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
 
@@ -291,37 +293,50 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
                 continue;
             }
 
-            if (input[index] == '\\' && !escaped) {
-                escaped = SEC_BOOLEAN_TRUE;
-                continue;
-            }
-            
-            if ((input[index] == '\'' || input[index] == '"') && !escaped) {
-                if (quotePosition == -1) {
-                    if (argument[0] != 0) {
-                        index--;
-                        goto publish_argument;
-                    }
-
-                    quotePosition = index;
-                    doubleQuote = input[index] == '"';
+            if (input[index] == '\\') {
+                if (!escaped) {
+                    escaped = SEC_BOOLEAN_TRUE;
                     continue;
                 }
+                
+                validEscapeCharacter = SEC_BOOLEAN_TRUE;
+            }
+            
+            if (input[index] == '\'' || input[index] == '"') {
+                if (!escaped) {
+                    if (quotePosition == -1) {
+                        if (argument[0] != 0) {
+                            index--;
+                            goto publish_argument;
+                        }
 
-                if (doubleQuote == (input[index] == '"')) {
-                    quotePosition = -1;
-                    doubleQuote = SEC_BOOLEAN_FALSE;
-                    quoteAdded = SEC_BOOLEAN_TRUE;
-                    goto publish_argument;
+                        quotePosition = index;
+                        doubleQuote = input[index] == '"';
+                        continue;
+                    }
+
+                    if (doubleQuote == (input[index] == '"')) {
+                        quotePosition = -1;
+                        doubleQuote = SEC_BOOLEAN_FALSE;
+                        quoteAdded = SEC_BOOLEAN_TRUE;
+                        goto publish_argument;
+                    }
                 }
+                
+                validEscapeCharacter = SEC_BOOLEAN_TRUE;
             }
 
             trimmed = SEC_BOOLEAN_TRUE;
 
+            if (escaped && !validEscapeCharacter) {
+                SEC_LOGGER_ERROR("Parsing error: invalid escape character '%c', use double backslashes instead of one\n", input[index]);
+                BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * (strlen(argument) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+                goto destroy;
+            }
+
             SEC_String_AppendCharacter(&argument, input[index]);
             BE_EngineMemory_AddSize(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
             
-            // TODO: Should we throw a parse error if someone tries to escape a normal character, or should we just assume they meant to use a backslash
             escaped = SEC_BOOLEAN_FALSE;
         }
 
