@@ -13,9 +13,6 @@
 #   include <Windows.h>
 #endif
 
-// TODO: Find a way to make it so the developers don't need to declare these
-//       That's probably impossible, though
-
 void I_EntryPoint_InitializeWrapper(const char*, const char*, const char*, void*, int, char**);
 const char* I_EntryPoint_GetEngineVersion(void);
 int I_EntryPoint_Start(int, char**);
