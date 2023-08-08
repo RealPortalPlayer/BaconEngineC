@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <limits.h>
 
 #include "BaconEngine/Console/ArgumentManager.h"
 #include "../InterfaceFunctions.h"
@@ -29,10 +30,10 @@ int BE_ArgumentManager_GetInteger(BE_DynamicDictionary arguments, const char* na
         }
 
         char* errored;
-        int parsedValue = (int) strtol(value, &errored, 0);
+        long parsedValue = strtol(value, &errored, 0);
 
-        if (errored == NULL || strlen(errored) == 0)
-            return parsedValue;
+        if (errored == NULL || strlen(errored) == 0 || parsedValue <= INT_MAX)
+            return (int) parsedValue;
     }
 
     return defaultValue;
