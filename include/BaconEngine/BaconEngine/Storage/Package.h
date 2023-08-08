@@ -22,7 +22,7 @@ typedef struct zip_t* BE_Package;
  * @example
  * If the client binary is inside "/home/user/Downloads/BaconEngine/Client", then calling this with the argument of
  * "Languages.package" will open the file named that from the directory above
- * @note Absolute paths **should** work, but isn't recommended
+ * @note Relative paths **should** work, but isn't recommended
  */
 BE_BINARYEXPORT BE_Package BE_Package_Open(const char* fileName);
 
