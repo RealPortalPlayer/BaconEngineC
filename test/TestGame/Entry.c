@@ -4,7 +4,7 @@
 #include <Interface/EntryPoint.h>
 #include <BaconEngine/Console/Console.h>
 #include <SharedEngineCode/Logger.h>
-#include <BaconEngine/Package.h>
+#include <BaconEngine/Storage/Package.h>
 #include <stdlib.h>
 
 #include "Layers.h"

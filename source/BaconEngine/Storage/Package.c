@@ -3,8 +3,8 @@
 
 #include <SharedEngineCode/Logger.h>
 
-#include "BaconEngine/Package.h"
-#include "InterfaceFunctions.h"
+#include "BaconEngine/Storage/Package.h"
+#include "../InterfaceFunctions.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 BE_Package BE_Package_Open(const char* fileName) {
