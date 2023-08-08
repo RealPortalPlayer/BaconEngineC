@@ -4,8 +4,6 @@
 #include <Interface/EntryPoint.h>
 #include <BaconEngine/Console/Console.h>
 #include <SharedEngineCode/Logger.h>
-#include <BaconEngine/Storage/Package.h>
-#include <stdlib.h>
 
 #include "Layers.h"
 
@@ -29,22 +27,6 @@ void TestCommand(BE_Command_Context context) {
 int I_EntryPoint_Start(int argc, char** argv) {
     (void) argc;
     (void) argv;
-
-    BE_Package package = BE_Package_Open("Test.package");
-
-    if (package != NULL) {
-        void* buffer = NULL;
-        size_t size = 0;
-
-        if (BE_Package_GetFile(package, "Test.txt", &buffer, &size)) {
-            SEC_LOGGER_INFO("File contents: ");
-            fwrite(buffer, 1, size, stdout);
-            SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "\n");
-            free(buffer);
-        } else
-            SEC_LOGGER_ERROR("Failed to open file: Test.txt\n");
-    } else
-        SEC_LOGGER_WARN("Failed to find: Test.package\n");
 
     InitializeTestLayers();
     BE_Command_Register("test", "Tests the command handler.", BE_COMMAND_FLAG_NULL,

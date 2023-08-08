@@ -59,7 +59,8 @@ set(BE_SOURCE_FILES
         DeltaTime.c
         Debugging/Assert.c
         Debugging/StrictMode.c
-        Package.c)
+        Storage/Package.c
+        Storage/DefaultPackage.c)
 
 add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         # Header files
@@ -76,6 +77,7 @@ add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         AntiClientGuard.h
         Storage/PrivateDynamicArray.h
         Storage/PrivateDynamicDictionary.h
+        Storage/PrivateDefaultPackage.h
 
         # Source files
         EntryPoint.c
@@ -130,12 +132,19 @@ if(MSVC) # I hate MSVC
     target_compile_options(BaconEngine PUBLIC /wd4204)
 endif()
 
+set(BE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+
 if(NOT BE_DONT_SET_BINARY_OUTPUT_PATH)
-    set_target_properties(BaconEngine PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/Engines/Official")
-    set_target_properties(BaconEngine PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/Engines/Official")
+    set(BE_OUTPUT_DIRECTORY "${BE_OUTPUT_DIRECTORY}/out/Engines/Official")
+    set_target_properties(BaconEngine PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${BE_OUTPUT_DIRECTORY}")
+    set_target_properties(BaconEngine PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${BE_OUTPUT_DIRECTORY}")
 endif()
 
 target_compile_definitions(BaconEngine PUBLIC BE_ENGINE_VERSION="${BE_ENGINE_VERSION}")
+
+add_custom_target(BaconEngineDefaultPackage
+        COMMAND ${CMAKE_COMMAND} -E tar cvf "${BE_OUTPUT_DIRECTORY}/Default.package" --format=zip .
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../assets/BaconEngine/Default)
 
 include(BaconEngineClient.cmake)
 include(BaconEngineClientStandalone.cmake)

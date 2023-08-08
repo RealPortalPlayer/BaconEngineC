@@ -34,6 +34,7 @@
 #include "Console/PrivateConsole.h"
 #include "Rendering/PrivateRenderer.h"
 #include "BaconEngine/Console/Console.h"
+#include "Storage/PrivateDefaultPackage.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 void BE_EntryPoint_SignalDetected(int receivedSignal) {
@@ -161,6 +162,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
         return 1;
     }
 
+    BE_PrivateDefaultPackage_Open();
     SEC_LOGGER_DEBUG("Registering signals\n");
     signal(SIGINT, BE_EntryPoint_SignalDetected);
     BE_PrivateRenderer_Initialize();
@@ -265,6 +267,9 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     BE_PrivateConsole_Destroy();
     BE_PrivateWindow_Destroy();
     BE_SpecificPlatformFunctions_Get().Destroy();
+
+    if (BE_PrivateDefaultPackage_IsOpen())
+        BE_PrivateDefaultPackage_Close();
 
     if (BE_EngineMemory_GetAllocatedBytes() > 0) {
         BE_EngineMemory_MemoryInformation memoryInformation = BE_EngineMemory_GetMemoryInformation();
