@@ -41,13 +41,13 @@ void BE_EngineCommands_Initialize(void) {
 
     BE_Command_Register("help", "Shows information about each command.", BE_COMMAND_FLAG_NULL, &BE_EngineCommands_Help);
     {
-        BE_Command_AddArgument("command", 0);
+        BE_Command_AddArgument("command", SEC_BOOLEAN_FALSE);
     }
 
     BE_Command_Register("cheats", "Get information or modify if cheats are enabled.", BE_COMMAND_FLAG_SERVER_ONLY,
                         &BE_EngineCommands_Cheats);
     {
-        BE_Command_AddArgument("toggle", 0);
+        BE_Command_AddArgument("toggle", SEC_BOOLEAN_FALSE);
     }
 
     BE_Command_Register("stop", BE_ClientInformation_IsServerModeEnabled() ? "Stops the server." : "Stops the client.",
@@ -63,7 +63,7 @@ void BE_EngineCommands_Initialize(void) {
 
     BE_Command_Register("say", "Say something as the server.", BE_COMMAND_FLAG_SERVER_ONLY | BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING, &BE_EngineCommands_Say);
     {
-        BE_Command_AddArgument( "message", 1);
+        BE_Command_AddArgument( "message", SEC_BOOLEAN_TRUE);
     }
 
     BE_Command_Register("disconnect", "Disconnects from the server.", BE_COMMAND_FLAG_CLIENT_ONLY,
@@ -74,26 +74,26 @@ void BE_EngineCommands_Initialize(void) {
 
     BE_Command_Register("kick", "Forcefully removes a client.", BE_COMMAND_FLAG_SERVER_ONLY, &BE_EngineCommands_Kick);
     {
-        BE_Command_AddArgument("client id", 1);
-        BE_Command_AddArgument("reason", 0);
+        BE_Command_AddArgument("client id", SEC_BOOLEAN_TRUE);
+        BE_Command_AddArgument("reason", SEC_BOOLEAN_FALSE);
     }
 
     BE_Command_Register("ban", "Forcefully removes a client, and prevents them from rejoining.",
                         BE_COMMAND_FLAG_SERVER_ONLY, &BE_EngineCommands_Ban);
     {
-        BE_Command_AddArgument("client id", 1);
-        BE_Command_AddArgument("reason", 0);
+        BE_Command_AddArgument("client id", SEC_BOOLEAN_TRUE);
+        BE_Command_AddArgument("reason", SEC_BOOLEAN_FALSE);
     }
 
     BE_Command_Register("sudo", "Runs a command as the server.", BE_COMMAND_FLAG_CLIENT_ONLY, &BE_EngineCommands_Sudo);
     {
-        BE_Command_AddArgument("key", 1);
-        BE_Command_AddArgument("command", 1);
+        BE_Command_AddArgument("key", SEC_BOOLEAN_TRUE);
+        BE_Command_AddArgument("command", SEC_BOOLEAN_TRUE);
     }
 
     BE_Command_Register("echo", "Print text into console.", BE_COMMAND_FLAGS_NO_ARGUMENT_PARSING, &BE_EngineCommands_Echo);
     {
-        BE_Command_AddArgument("message", 0);
+        BE_Command_AddArgument("message", SEC_BOOLEAN_FALSE);
     }
 
     BE_Command_Register("crash", "Force a segmentation fault", BE_COMMAND_FLAG_SERVER_ONLY,
