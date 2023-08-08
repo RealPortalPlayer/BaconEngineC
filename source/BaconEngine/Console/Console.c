@@ -274,12 +274,12 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
             added = SEC_BOOLEAN_FALSE;
 
-            if (quoteAdded && input[index] == ' ')
+            if (input[index] == ' ' && (quoteAdded || !trimmed))
                 continue;
 
             quoteAdded = SEC_BOOLEAN_FALSE;
 
-            if (input[index] == ' ' && trimmed && quotePosition == -1 && !escaped) {
+            if (input[index] == ' ' && quotePosition == -1 && !escaped) {
                 publish_argument:
                 BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, current++)->name, argument);
 
