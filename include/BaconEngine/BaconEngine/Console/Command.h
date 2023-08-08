@@ -44,7 +44,13 @@ typedef enum {
      * Don't apply backslash, or quote parsing.
      * Also disables any parsing errors
      */
-    BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING = (1 << 4)
+    BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING = (1 << 4),
+    
+    /**
+     * Don't parse arguments at all.
+     * Use this if you don't use any of the parsed arguments
+     */
+    BE_COMMAND_FLAGS_NO_ARGUMENT_PARSING = (1 << 5)
 } BE_Command_Flags;
 
 typedef struct { // TODO: Client

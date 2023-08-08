@@ -256,7 +256,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         goto destroy;
     }
 
-    if (command->publicCommand.arguments.used != 0) {
+    if (command->publicCommand.arguments.used != 0 && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_ARGUMENT_PARSING)) {
         char* argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
         int current = 0;
         int quotePosition = -1;

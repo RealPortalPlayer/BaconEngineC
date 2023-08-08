@@ -91,7 +91,7 @@ void BE_EngineCommands_Initialize(void) {
         BE_Command_AddArgument("command", 1);
     }
 
-    BE_Command_Register("echo", "Print text into console.", BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING, &BE_EngineCommands_Echo);
+    BE_Command_Register("echo", "Print text into console.", BE_COMMAND_FLAGS_NO_ARGUMENT_PARSING, &BE_EngineCommands_Echo);
     {
         BE_Command_AddArgument("message", 0);
     }
