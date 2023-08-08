@@ -30,7 +30,7 @@ macro(engine_project)
 
     project("${PARSED_NAME}")
 
-    if(BE_SUPPORTS_SHARED_LIBS AND NOT PARSED_STANDALONE)
+    if(NOT PARSED_STANDALONE)
         message(STATUS "Creating binary client: ${PARSED_NAME}")
         add_library("${PARSED_NAME}" SHARED ${PARSED_SOURCES})
         target_link_libraries("${PARSED_NAME}" LINK_PRIVATE BaconEngineClient)
@@ -77,7 +77,7 @@ endif()
 get_cmake_property(BE_SUPPORTS_SHARED_LIBS TARGET_SUPPORTS_SHARED_LIBS)
 
 if(NOT BE_SUPPORTS_SHARED_LIBS)
-    message(WARNING "Your platform does not support shared libraries, defaulting to BaconEngineLauncher")
+    message(FATAL_ERROR "Your platform doesn't support shared libraries, cannot continue")
 endif()
 
 message(STATUS "Adding dependencies")
