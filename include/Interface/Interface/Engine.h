@@ -7,7 +7,10 @@
 #pragma once
 
 #include <SharedEngineCode/Internal/CPlusPlusSupport.h>
+#include <SharedEngineCode/Internal/PlatformSpecific.h>
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 void* I_Engine_GetBinary(void);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+
+#define I_ENGINE_FUNCTION_EXISTS(functionName) SEC_PLATFORMSPECIFIC_GET_ADDRESS(I_Engine_GetBinary(), functionName) != NULL
