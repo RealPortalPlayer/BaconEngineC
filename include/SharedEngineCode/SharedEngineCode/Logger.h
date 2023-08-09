@@ -33,7 +33,7 @@ typedef enum {
 } SEC_Logger_LogLevels;
 
 SEC_Logger_LogLevels SEC_Logger_GetLogLevel(void);
-void BE_LOGGER_PRINTF_ATTRIBUTE SEC_Logger_LogImplementation(SEC_Boolean includeHeader, SEC_Logger_LogLevels logLevel, const char* message, ...);
+BE_LOGGER_PRINTF_ATTRIBUTE void SEC_Logger_LogImplementation(SEC_Boolean includeHeader, SEC_Logger_LogLevels logLevel, const char* message, ...);
 void SEC_Logger_LogHeader(FILE* output, SEC_Logger_LogLevels logLevel);
 SEC_Boolean SEC_Logger_IsLevelEnabled(SEC_Logger_LogLevels logLevel);
 
