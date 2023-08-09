@@ -151,10 +151,12 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     {
         const char* clientEngineVersion = engineDetails->clientGetEngineVersion != NULL ? engineDetails->clientGetEngineVersion() : BE_ENGINE_VERSION;
 
-        if (strcmp(clientEngineVersion, BE_ENGINE_VERSION) == 0)
-            SEC_LOGGER_INFO("Starting BaconEngine %s\n", BE_ENGINE_VERSION);
-        else
-            SEC_LOGGER_INFO("Starting BaconEngine %s (client was compiled with %s)\n", BE_ENGINE_VERSION, clientEngineVersion);
+        SEC_LOGGER_INFO("Starting BaconEngine %s", BE_ENGINE_VERSION);
+
+        if (strcmp(clientEngineVersion, BE_ENGINE_VERSION) != 0)
+            SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, " (client was compiled with %s)", clientEngineVersion);
+
+        SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "\n");
     }
 
     if (BE_ClientInformation_IsServerModeEnabled() && (engineDetails->clientSupportsServer == NULL || !engineDetails->clientSupportsServer())) {
