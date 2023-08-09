@@ -54,7 +54,12 @@ const char* SEC_Launcher_GetDefaultHelpList(void) {
            SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOC " (" SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOC_SHORT "): Do not log when the engine allocates memory, does nothing if log level is not trace\n"
 #endif
            SEC_BUILTINARGUMENTS_DISABLE_LOG_HEADER " (" SEC_BUILTINARGUMENTS_DISABLE_LOG_HEADER_SHORT "): Do not log the log level header\n"
-           SEC_BUILTINARGUMENTS_ENGINE " <engine binary> (" SEC_BUILTINARGUMENTS_ENGINE_SHORT "): Use a custom engine binary";
+           SEC_BUILTINARGUMENTS_ENGINE " <engine binary> (" SEC_BUILTINARGUMENTS_ENGINE_SHORT "): Use a custom engine binary"
+#ifdef BE_ALLOW_DEBUG_LOGS
+            "\n"
+           SEC_BUILTINARGUMENTS_DONT_PRINT_COMMAND_REGISTER " (" SEC_BUILTINARGUMENTS_DONT_PRINT_COMMAND_REGISTER_SHORT "): Do not log when a command gets registered, does nothing if log level is not trace"
+#endif
+            ;
 }
 
 void SEC_Launcher_InitializeEngine(SEC_Launcher_Configuration* configuration) {

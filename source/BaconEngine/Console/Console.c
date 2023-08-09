@@ -47,6 +47,19 @@ static BE_PrivateConsole_Command* BE_Console_GetPrivateCommand(const char* name)
 
     return NULL;
 }
+
+SEC_Boolean BE_Console_CheckRegisterLogsEnabled(void) {
+#   if BE_ALLOW_DEBUG_LOGS
+    static int enabled = -1;
+
+    if (enabled == -1)
+        enabled = !SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_DONT_PRINT_COMMAND_REGISTER, SEC_BUILTINARGUMENTS_DONT_PRINT_COMMAND_REGISTER_SHORT, SEC_BOOLEAN_FALSE);
+    
+    return enabled;
+#   else
+    return SEC_BOOLEAN_FALSE;
+#   endif
+}
 #endif
 
 BE_Command** BE_Console_GetCommands(void) {
@@ -121,7 +134,7 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
         BE_STRICTMODE_CHECK_NO_RETURN_VALUE(strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Command, beConsoleCommands, i)->name, name) != 0,
                             "The command '%s' is already registered\n", name);
 
-    if (!beConsoleDuplicateCommand)
+    if (!beConsoleDuplicateCommand && BE_Console_CheckRegisterLogsEnabled())
         SEC_LOGGER_TRACE("Registering command\n"
                          "Name: %s\n"
                          "Description: %s\n"
@@ -191,12 +204,14 @@ void BE_Command_AddArgument(const char* name, SEC_Boolean required) {
 void BE_Command_DuplicatePrevious(const char* name, const char* description) {
 #ifndef BE_CLIENT_BINARY
     BE_STRICTMODE_CHECK_NO_RETURN_VALUE(beConsoleCommands.used != 0, "There is no command to duplicate\n");
-    SEC_LOGGER_TRACE("Duplicating command\n"
-                     "Original name: %s\n"
-                     "Original description: %s\n"
-                     "New name: %s\n"
-                     "New description: %s\n", beConsoleLastCommand->publicCommand.name, beConsoleLastCommand->publicCommand.description, name,
-                     description != NULL ? description : beConsoleLastCommand->publicCommand.description);
+
+    if (BE_Console_CheckRegisterLogsEnabled())
+        SEC_LOGGER_TRACE("Duplicating command\n"
+                         "Original name: %s\n"
+                         "Original description: %s\n"
+                         "New name: %s\n"
+                         "New description: %s\n", beConsoleLastCommand->publicCommand.name, beConsoleLastCommand->publicCommand.description, name,
+                         description != NULL ? description : beConsoleLastCommand->publicCommand.description);
 
     beConsoleDuplicateCommand = SEC_BOOLEAN_TRUE;
 
