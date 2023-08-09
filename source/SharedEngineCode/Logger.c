@@ -82,8 +82,9 @@ void SEC_Logger_LogImplementation(int includeHeader, SEC_Logger_LogLevels logLev
                     else if (SEC_String_Equals(*results.value, "fatal", SEC_BOOLEAN_TRUE) ||
                              SEC_String_Equals(*results.value, "ftl", SEC_BOOLEAN_TRUE))
                         secLoggerCurrentLogLevel = SEC_LOGGER_LOG_LEVEL_FATAL;
-                    else if (SEC_String_Equals(*results.value, "info", SEC_BOOLEAN_TRUE) &&
-                             SEC_String_Equals(*results.value, "inf", SEC_BOOLEAN_TRUE)) {
+                    else if (!SEC_String_Equals(*results.value, "info", SEC_BOOLEAN_TRUE) &&
+                             !SEC_String_Equals(*results.value, "inf", SEC_BOOLEAN_TRUE) &&
+                             SEC_Logger_IsLevelEnabled(SEC_LOGGER_LOG_LEVEL_ERROR)) {
                         SEC_Logger_LogHeader(stderr, SEC_LOGGER_LOG_LEVEL_ERROR);
                         printf("Invalid log type: %s\n", *results.value);
                     }
