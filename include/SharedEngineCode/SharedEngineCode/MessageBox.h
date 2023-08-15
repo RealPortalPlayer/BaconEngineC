@@ -38,5 +38,5 @@ typedef enum {
     SEC_MESSAGEBOX_RESULT_CONTINUE
 } SEC_MessageBox_Results;
 
-SEC_MessageBox_Results SEC_MessageBox_Display(const char* message, const char* caption, SEC_MessageBox_Icons icon, SEC_MessageBox_Buttons buttons);
+SEC_MessageBox_Results SEC_MessageBox_Display(SEC_MessageBox_Icons icon, SEC_MessageBox_Buttons buttons, const char* caption, const char* message, ...);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()

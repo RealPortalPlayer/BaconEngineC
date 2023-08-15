@@ -4,15 +4,14 @@
 #include "SharedEngineCode/MessageBox.h"
 #include "SharedEngineCode/Internal/OperatingSystem.h"
 #include "SharedEngineCode/Internal/CPlusPlusSupport.h"
+#include "SharedEngineCode/String.h"
 
 #if SEC_OPERATINGSYSTEM_WINDOWS
 #   include <Windows.h>
 #endif
 
-// TODO: This code is very ugly, and platform specific.
-
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-SEC_MessageBox_Results SEC_MessageBox_Display(const char* message, const char* caption, SEC_MessageBox_Icons icon, SEC_MessageBox_Buttons buttons) {
+SEC_MessageBox_Results SEC_MessageBox_Display(SEC_MessageBox_Icons icon, SEC_MessageBox_Buttons buttons, const char* caption, const char* message, ...) {
 #if SEC_OPERATINGSYSTEM_WINDOWS
     UINT flags = MB_OK;
 
@@ -32,8 +31,18 @@ SEC_MessageBox_Results SEC_MessageBox_Display(const char* message, const char* c
         case SEC_MESSAGEBOX_BUTTON_RETRY_CANCEL:              flags |= MB_RETRYCANCEL; break;
         case SEC_MESSAGEBOX_BUTTON_CANCEL_TRY_AGAIN_CONTINUE: flags |= MB_CANCELTRYCONTINUE; break;
     }
+    
+    va_list arguments;
+    char* messageClone = SEC_String_Copy(message);
 
-    return MessageBox(NULL, message, caption, flags);
+    va_start(arguments, message);
+    SEC_String_FormatPremadeList(&messageClone, arguments);
+    va_end(arguments);
+    
+    SEC_MessageBox_Results result = MessageBox(NULL, messageClone, caption, flags);
+
+    free(messageClone);
+    return result;
 #else // TODO: Everything else.
     return 0;
 #endif
