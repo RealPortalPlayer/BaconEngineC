@@ -7,6 +7,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include <stdarg.h>
 
 #include "Internal/Boolean.h"
 
@@ -48,4 +49,18 @@ char* SEC_String_AppendCharacter(char** target, char character);
  * @note Returns NULL if it fails to allocate memory
  */
 char* SEC_String_PrependCharacter(char** target, char character);
+
+/** 
+ * @return The string target
+ * @note Returns NULL if it fails to allocate memory
+ * @warning Passing user controlled input as target will open up a uncontrolled format string attack.
+ */
+char* SEC_String_Format(char** target, const char* format, ...);
+
+/** 
+ * @return The string target
+ * @note Returns NULL if it fails to allocate memory
+ * @warning Passing user controlled input as target will open up a uncontrolled format string attack.
+ */
+char* SEC_String_FormatPremadeList(char** target, va_list arguments);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()

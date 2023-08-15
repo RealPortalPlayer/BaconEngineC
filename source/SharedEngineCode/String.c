@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdio.h>
 
 #include "SharedEngineCode/String.h"
 
@@ -240,6 +241,37 @@ char* SEC_String_PrependCharacter(char** target, char character) {
 
     (*target)[0] = character;
     (*target)[targetLength + 1] = 0;
+    return *target;
+}
+
+char* SEC_String_Format(char** target, const char* format, ...) {
+    va_list arguments;
+    
+    va_start(arguments, format);
+    
+    SEC_String_FormatPremadeList(target, arguments);
+    
+    va_end(arguments);
+    return *target;
+}
+
+char* SEC_String_FormatPremadeList(char** target, va_list arguments) {
+    va_list argumentsCopy;
+
+    va_copy(argumentsCopy, arguments);
+
+    size_t newSize = vsnprintf(NULL, 0, *target, arguments);
+    char* newBuffer = malloc(newSize + 1);
+
+    if (newBuffer == NULL) {
+        va_end(argumentsCopy);
+        return NULL;
+    }
+    
+    vsnprintf(newBuffer, newSize + 1, *target, argumentsCopy);
+    va_end(argumentsCopy);
+
+    *target = newBuffer;
     return *target;
 }
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()
