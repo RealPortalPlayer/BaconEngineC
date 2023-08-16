@@ -141,8 +141,7 @@ SEC_Launcher_StartEngineResults SEC_Launcher_StartEngine(const SEC_Launcher_Conf
                                              clientShutdown,
                                              clientSupportsServer,
                                              clientGetName,
-                                             clientGetEngineVersion
-                                         );
+                                             clientGetEngineVersion);
     
     SEC_Launcher_StartEngineResults results = SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(SEC_Launcher_StartEngineResults, SEC_BOOLEAN_TRUE);
     
