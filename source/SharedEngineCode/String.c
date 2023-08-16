@@ -252,7 +252,7 @@ char* SEC_String_Format(char** target, const char* format, ...) {
     SEC_String_FormatPremadeList(target, arguments);
     
     va_end(arguments);
-    return *target;
+    return target != NULL ? *target : NULL;
 }
 
 char* SEC_String_FormatPremadeList(char** target, va_list arguments) {
