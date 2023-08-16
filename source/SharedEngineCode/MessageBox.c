@@ -35,11 +35,13 @@ SEC_MessageBox_Results SEC_MessageBox_Display(SEC_MessageBox_Icons icon, SEC_Mes
     va_list arguments;
     char* messageClone = SEC_String_Copy(message);
 
-    va_start(arguments, message);
-    SEC_String_FormatPremadeList(&messageClone, arguments);
-    va_end(arguments);
+    if (messageClone != NULL) {
+        va_start(arguments, message);
+        SEC_String_FormatPremadeList(&messageClone, arguments);
+        va_end(arguments);   
+    }
     
-    SEC_MessageBox_Results result = MessageBox(NULL, messageClone, caption, flags);
+    SEC_MessageBox_Results result = MessageBox(NULL, messageClone != NULL ? messageClone : message, caption, flags);
 
     free(messageClone);
     return result;
