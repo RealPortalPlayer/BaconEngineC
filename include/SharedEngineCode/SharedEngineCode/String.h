@@ -55,7 +55,7 @@ char* SEC_String_PrependCharacter(char** target, char character);
  * @note Returns NULL if it fails to allocate memory
  * @warning Passing user controlled input as target will open up a uncontrolled format string attack.
  */
-char* SEC_String_Format(char** target, const char* format, ...);
+char* SEC_String_Format(char** target, ...);
 
 /** 
  * @return The string target

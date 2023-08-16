@@ -244,10 +244,10 @@ char* SEC_String_PrependCharacter(char** target, char character) {
     return *target;
 }
 
-char* SEC_String_Format(char** target, const char* format, ...) {
+char* SEC_String_Format(char** target, ...) {
     va_list arguments;
     
-    va_start(arguments, format);
+    va_start(arguments, target);
     
     SEC_String_FormatPremadeList(target, arguments);
     
