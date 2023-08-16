@@ -7,17 +7,33 @@
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <SharedEngineCode/User.h>
 #include <SharedEngineCode/Internal/PlatformSpecific.h>
+#include <SharedEngineCode/MessageBox.h>
+#include <SharedEngineCode/String.h>
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <dlfcn.h>
 #elif SEC_OPERATINGSYSTEM_WINDOWS
 #   include <Windows.h>
+#   define argc __argc
+#   define argv __argv
 #endif
 
+#ifndef BE_WINDOWS_LAUNCHER
+#   define BL_MAIN_INFO(caption, ...) SEC_LOGGER_INFO(__VA_ARGS__)
+#   define BL_MAIN_ERROR(caption, ...) SEC_LOGGER_FATAL(__VA_ARGS__)
 int main(int argc, char** argv) {
+#else
+#   define BL_MAIN_INFO(caption, ...) SEC_MessageBox_Display(SEC_MESSAGEBOX_ICON_INFORMATION, SEC_MESSAGEBOX_BUTTON_OK, caption, __VA_ARGS__)
+#   define BL_MAIN_ERROR(caption, ...) SEC_MessageBox_Display(SEC_MESSAGEBOX_ICON_ERROR, SEC_MESSAGEBOX_BUTTON_OK, caption, __VA_ARGS__)
+int APIENTRY WinMain(HINSTANCE instanceHandle, HINSTANCE previousInstanceHandle, PSTR commandLine, int commandShow) {
+    (void) instanceHandle;
+    (void) previousInstanceHandle;
+    (void) commandLine;
+    (void) commandShow;
+#endif
     SEC_ArgumentHandler_Initialize(argc, argv);
     SEC_LOGGER_TRACE("Built on: %s\nBuilt for: %s\n", __TIMESTAMP__, SEC_OPERATINGSYSTEM_NAME);
-
+    
     SEC_Launcher_Configuration configuration = {
         .code = SEC_LAUNCHER_ERROR_CODE_NULL
     };
@@ -27,9 +43,10 @@ int main(int argc, char** argv) {
                                                                                &results);
 
     if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_VERSION, SEC_BUILTINARGUMENTS_VERSION_SHORT, 0)) {
-        SEC_LOGGER_INFO("Launcher version: %s\n"
-                        "Built with engine version: %s\n", BE_LAUNCHER_VERSION, BE_ENGINE_VERSION);
+        char* message = SEC_String_Copy("Launcher version: %s\n"
+                                        "Built with engine version: %s\n");
 
+        SEC_String_Format(&message, BE_LAUNCHER_VERSION, BE_ENGINE_VERSION);
         SEC_Launcher_SetLauncherPath();
         SEC_Launcher_SetEnginePath();
         
@@ -44,30 +61,39 @@ int main(int argc, char** argv) {
 
             SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(GetVersion, getVersion, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.engineBinary, "BE_EntryPoint_GetVersion"));
             
-            if (getVersion != NULL)
-                SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "Engine version: %s\n", getVersion());
+            if (getVersion != NULL) {
+                SEC_String_Append(&message, "Engine version: %s\n");
+                SEC_String_Format(&message, getVersion());
+            }
 
             SEC_PLATFORMSPECIFIC_CLOSE_BINARY(configuration.unionVariables.data.engineBinary);
         }
         
-        if (clientInformationResults == 0)
+        if (clientInformationResults == 0) {
+            BL_MAIN_INFO("Version", "%s", message);
             return 0;
+        }
         
         configuration.code = SEC_LAUNCHER_ERROR_CODE_NULL;
 
         SEC_Launcher_InitializeClient(&configuration);
         
-        if (configuration.code != SEC_LAUNCHER_ERROR_CODE_NULL)
+        if (configuration.code != SEC_LAUNCHER_ERROR_CODE_NULL) {
+            BL_MAIN_INFO("Version", "%s", message);
             return 0;
+        }
 
         typedef const char* (*GetVersion)(void);
         GetVersion getVersion;
 
         SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(GetVersion, getVersion, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.clientBinary, "I_EntryPoint_GetEngineVersion"));
         
-        if (getVersion != NULL)
-            SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "Client was compiled with engine version: %s\n", getVersion());
-
+        if (getVersion != NULL) {
+            SEC_String_Append(&message, "Client was compiled with engine version: %s\n");
+            SEC_String_Format(&message, getVersion());
+        }
+        
+        BL_MAIN_INFO("Version", "%s", message);
         SEC_PLATFORMSPECIFIC_CLOSE_BINARY(configuration.unionVariables.data.clientBinary);
         return 0;
     }
@@ -81,7 +107,7 @@ int main(int argc, char** argv) {
         SEC_LOGGER_WARN("You're running as root! If a client says you require to be root, then it's probably a virus\n");
 
     if (clientInformationResults == 0) {
-        SEC_LOGGER_FATAL("No client specified, please check help for more information\n");
+        BL_MAIN_ERROR("Launcher Error", "No client specified, please check help for more information\n");
         return 1;
     }
 
@@ -90,15 +116,15 @@ int main(int argc, char** argv) {
     if (configuration.code != SEC_LAUNCHER_ERROR_CODE_NULL) {
         switch (configuration.code) {
             case SEC_LAUNCHER_ERROR_CODE_BINARY:
-                SEC_LOGGER_FATAL("Failed to load %s binary: %s\n", configuration.unionVariables.errorReason.isEngine ? "engine" : "client", configuration.unionVariables.errorReason.errorMessage);
+                BL_MAIN_ERROR("Launcher Error", "Failed to load %s binary: %s\n", configuration.unionVariables.errorReason.isEngine ? "engine" : "client", configuration.unionVariables.errorReason.errorMessage);
                 return 1;
 
             case SEC_LAUNCHER_ERROR_CODE_ENTRY_NULL:
-                SEC_LOGGER_FATAL("Failed to get engine entry-point: %s\n", configuration.unionVariables.errorReason.errorMessage);
+                BL_MAIN_ERROR("Launcher Error", "Failed to get engine entry-point: %s\n", configuration.unionVariables.errorReason.errorMessage);
                 return 1;
 
             default:
-                SEC_LOGGER_FATAL("Unknown error: %i\n", configuration.code);
+                BL_MAIN_ERROR("Launcher Error", "Unknown error: %i\n", configuration.code);
                 return 1;
         }
     }

@@ -18,3 +18,7 @@ if(NOT BE_DONT_SET_BINARY_OUTPUT_PATH)
 endif()
 
 target_compile_definitions(BaconLauncher PUBLIC BE_ENGINE_VERSION="${BE_ENGINE_VERSION}" BE_LAUNCHER_VERSION="${BE_LAUNCHER_VERSION}")
+
+if(WIN32)
+    include(BaconLauncherWindows.cmake)
+endif()
