@@ -13,6 +13,18 @@ set(BE_SOURCE_FILES
 
 add_library(SharedEngineCode STATIC ${BE_SOURCE_FILES})
 
+if(NOT "${BE_ASAN_SANITIZER}" STREQUAL "")
+    if(MSVC)
+        target_compile_options(SharedEngineCode PUBLIC /fsanitize=${BE_ASAN_SANITIZER})
+        target_link_options(SharedEngineCode PUBLIC /fsanitize=${BE_ASAN_SANITIZER})
+        target_compile_definitions(SharedEngineCode PUBLIC BE_ASAN_ENABLED)
+    else()
+        target_compile_options(SharedEngineCode PUBLIC -fsanitize=${BE_ASAN_SANITIZER})
+        target_link_options(SharedEngineCode PUBLIC -fsanitize=${BE_ASAN_SANITIZER})
+        target_compile_definitions(SharedEngineCode PUBLIC BE_ASAN_ENABLED)
+    endif()
+endif()
+
 if(NOT BE_DISABLE_PEDANTIC_MODE)
     if(MSVC)
         target_compile_options(SharedEngineCode PRIVATE /W4 /WX)
