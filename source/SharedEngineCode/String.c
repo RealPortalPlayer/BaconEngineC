@@ -216,7 +216,7 @@ SEC_Boolean SEC_String_Equals(const char* string, const char* compare, SEC_Boole
 
 char* SEC_String_AppendCharacter(char** target, char character) {
     size_t targetLength = strlen(*target);
-    char* reallocatedString = realloc(*target, sizeof(char) * (targetLength + 1));
+    char* reallocatedString = realloc(*target, sizeof(char) * (targetLength + 2));
     
     if (reallocatedString == NULL)
         return NULL;
@@ -229,7 +229,7 @@ char* SEC_String_AppendCharacter(char** target, char character) {
 
 char* SEC_String_PrependCharacter(char** target, char character) {
     size_t targetLength = strlen(*target);
-    char* reallocatedString = realloc(*target, sizeof(char) * (targetLength + 1));
+    char* reallocatedString = realloc(*target, sizeof(char) * (targetLength + 2));
     
     if (reallocatedString == NULL)
         return NULL;
