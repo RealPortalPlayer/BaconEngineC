@@ -132,7 +132,7 @@ int APIENTRY WinMain(HINSTANCE instanceHandle, HINSTANCE previousInstanceHandle,
     if (configuration.unionVariables.data.clientName[0] != '\0')
         SEC_LOGGER_INFO("Ready, starting: %s\n", configuration.unionVariables.data.clientName);
     else
-        SEC_LOGGER_INFO("Ready, starting");
+        SEC_LOGGER_INFO("Ready, starting\n");
 
     SEC_LOGGER_TRACE("Entering engine code\n");
 
