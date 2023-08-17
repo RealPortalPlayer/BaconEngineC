@@ -14,8 +14,10 @@
 #   include <dlfcn.h>
 #elif SEC_OPERATINGSYSTEM_WINDOWS
 #   include <Windows.h>
-#   define argc __argc
-#   define argv __argv
+#   ifdef BE_WINDOWS_LAUNCHER
+#       define argc __argc
+#       define argv __argv
+#   endif
 #endif
 
 #ifndef BE_WINDOWS_LAUNCHER
