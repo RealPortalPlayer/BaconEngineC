@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <SharedEngineCode/Internal/Boolean.h>
+#include <SharedEngineCode/MessageBox.h>
 
 #include "BaconEngine/ClientInformation.h"
 #include "BaconEngine/BinaryExport.h"
@@ -28,9 +29,11 @@ do {                                                 \
                 level = SEC_LOGGER_LOG_LEVEL_ERROR;  \
             SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, level, "Strict Check Failed\nCode: %s\nMessage: ", #check); \
             SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, level, __VA_ARGS__);  \
-            if (BE_ClientInformation_IsStrictModeEnabled()) \
+            if (BE_ClientInformation_IsStrictModeEnabled()) { \
+                SEC_MessageBox_Display(SEC_MESSAGEBOX_ICON_ERROR, SEC_MESSAGEBOX_BUTTON_OK, "BaconEngine - Strict Mode", "A strict check was triggered. More information can be found in the console. You can disable strict mode by using the \"--no-strict\", or the \"-ns\" argument.\n\nThe engine will now close."); \
                 abort();                             \
-            else                                     \
+                while (SEC_BOOLEAN_TRUE) continue; \
+            } else                                   \
                 return returnValue;                  \
         }                                            \
 } while (SEC_BOOLEAN_FALSE)

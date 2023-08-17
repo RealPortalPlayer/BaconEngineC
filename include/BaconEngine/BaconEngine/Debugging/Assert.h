@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <SharedEngineCode/Logger.h>
 #include <SharedEngineCode/Internal/Boolean.h>
+#include <SharedEngineCode/MessageBox.h>
 
 #include "BaconEngine/BinaryExport.h"
 
@@ -22,7 +23,9 @@ do {                          \
     if (!(check)) {           \
         SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, SEC_LOGGER_LOG_LEVEL_FATAL, "Assertion Failed\nCode: %s\nMessage: ", #check); \
         SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_FATAL, __VA_ARGS__); \
+        SEC_MessageBox_Display(SEC_MESSAGEBOX_ICON_ERROR, SEC_MESSAGEBOX_BUTTON_OK, "BaconEngine - Assert", "An assert was triggered. More information can be found in the console.\n\nThe engine will now close."); \
         abort();              \
+        while (SEC_BOOLEAN_TRUE) continue; \
     }                         \
 } while (SEC_BOOLEAN_FALSE)
 
