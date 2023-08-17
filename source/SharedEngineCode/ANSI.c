@@ -7,7 +7,7 @@
 #include "SharedEngineCode/BuiltInArguments.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-const char* secAnsiCodesCharArray[SEC_ANSI_CODE_SIZE] = {
+static const char* secAnsiCodesCharArray[SEC_ANSI_CODE_SIZE] = {
     "\033[1m", "\033[4m", "\033[5m", "\033[7m",
     "\033[m",
     "\033[0;30m", "\033[0;31m", "\033[0;32m", "\033[0;33m",
