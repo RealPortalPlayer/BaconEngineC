@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <SharedEngineCode/Logger.h>
+#include <SharedEngineCode/Internal/Boolean.h>
 
 #include "BaconEngine/BinaryExport.h"
 
@@ -25,5 +26,5 @@ do {                          \
     }                         \
 } while (SEC_BOOLEAN_FALSE)
 
-#define BE_ASSERT_ALWAYS(message) BE_ASSERT(0, message)
+#define BE_ASSERT_ALWAYS(message) BE_ASSERT(SEC_BOOLEAN_FALSE, message)
 #define BE_ASSERT_NOT_IMPLEMENTED() BE_ASSERT_ALWAYS("This function is currently not implemented\n")

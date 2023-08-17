@@ -7,6 +7,7 @@
 #pragma once
 
 #include "OperatingSystem.h"
+#include "Boolean.h"
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <dlfcn.h>
@@ -33,7 +34,7 @@
         LPSTR message = NULL;                            \
         FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, id, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR) &message, 0, NULL); \
         variable = message;                              \
-    } while (0)
+    } while (SEC_BOOLEAN_FALSE)
 #   define SEC_PLATFORMSPECIFIC_BINARY_EXTENSION ".dll"
 #   define SEC_PLATFORMSPECIFIC_CLOSE_BINARY(binary) FreeLibrary(binary)
 #   define SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(type, variable, value) variable = (type) value

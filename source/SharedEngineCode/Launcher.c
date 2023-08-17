@@ -127,18 +127,18 @@ SEC_Launcher_StartEngineResults SEC_Launcher_StartEngine(const SEC_Launcher_Conf
     SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(SEC_Launcher_ClientGetEngineVersion, clientGetEngineVersion, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_GetEngineVersion"));
 
     SEC_Launcher_EngineDetails details = SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(SEC_Launcher_EngineDetails,
-                                             SEC_ArgumentHandler_GetCount(),
-                                             SEC_ArgumentHandler_GetVector(),
-                                             SEC_Paths_GetLauncherDirectory(),
-                                             SEC_Paths_GetEngineDirectory(),
-                                             SEC_Paths_GetClientDirectory(),
-                                             configuration->unionVariables.data.engineBinary,
-                                             clientInitialize,
-                                             clientStart,
-                                             clientShutdown,
-                                             clientSupportsServer,
-                                             clientGetName,
-                                             clientGetEngineVersion);
+        SEC_ArgumentHandler_GetCount(),
+        SEC_ArgumentHandler_GetVector(),
+        SEC_Paths_GetLauncherDirectory(),
+        SEC_Paths_GetEngineDirectory(),
+        SEC_Paths_GetClientDirectory(),
+        configuration->unionVariables.data.engineBinary,
+        clientInitialize,
+        clientStart,
+        clientShutdown,
+        clientSupportsServer,
+        clientGetName,
+        clientGetEngineVersion);
     
     SEC_Launcher_StartEngineResults results = SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(SEC_Launcher_StartEngineResults, SEC_BOOLEAN_TRUE);
     

@@ -22,7 +22,7 @@ void BE_Windows_Initialize(void) {
     beWindowsInitialized = SEC_BOOLEAN_TRUE;
 
     BE_SpecificPlatformFunctions_Initialize(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions,
-                                                                                {
+        {
             &BE_WindowsWindow_Create,
             &BE_WindowsWindow_GetTitle,
             &BE_WindowsWindow_GetSize,
@@ -36,16 +36,16 @@ void BE_Windows_Initialize(void) {
             &BE_WindowsWindow_Close,
             &BE_WindowsWindow_UpdateEvents
         },
-                                                                                {
+        {
             &BE_WindowsRenderer_ClearScreen,
             &BE_WindowsRenderer_SetClearColor,
             &BE_WindowsRenderer_GetClearColor,
             &BE_WindowsRenderer_Render,
             &BE_WindowsRenderer_DrawFilledRectangle
         },
-                                                                                {NULL}, // TODO: Input
+        {NULL}, // TODO: Input
         &BE_Windows_Destroy,
-                                                                                &BE_Windows_GetTimer
+        &BE_Windows_GetTimer
     ));
 }
 
