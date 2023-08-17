@@ -56,7 +56,7 @@ typedef struct {
 
 typedef int (*SEC_Launcher_EngineStart)(const SEC_Launcher_EngineDetails*);
 
-typedef struct SEC_Launcher_Configuration {
+typedef struct {
     SEC_Launcher_ErrorCodes code;
     union {
         struct {
