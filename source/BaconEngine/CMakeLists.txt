@@ -147,4 +147,3 @@ add_custom_target(BaconEngineDefaultPackage
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../assets/BaconEngine/Default)
 
 include(BaconEngineClient.cmake)
-include(BaconEngineClientStandalone.cmake)

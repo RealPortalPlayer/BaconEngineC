@@ -12,7 +12,7 @@ if(NOT BE_DISABLE_PEDANTIC_MODE)
     endif()
 endif()
 
-target_link_libraries(BaconEngineLauncher LINK_PUBLIC BaconEngineClientStandalone)
+target_link_libraries(BaconEngineLauncher LINK_PUBLIC BaconEngineClient)
 
 if(NOT WIN32)
     target_compile_options(BaconEngineLauncher PUBLIC -rdynamic)

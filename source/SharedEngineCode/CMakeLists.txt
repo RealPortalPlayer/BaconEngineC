@@ -39,5 +39,3 @@ target_include_directories(SharedEngineCode PUBLIC ../../include/SharedEngineCod
 if(MSVC)
     target_compile_definitions(SharedEngineCode PUBLIC -D_CRT_SECURE_NO_WARNINGS)
 endif()
-
-include(SharedEngineCodeStandalone.cmake)

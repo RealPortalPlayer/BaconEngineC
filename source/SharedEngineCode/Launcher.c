@@ -26,9 +26,7 @@ void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration,
 
 const char* SEC_Launcher_GetDefaultHelpList(void) {
     return SEC_BUILTINARGUMENTS_HELP " (" SEC_BUILTINARGUMENTS_HELP_SHORT "): Shows information about each argument\n"
-#ifndef BE_STANDALONE_CLIENT
-           SEC_BUILTINARGUMENTS_CLIENT " <path> (" SEC_BUILTINARGUMENTS_CLIENT_SHORT "): Specifies what client you want to run\n"
-#endif
+           SEC_BUILTINARGUMENTS_CLIENT " <path> (" SEC_BUILTINARGUMENTS_CLIENT_SHORT "): Specifies what client you want to run, does nothing for standalone builds\n"
            SEC_BUILTINARGUMENTS_SERVER " (" SEC_BUILTINARGUMENTS_SERVER_SHORT "): Starts the client as a server instance\n"
            SEC_BUILTINARGUMENTS_NO_STRICT " (" SEC_BUILTINARGUMENTS_NO_STRICT_SHORT "): Don't crash the client when an API error occurs\n"
            SEC_BUILTINARGUMENTS_DONT_PARSE " <argument>: Do not parse arguments beyond this point\n"
@@ -83,7 +81,6 @@ void SEC_Launcher_InitializeEngine(SEC_Launcher_Configuration* configuration) {
 
     SEC_PLATFORMSPECIFIC_GET_ERROR(configuration->unionVariables.errorReason.errorMessage);
 }
-
 
 void SEC_Launcher_InitializeClient(SEC_Launcher_Configuration* configuration) {
     configuration->unionVariables.data.clientBinary = SEC_PLATFORMSPECIFIC_GET_BINARY(SEC_Paths_GetClientBinaryPath(), RTLD_NOW);
