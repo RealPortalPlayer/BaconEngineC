@@ -6,19 +6,18 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <SharedEngineCode/Logger.h>
-#include <SharedEngineCode/Internal/Boolean.h>
-#include <SharedEngineCode/MessageBox.h>
 
-#include "BaconEngine/BinaryExport.h"
+#include "SharedEngineCode/Logger.h"
+#include "SharedEngineCode/Internal/Boolean.h"
+#include "SharedEngineCode/MessageBox.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-BE_BINARYEXPORT SEC_Boolean BE_Assert_CheckLogsEnabled(void);
+SEC_Boolean SEC_Assert_CheckLogsEnabled(void);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()
 
-#define BE_ASSERT(check, ...) \
+#define SEC_ASSERT(check, ...) \
 do {                          \
-    if (BE_Assert_CheckLogsEnabled()) \
+    if (SEC_Assert_CheckLogsEnabled()) \
         SEC_LOGGER_TRACE("Assert checking: %s\n", #check); \
     if (!(check)) {           \
         SEC_Logger_LogImplementation(SEC_BOOLEAN_TRUE, SEC_LOGGER_LOG_LEVEL_FATAL, "Assertion Failed\nCode: %s\nMessage: ", #check); \
@@ -29,5 +28,5 @@ do {                          \
     }                         \
 } while (SEC_BOOLEAN_FALSE)
 
-#define BE_ASSERT_ALWAYS(message) BE_ASSERT(SEC_BOOLEAN_FALSE, message)
-#define BE_ASSERT_NOT_IMPLEMENTED() BE_ASSERT_ALWAYS("This function is currently not implemented\n")
+#define SEC_ASSERT_ALWAYS(message) SEC_ASSERT(SEC_BOOLEAN_FALSE, message)
+#define SEC_ASSERT_NOT_IMPLEMENTED() SEC_ASSERT_ALWAYS("This function is currently not implemented\n")

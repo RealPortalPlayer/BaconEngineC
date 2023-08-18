@@ -51,14 +51,10 @@ set(BE_SOURCE_FILES
         Console/Console.c
         Rendering/Layer.c
         Input/Keyboard.c
-        Storage/DynamicArray.c
-        Storage/DynamicDictionary.c
         I18N.c
         Input/Mouse.c
         Rendering/UI.c
         DeltaTime.c
-        Debugging/Assert.c
-        Debugging/StrictMode.c
         Storage/Package.c
         Storage/DefaultPackage.c)
 
@@ -86,7 +82,9 @@ add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         Platform/SpecificPlatformFunctions.c
         Platform/TextMode/TextMode.c
         Rendering/EngineUIs.c
-        Rendering/EngineLayers.c)
+        Rendering/EngineLayers.c
+        Storage/PrivateDynamicArray.c
+        Storage/PrivateDynamicDictionary.c)
 
 if(NOT BE_DISABLE_OPENGL)
     set(BE_LIBRARIES glfw OpenGL::GL glad)

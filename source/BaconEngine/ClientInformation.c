@@ -46,20 +46,6 @@ SEC_Boolean BE_ClientInformation_IsServerModeEnabled(void) {
 #endif
 }
 
-SEC_Boolean BE_ClientInformation_IsStrictModeEnabled(void) {
-#ifndef BE_CLIENT_BINARY
-    static int enabled = -1;
-
-    if (enabled == -1)
-        enabled = !SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_NO_STRICT, SEC_BUILTINARGUMENTS_NO_STRICT_SHORT, 0);
-
-    return enabled;
-#else
-    BE_INTERFACEFUNCTION(SEC_Boolean, void);
-    return function();
-#endif
-}
-
 void BE_ClientInformation_StopRunning(void) {
 #ifndef BE_CLIENT_BINARY
     if (!beClientInformationRunning) {

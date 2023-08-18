@@ -3,25 +3,26 @@
 
 #include <stddef.h>
 #include <string.h>
+#include <SharedEngineCode/Debugging/StrictMode.h>
+#include <SharedEngineCode/Debugging/Assert.h>
 
-#include "BaconEngine/Debugging/StrictMode.h"
-#include "BaconEngine/Debugging/Assert.h"
 #include "BaconEngine/Console/Console.h"
 #include "../InterfaceFunctions.h"
+#include "BaconEngine/Math/Bitwise.h"
+#include "BaconEngine/ClientInformation.h"
 
 #ifndef BE_CLIENT_BINARY
 #   include "EngineCommands.h"
 #   include "PrivateConsole.h"
 #   include "../Storage/PrivateDynamicArray.h"
 #   include "../EngineMemory.h"
-#   include "BaconEngine/Math/Bitwise.h"
 #   include "../Storage/PrivateDynamicDictionary.h"
 #endif
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
-static BE_DynamicArray beConsolePrivateCommands;
-static BE_DynamicArray beConsoleCommands;
+static SEC_DynamicArray beConsolePrivateCommands;
+static SEC_DynamicArray beConsoleCommands;
 static BE_PrivateConsole_Command* beConsoleLastCommand;
 static SEC_Boolean beConsoleDuplicateCommand = SEC_BOOLEAN_FALSE;
 static SEC_Boolean beConsoleInitialized = SEC_BOOLEAN_FALSE;
@@ -36,7 +37,7 @@ static BE_PrivateConsole_Command* BE_Console_GetPrivateCommand(const char* name)
         return cachedCommand;
 
     for (int commandId = 0; commandId < beConsolePrivateCommands.used; commandId++) {
-        BE_PrivateConsole_Command* foundCommand = BE_DYNAMICARRAY_GET_ELEMENT(BE_PrivateConsole_Command, beConsolePrivateCommands, commandId);
+        BE_PrivateConsole_Command* foundCommand = SEC_DYNAMICARRAY_GET_ELEMENT(BE_PrivateConsole_Command, beConsolePrivateCommands, commandId);
 
         if (strcmp(foundCommand->publicCommand.name, name) != 0)
             continue;
@@ -102,7 +103,7 @@ int BE_Console_GetAllocatedCommandsAmount(void) {
 
 int BE_Console_GetCommandReallocationAmount(void) {
 #ifndef BE_CLIENT_BINARY
-    return beConsoleCommands.calledRealloc;
+    return beConsoleCommands.calledReallocate;
 #else
     BE_INTERFACEFUNCTION(int, void);
     return function();
@@ -111,7 +112,7 @@ int BE_Console_GetCommandReallocationAmount(void) {
 
 #ifndef BE_CLIENT_BINARY
 void BE_PrivateConsole_Initialize(void) {
-    BE_ASSERT(!beConsoleInitialized, "Already initialized the console\n");
+    SEC_ASSERT(!beConsoleInitialized, "Already initialized the console\n");
     SEC_LOGGER_INFO("Initializing console\n");
 
     beConsoleInitialized = SEC_BOOLEAN_TRUE;
@@ -131,8 +132,8 @@ void BE_PrivateConsole_Initialize(void) {
 void BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context)) {
 #ifndef BE_CLIENT_BINARY
     for (int i = 0; i < (int) beConsoleCommands.used; i++)
-        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(strcmp(BE_DYNAMICARRAY_GET_ELEMENT(BE_Command, beConsoleCommands, i)->name, name) != 0,
-                            "The command '%s' is already registered\n", name);
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(strcmp(SEC_DYNAMICARRAY_GET_ELEMENT(BE_Command, beConsoleCommands, i)->name, name) != 0,
+                                             "The command '%s' is already registered\n", name);
 
     if (!beConsoleDuplicateCommand && BE_Console_CheckRegisterLogsEnabled())
         SEC_LOGGER_TRACE("Registering command\n"
@@ -142,12 +143,12 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
                          "Spot: %i/%zu\n", name, description, flags, beConsoleCommands.used, beConsoleCommands.size);
 
     if (flags != BE_COMMAND_FLAG_NULL) {
-        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_SERVER_ONLY) || !BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY),
-                                            "Invalid command flags, cannot be both for server and client only\n");
-        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CHEATS_ONLY) || !BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY),
-                                            "Invalid command flags, the client cannot run any cheat commands\n");
-        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY) || !BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAGS_RAN_ON_SERVER),
-                                            "Invalid command flags, cannot be both client only but also only runs on the server\n");
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_SERVER_ONLY) || !BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY),
+                                             "Invalid command flags, cannot be both for server and client only\n");
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CHEATS_ONLY) || !BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY),
+                                             "Invalid command flags, the client cannot run any cheat commands\n");
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY) || !BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAGS_RAN_ON_SERVER),
+                                             "Invalid command flags, cannot be both client only but also only runs on the server\n");
 
         if (BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_SERVER_ONLY) && BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAGS_RAN_ON_SERVER))
             SEC_LOGGER_WARN("Redundant command flags, server commands will only run on servers\n");
@@ -168,8 +169,10 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
     privateConsoleCommand->publicCommand.Run = Run;
     beConsoleLastCommand = privateConsoleCommand;
 
-    BE_DynamicArray_AddElementToLast(&beConsolePrivateCommands, (void*) privateConsoleCommand);
-    BE_DynamicArray_AddElementToLast(&beConsoleCommands, (void*) &privateConsoleCommand->publicCommand);
+    BE_PrivateDynamicArray_CheckResize(&beConsolePrivateCommands);
+    SEC_DynamicArray_AddElementToLast(&beConsolePrivateCommands, (void*) privateConsoleCommand);
+    BE_PrivateDynamicArray_CheckResize(&beConsolePrivateCommands);
+    SEC_DynamicArray_AddElementToLast(&beConsoleCommands, (void*) &privateConsoleCommand->publicCommand);
 
     beConsoleDuplicateCommand = SEC_BOOLEAN_FALSE;
 #else
@@ -179,13 +182,13 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
 
 void BE_Command_AddArgument(const char* name, SEC_Boolean required) {
 #ifndef BE_CLIENT_BINARY
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(beConsoleCommands.used != 0, "There is no command to add arguments to\n");
+    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beConsoleCommands.used != 0, "There is no command to add arguments to\n");
 
-    BE_PrivateConsole_Command* command = BE_DYNAMICARRAY_GET_LAST_ELEMENT(BE_PrivateConsole_Command, beConsolePrivateCommands);
+    BE_PrivateConsole_Command* command = SEC_DYNAMICARRAY_GET_LAST_ELEMENT(BE_PrivateConsole_Command, beConsolePrivateCommands);
 
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(command->publicCommand.arguments.used == 0 ||
-                                        BE_DYNAMICARRAY_GET_LAST_ELEMENT(BE_Command_Argument, command->publicCommand.arguments)->required ||
-                                        !required, "Required arguments cannot be added after an optional argument\n");
+    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(command->publicCommand.arguments.used == 0 ||
+                                         SEC_DYNAMICARRAY_GET_LAST_ELEMENT(BE_Command_Argument, command->publicCommand.arguments)->required ||
+                                         !required, "Required arguments cannot be added after an optional argument\n");
 
     BE_Command_Argument* argument = BE_EngineMemory_AllocateMemory(sizeof(BE_Command_Argument), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
 
@@ -195,7 +198,8 @@ void BE_Command_AddArgument(const char* name, SEC_Boolean required) {
     if (required)
         command->requiredArgumentCount++;
 
-    BE_DynamicArray_AddElementToLast(&command->publicCommand.arguments, (void*) argument);
+    BE_PrivateDynamicArray_CheckResize(&command->publicCommand.arguments);
+    SEC_DynamicArray_AddElementToLast(&command->publicCommand.arguments, (void*) argument);
 #else
     BE_INTERFACEFUNCTION(void, const char*, SEC_Boolean)(name, required);
 #endif
@@ -203,7 +207,7 @@ void BE_Command_AddArgument(const char* name, SEC_Boolean required) {
 
 void BE_Command_DuplicatePrevious(const char* name, const char* description) {
 #ifndef BE_CLIENT_BINARY
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(beConsoleCommands.used != 0, "There is no command to duplicate\n");
+    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beConsoleCommands.used != 0, "There is no command to duplicate\n");
 
     if (BE_Console_CheckRegisterLogsEnabled())
         SEC_LOGGER_TRACE("Duplicating command\n"
@@ -234,7 +238,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
     char* name = BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
     BE_PrivateConsole_Command* command = NULL;
-    BE_DynamicDictionary arguments;
+    SEC_DynamicDictionary arguments;
     size_t inputLength = strlen(input);
     
     name[0] = 0;
@@ -301,7 +305,12 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
             if (input[index] == ' ' && quotePosition == -1 && !escaped) {
                 publish_argument:
-                BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->publicCommand.arguments, current++)->name, argument);
+                BE_PrivateDynamicArray_CheckResize(&arguments.keys);
+                BE_PrivateDynamicArray_CheckResize(&arguments.values);
+                SEC_DynamicDictionary_AddElementToLast(&arguments,
+                                                       (void*) SEC_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument,
+                                                                                            command->publicCommand.arguments,
+                                                                                            current++)->name, argument);
 
                 added = SEC_BOOLEAN_TRUE;
                 trimmed = SEC_BOOLEAN_FALSE;
@@ -367,7 +376,12 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
         if (!added) {
             if (argument[0] != '\0') {
-                BE_DynamicDictionary_AddElementToLast(&arguments, (void*) BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->publicCommand.arguments, current)->name, argument);
+                BE_PrivateDynamicArray_CheckResize(&arguments.keys);
+                BE_PrivateDynamicArray_CheckResize(&arguments.values);
+                SEC_DynamicDictionary_AddElementToLast(&arguments,
+                                                       (void*) SEC_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument,
+                                                                                            command->publicCommand.arguments,
+                                                                                            current)->name, argument);
 
                 added = SEC_BOOLEAN_TRUE;
             }
@@ -430,13 +444,13 @@ SEC_Boolean BE_Console_IsEngineCommand(BE_Command command) {
 
 #ifndef BE_CLIENT_BINARY
 void BE_PrivateConsole_Destroy(void) {
-    BE_ASSERT(beConsoleInitialized, "Console are not initialized\n");
+    SEC_ASSERT(beConsoleInitialized, "Console are not initialized\n");
     SEC_LOGGER_INFO("Destroying console\n");
 
     beConsoleInitialized = SEC_BOOLEAN_FALSE;
 
     for (int commandId = 0; commandId < beConsoleCommands.used; commandId++) {
-        BE_PrivateConsole_Command* command = BE_DYNAMICARRAY_GET_ELEMENT(BE_PrivateConsole_Command, beConsoleCommands, commandId);
+        BE_PrivateConsole_Command* command = SEC_DYNAMICARRAY_GET_ELEMENT(BE_PrivateConsole_Command, beConsoleCommands, commandId);
 
         for (int argumentId = 0; argumentId < command->publicCommand.arguments.used; argumentId++)
             BE_EngineMemory_DeallocateMemory(command->publicCommand.arguments.internalArray[argumentId], sizeof(BE_Command_Argument),

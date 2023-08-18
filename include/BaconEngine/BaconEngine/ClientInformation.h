@@ -15,7 +15,6 @@ SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 BE_BINARYEXPORT SEC_Boolean BE_ClientInformation_IsRunning(void);
 BE_BINARYEXPORT SEC_Boolean BE_ClientInformation_IsCheatsEnabled(void);
 BE_BINARYEXPORT SEC_Boolean BE_ClientInformation_IsServerModeEnabled(void);
-BE_BINARYEXPORT SEC_Boolean BE_ClientInformation_IsStrictModeEnabled(void);
 
 BE_BINARYEXPORT void BE_ClientInformation_StopRunning(void);
 BE_BINARYEXPORT void BE_ClientInformation_SetCheats(SEC_Boolean enable);

@@ -18,7 +18,7 @@ static int BE_ArgumentManager_EqualsStringBoolean(const char* value) {
 }
 #endif
 
-int BE_ArgumentManager_GetInteger(BE_DynamicDictionary arguments, const char* name, int defaultValue) {
+int BE_ArgumentManager_GetInteger(SEC_DynamicDictionary arguments, const char* name, int defaultValue) {
 #ifndef BE_CLIENT_BINARY
     if (arguments.keys.size != 0) {
         const char* value = BE_ArgumentManager_GetString(arguments, name, "");
@@ -38,21 +38,21 @@ int BE_ArgumentManager_GetInteger(BE_DynamicDictionary arguments, const char* na
 
     return defaultValue;
 #else
-    BE_INTERFACEFUNCTION(int, BE_DynamicDictionary, const char*, int);
+    BE_INTERFACEFUNCTION(int, SEC_DynamicDictionary, const char*, int);
     return function(arguments, name, defaultValue);
 #endif
 }
 
-SEC_Boolean BE_ArgumentManager_GetBoolean(BE_DynamicDictionary arguments, const char* name, int defaultValue) {
+SEC_Boolean BE_ArgumentManager_GetBoolean(SEC_DynamicDictionary arguments, const char* name, int defaultValue) {
 #ifndef BE_CLIENT_BINARY
     return BE_ArgumentManager_GetInteger(arguments, name, defaultValue) >= 1;
 #else
-    BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicDictionary, const char*, int);
+    BE_INTERFACEFUNCTION(SEC_Boolean, SEC_DynamicDictionary, const char*, int);
     return function(arguments, name, defaultValue);
 #endif
 }
 
-float BE_ArgumentManager_GetFloat(BE_DynamicDictionary arguments, const char* name, float defaultValue) {
+float BE_ArgumentManager_GetFloat(SEC_DynamicDictionary arguments, const char* name, float defaultValue) {
 #ifndef BE_CLIENT_BINARY
     if (arguments.keys.size != 0) {
         const char* value = BE_ArgumentManager_GetString(arguments, name, "");
@@ -72,18 +72,19 @@ float BE_ArgumentManager_GetFloat(BE_DynamicDictionary arguments, const char* na
 
     return defaultValue;
 #else
-    BE_INTERFACEFUNCTION(float, BE_DynamicDictionary, const char*, float);
+    BE_INTERFACEFUNCTION(float, SEC_DynamicDictionary, const char*, float);
     return function(arguments, name, defaultValue);
 #endif
 }
 
-const char* BE_ArgumentManager_GetString(BE_DynamicDictionary arguments, const char* name, const char* defaultValue) {
+const char* BE_ArgumentManager_GetString(SEC_DynamicDictionary arguments, const char* name, const char* defaultValue) {
 #ifndef BE_CLIENT_BINARY
-    const char* value = BE_DynamicDictionary_GetElementValueViaKey(arguments, (void*) name, sizeof(char) + strlen(name));
+    const char* value = SEC_DynamicDictionary_GetElementValueViaKey(arguments, (void*) name,
+                                                                    sizeof(char) + strlen(name));
 
     return value != NULL ? value : defaultValue;
 #else
-    BE_INTERFACEFUNCTION(const char*, BE_DynamicDictionary, const char*, const char*);
+    BE_INTERFACEFUNCTION(const char*, SEC_DynamicDictionary, const char*, const char*);
     return function(arguments, name, defaultValue);
 #endif
 }

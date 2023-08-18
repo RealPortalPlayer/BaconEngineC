@@ -5,8 +5,8 @@
 #include <SharedEngineCode/ArgumentHandler.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <string.h>
+#include <SharedEngineCode/Debugging/Assert.h>
 
-#include "BaconEngine/Debugging/Assert.h"
 #include "BaconEngine/Rendering/Window.h"
 #include "BaconEngine/Rendering/Renderer.h"
 #include "../InterfaceFunctions.h"

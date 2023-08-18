@@ -9,8 +9,8 @@
 #include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
 #include <SharedEngineCode/String.h>
+#include <SharedEngineCode/Storage/DynamicDictionary.h>
 
-#include "BaconEngine/Storage/DynamicDictionary.h"
 #include "ArgumentManager.h"
 #include "BaconEngine/BinaryExport.h"
 
@@ -56,7 +56,7 @@ typedef enum {
 typedef struct { // TODO: Client
     const char* fullInput;
     const char* unparsedArguments;
-    BE_DynamicDictionary arguments;
+    SEC_DynamicDictionary arguments;
 } BE_Command_Context;
 
 typedef struct {
@@ -67,7 +67,7 @@ typedef struct {
 typedef struct {
     const char* name;
     const char* description;
-    BE_DynamicArray arguments;
+    SEC_DynamicArray arguments;
     BE_Command_Flags flags;
     void (*Run)(BE_Command_Context context);
 } BE_Command;

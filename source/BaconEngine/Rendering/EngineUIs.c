@@ -3,8 +3,8 @@
 
 #include <SharedEngineCode/ArgumentHandler.h>
 #include <SharedEngineCode/BuiltInArguments.h>
+#include <SharedEngineCode/Debugging/Assert.h>
 
-#include "BaconEngine/Debugging/Assert.h"
 #include "EngineUIs.h"
 #include "BaconEngine/Rendering/UI.h"
 #include "BaconEngine/Math/Bitwise.h"
@@ -13,7 +13,7 @@ SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 void BE_EngineUIs_Initialize(void) {
     static SEC_Boolean initialized = SEC_BOOLEAN_FALSE;
 
-    BE_ASSERT(!initialized, "Engine UIs are already initialized\n");
+    SEC_ASSERT(!initialized, "Engine UIs are already initialized\n");
 
     initialized = SEC_BOOLEAN_TRUE;
 

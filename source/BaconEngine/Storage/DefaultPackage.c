@@ -2,11 +2,11 @@
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <SharedEngineCode/Paths.h>
+#include <SharedEngineCode/Debugging/Assert.h>
+#include <SharedEngineCode/Debugging/StrictMode.h>
 
 #include "BaconEngine/Storage/DefaultPackage.h"
 #include "BaconEngine/Storage/Package.h"
-#include "BaconEngine/Debugging/Assert.h"
-#include "BaconEngine/Debugging/StrictMode.h"
 #include "../InterfaceFunctions.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
@@ -14,7 +14,7 @@ SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 static BE_Package beDefaultPackage = NULL;
 
 SEC_Boolean BE_PrivateDefaultPackage_Open(void) {
-    BE_ASSERT(beDefaultPackage == NULL, "Default package is already opened\n");
+    SEC_ASSERT(beDefaultPackage == NULL, "Default package is already opened\n");
     SEC_LOGGER_INFO("Opening default engine package\n");
     
     char* filePath = malloc(sizeof(char));
@@ -25,7 +25,7 @@ SEC_Boolean BE_PrivateDefaultPackage_Open(void) {
     
     beDefaultPackage = BE_Package_Open(filePath);
 
-    BE_STRICTMODE_CHECK(beDefaultPackage != NULL, SEC_BOOLEAN_FALSE, "Failed to open default package\n");
+    SEC_STRICTMODE_CHECK(beDefaultPackage != NULL, SEC_BOOLEAN_FALSE, "Failed to open default package\n");
     return SEC_BOOLEAN_TRUE;
 }
 
@@ -34,7 +34,7 @@ SEC_Boolean BE_PrivateDefaultPackage_IsOpen(void) {
 }
 
 void BE_PrivateDefaultPackage_Close(void) {
-    BE_ASSERT(beDefaultPackage != NULL, "Default package is already closed\n");
+    SEC_ASSERT(beDefaultPackage != NULL, "Default package is already closed\n");
     SEC_LOGGER_INFO("Closing default engine package\n");
     
     BE_Package_Close(beDefaultPackage);

@@ -3,8 +3,8 @@
 
 #include <SharedEngineCode/ArgumentHandler.h>
 #include <SharedEngineCode/BuiltInArguments.h>
+#include <SharedEngineCode/Debugging/Assert.h>
 
-#include "BaconEngine/Debugging/Assert.h"
 #include "EngineMemory.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
@@ -52,7 +52,7 @@ BE_EngineMemoryInformation_MemoryType* BE_EngineMemory_GetMemoryTypeInformation(
             return &beEngineMemoryInformation.layer;
 
         default:
-            BE_ASSERT_ALWAYS("This shouldn't be reached\n");
+            SEC_ASSERT_ALWAYS("This shouldn't be reached\n");
     }
 }
 
@@ -66,8 +66,8 @@ void* BE_EngineMemory_AllocateMemory(size_t size, BE_EngineMemory_MemoryType mem
                          "Size: %zu\n"
                          "Type: %i\n", size, memoryType);
 
-    BE_ASSERT(size > 0, "Size cannot be zero or below\n");
-    BE_ASSERT((pointer = malloc(size)) != NULL, "Failed to allocate %zu bytes of data\n", size);
+    SEC_ASSERT(size > 0, "Size cannot be zero or below\n");
+    SEC_ASSERT((pointer = malloc(size)) != NULL, "Failed to allocate %zu bytes of data\n", size);
 
     memoryTypeInformation->allocatedBytes += size;
     memoryTypeInformation->allocatedAmount++;
@@ -86,9 +86,9 @@ void* BE_EngineMemory_ReallocateMemory(void* pointer, size_t oldSize, size_t new
                          "New Size: %zu\n"
                          "Type: %i\n", oldSize, newSize, memoryType);
 
-    BE_ASSERT(pointer != NULL, "Pointer cannot be null\n");
-    BE_ASSERT(oldSize > 0 && newSize > 0, "Size cannot be zero or below\n");
-    BE_ASSERT((newPointer = realloc(pointer, newSize)) != NULL, "Failed to reallocate %zu bytes of data\n", newSize);
+    SEC_ASSERT(pointer != NULL, "Pointer cannot be null\n");
+    SEC_ASSERT(oldSize > 0 && newSize > 0, "Size cannot be zero or below\n");
+    SEC_ASSERT((newPointer = realloc(pointer, newSize)) != NULL, "Failed to reallocate %zu bytes of data\n", newSize);
 
     memoryTypeInformation->allocatedBytes = memoryTypeInformation->allocatedBytes - oldSize + newSize;
     return newPointer;
@@ -102,8 +102,8 @@ void BE_EngineMemory_DeallocateMemory(void* pointer, size_t oldSize, BE_EngineMe
                          "Size: %zu\n"
                          "Type: %i\n", oldSize, memoryType);
 
-    BE_ASSERT(pointer != NULL, "Pointer cannot be null\n");
-    BE_ASSERT(oldSize > 0, "Size cannot be zero or below\n");
+    SEC_ASSERT(pointer != NULL, "Pointer cannot be null\n");
+    SEC_ASSERT(oldSize > 0, "Size cannot be zero or below\n");
     free(pointer);
 
     memoryTypeInformation->allocatedBytes -= oldSize;

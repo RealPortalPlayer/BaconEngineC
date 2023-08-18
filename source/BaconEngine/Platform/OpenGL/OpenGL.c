@@ -2,10 +2,10 @@
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <GLFW/glfw3.h>
+#include <SharedEngineCode/Debugging/Assert.h>
 
 #include "OpenGL.h"
 #include "../SpecificPlatformFunctions.h"
-#include "BaconEngine/Debugging/Assert.h"
 #include "OpenGLWindow.h"
 #include "OpenGLRenderer.h"
 #include "OpenGLInput.h"
@@ -24,8 +24,8 @@ double BE_OpenGL_GetTimer(void) {
 }
 
 void BE_OpenGL_Initialize(void) {
-    BE_ASSERT(!beOpenGLInitialized, "Already initialized OpenGL\n");
-    BE_ASSERT(glfwInit(), "Failed to initialize GLFW\n");
+    SEC_ASSERT(!beOpenGLInitialized, "Already initialized OpenGL\n");
+    SEC_ASSERT(glfwInit(), "Failed to initialize GLFW\n");
     glfwSetErrorCallback(&BE_OpenGL_Error);
     BE_SpecificPlatformFunctions_Initialize(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions,
         {
@@ -62,7 +62,7 @@ void BE_OpenGL_Initialize(void) {
 }
 
 void BE_OpenGL_Destroy(void) {
-    BE_ASSERT(beOpenGLInitialized, "Already destroyed OpenGL\n");
+    SEC_ASSERT(beOpenGLInitialized, "Already destroyed OpenGL\n");
     glfwTerminate();
 
     beOpenGLInitialized = SEC_BOOLEAN_FALSE;

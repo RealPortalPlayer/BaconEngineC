@@ -4,8 +4,8 @@
 #include <string.h>
 #include <signal.h>
 #include <SharedEngineCode/Paths.h>
+#include <SharedEngineCode/Debugging/Assert.h>
 
-#include "BaconEngine/Debugging/Assert.h"
 #include "EngineCommands.h"
 #include "BaconEngine/Console/Console.h"
 #include "BaconEngine/Rendering/Renderer.h"
@@ -35,7 +35,7 @@ void BE_EngineCommands_Crash(void);
 void BE_EngineCommands_Initialize(void) {
     static SEC_Boolean initialized = SEC_BOOLEAN_FALSE;
 
-    BE_ASSERT(!initialized, "Engine commands are already initialized\n");
+    SEC_ASSERT(!initialized, "Engine commands are already initialized\n");
 
     initialized = SEC_BOOLEAN_TRUE;
 
@@ -117,7 +117,7 @@ void BE_EngineCommands_HelpPrint(BE_Command* command) {
 #endif
 
     for (int argumentId = 0; argumentId < command->arguments.used; argumentId++) {
-        BE_Command_Argument* argument = BE_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, argumentId);
+        BE_Command_Argument* argument = SEC_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, argumentId);
 
         SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "%s", argumentId != 0 ? " " : " - args: ");
 
@@ -255,12 +255,12 @@ void BE_EngineCommands_Say(BE_Command_Context context) {
 
 void BE_EngineCommands_Disconnect(BE_Command_Context context) {
     (void) context;
-    BE_ASSERT_NOT_IMPLEMENTED();
+    SEC_ASSERT_NOT_IMPLEMENTED();
 }
 
 void BE_EngineCommands_Connect(BE_Command_Context context) {
     (void) context;
-    BE_ASSERT_NOT_IMPLEMENTED();
+    SEC_ASSERT_NOT_IMPLEMENTED();
 }
 
 void BE_EngineCommands_WhatAmI(void) {
@@ -279,17 +279,17 @@ void BE_EngineCommands_WhatAmI(void) {
 
 void BE_EngineCommands_Kick(BE_Command_Context context) {
     (void) context;
-    BE_ASSERT_NOT_IMPLEMENTED();
+    SEC_ASSERT_NOT_IMPLEMENTED();
 }
 
 void BE_EngineCommands_Ban(BE_Command_Context context) {
     (void) context;
-    BE_ASSERT_NOT_IMPLEMENTED();
+    SEC_ASSERT_NOT_IMPLEMENTED();
 }
 
 void BE_EngineCommands_Sudo(BE_Command_Context context) {
     (void) context;
-    BE_ASSERT_NOT_IMPLEMENTED();
+    SEC_ASSERT_NOT_IMPLEMENTED();
 }
 
 void BE_EngineCommands_Echo(BE_Command_Context context) {

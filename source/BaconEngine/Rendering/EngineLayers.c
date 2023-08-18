@@ -3,8 +3,8 @@
 
 #include <SharedEngineCode/ArgumentHandler.h>
 #include <SharedEngineCode/BuiltInArguments.h>
+#include <SharedEngineCode/Debugging/Assert.h>
 
-#include "BaconEngine/Debugging/Assert.h"
 #include "EngineLayers.h"
 #include "PrivateUI.h"
 #include "BaconEngine/Rendering/Layer.h"
@@ -24,7 +24,7 @@ int BE_EngineLayers_ConsoleOpener_OnEvent(BE_Event event);
 void BE_EngineLayers_Initialize(void) {
     static SEC_Boolean initialized = SEC_BOOLEAN_FALSE;
 
-    BE_ASSERT(!initialized, "Engine layers are already initialized\n");
+    SEC_ASSERT(!initialized, "Engine layers are already initialized\n");
 
     initialized = SEC_BOOLEAN_TRUE;
 
@@ -102,7 +102,7 @@ void BE_EngineLayers_UIRendering_OnUpdate(BE_Layer_UpdateTypes updateType) {
     if (updateType != BE_LAYER_UPDATE_TYPE_BEFORE_RENDERING)
         return;
 
-    const BE_DynamicArray* uiWindows = BE_PrivateUI_GetRenderWindows();
+    const SEC_DynamicArray* uiWindows = BE_PrivateUI_GetRenderWindows();
     BE_Vector2_Unsigned windowSize = BE_Window_GetSize();
 
     beEngineLayersRenderCount = 0;
@@ -110,7 +110,7 @@ void BE_EngineLayers_UIRendering_OnUpdate(BE_Layer_UpdateTypes updateType) {
     // OPTIMIZE: Only render the maximized window.
 
     for (int windowId = uiWindows->used - 1; windowId >= 0; windowId--) {
-        BE_PrivateUI_Window* uiWindow = BE_DYNAMICARRAY_GET_ELEMENT_POINTER(BE_PrivateUI_Window, uiWindows, windowId);
+        BE_PrivateUI_Window* uiWindow = SEC_DYNAMICARRAY_GET_ELEMENT_POINTER(BE_PrivateUI_Window, uiWindows, windowId);
 
         if (BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_CLOSED))
             continue;
@@ -162,7 +162,7 @@ void BE_EngineLayers_UIRendering_OnUpdate(BE_Layer_UpdateTypes updateType) {
 }
 
 SEC_Boolean BE_EngineLayers_UIRendering_OnEvent(BE_Event event) {
-    const BE_DynamicArray* renderOrder = BE_PrivateUI_GetRenderWindows();
+    const SEC_DynamicArray* renderOrder = BE_PrivateUI_GetRenderWindows();
 
 //        SDL_Point mousePoint = {
 //            event.unionVariables.mouse.unionVariables.position.x,
@@ -170,7 +170,7 @@ SEC_Boolean BE_EngineLayers_UIRendering_OnEvent(BE_Event event) {
 //        };
 
     for (int windowId = 0; windowId < renderOrder->used; windowId++) {
-        BE_PrivateUI_Window* uiWindow = BE_DYNAMICARRAY_GET_ELEMENT_POINTER(BE_PrivateUI_Window, renderOrder, windowId);
+        BE_PrivateUI_Window* uiWindow = SEC_DYNAMICARRAY_GET_ELEMENT_POINTER(BE_PrivateUI_Window, renderOrder, windowId);
 
         if (BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_CLOSED))
             continue;

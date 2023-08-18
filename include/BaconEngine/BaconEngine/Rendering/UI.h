@@ -8,10 +8,10 @@
 
 #include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <SharedEngineCode/String.h>
+#include <SharedEngineCode/Storage/DynamicArray.h>
 
 #include "BaconEngine/Math/Vector.h"
 #include "BaconEngine/Event.h"
-#include "BaconEngine/Storage/DynamicArray.h"
 #include "BaconEngine/BinaryExport.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
@@ -27,7 +27,7 @@ typedef struct BE_UI_Element {
     BE_Vector2_Unsigned position;
     BE_Vector2_Unsigned size;
     SEC_Boolean enabled;
-    BE_DynamicArray elements;
+    SEC_DynamicArray elements;
 } BE_UI_Element;
 
 typedef enum {
@@ -45,7 +45,7 @@ typedef enum {
 
 BE_BINARYEXPORT const char* BE_UI_GetWindowName(int windowId);
 BE_BINARYEXPORT SEC_Boolean BE_UI_IsWindowStillOpen(int windowId);
-BE_BINARYEXPORT BE_DynamicArray* BE_UI_GetWindowElements(int windowId);
+BE_BINARYEXPORT SEC_DynamicArray* BE_UI_GetWindowElements(int windowId);
 BE_BINARYEXPORT int BE_UI_GetWindowAmount(void);
 BE_BINARYEXPORT int BE_UI_GetAllocatedWindowsAmount(void);
 BE_BINARYEXPORT int BE_UI_GetWindowReallocationAmount(void);

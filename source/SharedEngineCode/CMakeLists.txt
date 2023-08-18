@@ -1,17 +1,19 @@
 project(SharedEngineCode)
 
-set(BE_SOURCE_FILES
-        ArgumentHandler.c 
-        Launcher.c 
+add_library(SharedEngineCode STATIC
+        ArgumentHandler.c
+        Launcher.c
         Logger.c
         ANSI.c
         User.c
         MessageBox.c
         Threads.c
         Paths.c
-        String.c)
-
-add_library(SharedEngineCode STATIC ${BE_SOURCE_FILES})
+        String.c
+        Storage/DynamicArray.c
+        Storage/DynamicDictionary.c
+        Debugging/Assert.c
+        Debugging/StrictMode.c)
 
 if(NOT "${BE_ASAN_SANITIZER}" STREQUAL "")
     if(MSVC)

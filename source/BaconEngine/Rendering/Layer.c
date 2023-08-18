@@ -2,9 +2,9 @@
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <string.h>
+#include <SharedEngineCode/Debugging/StrictMode.h>
+#include <SharedEngineCode/Debugging/Assert.h>
 
-#include "BaconEngine/Debugging/StrictMode.h"
-#include "BaconEngine/Debugging/Assert.h"
 #include "BaconEngine/Rendering/Layer.h"
 #include "../InterfaceFunctions.h"
 
@@ -25,7 +25,7 @@ typedef struct {
     SEC_Boolean enabled;
 } BE_Layer_Internal;
 
-static BE_DynamicArray beLayerArray;
+static SEC_DynamicArray beLayerArray;
 static SEC_Boolean beLayerInitialized = SEC_BOOLEAN_FALSE;
 
 static int BE_Layer_NoOperation(void) {
@@ -34,7 +34,7 @@ static int BE_Layer_NoOperation(void) {
 
 static BE_Layer_Internal* BE_Layer_InternalGet(const char* name) {
     for (int i = 0; i < (int) beLayerArray.used; i++) {
-        if (!SEC_String_Equals(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->name, name, SEC_BOOLEAN_FALSE))
+        if (!SEC_String_Equals(SEC_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->name, name, SEC_BOOLEAN_FALSE))
             continue;
 
         return beLayerArray.internalArray[i];
@@ -47,7 +47,7 @@ void BE_PrivateLayer_InitializeLayers(void) {
     if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT)
         return;
 
-    BE_ASSERT(!beLayerInitialized, "Already initialized the layer stack\n");
+    SEC_ASSERT(!beLayerInitialized, "Already initialized the layer stack\n");
     SEC_LOGGER_INFO("Initializing layer stack\n");
 
     beLayerInitialized = SEC_BOOLEAN_TRUE;
@@ -65,7 +65,7 @@ void BE_Layer_Register(const char* name, SEC_Boolean enabled, BE_Layer_Functions
         return;
 
     for (int i = 0; i < (int) beLayerArray.used; i++)
-        BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!SEC_String_Equals(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->name, name, SEC_BOOLEAN_FALSE), "The layer '%s' is already registered\n", name);
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!SEC_String_Equals(SEC_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->name, name, SEC_BOOLEAN_FALSE), "The layer '%s' is already registered\n", name);
 
     BE_Layer_Internal* layer = (BE_Layer_Internal*) BE_EngineMemory_AllocateMemory(sizeof(BE_Layer_Internal), BE_ENGINEMEMORY_MEMORY_TYPE_LAYER);
 
@@ -78,7 +78,7 @@ void BE_Layer_Register(const char* name, SEC_Boolean enabled, BE_Layer_Functions
     layer->functions.OnEvent = functions.OnEvent != NULL ? functions.OnEvent : (int (*)(BE_Event)) &BE_Layer_NoOperation;
     layer->functions.OnStop = functions.OnStop != NULL ? functions.OnStop : (void (*)(void)) &BE_Layer_NoOperation;
 
-    BE_DynamicArray_AddElementToLast(&beLayerArray, (void *) layer);
+    SEC_DynamicArray_AddElementToLast(&beLayerArray, (void*) layer);
 #else
     BE_INTERFACEFUNCTION(void, const char*, SEC_Boolean, BE_Layer_Functions)(name, enabled, functions);
 #endif
@@ -104,7 +104,7 @@ int BE_Layer_GetAllocatedLayersAmount(void) {
 
 int BE_Layer_GetLayersReallocationAmount(void) {
 #ifndef BE_CLIENT_BINARY
-    return beLayerInitialized ? beLayerArray.calledRealloc : 0;
+    return beLayerInitialized ? beLayerArray.calledReallocate : 0;
 #else
     BE_INTERFACEFUNCTION(int, void);
     return function();
@@ -145,7 +145,7 @@ void BE_PrivateLayer_OnUpdate(BE_Layer_UpdateTypes updateTypes) {
         return;
 
     for (int i = 0; i < beLayerArray.used; i++) {
-        BE_Layer_Internal* layer = BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i);
+        BE_Layer_Internal* layer = SEC_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i);
 
         if (!layer->enabled)
             continue;
@@ -162,7 +162,7 @@ void BE_PrivateLayer_OnUpdate(BE_Layer_UpdateTypes updateTypes) {
 
 int BE_PrivateLayer_OnEvent(BE_Event event) {
     for (int i = 0; i < beLayerArray.used; i++) {
-        BE_Layer_Internal* layer = BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i);
+        BE_Layer_Internal* layer = SEC_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i);
 
         if (!layer->enabled)
             continue;
@@ -209,13 +209,13 @@ void BE_PrivateLayer_DestroyLayers(void) {
     if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT)
         return;
 
-    BE_ASSERT(beLayerInitialized, "Layers are already destroyed\n");
+    SEC_ASSERT(beLayerInitialized, "Layers are already destroyed\n");
     SEC_LOGGER_INFO("Destroying layer stack\n");
 
     beLayerInitialized = SEC_BOOLEAN_FALSE;
 
     for (int i = 0; i < beLayerArray.used; i++) {
-        BE_Layer_Internal* layer = BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i);
+        BE_Layer_Internal* layer = SEC_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i);
 
         if (!layer->calledStart)
             continue;
@@ -224,9 +224,9 @@ void BE_PrivateLayer_DestroyLayers(void) {
     }
 
     for (int i = 0; i < beLayerArray.used; i++)
-        BE_EngineMemory_DeallocateMemory(BE_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i), sizeof(BE_Layer_Internal), BE_ENGINEMEMORY_MEMORY_TYPE_LAYER);
+        BE_EngineMemory_DeallocateMemory(SEC_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i), sizeof(BE_Layer_Internal), BE_ENGINEMEMORY_MEMORY_TYPE_LAYER);
 
-    BE_EngineMemory_DeallocateMemory(beLayerArray.internalArray, sizeof(void *) * beLayerArray.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BE_EngineMemory_DeallocateMemory(beLayerArray.internalArray, sizeof(void*) * beLayerArray.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 #endif
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()

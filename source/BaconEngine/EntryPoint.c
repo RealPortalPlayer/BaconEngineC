@@ -9,6 +9,8 @@
 #include <SharedEngineCode/Internal/PlatformSpecific.h>
 #include <SharedEngineCode/Paths.h>
 #include <SharedEngineCode/Launcher.h>
+#include <SharedEngineCode/Debugging/Assert.h>
+#include <SharedEngineCode/Debugging/StrictMode.h>
 
 #if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <unistd.h>
@@ -21,8 +23,6 @@
 #   define write(file, message, size) _write(file, message, (unsigned) size) // HACK: This is a stupid idea, but it's the only way to make MSVC shut up.
 #endif
 
-#include "BaconEngine/Debugging/Assert.h"
-#include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Rendering/Window.h"
 #include "BaconEngine/Rendering/Renderer.h"
 #include "BaconEngine/EngineMemoryInformation.h"
@@ -35,6 +35,7 @@
 #include "Rendering/PrivateRenderer.h"
 #include "BaconEngine/Console/Console.h"
 #include "Storage/PrivateDefaultPackage.h"
+#include "BaconEngine/ClientInformation.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 void BE_EntryPoint_SignalDetected(int receivedSignal) {
@@ -122,7 +123,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     SEC_Paths_SetLauncherPath(engineDetails->launcherPath);
     SEC_Paths_SetEnginePath(engineDetails->enginePath);
     SEC_Paths_SetClientPath(engineDetails->clientPath);
-    BE_STRICTMODE_CHECK(!alreadyStarted, 1, "Reinitializing the engine is not supported\n");
+    SEC_STRICTMODE_CHECK(!alreadyStarted, 1, "Reinitializing the engine is not supported\n");
     SEC_LOGGER_TRACE("Entered engine code\n");
 
     alreadyStarted = SEC_BOOLEAN_TRUE;
@@ -210,7 +211,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
 
     BE_PrivateUI_Initialize();
     BE_PrivateConsole_Initialize();
-    BE_ASSERT(engineDetails->clientStart == NULL || engineDetails->clientStart(engineDetails->argc, engineDetails->argv) == 0, "Client start returned non-zero\n");
+    SEC_ASSERT(engineDetails->clientStart == NULL || engineDetails->clientStart(engineDetails->argc, engineDetails->argv) == 0, "Client start returned non-zero\n");
 
     {
         const char* preParsedExitCode = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_EXIT, 0);
@@ -260,7 +261,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     }
 
     SEC_LOGGER_TRACE("Client loop ended, shutting down\n");
-    BE_ASSERT(engineDetails->clientShutdown == NULL || engineDetails->clientShutdown() == 0, "Client shutdown returned non-zero\n");
+    SEC_ASSERT(engineDetails->clientShutdown == NULL || engineDetails->clientShutdown() == 0, "Client shutdown returned non-zero\n");
     SEC_LOGGER_INFO("Waiting for thread shutdown (press CTRL+C if frozen)\n");
     SEC_Thread_Join(commandThread);
     SEC_LOGGER_DEBUG("Command thread ended\n");
@@ -295,6 +296,6 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
 BE_BINARYEXPORT void I_EntryPoint_InitializeWrapper(void* engineBinary) {
     (void) engineBinary;
 
-    BE_ASSERT_ALWAYS("I am not a client\n");
+    SEC_ASSERT_ALWAYS("I am not a client\n");
 }
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()

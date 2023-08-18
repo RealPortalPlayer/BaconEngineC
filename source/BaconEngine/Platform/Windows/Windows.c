@@ -2,9 +2,9 @@
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <Windows.h>
+#include <SharedEngineCode/Debugging/Assert.h>
 
 #include "Windows.h"
-#include "BaconEngine/Debugging/Assert.h"
 #include "../SpecificPlatformFunctions.h"
 #include "WindowsWindow.h"
 #include "WindowsRenderer.h"
@@ -17,7 +17,7 @@ double BE_Windows_GetTimer(void) {
 }
 
 void BE_Windows_Initialize(void) {
-    BE_ASSERT(!beWindowsInitialized, "Already initialized Windows\n");
+    SEC_ASSERT(!beWindowsInitialized, "Already initialized Windows\n");
 
     beWindowsInitialized = SEC_BOOLEAN_TRUE;
 

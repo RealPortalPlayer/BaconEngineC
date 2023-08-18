@@ -3,16 +3,16 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <SharedEngineCode/Debugging/StrictMode.h>
 
 #include "BaconEngine/I18N.h"
-#include "BaconEngine/Debugging/StrictMode.h"
 #include "InterfaceFunctions.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 const char* BE_I18N_Translate(FILE* languageFile, const char* key) {
 #ifndef BE_CLIENT_BINARY
-    BE_STRICTMODE_CHECK(strlen(key) != 0, key, "Key cannot be empty\n");
-    BE_STRICTMODE_CHECK(languageFile != NULL, key, "Language file cannot be null\n");
+    SEC_STRICTMODE_CHECK(strlen(key) != 0, key, "Key cannot be empty\n");
+    SEC_STRICTMODE_CHECK(languageFile != NULL, key, "Language file cannot be null\n");
 
     //char* line = NULL;
     //size_t lineCap;

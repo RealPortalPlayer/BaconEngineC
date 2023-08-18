@@ -8,10 +8,11 @@
 
 #include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
+#include <SharedEngineCode/Storage/DynamicArray.h>
 
 #include "../AntiClientGuard.h"
-#include "BaconEngine/Storage/DynamicArray.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-SEC_Boolean BE_PrivateDynamicArray_Create(BE_DynamicArray* array, size_t size);
+SEC_Boolean BE_PrivateDynamicArray_Create(SEC_DynamicArray* array, size_t size);
+SEC_Boolean BE_PrivateDynamicArray_CheckResize(SEC_DynamicArray* array);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()

@@ -8,10 +8,10 @@
 
 #include <SharedEngineCode/Internal/CPlusPlusSupport.h>
 #include <SharedEngineCode/Internal/Boolean.h>
+#include <SharedEngineCode/Storage/DynamicDictionary.h>
 
 #include "../AntiClientGuard.h"
-#include "BaconEngine/Storage/DynamicDictionary.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-SEC_Boolean BE_PrivateDynamicDictionary_Create(BE_DynamicDictionary* dictionary, size_t size);
+SEC_Boolean BE_PrivateDynamicDictionary_Create(SEC_DynamicDictionary* dictionary, size_t size);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()

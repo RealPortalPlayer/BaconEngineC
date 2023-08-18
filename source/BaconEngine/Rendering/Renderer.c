@@ -3,8 +3,9 @@
 
 #include <SharedEngineCode/Internal/OperatingSystem.h>
 #include <SharedEngineCode/BuiltInArguments.h>
+#include <SharedEngineCode/Debugging/StrictMode.h>
+#include <SharedEngineCode/Debugging/Assert.h>
 
-#include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Rendering/Renderer.h"
 
 #ifndef BE_CLIENT_BINARY
@@ -20,8 +21,8 @@
 #   endif
 #endif
 
-#include "BaconEngine/Debugging/Assert.h"
 #include "../InterfaceFunctions.h"
+#include "BaconEngine/ClientInformation.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
@@ -41,7 +42,7 @@ void BE_Renderer_SetClearColor(BE_Color3_Unsigned color) {
 void BE_PrivateRenderer_Initialize(void) {
     static SEC_Boolean initialized = SEC_BOOLEAN_FALSE;
 
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized rendererFunctions\n");
+    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized rendererFunctions\n");
 
     const char* specifiedRenderer = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_RENDERER, 0);
 
@@ -72,7 +73,7 @@ void BE_PrivateRenderer_Initialize(void) {
         if (SEC_String_Equals(specifiedRenderer, "vulkan", SEC_BOOLEAN_TRUE)) {
 #   if !SEC_OPERATINGSYSTEM_APPLE
 //            vulkan:
-            BE_ASSERT_ALWAYS("Renderer not implemented\n");
+            SEC_ASSERT_ALWAYS("Renderer not implemented\n");
 #   else
             SEC_LOGGER_WARN("Vulkan doesn't support Apple operating systems\n");
             goto textmode;
@@ -100,7 +101,7 @@ void BE_PrivateRenderer_Initialize(void) {
         if (SEC_String_Equals(specifiedRenderer, "directx", SEC_BOOLEAN_TRUE)) {
 #   if SEC_OPERATINGSYSTEM_WINDOWS
 //            directx:
-            BE_ASSERT_ALWAYS("Renderer not implemented\n");
+            SEC_ASSERT_ALWAYS("Renderer not implemented\n");
 #   else
             SEC_LOGGER_WARN("DirectX only works on Microsoft operating systems\n");
             goto textmode;
@@ -115,7 +116,7 @@ void BE_PrivateRenderer_Initialize(void) {
 #   if SEC_OPERATINGSYSTEM_WINDOWS
             BE_Windows_Initialize();
 #   else
-            BE_ASSERT_ALWAYS("No software renderer implementation for your OS\n");
+            SEC_ASSERT_ALWAYS("No software renderer implementation for your OS\n");
 #   endif
             return;
         }
