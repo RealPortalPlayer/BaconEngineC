@@ -10,6 +10,7 @@
 #include <stdarg.h>
 
 #include "Internal/Boolean.h"
+#include "SharedEngineCode/Storage/DynamicArray.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 SEC_Boolean SEC_String_Contains(const char* string, const char* compare, SEC_Boolean caseless);
@@ -63,4 +64,16 @@ char* SEC_String_Format(char** target, ...);
  * @warning Passing user controlled input as target will open up a uncontrolled format string attack.
  */
 char* SEC_String_FormatPremadeList(char** target, va_list arguments);
+
+/**
+ * @return A char* DynamicArray
+ * @note Make sure to free all the elements, including the DynamicArray's internalArray, and the DynamicArray itself, once done using
+ */
+SEC_DynamicArray* SEC_String_Split(const char* target, const char* splitBy);
+
+/**
+ * @return A char* DynamicArray
+ * @note Make sure to free all the elements, including the DynamicArray's internalArray, and the DynamicArray itself, once done using
+ */
+SEC_DynamicArray* SEC_String_SplitCharacter(const char* target, char splitBy);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()

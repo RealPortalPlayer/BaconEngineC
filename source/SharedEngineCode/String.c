@@ -274,4 +274,77 @@ char* SEC_String_FormatPremadeList(char** target, va_list arguments) {
     *target = newBuffer;
     return *target;
 }
+
+SEC_DynamicArray* SEC_String_Split(const char* target, const char* splitBy) {
+    SEC_DynamicArray* dynamicArray = malloc(sizeof(SEC_DynamicArray));
+
+    SEC_DynamicArray_Create(dynamicArray, 100);
+    
+    char* string = malloc(sizeof(char));
+    int matchCount = 0;
+    size_t splitByLength = strlen(splitBy);
+    size_t targetLength = strlen(target);
+    int i = 0;
+    SEC_Boolean characterMatched = SEC_BOOLEAN_FALSE;
+    
+    string[0] = '\0';
+
+    for (; i < targetLength; i++) {
+        if (matchCount == splitByLength) {
+            SEC_DynamicArray_AddElementToLast(dynamicArray, (void*) string);
+            
+            matchCount = 0;
+            string = malloc(sizeof(char));
+            string[0] = '\0';
+        }
+        
+        if (target[i] != splitBy[matchCount]) {
+            matchCount = 0;
+            characterMatched = SEC_BOOLEAN_FALSE;
+
+            SEC_String_AppendCharacter(&string, target[i]);
+            continue;
+        }
+
+        characterMatched = SEC_BOOLEAN_TRUE;
+        matchCount++;
+    }
+
+    SEC_DynamicArray_AddElementToLast(dynamicArray, string);
+
+    if (i == targetLength && characterMatched) {
+        string = malloc(sizeof(char));
+        string[0] = '\0';
+
+        SEC_DynamicArray_AddElementToLast(dynamicArray, (void*) string);
+    }
+    
+    return dynamicArray;
+}
+
+SEC_DynamicArray* SEC_String_SplitCharacter(const char* target, char splitBy) {
+    SEC_DynamicArray* dynamicArray = malloc(sizeof(SEC_DynamicArray));
+
+    SEC_DynamicArray_Create(dynamicArray, 100);
+
+    char* string = malloc(sizeof(char));
+    size_t targetLength = strlen(target);
+
+    string[0] = '\0';
+
+    for (int i = 0; i < targetLength; i++) {
+        if (target[i] != splitBy) {
+            SEC_String_AppendCharacter(&string, target[i]);
+            continue;
+        }
+
+        SEC_DynamicArray_AddElementToLast(dynamicArray, (void*) string);
+
+        string = malloc(sizeof(char));
+        string[0] = '\0';
+    }
+
+    SEC_DynamicArray_AddElementToLast(dynamicArray, (void*) string);
+    return dynamicArray;
+}
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()
