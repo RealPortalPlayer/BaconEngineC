@@ -299,6 +299,10 @@ SEC_DynamicArray* SEC_String_Split(const char* target, const char* splitBy) {
         }
         
         if (target[i] != splitBy[matchCount]) {
+            if (matchCount != 0)
+                for (int j = 0; j < matchCount; j++)
+                    SEC_String_AppendCharacter(&string, splitBy[j]);
+            
             matchCount = 0;
             characterMatched = SEC_BOOLEAN_FALSE;
 
