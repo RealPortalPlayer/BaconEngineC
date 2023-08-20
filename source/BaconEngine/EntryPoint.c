@@ -62,12 +62,6 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
             if (!BE_ClientInformation_IsRunning())
                 return;
 
-            // TODO: Windows?
-#if SEC_OPERATINGSYSTEM_UNIX
-            // TODO: Reprint cursor
-            siginterrupt(SIGINT, SEC_BOOLEAN_FALSE);
-#endif
-
             printf(" (type 'exit' to quit)\n");
             return;
 
@@ -82,7 +76,7 @@ void BE_EntryPoint_CommandThreadFunction(void) {
     // FIXME: Find out why this is not working on Serenity.
     // TODO: Find fcntl replacement for Windows.
 #if !SEC_OPERATINGSYSTEM_SERENITY && !SEC_OPERATINGSYSTEM_WINDOWS
-    fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
+    fcntl(STDIN_FILENO, F_SETFL, fcntl(STDIN_FILENO, F_GETFL) | O_NONBLOCK);
 #endif
 
     while (BE_ClientInformation_IsRunning()) {
@@ -166,8 +160,6 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     }
 
     BE_PrivateDefaultPackage_Open();
-    SEC_LOGGER_DEBUG("Registering signals\n");
-    signal(SIGINT, BE_EntryPoint_SignalDetected);
     BE_PrivateRenderer_Initialize();
     BE_PrivateLayer_InitializeLayers();
 
@@ -212,6 +204,8 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     BE_PrivateUI_Initialize();
     BE_PrivateConsole_Initialize();
     SEC_ASSERT(engineDetails->clientStart == NULL || engineDetails->clientStart(engineDetails->argc, engineDetails->argv) == 0, "Client start returned non-zero\n");
+    SEC_LOGGER_DEBUG("Registering signals\n");
+    signal(SIGINT, &BE_EntryPoint_SignalDetected);
 
     {
         const char* preParsedExitCode = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_EXIT, 0);
