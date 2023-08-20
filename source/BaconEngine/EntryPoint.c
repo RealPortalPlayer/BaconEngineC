@@ -38,6 +38,8 @@
 #include "BaconEngine/ClientInformation.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+SEC_Boolean printedCursor = SEC_BOOLEAN_FALSE;
+
 void BE_EntryPoint_SignalDetected(int receivedSignal) {
     switch (receivedSignal) {
         case SIGSEGV:
@@ -63,6 +65,8 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
                 return;
 
             printf(" (type 'exit' to quit)\n");
+
+            printedCursor = SEC_BOOLEAN_FALSE;
             return;
 
         default:
@@ -71,8 +75,6 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
 }
 
 void BE_EntryPoint_CommandThreadFunction(void) {
-    SEC_Boolean printedCursor = SEC_BOOLEAN_FALSE;
-
     // FIXME: Find out why this is not working on Serenity.
     // TODO: Find fcntl replacement for Windows.
 #if !SEC_OPERATINGSYSTEM_SERENITY && !SEC_OPERATINGSYSTEM_WINDOWS
