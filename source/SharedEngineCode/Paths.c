@@ -9,6 +9,12 @@
 #include "SharedEngineCode/Internal/Boolean.h"
 #include "SharedEngineCode/String.h"
 
+#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
+#   define SEC_PATHS_SEPARATOR "/"
+#else
+#   define SEC_PATHS_SEPARATOR "\\"
+#endif
+
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 static const char* secPathsLauncherDirectory;
 static const char* secPathsClientDirectory;
@@ -27,12 +33,12 @@ static char* createdPath = NULL;     \
 if (createdPath == NULL) {           \
     if (!SEC_Paths_IsAbsolute(path)) { \
         createdPath = SEC_String_Copy(secPathsLauncherDirectory); \
-        SEC_String_Append(&createdPath, "/"); \
+        SEC_String_Append(&createdPath, SEC_PATHS_SEPARATOR); \
         SEC_String_Append(&createdPath, path); \
-        SEC_String_Append(&createdPath, "/"); \
+        SEC_String_Append(&createdPath, SEC_PATHS_SEPARATOR); \
     } else {                         \
         createdPath = SEC_String_Copy(path); \
-        SEC_String_Append(&createdPath, "/"); \
+        SEC_String_Append(&createdPath, SEC_PATHS_SEPARATOR); \
     }                                \
 }                                    \
 return createdPath;
@@ -70,7 +76,7 @@ const char* SEC_Paths_GetClientBinaryPath(void) {
     if (binaryPath == NULL) {
         binaryPath = malloc(sizeof(char));
         binaryPath[0] = '\0';
-
+        
         SEC_Paths_GetItemInsideClientDirectory(&binaryPath, "Binary" SEC_PLATFORMSPECIFIC_BINARY_EXTENSION);
     }
         

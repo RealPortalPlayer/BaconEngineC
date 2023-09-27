@@ -1,5 +1,13 @@
 project(SharedEngineCode)
 
+set(BE_SOURCE_FILES)
+
+if(NOT BE_DISABLE_HACKS)
+    if(WIN32)
+        set(BE_SOURCE_FILES Hacks/Windows.c)
+    endif()
+endif()
+
 add_library(SharedEngineCode STATIC
         ArgumentHandler.c
         Launcher.c
@@ -13,7 +21,8 @@ add_library(SharedEngineCode STATIC
         Storage/DynamicArray.c
         Storage/DynamicDictionary.c
         Debugging/Assert.c
-        Debugging/StrictMode.c)
+        Debugging/StrictMode.c
+        ${BE_SOURCE_FILES})
 
 if(NOT "${BE_ASAN_SANITIZER}" STREQUAL "")
     if(MSVC)
@@ -40,4 +49,8 @@ target_include_directories(SharedEngineCode PUBLIC ../../include/SharedEngineCod
 
 if(MSVC)
     target_compile_definitions(SharedEngineCode PUBLIC -D_CRT_SECURE_NO_WARNINGS)
+endif()
+
+if(BE_DISABLE_HACKS)
+    target_compile_definitions(SharedEngineCode PUBLIC BE_DISABLE_HACKS)
 endif()

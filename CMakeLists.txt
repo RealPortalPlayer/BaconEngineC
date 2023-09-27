@@ -20,6 +20,7 @@ option(BE_DISABLE_PEDANTIC_MODE "Don't enable pedantic checks" OFF)
 option(BE_ALLOW_DEBUG_LOGS "Always allow debug logs, even for release builds" OFF)
 set(BE_GLFW_PATH "" CACHE STRING "Use GLFW from the specified path instead of trying to find it")
 set(BE_ASAN_SANITIZER "" CACHE STRING "Set what ASAN sanitizer to use")
+option(BE_DISABLE_HACKS "Disable operating system specific hacks" OFF)
 
 macro(engine_project)
     cmake_parse_arguments(PARSED "STANDALONE" "NAME" "SOURCES" ${ARGN})

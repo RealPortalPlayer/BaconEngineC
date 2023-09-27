@@ -248,9 +248,7 @@ char* SEC_String_Format(char** target, ...) {
     va_list arguments;
     
     va_start(arguments, target);
-    
     SEC_String_FormatPremadeList(target, arguments);
-    
     va_end(arguments);
     return target != NULL ? *target : NULL;
 }

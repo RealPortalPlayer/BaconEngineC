@@ -81,6 +81,8 @@ void BE_EntryPoint_CommandThreadFunction(void) {
     fcntl(STDIN_FILENO, F_SETFL, fcntl(STDIN_FILENO, F_GETFL) | O_NONBLOCK);
 #endif
 
+    SEC_LOGGER_DEBUG("Command thread started\n");
+
     while (BE_ClientInformation_IsRunning()) {
         if (BE_Console_GetCommandAmount() == 0)
             continue;
@@ -231,7 +233,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     SEC_Thread commandThread;
 
     SEC_Thread_Create(&commandThread, &BE_EntryPoint_CommandThreadFunction);
-
+    
     double deltaStart = 0;
 
     while (BE_ClientInformation_IsRunning()) {

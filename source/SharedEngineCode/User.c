@@ -8,9 +8,10 @@
 #   include <unistd.h>
 #   include <pwd.h>
 #elif SEC_OPERATINGSYSTEM_WINDOWS
-#   include <Windows.h>
 #   include <stdio.h>
 #   include <lmcons.h>
+
+#   include "SharedEngineCode/Hacks/Windows.h"
 #endif
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
@@ -20,11 +21,10 @@ SEC_Boolean SEC_User_IsAdministrator(void) {
 #elif SEC_OPERATINGSYSTEM_WINDOWS
     SID_IDENTIFIER_AUTHORITY authority = SECURITY_NT_AUTHORITY;
     PSID adminGroup;
-    SEC_Boolean admin = AllocateAndInitializeSid(&authority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0,
-                                                 0, 0, 0, &adminGroup);
-
+    SEC_Boolean admin = SEC_WindowsHacks_AllocateAndInitializeSid(&authority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0, &adminGroup);
+    
     if (admin) {
-        if (!CheckTokenMembership(NULL, adminGroup, &admin))
+        if (!SEC_WindowsHacks_CheckTokenMembership(NULL, adminGroup, &admin))
             admin = SEC_BOOLEAN_FALSE;
 
         FreeSid(adminGroup);
