@@ -177,24 +177,9 @@ SEC_Boolean SEC_String_Contains(const char* string, const char* compare, SEC_Boo
 }
 
 SEC_Boolean SEC_String_ContainsCharacter(const char* string, char compare, SEC_Boolean caseless) {
-    size_t stringLength = strlen(string);
-    
-    if (stringLength == 0)
-        return SEC_BOOLEAN_FALSE;
+    char temporaryString[2] = {compare, '\0'};
 
-    for (size_t i = 0; i < stringLength; i++) {
-        char character = string[i];
-        
-        if (caseless)
-            character = (char) tolower(character);
-        
-        if (character != compare)
-            continue;
-
-        return SEC_BOOLEAN_TRUE;
-    }
-    
-    return SEC_BOOLEAN_FALSE;
+    return SEC_String_Contains(string, temporaryString, caseless);
 }
 
 SEC_Boolean SEC_String_Equals(const char* string, const char* compare, SEC_Boolean caseless) {
@@ -215,33 +200,15 @@ SEC_Boolean SEC_String_Equals(const char* string, const char* compare, SEC_Boole
 }
 
 char* SEC_String_AppendCharacter(char** target, char character) {
-    size_t targetLength = strlen(*target);
-    char* reallocatedString = realloc(*target, sizeof(char) * (targetLength + 2));
+    char temporaryString[2] = {character, '\0'};
     
-    if (reallocatedString == NULL)
-        return NULL;
-    
-    *target = reallocatedString;
-    (*target)[targetLength] = character;
-    (*target)[targetLength + 1] = 0;
-    return *target;
+    return SEC_String_Append(target, temporaryString);
 }
 
 char* SEC_String_PrependCharacter(char** target, char character) {
-    size_t targetLength = strlen(*target);
-    char* reallocatedString = realloc(*target, sizeof(char) * (targetLength + 2));
+    char temporaryString[2] = {character, '\0'};
     
-    if (reallocatedString == NULL)
-        return NULL;
-    
-    *target = reallocatedString;
-
-    for (size_t i = targetLength; i > 0 ; i--)
-        (*target)[i] = (*target)[i - 1];
-
-    (*target)[0] = character;
-    (*target)[targetLength + 1] = 0;
-    return *target;
+    return SEC_String_Prepend(target, temporaryString);
 }
 
 char* SEC_String_Format(char** target, ...) {
@@ -325,29 +292,9 @@ SEC_DynamicArray* SEC_String_Split(const char* target, const char* splitBy) {
 }
 
 SEC_DynamicArray* SEC_String_SplitCharacter(const char* target, char splitBy) {
-    SEC_DynamicArray* dynamicArray = malloc(sizeof(SEC_DynamicArray));
-
-    SEC_DynamicArray_Create(dynamicArray, 100);
-
-    char* string = malloc(sizeof(char));
-    size_t targetLength = strlen(target);
-
-    string[0] = '\0';
-
-    for (int i = 0; i < targetLength; i++) {
-        if (target[i] != splitBy) {
-            SEC_String_AppendCharacter(&string, target[i]);
-            continue;
-        }
-
-        SEC_DynamicArray_AddElementToLast(dynamicArray, (void*) string);
-
-        string = malloc(sizeof(char));
-        string[0] = '\0';
-    }
-
-    SEC_DynamicArray_AddElementToLast(dynamicArray, (void*) string);
-    return dynamicArray;
+    char temporaryString[2] = {splitBy, '\0'};
+    
+    return SEC_String_Split(target, temporaryString);
 }
 
 char* SEC_String_ReadFile(FILE* file, size_t lengthLimit, size_t* lineLength) {
