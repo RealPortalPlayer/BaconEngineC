@@ -8,6 +8,7 @@
 
 #include <stdlib.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 #include "Internal/Boolean.h"
 #include "SharedEngineCode/Storage/DynamicArray.h"
@@ -76,4 +77,32 @@ SEC_DynamicArray* SEC_String_Split(const char* target, const char* splitBy);
  * @note Make sure to free all the elements, including the DynamicArray's internalArray, and the DynamicArray itself, once done using
  */
 SEC_DynamicArray* SEC_String_SplitCharacter(const char* target, char splitBy);
+
+/**
+ * Reads all the file contents into a buffer, this buffer can get quite big
+ * @param lengthLimit Limit how long the buffer will be, zero will disable it
+ * @param lineLength Tells you how long the resulting buffer is. We do nothing to it if it equals to NULL
+ * @return The contents of the file, NULL if it failed to allocate memory
+ */
+char* SEC_String_ReadFile(FILE* file, size_t lengthLimit, size_t* lineLength);
+
+/**
+ * Gets the next line in the file
+ * @param line The output string
+ * @param splitString Split the file contents by this string, defaults to newline if NULL
+ * @return The length of the current line, -1 if it's end of file, -2 if it failed to allocate buffer
+ * @note This moves the file pointer
+ * @warning Make sure to run free on the returned buffer
+ */
+ssize_t SEC_String_GetLine(FILE* file, char** line, const char* splitString);
+
+/**
+ * Gets the next line in the file
+ * @param line The output string
+ * @param splitCharacter Split the file contents by this character
+ * @return The length of the current line, -1 if it's end of file, -2 if it failed to allocate buffer
+ * @note This moves the file pointer
+ * @warning Make sure to run free on the returned buffer
+ */
+ssize_t SEC_String_GetLineCharacter(FILE* file, char** line, char splitCharacter);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()

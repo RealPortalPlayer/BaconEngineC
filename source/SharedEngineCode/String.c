@@ -349,4 +349,88 @@ SEC_DynamicArray* SEC_String_SplitCharacter(const char* target, char splitBy) {
     SEC_DynamicArray_AddElementToLast(dynamicArray, (void*) string);
     return dynamicArray;
 }
+
+char* SEC_String_ReadFile(FILE* file, size_t lengthLimit, size_t* lineLength) {
+    size_t numberOfBytes;
+
+    fseek(file, 0, SEEK_END);
+    
+    numberOfBytes = ftell(file);
+
+    fseek(file, 0, SEEK_SET);
+
+    if (lengthLimit != 0 && numberOfBytes > lengthLimit)
+        numberOfBytes = lengthLimit;
+    
+    char* buffer = malloc(sizeof(char) * numberOfBytes);
+    
+    if (buffer == NULL)
+        return NULL;
+
+    if (lineLength != NULL)
+        *lineLength = numberOfBytes;
+
+    buffer[0] = '\0';
+
+    fread(buffer, sizeof(char), numberOfBytes, file);
+    fseek(file, 0, SEEK_SET);
+
+    buffer[numberOfBytes] = '\0';
+    return buffer;
+}
+
+ssize_t SEC_String_GetLine(FILE* file, char** line, const char* splitString) {
+    const char* currentSplitString = splitString != NULL ? splitString : "\n";
+    ssize_t length = 0;
+    char* buffer = NULL;
+    ssize_t splitStringLength = (int) strlen(currentSplitString);
+
+    if (line != NULL) {
+        buffer = malloc(sizeof(char));
+                
+        if (buffer == NULL)
+            return -2;
+
+        buffer[0] = '\0';
+    }
+    
+    while (!feof(file)) {
+        char contents[splitStringLength + 1];
+        
+        contents[0] = '\0';
+        contents[splitStringLength] = '\0';
+        
+        fread(contents, sizeof(char), splitStringLength, file);
+
+        if (SEC_String_Equals(contents, currentSplitString, SEC_BOOLEAN_FALSE)) {
+            if (line != NULL)
+                *line = buffer;
+            
+            return length;
+        }
+        
+        length += splitStringLength;
+
+        if (line == NULL)
+            continue;
+        
+        
+        SEC_String_Append(&buffer, SEC_String_Copy(contents));
+    }
+
+    if (buffer[0] != '\0') {
+        if (line != NULL)
+            *line = buffer;
+        
+        return length;
+    }
+    
+    return -1;
+}
+
+ssize_t SEC_String_GetLineCharacter(FILE* file, char** line, char splitCharacter) {
+    const char temporaryString[2] = {splitCharacter, '\0'};
+    
+    return SEC_String_GetLine(file, line, temporaryString);
+}
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()
