@@ -14,22 +14,25 @@ const char* BE_I18N_Translate(FILE* languageFile, const char* key) {
     SEC_STRICTMODE_CHECK(strlen(key) != 0, key, "Key cannot be empty\n");
     SEC_STRICTMODE_CHECK(languageFile != NULL, key, "Language file cannot be null\n");
 
-    //char* line = NULL;
-    //size_t lineCap;
-    //ssize_t length;
-    //size_t keyLength = strlen(key);
+    // TODO: String formatting? We cannot just use SEC_String_Format, since the translated string is controlled by the
+    //       user. Perhaps a new function for SEC_String just for formatting user controlled strings?
+    char* line;
+    ssize_t length;
+    size_t keyLength = strlen(key);
 
-    // FIXME: getline is not a compliant function.
-    // TODO: Should we free line?
-    /*while ((length = getline(&line, &lineCap, languageFile)) != -1) {
+    while ((length = SEC_String_GetLine(languageFile, &line, NULL)) != -1) {
+        if (length == -2) {
+            SEC_LOGGER_TRACE("Failed to allocate enough memory for translated buffer: %s\n", key);
+            return key;
+        }
+
         if (length == 0 || length <= keyLength || line[keyLength] != '=' || memcmp(line, key, keyLength) != 0)
             continue;
-
+        
         return line + keyLength + 1;
-    }*/
-
+    }
+    
     SEC_LOGGER_ERROR("Failed to translate: %s\n", key);
-
     return key;
 #else
     BE_INTERFACEFUNCTION(const char*, FILE*, const char*);
