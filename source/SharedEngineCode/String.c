@@ -13,6 +13,7 @@
 #include <stdio.h>
 
 #include "SharedEngineCode/String.h"
+#include "SharedEngineCode/Debugging/Assert.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 char* SEC_String_Copy(const char* duplicateFrom) {
@@ -215,9 +216,11 @@ char* SEC_String_Format(char** target, ...) {
     va_list arguments;
     
     va_start(arguments, target);
-    SEC_String_FormatPremadeList(target, arguments);
+    
+    char* returnValue = SEC_String_FormatPremadeList(target, arguments);
+    
     va_end(arguments);
-    return target != NULL ? *target : NULL;
+    return returnValue;
 }
 
 char* SEC_String_FormatPremadeList(char** target, va_list arguments) {
@@ -226,7 +229,7 @@ char* SEC_String_FormatPremadeList(char** target, va_list arguments) {
     va_copy(argumentsCopy, arguments);
 
     size_t newSize = vsnprintf(NULL, 0, *target, arguments);
-    char* newBuffer = malloc(newSize + 1);
+    char* newBuffer = malloc(sizeof(char) * newSize + 1);
 
     if (newBuffer == NULL) {
         va_end(argumentsCopy);
@@ -379,5 +382,112 @@ ssize_t SEC_String_GetLineCharacter(FILE* file, char** line, char splitCharacter
     const char temporaryString[2] = {splitCharacter, '\0'};
     
     return SEC_String_GetLine(file, line, temporaryString);
+}
+
+char* SEC_String_FormatSafe(char** target, int amountOfFormatters, ...) {
+    va_list arguments;
+
+    va_start(arguments, amountOfFormatters);
+    
+    char* returnValue = SEC_String_FormatSafePremadeList(target, amountOfFormatters, arguments);
+
+    va_end(arguments);
+    return returnValue;
+}
+
+char* SEC_String_FormatSafePremadeList(char** target, int amountOfFormatters, va_list arguments) {
+    size_t originalTargetSize = strlen(*target);
+
+    if (originalTargetSize == 0 || amountOfFormatters <= 0)
+        return *target;
+
+    char* newBuffer = malloc(sizeof(char));
+
+    if (newBuffer == NULL)
+        return NULL;
+
+    newBuffer[0] = '\0';
+
+    SEC_Boolean percentageFound = SEC_BOOLEAN_FALSE;
+    int usedArguments = 0;
+    
+    for (int i = 0; i < originalTargetSize; i++) {
+        char character = (*target)[i];
+
+        if (character == '%') {
+            if (!percentageFound) {
+                percentageFound = SEC_BOOLEAN_TRUE;
+                continue;
+            }
+
+            SEC_String_Append(&newBuffer, "%%");
+
+            percentageFound = SEC_BOOLEAN_FALSE;
+            continue;
+        }
+
+        if (percentageFound) {
+            percentageFound = SEC_BOOLEAN_FALSE;
+
+            if (character == 's') {
+                if (usedArguments >= amountOfFormatters) {
+                    SEC_String_Append(&newBuffer, "%s");
+                    continue;
+                }
+
+                usedArguments++;
+
+                switch (va_arg(arguments, SEC_String_SafeFormatTypes)) {
+                    case SEC_STRING_SAFE_FORMAT_TYPE_STRING:
+                        SEC_String_Append(&newBuffer, va_arg(arguments, char*));
+                        break;
+
+                    case SEC_STRING_SAFE_FORMAT_TYPE_INTEGER:
+                    {
+                        int value = va_arg(arguments, int);
+                        size_t bufferSize = snprintf(NULL, 0, "%d", value);
+                        char buffer[bufferSize];
+
+                        snprintf(buffer, bufferSize + 1, "%d", value);
+                        SEC_String_Append(&newBuffer, buffer);
+                        break;
+                    }
+
+                    case SEC_STRING_SAFE_FORMAT_TYPE_DOUBLE:
+                    {
+                        double value = va_arg(arguments, double);
+                        size_t bufferSize = snprintf(NULL, 0, "%lf", value);
+                        char buffer[bufferSize];
+
+                        snprintf(buffer, bufferSize + 1, "%lf", value);
+                        SEC_String_Append(&newBuffer, buffer);
+                        break;
+                    }
+
+                    case SEC_STRING_SAFE_FORMAT_TYPE_CHARACTER:
+                        SEC_String_AppendCharacter(&newBuffer, (char) va_arg(arguments, int));
+                        break;
+
+                    default:
+                        // FIXME: Specify which type
+                        SEC_ASSERT_ALWAYS("Type not supported in this engine version\n");
+                }
+
+                continue;
+            }
+
+            SEC_String_AppendCharacter(&newBuffer, '%');
+            SEC_String_AppendCharacter(&newBuffer, character);
+            continue;
+        }
+
+        SEC_String_AppendCharacter(&newBuffer, character);
+    }
+
+    if (percentageFound)
+        SEC_String_AppendCharacter(&newBuffer, '%');
+
+    *target = newBuffer;
+    return *target;
 }
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()

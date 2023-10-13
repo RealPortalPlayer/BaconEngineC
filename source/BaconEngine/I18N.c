@@ -14,8 +14,6 @@ const char* BE_I18N_Translate(FILE* languageFile, const char* key) {
     SEC_STRICTMODE_CHECK(strlen(key) != 0, key, "Key cannot be empty\n");
     SEC_STRICTMODE_CHECK(languageFile != NULL, key, "Language file cannot be null\n");
 
-    // TODO: String formatting? We cannot just use SEC_String_Format, since the translated string is controlled by the
-    //       user. Perhaps a new function for SEC_String just for formatting user controlled strings?
     char* line;
     ssize_t length;
     size_t keyLength = strlen(key);

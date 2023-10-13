@@ -14,6 +14,13 @@
 #include "SharedEngineCode/Storage/DynamicArray.h"
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+typedef enum {
+    SEC_STRING_SAFE_FORMAT_TYPE_STRING,
+    SEC_STRING_SAFE_FORMAT_TYPE_INTEGER,
+    SEC_STRING_SAFE_FORMAT_TYPE_DOUBLE,
+    SEC_STRING_SAFE_FORMAT_TYPE_CHARACTER
+} SEC_String_SafeFormatTypes;
+
 SEC_Boolean SEC_String_Contains(const char* string, const char* compare, SEC_Boolean caseless);
 SEC_Boolean SEC_String_Equals(const char* string, const char* compare, SEC_Boolean caseless);
 SEC_Boolean SEC_String_StartsWith(const char* string, const char* compare, SEC_Boolean caseless);
@@ -105,4 +112,35 @@ ssize_t SEC_String_GetLine(FILE* file, char** line, const char* splitString);
  * @warning Make sure to run free on the returned buffer
  */
 ssize_t SEC_String_GetLineCharacter(FILE* file, char** line, char splitCharacter);
+
+/**
+ * Safer version of SEC_String_Format, intended to be used when target is controlled by user input.
+ * Use %s when you want to substitute an argument, no matter the type
+ * @param ... Each format type
+ * @return The string target
+ * @note Returns NULL if it fails to allocate memory
+ * @warning Undefined behavior if amountOfFormatters is greater than the amount of formatters you've actually passed
+ * @example
+ * @code
+ * char* exampleString = SEC_String_Copy("Hello, %s\n");
+ * SEC_String_FormatSafe(&exampleString, 1, SEC_STRING_FORMAT_SAFE_ARGUMENT_STRING("World!"));
+ * @endcode
+ * You should be using the helper macros for this, but this is essentially how it works.
+ * The code takes amountOfFormatters and times it by 2.
+ * The reason why is because the helper macros gives two pieces of information at once: `SEC_String_SafeFormatTypes, value`.
+ * This is so we know what the values type is.
+ * It works something like this:
+ * @code
+ * char* exampleString = SEC_String_Copy("Hello, %s\n");
+ * SEC_String_FormatSafe(&exampleString, 1, SEC_STRING_SAFE_FORMAT_TYPE_STRING, "World!");
+ * @endcode
+ */
+char* SEC_String_FormatSafe(char** target, int amountOfFormatters, ...);
+
+char* SEC_String_FormatSafePremadeList(char** target, int amountOfFormatters, va_list arguments);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+
+#define SEC_STRING_FORMAT_SAFE_ARGUMENT_STRING(value) SEC_STRING_SAFE_FORMAT_TYPE_STRING, value
+#define SEC_STRING_FORMAT_SAFE_ARGUMENT_INTEGER(value) SEC_STRING_SAFE_FORMAT_TYPE_INTEGER, value
+#define SEC_STRING_FORMAT_SAFE_ARGUMENT_DOUBLE(value) SEC_STRING_SAFE_FORMAT_TYPE_DOUBLE, value
+#define SEC_STRING_FORMAT_SAFE_ARGUMENT_CHARACTER(value) SEC_STRING_SAFE_FORMAT_TYPE_CHARACTER, value
