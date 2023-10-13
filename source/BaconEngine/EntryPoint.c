@@ -39,6 +39,7 @@
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
 SEC_Boolean printedCursor = SEC_BOOLEAN_FALSE;
+SEC_Boolean commandThreadRunning = SEC_BOOLEAN_FALSE;
 
 void BE_EntryPoint_SignalDetected(int receivedSignal) {
     switch (receivedSignal) {
@@ -61,8 +62,14 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
             abort();
 
         case SIGINT:
-            if (!BE_ClientInformation_IsRunning())
+            if (!BE_ClientInformation_IsRunning() || !commandThreadRunning) {
+                if (!commandThreadRunning)
+                    SEC_LOGGER_WARN("Command thread is not running, using default behavior\n");
+
+                signal(SIGINT, SIG_DFL);
+                raise(SIGINT);
                 return;
+            }
 
             printf(" (type 'exit' to quit)\n");
 
@@ -75,6 +82,8 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
 }
 
 void BE_EntryPoint_CommandThreadFunction(void) {
+    commandThreadRunning = SEC_BOOLEAN_TRUE;
+
     // FIXME: Find out why this is not working on Serenity.
     // TODO: Find fcntl replacement for Windows.
 #if !SEC_OPERATINGSYSTEM_SERENITY && !SEC_OPERATINGSYSTEM_WINDOWS
@@ -108,6 +117,8 @@ void BE_EntryPoint_CommandThreadFunction(void) {
 
         printedCursor = SEC_BOOLEAN_FALSE;
     }
+
+    commandThreadRunning = SEC_BOOLEAN_FALSE;
 }
 
 BE_BINARYEXPORT const char* BE_EntryPoint_GetVersion(void) {
