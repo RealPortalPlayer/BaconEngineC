@@ -15,5 +15,6 @@
 // TODO: Variables.
 
 SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-BE_BINARYEXPORT const char* BE_I18N_Translate(FILE* languageFile, const char* key);
+BE_BINARYEXPORT const char* BE_I18N_TranslateFromFile(FILE* languageFile, const char* key);
+BE_BINARYEXPORT const char* BE_I18N_Translate(const char* buffer, const char* key);
 SEC_CPLUSPLUS_SUPPORT_GUARD_END()
