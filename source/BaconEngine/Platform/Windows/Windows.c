@@ -2,26 +2,26 @@
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <Windows.h>
-#include <SharedEngineCode/Debugging/Assert.h>
+#include <BaconAPI/Debugging/Assert.h>
 
 #include "Windows.h"
 #include "../SpecificPlatformFunctions.h"
 #include "WindowsWindow.h"
 #include "WindowsRenderer.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-static SEC_Boolean beWindowsInitialized = SEC_BOOLEAN_FALSE;
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
+static BA_Boolean beWindowsInitialized = BA_BOOLEAN_FALSE;
 
 double BE_Windows_GetTimer(void) {
     return GetTickCount();
 }
 
 void BE_Windows_Initialize(void) {
-    SEC_ASSERT(!beWindowsInitialized, "Already initialized Windows\n");
+    BA_ASSERT(!beWindowsInitialized, "Already initialized Windows\n");
 
-    beWindowsInitialized = SEC_BOOLEAN_TRUE;
+    beWindowsInitialized = BA_BOOLEAN_TRUE;
 
-    BE_SpecificPlatformFunctions_Initialize(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions,
+    BE_SpecificPlatformFunctions_Initialize(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions,
         {
             &BE_WindowsWindow_Create,
             &BE_WindowsWindow_GetTitle,
@@ -50,4 +50,4 @@ void BE_Windows_Initialize(void) {
 }
 
 void BE_Windows_Destroy(void) {}
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

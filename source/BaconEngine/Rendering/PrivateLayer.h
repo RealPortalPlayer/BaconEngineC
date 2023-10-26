@@ -6,14 +6,14 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
 
 #include "../AntiClientGuard.h"
 #include "BaconEngine/Rendering/Layer.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 void BE_PrivateLayer_InitializeLayers(void);
 void BE_PrivateLayer_OnUpdate(BE_Layer_UpdateTypes updateTypes);
-SEC_Boolean BE_PrivateLayer_OnEvent(BE_Event event);
+BA_Boolean BE_PrivateLayer_OnEvent(BE_Event event);
 void BE_PrivateLayer_DestroyLayers(void);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

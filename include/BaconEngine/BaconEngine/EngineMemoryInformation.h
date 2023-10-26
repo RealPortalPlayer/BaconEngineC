@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
 #include <stddef.h>
 
 #include "BinaryExport.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef struct {
     size_t allocatedBytes;
     size_t allocatedAmount;
@@ -26,4 +26,4 @@ typedef struct {
 
 BE_BINARYEXPORT BE_EngineMemoryInformation BE_EngineMemoryInformation_Get(void);
 BE_BINARYEXPORT size_t BE_EngineMemoryInformation_GetAllocatedBytes(void);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

@@ -1,18 +1,18 @@
 // Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include <SharedEngineCode/ArgumentHandler.h>
-#include <SharedEngineCode/Logger.h>
+#include <BaconAPI/ArgumentHandler.h>
+#include <BaconAPI/Logger.h>
 #include <SharedEngineCode/Launcher.h>
 #include <SharedEngineCode/BuiltInArguments.h>
-#include <SharedEngineCode/User.h>
-#include <SharedEngineCode/Internal/PlatformSpecific.h>
+#include <BaconAPI/User.h>
+#include <BaconAPI/Internal/PlatformSpecific.h>
 #include <SharedEngineCode/MessageBox.h>
-#include <SharedEngineCode/String.h>
+#include <BaconAPI/String.h>
 
-#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
+#if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <dlfcn.h>
-#elif SEC_OPERATINGSYSTEM_WINDOWS
+#elif BA_OPERATINGSYSTEM_WINDOWS
 #   include <Windows.h>
 #   ifdef BE_WINDOWS_LAUNCHER
 #       define argc __argc
@@ -21,8 +21,8 @@
 #endif
 
 #ifndef BE_WINDOWS_LAUNCHER
-#   define BL_MAIN_INFO(caption, ...) SEC_LOGGER_INFO(__VA_ARGS__)
-#   define BL_MAIN_ERROR(caption, ...) SEC_LOGGER_FATAL(__VA_ARGS__)
+#   define BL_MAIN_INFO(caption, ...) BA_LOGGER_INFO(__VA_ARGS__)
+#   define BL_MAIN_ERROR(caption, ...) BA_LOGGER_FATAL(__VA_ARGS__)
 int main(int argc, char** argv) {
 #else
 #   define BL_MAIN_INFO(caption, ...) SEC_MessageBox_Display(SEC_MESSAGEBOX_ICON_INFORMATION, SEC_MESSAGEBOX_BUTTON_OK, caption, __VA_ARGS__)
@@ -33,22 +33,22 @@ int APIENTRY WinMain(HINSTANCE instanceHandle, HINSTANCE previousInstanceHandle,
     (void) commandLine;
     (void) commandShow;
 #endif
-    SEC_ArgumentHandler_Initialize(argc, argv);
-    SEC_LOGGER_TRACE("Built on: %s\nBuilt for: %s\n", __TIMESTAMP__, SEC_OPERATINGSYSTEM_NAME);
+    BA_ArgumentHandler_Initialize(argc, argv);
+    BA_LOGGER_TRACE("Built on: %s\nBuilt for: %s\n", __TIMESTAMP__, BA_OPERATINGSYSTEM_NAME);
     
     SEC_Launcher_Configuration configuration = {
         .code = SEC_LAUNCHER_ERROR_CODE_NULL
     };
 
-    SEC_ArgumentHandler_ShortResults results;
-    int clientInformationResults = SEC_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_CLIENT, SEC_BUILTINARGUMENTS_CLIENT_SHORT, 0,
+    BA_ArgumentHandler_ShortResults results;
+    int clientInformationResults = BA_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_CLIENT, SEC_BUILTINARGUMENTS_CLIENT_SHORT, 0,
                                                                                &results);
 
-    if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_VERSION, SEC_BUILTINARGUMENTS_VERSION_SHORT, 0)) {
-        char* message = SEC_String_Copy("Launcher version: %s\n"
+    if (BA_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_VERSION, SEC_BUILTINARGUMENTS_VERSION_SHORT, 0)) {
+        char* message = BA_String_Copy("Launcher version: %s\n"
                                         "Built with engine version: %s\n");
 
-        SEC_String_Format(&message, BE_LAUNCHER_VERSION, BE_ENGINE_VERSION);
+        BA_String_Format(&message, BE_LAUNCHER_VERSION, BE_ENGINE_VERSION);
         SEC_Launcher_SetLauncherPath();
         SEC_Launcher_SetEnginePath();
         
@@ -61,14 +61,14 @@ int APIENTRY WinMain(HINSTANCE instanceHandle, HINSTANCE previousInstanceHandle,
             typedef const char* (*GetVersion)(void);
             GetVersion getVersion;
 
-            SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(GetVersion, getVersion, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.engineBinary, "BE_EntryPoint_GetVersion"));
+            BA_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(GetVersion, getVersion, BA_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.engineBinary, "BE_EntryPoint_GetVersion"));
             
             if (getVersion != NULL) {
-                SEC_String_Append(&message, "Engine version: %s\n");
-                SEC_String_Format(&message, getVersion());
+                BA_String_Append(&message, "Engine version: %s\n");
+                BA_String_Format(&message, getVersion());
             }
 
-            SEC_PLATFORMSPECIFIC_CLOSE_BINARY(configuration.unionVariables.data.engineBinary);
+            BA_PLATFORMSPECIFIC_CLOSE_BINARY(configuration.unionVariables.data.engineBinary);
         }
         
         if (clientInformationResults == 0) {
@@ -88,25 +88,25 @@ int APIENTRY WinMain(HINSTANCE instanceHandle, HINSTANCE previousInstanceHandle,
         typedef const char* (*GetVersion)(void);
         GetVersion getVersion;
 
-        SEC_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(GetVersion, getVersion, SEC_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.clientBinary, "I_EntryPoint_GetEngineVersion"));
+        BA_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(GetVersion, getVersion, BA_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.clientBinary, "I_EntryPoint_GetEngineVersion"));
         
         if (getVersion != NULL) {
-            SEC_String_Append(&message, "Client was compiled with engine version: %s\n");
-            SEC_String_Format(&message, getVersion());
+            BA_String_Append(&message, "Client was compiled with engine version: %s\n");
+            BA_String_Format(&message, getVersion());
         }
         
         BL_MAIN_INFO("Version", "%s", message);
-        SEC_PLATFORMSPECIFIC_CLOSE_BINARY(configuration.unionVariables.data.clientBinary);
+        BA_PLATFORMSPECIFIC_CLOSE_BINARY(configuration.unionVariables.data.clientBinary);
         return 0;
     }
 
-    if (SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_HELP, SEC_BUILTINARGUMENTS_HELP_SHORT, SEC_BOOLEAN_FALSE)) {
-        SEC_LOGGER_INFO("Arguments:\n%s\n", SEC_Launcher_GetDefaultHelpList());
+    if (BA_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_HELP, SEC_BUILTINARGUMENTS_HELP_SHORT, BA_BOOLEAN_FALSE)) {
+        BA_LOGGER_INFO("Arguments:\n%s\n", SEC_Launcher_GetDefaultHelpList());
         return 0;
     }
 
-    if (SEC_User_IsAdministrator())
-        SEC_LOGGER_WARN("You're running as root! If a client says you require to be root, then it's probably a virus\n");
+    if (BA_User_IsAdministrator())
+        BA_LOGGER_WARN("You're running as root! If a client says you require to be root, then it's probably a virus\n");
 
     if (clientInformationResults == 0) {
         BL_MAIN_ERROR("Launcher Error", "No client specified, please check help for more information\n");
@@ -132,23 +132,23 @@ int APIENTRY WinMain(HINSTANCE instanceHandle, HINSTANCE previousInstanceHandle,
     }
 
     if (configuration.unionVariables.data.clientName[0] != '\0')
-        SEC_LOGGER_INFO("Ready, starting: %s\n", configuration.unionVariables.data.clientName);
+        BA_LOGGER_INFO("Ready, starting: %s\n", configuration.unionVariables.data.clientName);
     else
-        SEC_LOGGER_INFO("Ready, starting\n");
+        BA_LOGGER_INFO("Ready, starting\n");
 
-    SEC_LOGGER_TRACE("Entering engine code\n");
+    BA_LOGGER_TRACE("Entering engine code\n");
 
     SEC_Launcher_StartEngineResults engineResults = SEC_Launcher_StartEngine(&configuration);
 
     if (!engineResults.success) {
-        SEC_LOGGER_FATAL("Failed to start engine: %s\n", engineResults.unionVariables.errorMessage);
+        BA_LOGGER_FATAL("Failed to start engine: %s\n", engineResults.unionVariables.errorMessage);
         return 1;
     }
 
-    SEC_LOGGER_TRACE("Returned back to launcher\n");
-    SEC_LOGGER_TRACE("Freeing binaries\n");
-    SEC_PLATFORMSPECIFIC_CLOSE_BINARY(configuration.unionVariables.data.engineBinary);
-    SEC_PLATFORMSPECIFIC_CLOSE_BINARY(configuration.unionVariables.data.clientBinary);
-    SEC_LOGGER_INFO("Goodbye\n");
+    BA_LOGGER_TRACE("Returned back to launcher\n");
+    BA_LOGGER_TRACE("Freeing binaries\n");
+    BA_PLATFORMSPECIFIC_CLOSE_BINARY(configuration.unionVariables.data.engineBinary);
+    BA_PLATFORMSPECIFIC_CLOSE_BINARY(configuration.unionVariables.data.clientBinary);
+    BA_LOGGER_INFO("Goodbye\n");
     return engineResults.unionVariables.returnCode;
 }

@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
 
 #include "BinaryExport.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 BE_BINARYEXPORT double BE_DeltaTime_GetMilliseconds(void);
 BE_BINARYEXPORT double BE_DeltaTime_GetSeconds(void);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

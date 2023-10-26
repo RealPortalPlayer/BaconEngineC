@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
-#include <SharedEngineCode/String.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/String.h>
 
 #include "Command.h"
 #include "BaconEngine/BinaryExport.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 BE_BINARYEXPORT BE_Command** BE_Console_GetCommands(void);
 BE_BINARYEXPORT BE_Command* BE_Console_GetCommand(const char* name);
 
@@ -31,5 +31,5 @@ BE_BINARYEXPORT int BE_Console_GetAllocatedCommandsAmount(void);
  */
 BE_BINARYEXPORT int BE_Console_GetCommandReallocationAmount(void);
 BE_BINARYEXPORT void BE_Console_ExecuteCommand(const char* input); // TODO: Client
-BE_BINARYEXPORT SEC_Boolean BE_Console_IsEngineCommand(BE_Command command);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BE_BINARYEXPORT BA_Boolean BE_Console_IsEngineCommand(BE_Command command);
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "Internal/CPlusPlusSupport.h"
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     SEC_MESSAGEBOX_BUTTON_OK,
     SEC_MESSAGEBOX_BUTTON_OK_CANCEL,
@@ -39,4 +39,4 @@ typedef enum {
 } SEC_MessageBox_Results;
 
 SEC_MessageBox_Results SEC_MessageBox_Display(SEC_MessageBox_Icons icon, SEC_MessageBox_Buttons buttons, const char* caption, const char* message, ...);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

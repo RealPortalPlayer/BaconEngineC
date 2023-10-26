@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
 
 #include "../../AntiClientGuard.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 void BE_Metal_Initialize(void);
 void BE_Metal_Destroy(void);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

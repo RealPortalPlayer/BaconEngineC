@@ -7,7 +7,7 @@
 #include "OpenGLRenderer.h"
 #include "OpenGLWindow.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 BE_Color3_Unsigned clearColor;
 const char* vertexShaderCode = "#version 330 core\n"
                                "layout (location = 0) in vec3 position;\n"
@@ -27,7 +27,7 @@ void BE_OpenGLRenderer_CompileShaders(void) {
 #if 0 // FIXME: This isn't finished.
     unsigned vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
-    SEC_LOGGER_DEBUG("Compiling shaders\n");
+    BA_LOGGER_DEBUG("Compiling shaders\n");
     glShaderSource(vertexShader, 1, &vertexShaderCode, NULL);
     glCompileShader(vertexShader);
 
@@ -39,7 +39,7 @@ void BE_OpenGLRenderer_CompileShaders(void) {
 
         if (!compiled) {
             glGetShaderInfoLog(vertexShader, sizeof(error), NULL, error);
-            SEC_LOGGER_ERROR("Failed to compile vertex shader: %s\n", error);
+            BA_LOGGER_ERROR("Failed to compile vertex shader: %s\n", error);
         }
     }
 
@@ -56,11 +56,11 @@ void BE_OpenGLRenderer_CompileShaders(void) {
 
         if (!compiled) {
             glGetShaderInfoLog(fragmentShader, sizeof(error), NULL, error);
-            SEC_LOGGER_ERROR("Failed to compile fragment shader: %s\n", error);
+            BA_LOGGER_ERROR("Failed to compile fragment shader: %s\n", error);
         }
     }
 
-    SEC_LOGGER_DEBUG("Creating shader program\n");
+    BA_LOGGER_DEBUG("Creating shader program\n");
 
     shaderProgram = glCreateProgram();
 
@@ -76,7 +76,7 @@ void BE_OpenGLRenderer_CompileShaders(void) {
 
         if (!linked) {
             glGetProgramInfoLog(shaderProgram, 512, NULL, error);
-            SEC_LOGGER_ERROR("Failed to link shaders: %s\n", error);
+            BA_LOGGER_ERROR("Failed to link shaders: %s\n", error);
         }
     }
 
@@ -110,4 +110,4 @@ void BE_OpenGLRenderer_DrawFilledRectangle(BE_Vector2_Integer position, BE_Vecto
     (void) color;
     // TODO: Implementation.
 }
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

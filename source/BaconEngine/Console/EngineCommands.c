@@ -4,7 +4,7 @@
 #include <string.h>
 #include <signal.h>
 #include <SharedEngineCode/Paths.h>
-#include <SharedEngineCode/Debugging/Assert.h>
+#include <BaconAPI/Debugging/Assert.h>
 
 #include "EngineCommands.h"
 #include "BaconEngine/Console/Console.h"
@@ -17,7 +17,7 @@
 #include "BaconEngine/Math/Bitwise.h"
 #include "BaconEngine/DeltaTime.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 void BE_EngineCommands_Help(BE_Command_Context context);
 void BE_EngineCommands_Cheats(BE_Command_Context context);
 void BE_EngineCommands_Stop(void);
@@ -33,21 +33,21 @@ void BE_EngineCommands_Echo(BE_Command_Context context);
 void BE_EngineCommands_Crash(void);
 
 void BE_EngineCommands_Initialize(void) {
-    static SEC_Boolean initialized = SEC_BOOLEAN_FALSE;
+    static BA_Boolean initialized = BA_BOOLEAN_FALSE;
 
-    SEC_ASSERT(!initialized, "Engine commands are already initialized\n");
+    BA_ASSERT(!initialized, "Engine commands are already initialized\n");
 
-    initialized = SEC_BOOLEAN_TRUE;
+    initialized = BA_BOOLEAN_TRUE;
 
     BE_Command_Register("help", "Shows information about each command.", BE_COMMAND_FLAG_NULL, &BE_EngineCommands_Help);
     {
-        BE_Command_AddArgument("command", SEC_BOOLEAN_FALSE);
+        BE_Command_AddArgument("command", BA_BOOLEAN_FALSE);
     }
 
     BE_Command_Register("cheats", "Get information or modify if cheats are enabled.", BE_COMMAND_FLAG_SERVER_ONLY,
                         &BE_EngineCommands_Cheats);
     {
-        BE_Command_AddArgument("toggle", SEC_BOOLEAN_FALSE);
+        BE_Command_AddArgument("toggle", BA_BOOLEAN_FALSE);
     }
 
     BE_Command_Register("stop", BE_ClientInformation_IsServerModeEnabled() ? "Stops the server." : "Stops the client.",
@@ -63,7 +63,7 @@ void BE_EngineCommands_Initialize(void) {
 
     BE_Command_Register("say", "Say something as the server.", BE_COMMAND_FLAG_SERVER_ONLY | BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING, &BE_EngineCommands_Say);
     {
-        BE_Command_AddArgument( "message", SEC_BOOLEAN_TRUE);
+        BE_Command_AddArgument( "message", BA_BOOLEAN_TRUE);
     }
 
     BE_Command_Register("disconnect", "Disconnects from the server.", BE_COMMAND_FLAG_CLIENT_ONLY,
@@ -74,26 +74,26 @@ void BE_EngineCommands_Initialize(void) {
 
     BE_Command_Register("kick", "Forcefully removes a client.", BE_COMMAND_FLAG_SERVER_ONLY, &BE_EngineCommands_Kick);
     {
-        BE_Command_AddArgument("client id", SEC_BOOLEAN_TRUE);
-        BE_Command_AddArgument("reason", SEC_BOOLEAN_FALSE);
+        BE_Command_AddArgument("client id", BA_BOOLEAN_TRUE);
+        BE_Command_AddArgument("reason", BA_BOOLEAN_FALSE);
     }
 
     BE_Command_Register("ban", "Forcefully removes a client, and prevents them from rejoining.",
                         BE_COMMAND_FLAG_SERVER_ONLY, &BE_EngineCommands_Ban);
     {
-        BE_Command_AddArgument("client id", SEC_BOOLEAN_TRUE);
-        BE_Command_AddArgument("reason", SEC_BOOLEAN_FALSE);
+        BE_Command_AddArgument("client id", BA_BOOLEAN_TRUE);
+        BE_Command_AddArgument("reason", BA_BOOLEAN_FALSE);
     }
 
     BE_Command_Register("sudo", "Runs a command as the server.", BE_COMMAND_FLAG_CLIENT_ONLY, &BE_EngineCommands_Sudo);
     {
-        BE_Command_AddArgument("key", SEC_BOOLEAN_TRUE);
-        BE_Command_AddArgument("command", SEC_BOOLEAN_TRUE);
+        BE_Command_AddArgument("key", BA_BOOLEAN_TRUE);
+        BE_Command_AddArgument("command", BA_BOOLEAN_TRUE);
     }
 
     BE_Command_Register("echo", "Print text into console.", BE_COMMAND_FLAGS_NO_ARGUMENT_PARSING, &BE_EngineCommands_Echo);
     {
-        BE_Command_AddArgument("message", SEC_BOOLEAN_FALSE);
+        BE_Command_AddArgument("message", BA_BOOLEAN_FALSE);
     }
 
     BE_Command_Register("crash", "Force a segmentation fault", BE_COMMAND_FLAG_SERVER_ONLY,
@@ -105,29 +105,29 @@ void BE_EngineCommands_HelpPrint(BE_Command* command) {
         (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
         return;
 
-    SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "        %s", command->name);
-    SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, " - ");
-    SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "%s",
+    BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "        %s", command->name);
+    BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, " - ");
+    BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "%s",
                                  command->description);
 
-#ifdef BE_ALLOW_DEBUG_LOGS
+#ifdef BA_ALLOW_DEBUG_LOGS
     if (command->flags != BE_COMMAND_FLAG_NULL)
-        SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_DEBUG, " - flags: %i",
+        BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_DEBUG, " - flags: %i",
                                      command->flags);
 #endif
 
     for (int argumentId = 0; argumentId < command->arguments.used; argumentId++) {
-        BE_Command_Argument* argument = SEC_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, argumentId);
+        BE_Command_Argument* argument = BA_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, argumentId);
 
-        SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "%s", argumentId != 0 ? " " : " - args: ");
+        BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "%s", argumentId != 0 ? " " : " - args: ");
 
         if (argument->required)
-            SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "<%s>", argument->name);
+            BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "<%s>", argument->name);
         else
-            SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "[%s]", argument->name);
+            BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "[%s]", argument->name);
     }
 
-    SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "\n");
+    BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "\n");
 }
 
 void BE_EngineCommands_Help(BE_Command_Context context) {
@@ -140,7 +140,7 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
         int showClient = 0;
         int commandIdClient = -1;
 
-        SEC_LOGGER_INFO("Help:\n"
+        BA_LOGGER_INFO("Help:\n"
                         "    Engine Commands:\n");
 
         for (; commandId < BE_Console_GetCommandAmount(); commandId++) {
@@ -164,7 +164,7 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
         if (commandIdClient == -1 || showClient == 0)
             return;
 
-        SEC_Logger_LogImplementation(SEC_BOOLEAN_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "    Client Commands:\n");
+        BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "    Client Commands:\n");
 
         for (; commandIdClient < BE_Console_GetCommandAmount(); commandIdClient++)
             BE_EngineCommands_HelpPrint(BE_Console_GetCommands()[commandIdClient]);
@@ -175,32 +175,32 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
     BE_Command* command = BE_Console_GetCommand(commandName);
 
     if (command == NULL) {
-        SEC_LOGGER_ERROR("'%s' is not a valid command\n", commandName);
+        BA_LOGGER_ERROR("'%s' is not a valid command\n", commandName);
         return;
     }
 
     if (strcmp(command->name, "help") == 0 && rand() % 50 == 0)
-        SEC_LOGGER_WARN("There is no help\n");
+        BA_LOGGER_WARN("There is no help\n");
 
-    SEC_LOGGER_INFO("Help:\n    %s Command:\n", BE_Console_IsEngineCommand(*command) ? "Engine" : "Client");
+    BA_LOGGER_INFO("Help:\n    %s Command:\n", BE_Console_IsEngineCommand(*command) ? "Engine" : "Client");
     BE_EngineCommands_HelpPrint(command);
 }
 
 void BE_EngineCommands_Cheats(BE_Command_Context context) {
     if (BE_ArgumentManager_GetString(context.arguments, "toggle", NULL) == NULL) {
-        SEC_LOGGER_INFO("Cheats are %s\n", BE_ClientInformation_IsCheatsEnabled() ? "enabled" : "disabled");
+        BA_LOGGER_INFO("Cheats are %s\n", BE_ClientInformation_IsCheatsEnabled() ? "enabled" : "disabled");
         return;
     }
 
-    SEC_Boolean value = BE_ArgumentManager_GetBoolean(context.arguments, "toggle", 0);
+    BA_Boolean value = BE_ArgumentManager_GetBoolean(context.arguments, "toggle", 0);
 
     if (BE_ClientInformation_IsCheatsEnabled() == value) {
-        SEC_LOGGER_WARN("Cheats are already %s\n", BE_ClientInformation_IsCheatsEnabled() ? "enabled" : "disabled");
+        BA_LOGGER_WARN("Cheats are already %s\n", BE_ClientInformation_IsCheatsEnabled() ? "enabled" : "disabled");
         return;
     }
 
     BE_ClientInformation_SetCheats(value);
-    SEC_LOGGER_INFO("Cheats are now %s\n", BE_ClientInformation_IsCheatsEnabled() ? "enabled" : "disabled");
+    BA_LOGGER_INFO("Cheats are now %s\n", BE_ClientInformation_IsCheatsEnabled() ? "enabled" : "disabled");
 
     if (BE_ArgumentManager_GetBoolean(context.arguments, "silence", 0))
         return;
@@ -215,7 +215,7 @@ void BE_EngineCommands_Stop(void) {
 void BE_EngineCommands_DebugInfo(void) {
     BE_EngineMemoryInformation memoryInformation = BE_EngineMemoryInformation_Get();
 
-    SEC_LOGGER_INFO("DeltaTime: %f seconds (%f milliseconds)\n"
+    BA_LOGGER_INFO("DeltaTime: %f seconds (%f milliseconds)\n"
                     "Command: %i/%i (%i realloc)\n"
                     "UI: %i rendered (%i/%i, %i realloc)\n"
                     "Layer: %i/%i (%i realloc)\n"
@@ -249,54 +249,54 @@ void BE_EngineCommands_DebugInfo(void) {
 }
 
 void BE_EngineCommands_Say(BE_Command_Context context) {
-    SEC_LOGGER_INFO("Server: %s\n", context.unparsedArguments);
+    BA_LOGGER_INFO("Server: %s\n", context.unparsedArguments);
     // TODO: Broadcast to everyone
 }
 
 void BE_EngineCommands_Disconnect(BE_Command_Context context) {
     (void) context;
-    SEC_ASSERT_NOT_IMPLEMENTED();
+    BA_ASSERT_NOT_IMPLEMENTED();
 }
 
 void BE_EngineCommands_Connect(BE_Command_Context context) {
     (void) context;
-    SEC_ASSERT_NOT_IMPLEMENTED();
+    BA_ASSERT_NOT_IMPLEMENTED();
 }
 
 void BE_EngineCommands_WhatAmI(void) {
     if (BE_ClientInformation_IsServerModeEnabled()) {
-        SEC_LOGGER_INFO("Server\n");
+        BA_LOGGER_INFO("Server\n");
         return;
     }
 
     if (BE_Renderer_GetCurrentType() != BE_RENDERER_TYPE_TEXT) {
-        SEC_LOGGER_INFO("Client\n");
+        BA_LOGGER_INFO("Client\n");
         return;
     }
 
-    SEC_LOGGER_INFO("Headless Client\n");
+    BA_LOGGER_INFO("Headless Client\n");
 }
 
 void BE_EngineCommands_Kick(BE_Command_Context context) {
     (void) context;
-    SEC_ASSERT_NOT_IMPLEMENTED();
+    BA_ASSERT_NOT_IMPLEMENTED();
 }
 
 void BE_EngineCommands_Ban(BE_Command_Context context) {
     (void) context;
-    SEC_ASSERT_NOT_IMPLEMENTED();
+    BA_ASSERT_NOT_IMPLEMENTED();
 }
 
 void BE_EngineCommands_Sudo(BE_Command_Context context) {
     (void) context;
-    SEC_ASSERT_NOT_IMPLEMENTED();
+    BA_ASSERT_NOT_IMPLEMENTED();
 }
 
 void BE_EngineCommands_Echo(BE_Command_Context context) {
-    SEC_LOGGER_INFO("%s\n", context.unparsedArguments);
+    BA_LOGGER_INFO("%s\n", context.unparsedArguments);
 }
 
 void BE_EngineCommands_Crash(void) {
     raise(SIGSEGV);
 }
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

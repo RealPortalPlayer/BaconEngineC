@@ -6,15 +6,15 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
-#include <SharedEngineCode/Internal/Boolean.h>
-#include <SharedEngineCode/String.h>
-#include <SharedEngineCode/Storage/DynamicDictionary.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/Boolean.h>
+#include <BaconAPI/String.h>
+#include <BaconAPI/Storage/DynamicDictionary.h>
 
 #include "ArgumentManager.h"
 #include "BaconEngine/BinaryExport.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     BE_COMMAND_FLAG_NULL,
     
@@ -56,24 +56,24 @@ typedef enum {
 typedef struct { // TODO: Client
     const char* fullInput;
     const char* unparsedArguments;
-    SEC_DynamicDictionary arguments;
+    BA_DynamicDictionary arguments;
 } BE_Command_Context;
 
 typedef struct {
     char* name;
-    SEC_Boolean required;
+    BA_Boolean required;
 } BE_Command_Argument;
 
 typedef struct {
     const char* name;
     const char* description;
-    SEC_DynamicArray arguments;
+    BA_DynamicArray arguments;
     BE_Command_Flags flags;
     void (*Run)(BE_Command_Context context);
 } BE_Command;
 
 BE_BINARYEXPORT void BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context));
-BE_BINARYEXPORT void BE_Command_AddArgument(const char* name, SEC_Boolean required);
+BE_BINARYEXPORT void BE_Command_AddArgument(const char* name, BA_Boolean required);
 
 /**
  * Duplicates the previously added command
@@ -81,4 +81,4 @@ BE_BINARYEXPORT void BE_Command_AddArgument(const char* name, SEC_Boolean requir
  * @param description If this is NULL, then it will use the description of the previous command
  */
 BE_BINARYEXPORT void BE_Command_DuplicatePrevious(const char* name, const char* description);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

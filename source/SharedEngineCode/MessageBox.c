@@ -1,18 +1,19 @@
 // Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include "SharedEngineCode/MessageBox.h"
-#include "SharedEngineCode/Internal/OperatingSystem.h"
-#include "SharedEngineCode/Internal/CPlusPlusSupport.h"
-#include "SharedEngineCode/String.h"
+#include <BaconAPI/Internal/OperatingSystem.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/String.h>
 
-#if SEC_OPERATINGSYSTEM_WINDOWS
+#include "SharedEngineCode/MessageBox.h"
+
+#if BA_OPERATINGSYSTEM_WINDOWS
 #   include <Windows.h>
 #endif
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 SEC_MessageBox_Results SEC_MessageBox_Display(SEC_MessageBox_Icons icon, SEC_MessageBox_Buttons buttons, const char* caption, const char* message, ...) {
-#if SEC_OPERATINGSYSTEM_WINDOWS
+#if BA_OPERATINGSYSTEM_WINDOWS
     UINT flags = MB_OK;
 
     switch (icon) {
@@ -33,11 +34,11 @@ SEC_MessageBox_Results SEC_MessageBox_Display(SEC_MessageBox_Icons icon, SEC_Mes
     }
     
     va_list arguments;
-    char* messageClone = SEC_String_Copy(message);
+    char* messageClone = BA_String_Copy(message);
 
     if (messageClone != NULL) {
         va_start(arguments, message);
-        SEC_String_FormatPremadeList(&messageClone, arguments);
+        BA_String_FormatPremadeList(&messageClone, arguments);
         va_end(arguments);   
     }
     
@@ -49,4 +50,4 @@ SEC_MessageBox_Results SEC_MessageBox_Display(SEC_MessageBox_Icons icon, SEC_Mes
     return 0;
 #endif
 }
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
 
 #include "BaconEngine/Math/Vector.h"
 #include "BaconEngine/Input/Keyboard.h"
 #include "BaconEngine/Input/Mouse.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     BE_EVENT_TYPE_KEYBOARD_KEY_DOWN,
     BE_EVENT_TYPE_KEYBOARD_KEY_UP,
@@ -53,4 +53,4 @@ typedef struct {
         } mouse;
     } data;
 } BE_Event;
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

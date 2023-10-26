@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
-#include <SharedEngineCode/Internal/Boolean.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/Boolean.h>
 #include <stdlib.h>
 
 #include "BaconEngine/BinaryExport.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-BE_BINARYEXPORT SEC_Boolean BE_DefaultPackage_GetFile(const char* filePath, void** buffer, size_t* bufferSize);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
+BE_BINARYEXPORT BA_Boolean BE_DefaultPackage_GetFile(const char* filePath, void** buffer, size_t* bufferSize);
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

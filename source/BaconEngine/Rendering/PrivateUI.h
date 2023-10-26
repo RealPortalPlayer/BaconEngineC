@@ -6,16 +6,16 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
-#include <SharedEngineCode/Storage/DynamicArray.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Storage/DynamicArray.h>
 
 #include "../AntiClientGuard.h"
 #include "BaconEngine/Rendering/UI.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef struct {
     const char* name;
-    SEC_DynamicArray elements;
+    BA_DynamicArray elements;
     BE_UI_WindowFlags flags;
     BE_Vector2_Integer position;
     BE_Vector2_Unsigned size;
@@ -23,9 +23,9 @@ typedef struct {
     int windowId;
 } BE_PrivateUI_Window;
 
-const SEC_DynamicArray* BE_PrivateUI_GetWindows(void);
-const SEC_DynamicArray* BE_PrivateUI_GetRenderWindows(void);
+const BA_DynamicArray* BE_PrivateUI_GetWindows(void);
+const BA_DynamicArray* BE_PrivateUI_GetRenderWindows(void);
 
 void BE_PrivateUI_Initialize(void);
 void BE_PrivateUI_Destroy(void);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

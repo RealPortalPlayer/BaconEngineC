@@ -6,14 +6,14 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
 #include <zip.h>
-#include <SharedEngineCode/Internal/Boolean.h>
-#include <SharedEngineCode/String.h>
+#include <BaconAPI/Internal/Boolean.h>
+#include <BaconAPI/String.h>
 
 #include "BaconEngine/BinaryExport.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef struct zip_t* BE_Package;
 
 /**
@@ -37,6 +37,6 @@ BE_BINARYEXPORT BE_Package BE_Package_Open(const char* fileName);
  * @note When you're done with the buffer, remember to call "free" on it to prevent memory leaks
  * @warning The buffer will not be NULL terminated, and as such, will be dangerous to call functions that expect a NULL terminated string
  */
-BE_BINARYEXPORT SEC_Boolean BE_Package_GetFile(BE_Package package, const char* filePath, void** buffer, size_t* bufferSize);
+BE_BINARYEXPORT BA_Boolean BE_Package_GetFile(BE_Package package, const char* filePath, void** buffer, size_t* bufferSize);
 BE_BINARYEXPORT void BE_Package_Close(BE_Package package);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

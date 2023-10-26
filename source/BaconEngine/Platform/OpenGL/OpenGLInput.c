@@ -6,17 +6,17 @@
 #include "OpenGLInput.h"
 #include "OpenGLWindow.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-SEC_Boolean BE_OpenGLInput_IsKeyDown(BE_Keyboard_KeyCodes keyCode) {
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_Boolean BE_OpenGLInput_IsKeyDown(BE_Keyboard_KeyCodes keyCode) {
     (void) keyCode;
-    return SEC_BOOLEAN_FALSE; // TODO
+    return BA_BOOLEAN_FALSE; // TODO
 }
 
-SEC_Boolean BE_OpenGLInput_IsKeyPressed(BE_Keyboard_KeyCodes keyCode) {
+BA_Boolean BE_OpenGLInput_IsKeyPressed(BE_Keyboard_KeyCodes keyCode) {
     return glfwGetKey(BE_OpenGLWindow_GetWindow(), keyCode) == GLFW_PRESS;
 }
 
-SEC_Boolean BE_OpenGLInput_IsMouseDown(BE_Mouse_ButtonType button) {
+BA_Boolean BE_OpenGLInput_IsMouseDown(BE_Mouse_ButtonType button) {
     return glfwGetMouseButton(BE_OpenGLWindow_GetWindow(), button) == GLFW_PRESS;
 }
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

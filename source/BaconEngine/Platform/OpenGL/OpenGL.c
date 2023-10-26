@@ -2,7 +2,7 @@
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <GLFW/glfw3.h>
-#include <SharedEngineCode/Debugging/Assert.h>
+#include <BaconAPI/Debugging/Assert.h>
 
 #include "OpenGL.h"
 #include "../SpecificPlatformFunctions.h"
@@ -10,11 +10,11 @@
 #include "OpenGLRenderer.h"
 #include "OpenGLInput.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-static SEC_Boolean beOpenGLInitialized = SEC_BOOLEAN_FALSE;
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
+static BA_Boolean beOpenGLInitialized = BA_BOOLEAN_FALSE;
 
 void BE_OpenGL_Error(int error, const char* description) {
-    SEC_LOGGER_ERROR("GLFW Error:\n"
+    BA_LOGGER_ERROR("GLFW Error:\n"
                      "Error: %i\n"
                      "Description: %s\n", error, description);
 }
@@ -24,10 +24,10 @@ double BE_OpenGL_GetTimer(void) {
 }
 
 void BE_OpenGL_Initialize(void) {
-    SEC_ASSERT(!beOpenGLInitialized, "Already initialized OpenGL\n");
-    SEC_ASSERT(glfwInit(), "Failed to initialize GLFW\n");
+    BA_ASSERT(!beOpenGLInitialized, "Already initialized OpenGL\n");
+    BA_ASSERT(glfwInit(), "Failed to initialize GLFW\n");
     glfwSetErrorCallback(&BE_OpenGL_Error);
-    BE_SpecificPlatformFunctions_Initialize(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions,
+    BE_SpecificPlatformFunctions_Initialize(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions,
         {
             &BE_OpenGLWindow_Create,
             &BE_OpenGLWindow_GetTitle,
@@ -58,13 +58,13 @@ void BE_OpenGL_Initialize(void) {
         &BE_OpenGL_GetTimer
     ));
 
-    beOpenGLInitialized = SEC_BOOLEAN_TRUE;
+    beOpenGLInitialized = BA_BOOLEAN_TRUE;
 }
 
 void BE_OpenGL_Destroy(void) {
-    SEC_ASSERT(beOpenGLInitialized, "Already destroyed OpenGL\n");
+    BA_ASSERT(beOpenGLInitialized, "Already destroyed OpenGL\n");
     glfwTerminate();
 
-    beOpenGLInitialized = SEC_BOOLEAN_FALSE;
+    beOpenGLInitialized = BA_BOOLEAN_FALSE;
 }
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

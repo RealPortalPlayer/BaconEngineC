@@ -5,7 +5,7 @@
 
 #include "MetalWindow.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 NSWindow* beMetalWindow;
 
 void* BE_MetalWindow_GetWindow(void) {
@@ -18,19 +18,19 @@ const char* BE_MetalWindow_GetTitle(void) {
 
 BE_Vector2_Unsigned BE_MetalWindow_GetSize(void) {
     CGSize size = [[beMetalWindow contentView] frame].size;
-    return SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, (unsigned) size.width, (unsigned) size.height);
+    return BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, (unsigned) size.width, (unsigned) size.height);
 }
 
 BE_Vector2_Integer BE_MetalWindow_GetPosition(void) {
     CGPoint position = [[beMetalWindow contentView] frame].origin;
-    return SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer, (int) position.x, (int) position.y);
+    return BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer, (int) position.x, (int) position.y);
 }
 
-SEC_Boolean BE_MetalWindow_IsVisible(void) {
+BA_Boolean BE_MetalWindow_IsVisible(void) {
     return [beMetalWindow isVisible];
 }
 
-SEC_Boolean BE_MetalWindow_IsStillOpened(void) {
+BA_Boolean BE_MetalWindow_IsStillOpened(void) {
     return SEC_TRUE; // TODO
 }
 
@@ -54,7 +54,7 @@ void BE_MetalWindow_SetSize(BE_Vector2_Unsigned newSize) {
 void BE_MetalWindow_SetPosition(BE_Vector2_Integer newPosition) {
 }
 
-void BE_MetalWindow_SetVisibility(SEC_Boolean visible) {
+void BE_MetalWindow_SetVisibility(BA_Boolean visible) {
     [beMetalWindow setIsVisible:(BOOL) visible];
 }
 
@@ -65,4 +65,4 @@ void BE_MetalWindow_Close(void) {
 void BE_MetalWindow_UpdateEvents(void) {
     [beMetalWindow update];
 }
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

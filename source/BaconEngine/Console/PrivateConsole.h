@@ -6,19 +6,19 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
 
 #include "../AntiClientGuard.h"
 #include "BaconEngine/Console/Command.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef struct {
     BE_Command publicCommand;
-    SEC_Boolean engineCommand;
-    SEC_Boolean duplicate;
+    BA_Boolean engineCommand;
+    BA_Boolean duplicate;
     int requiredArgumentCount;
 } BE_PrivateConsole_Command;
 
 void BE_PrivateConsole_Initialize(void);
 void BE_PrivateConsole_Destroy(void);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

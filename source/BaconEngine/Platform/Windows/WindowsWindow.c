@@ -2,11 +2,11 @@
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <Windows.h>
-#include <SharedEngineCode/Debugging/Assert.h>
+#include <BaconAPI/Debugging/Assert.h>
 
 #include "WindowsWindow.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 HWND beWindowsWindowHandle;
 const char beWindowsWindowClassName[] = "BaconEngineSoftwareWindow";
 
@@ -55,12 +55,12 @@ void BE_WindowsWindow_Create(const char* title, BE_Vector2_Unsigned size, int mo
         LoadIcon(NULL, IDI_APPLICATION)
     };
 
-    SEC_ASSERT(RegisterClassEx(&windowClass), "Failed to register window class: %u\n", GetLastError());
+    BA_ASSERT(RegisterClassEx(&windowClass), "Failed to register window class: %u\n", GetLastError());
 
     beWindowsWindowHandle = CreateWindowEx(WS_EX_CLIENTEDGE, beWindowsWindowClassName, title, WS_OVERLAPPEDWINDOW,
                                            CW_USEDEFAULT, CW_USEDEFAULT, (int) size.x, (int) size.y, NULL, NULL, instance, NULL);
 
-    SEC_ASSERT(beWindowsWindowHandle != NULL, "Failed to create window: %u\n", GetLastError());
+    BA_ASSERT(beWindowsWindowHandle != NULL, "Failed to create window: %u\n", GetLastError());
     ShowWindow(beWindowsWindowHandle, SW_SHOW);
     UpdateWindow(beWindowsWindowHandle);
 }
@@ -85,27 +85,27 @@ const char* BE_WindowsWindow_GetTitle(void) {
 }
 
 BE_Vector2_Unsigned BE_WindowsWindow_GetSize(void) {
-    RECT rectangle = SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(RECT, 0);
+    RECT rectangle = BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(RECT, 0);
 
     GetWindowRect(beWindowsWindowHandle, &rectangle);
 
-    return SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, rectangle.right - rectangle.left,
+    return BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, rectangle.right - rectangle.left,
                                                        rectangle.bottom - rectangle.top);
 }
 
 BE_Vector2_Integer BE_WindowsWindow_GetPosition(void) {
-    RECT rectangle = SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(RECT, 0);
+    RECT rectangle = BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(RECT, 0);
 
     GetWindowRect(beWindowsWindowHandle, &rectangle);
 
-    return SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer, rectangle.left, rectangle.top);
+    return BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer, rectangle.left, rectangle.top);
 }
 
-SEC_Boolean BE_WindowsWindow_IsVisible(void) {
+BA_Boolean BE_WindowsWindow_IsVisible(void) {
     return IsWindowVisible(beWindowsWindowHandle);
 }
 
-SEC_Boolean BE_WindowsWindow_IsStillOpened(void) {
+BA_Boolean BE_WindowsWindow_IsStillOpened(void) {
     return beWindowsWindowHandle != NULL;
 }
 
@@ -125,7 +125,7 @@ void BE_WindowsWindow_SetPosition(BE_Vector2_Integer newPosition) {
     SetWindowPos(beWindowsWindowHandle, HWND_TOP, newPosition.x, newPosition.y, (int) size.x, (int) size.y, SWP_NOOWNERZORDER);
 }
 
-void BE_WindowsWindow_SetVisibility(SEC_Boolean visible) {
+void BE_WindowsWindow_SetVisibility(BA_Boolean visible) {
     ShowWindow(beWindowsWindowHandle, visible ? SW_SHOW : SW_HIDE);
 }
 
@@ -141,4 +141,4 @@ void BE_WindowsWindow_UpdateEvents(void) {
         DispatchMessage(&message);
     }
 }
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

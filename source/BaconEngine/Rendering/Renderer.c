@@ -1,10 +1,10 @@
 // Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include <SharedEngineCode/Internal/OperatingSystem.h>
+#include <BaconAPI/Internal/OperatingSystem.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <SharedEngineCode/Debugging/StrictMode.h>
-#include <SharedEngineCode/Debugging/Assert.h>
+#include <BaconAPI/Debugging/Assert.h>
 
 #include "BaconEngine/Rendering/Renderer.h"
 
@@ -14,9 +14,9 @@
 #   ifndef BE_DISABLE_OPENGL
 #      include "../Platform/OpenGL/OpenGL.h"
 #   endif
-#   if SEC_OPERATINGSYSTEM_WINDOWS
+#   if BA_OPERATINGSYSTEM_WINDOWS
 #      include "../Platform/Windows/Windows.h"
-#   elif SEC_OPERATINGSYSTEM_APPLE && !defined(BE_DISABLE_METAL)
+#   elif BA_OPERATINGSYSTEM_APPLE && !defined(BE_DISABLE_METAL)
 #      include "../Platform/Metal/Metal.h"
 #   endif
 #endif
@@ -24,7 +24,7 @@
 #include "../InterfaceFunctions.h"
 #include "BaconEngine/ClientInformation.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
 static BE_Renderer_Types beRendererCurrent;
 static int renderCalls = 0;
@@ -40,15 +40,15 @@ void BE_Renderer_SetClearColor(BE_Color3_Unsigned color) {
 
 #ifndef BE_CLIENT_BINARY
 void BE_PrivateRenderer_Initialize(void) {
-    static SEC_Boolean initialized = SEC_BOOLEAN_FALSE;
+    static BA_Boolean initialized = BA_BOOLEAN_FALSE;
 
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized rendererFunctions\n");
 
-    const char* specifiedRenderer = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_RENDERER, 0);
+    const char* specifiedRenderer = BA_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_RENDERER, 0);
 
-    if (BE_ClientInformation_IsServerModeEnabled() || (specifiedRenderer != NULL && SEC_String_Equals(specifiedRenderer, "text", SEC_BOOLEAN_TRUE))) {
+    if (BE_ClientInformation_IsServerModeEnabled() || (specifiedRenderer != NULL && BA_String_Equals(specifiedRenderer, "text", BA_BOOLEAN_TRUE))) {
         textmode:
-        SEC_LOGGER_INFO("Using no renderer\n");
+        BA_LOGGER_INFO("Using no renderer\n");
         BE_TextMode_Initialize();
 
         beRendererCurrent = BE_RENDERER_TYPE_TEXT;
@@ -56,72 +56,72 @@ void BE_PrivateRenderer_Initialize(void) {
     }
 
     if (specifiedRenderer != NULL) {
-        if (SEC_String_Equals(specifiedRenderer, "opengl", SEC_BOOLEAN_TRUE)) {
+        if (BA_String_Equals(specifiedRenderer, "opengl", BA_BOOLEAN_TRUE)) {
 #   ifndef BE_DISABLE_OPENGL
 //            opengl:
-            SEC_LOGGER_INFO("Using OpenGL as the renderer\n");
+            BA_LOGGER_INFO("Using OpenGL as the renderer\n");
             BE_OpenGL_Initialize();
 
             beRendererCurrent = BE_RENDERER_TYPE_OPENGL;
 #   else
-            SEC_LOGGER_WARN("This binary has OpenGL disabled\n");
+            BA_LOGGER_WARN("This binary has OpenGL disabled\n");
             goto textmode;
 #   endif
             return;
         }
 
-        if (SEC_String_Equals(specifiedRenderer, "vulkan", SEC_BOOLEAN_TRUE)) {
-#   if !SEC_OPERATINGSYSTEM_APPLE
+        if (BA_String_Equals(specifiedRenderer, "vulkan", BA_BOOLEAN_TRUE)) {
+#   if !BA_OPERATINGSYSTEM_APPLE
 //            vulkan:
-            SEC_ASSERT_ALWAYS("Renderer not implemented\n");
+            BA_ASSERT_ALWAYS("Renderer not implemented\n");
 #   else
-            SEC_LOGGER_WARN("Vulkan doesn't support Apple operating systems\n");
+            BA_LOGGER_WARN("Vulkan doesn't support Apple operating systems\n");
             goto textmode;
 #   endif
         }
 
-        if (SEC_String_Equals(specifiedRenderer, "metal", SEC_BOOLEAN_TRUE)) {
-#   if SEC_OPERATINGSYSTEM_APPLE
+        if (BA_String_Equals(specifiedRenderer, "metal", BA_BOOLEAN_TRUE)) {
+#   if BA_OPERATINGSYSTEM_APPLE
 #       ifndef BE_DISABLE_METAL
 //            metal:
-            SEC_LOGGER_INFO("Using Metal as the renderer");
+            BA_LOGGER_INFO("Using Metal as the renderer");
             BE_Metal_Initialize();
 #       else
-            SEC_LOGGER_WARN("This binary has Metal disabled\n");
+            BA_LOGGER_WARN("This binary has Metal disabled\n");
             goto textmode;
 #       endif
 #   else
-            SEC_LOGGER_WARN("Metal only works on Apple operating systems\n");
+            BA_LOGGER_WARN("Metal only works on Apple operating systems\n");
             goto textmode;
 #   endif
 
             return;
         }
 
-        if (SEC_String_Equals(specifiedRenderer, "directx", SEC_BOOLEAN_TRUE)) {
-#   if SEC_OPERATINGSYSTEM_WINDOWS
+        if (BA_String_Equals(specifiedRenderer, "directx", BA_BOOLEAN_TRUE)) {
+#   if BA_OPERATINGSYSTEM_WINDOWS
 //            directx:
-            SEC_ASSERT_ALWAYS("Renderer not implemented\n");
+            BA_ASSERT_ALWAYS("Renderer not implemented\n");
 #   else
-            SEC_LOGGER_WARN("DirectX only works on Microsoft operating systems\n");
+            BA_LOGGER_WARN("DirectX only works on Microsoft operating systems\n");
             goto textmode;
 #   endif
             return;
         }
 
-        if (SEC_String_Equals(specifiedRenderer, "software", SEC_BOOLEAN_TRUE)) {
-            SEC_LOGGER_INFO("Using software rendering\n");
-            SEC_LOGGER_WARN("This is going to lag; use a better renderer\n");
+        if (BA_String_Equals(specifiedRenderer, "software", BA_BOOLEAN_TRUE)) {
+            BA_LOGGER_INFO("Using software rendering\n");
+            BA_LOGGER_WARN("This is going to lag; use a better renderer\n");
 
-#   if SEC_OPERATINGSYSTEM_WINDOWS
+#   if BA_OPERATINGSYSTEM_WINDOWS
             BE_Windows_Initialize();
 #   else
-            SEC_ASSERT_ALWAYS("No software renderer implementation for your OS\n");
+            BA_ASSERT_ALWAYS("No software renderer implementation for your OS\n");
 #   endif
             return;
         }
 
-        SEC_LOGGER_WARN("Invalid renderer: %s\n", specifiedRenderer);
+        BA_LOGGER_WARN("Invalid renderer: %s\n", specifiedRenderer);
     }
 
     // TODO: Automatically select renderer
@@ -186,7 +186,7 @@ BE_Color3_Unsigned BE_Renderer_GetClearColor(void) {
 
 BE_Vector2_Integer BE_Renderer_GetCenterPosition(BE_Vector2_Integer rectanglePosition, BE_Vector2_Unsigned rectangleSize, BE_Vector2_Unsigned objectSize) {
 #ifndef BE_CLIENT_BINARY
-    return SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer,
+    return BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer,
         rectanglePosition.x + (int) rectangleSize.x / 2 - (int) objectSize.x / 2,
         rectanglePosition.y + (int) rectangleSize.y / 2 - (int) objectSize.y / 2
     );
@@ -286,4 +286,4 @@ void BE_Renderer_DrawBorderedRectangle(BE_Vector2_Integer position, BE_Vector2_U
 //                                   borderColor) &&
 //         BE_Renderer_FillRectangle(position, size, fillColor);
     }
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

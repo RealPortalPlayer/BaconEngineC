@@ -3,7 +3,7 @@
 
 #include <Interface/EntryPoint.h>
 #include <BaconEngine/Console/Console.h>
-#include <SharedEngineCode/Logger.h>
+#include <BaconAPI/Logger.h>
 
 #include "Layers.h"
 
@@ -12,16 +12,16 @@ void TestCommand(BE_Command_Context context) {
     const char* string2 = BE_ArgumentManager_GetString(context.arguments, "test2", NULL);
 
     if (string == NULL) {
-        SEC_LOGGER_INFO("No arguments\n");
+        BA_LOGGER_INFO("No arguments\n");
         return;
     }
 
     if (string2 == NULL) {
-        SEC_LOGGER_INFO("Argument: %s\n", string);
+        BA_LOGGER_INFO("Argument: %s\n", string);
         return;
     }
 
-    SEC_LOGGER_INFO("Arguments: %s, %s\n", string, string2);
+    BA_LOGGER_INFO("Arguments: %s, %s\n", string, string2);
 }
 
 int I_EntryPoint_Start(int argc, char** argv) {
@@ -39,8 +39,8 @@ int I_EntryPoint_Start(int argc, char** argv) {
     return 0;
 }
 
-SEC_Boolean I_EntryPoint_SupportsServer(void) {
-    return SEC_BOOLEAN_TRUE;
+BA_Boolean I_EntryPoint_SupportsServer(void) {
+    return BA_BOOLEAN_TRUE;
 }
 
 const char* I_EntryPoint_GetName(void) {

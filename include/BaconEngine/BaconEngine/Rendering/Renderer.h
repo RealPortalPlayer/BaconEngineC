@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
 
 #include "BaconEngine/Math/Color.h"
 #include "BaconEngine/Math/Vector.h"
 #include "BaconEngine/BinaryExport.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     BE_RENDERER_TYPE_OPENGL,
     BE_RENDERER_TYPE_VULKAN,
@@ -35,6 +35,6 @@ BE_BINARYEXPORT void BE_Renderer_FillRectangle(BE_Vector2_Integer position, BE_V
 BE_BINARYEXPORT void BE_Renderer_DrawBorderedRectangle(BE_Vector2_Integer position, BE_Vector2_Unsigned size, BE_Color4_Unsigned borderColor, BE_Color4_Unsigned fillColor, int borderPadding);
 // BE_Vector2_Unsigned BE_Renderer_GetFontSize(TTF_Font* font, const char* text);
 BE_BINARYEXPORT void BE_Renderer_SetClearColor(BE_Color3_Unsigned color);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()
 
 #define BE_RENDERER_DRAW_BORDERED_RECTANGLE_SAME_COLOR(position, size, color, borderPadding) BE_Renderer_DrawBorderedRectangle((position), (size), (color), (color), (borderPadding))

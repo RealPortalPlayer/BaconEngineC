@@ -6,14 +6,14 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
 
 #include "../../AntiClientGuard.h"
 #include "BaconEngine/Input/Keyboard.h"
 #include "BaconEngine/Input/Mouse.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-SEC_Boolean BE_OpenGLInput_IsKeyDown(BE_Keyboard_KeyCodes keyCode);
-SEC_Boolean BE_OpenGLInput_IsKeyPressed(BE_Keyboard_KeyCodes keyCode);
-SEC_Boolean BE_OpenGLInput_IsMouseDown(BE_Mouse_ButtonType button);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_Boolean BE_OpenGLInput_IsKeyDown(BE_Keyboard_KeyCodes keyCode);
+BA_Boolean BE_OpenGLInput_IsKeyPressed(BE_Keyboard_KeyCodes keyCode);
+BA_Boolean BE_OpenGLInput_IsMouseDown(BE_Mouse_ButtonType button);
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

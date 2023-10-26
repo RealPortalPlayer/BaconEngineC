@@ -15,4 +15,4 @@ do {                                        \
         BE_BITWISE_UNSET_BIT(mainBit, bit); \
     else                                    \
         BE_BITWISE_SET_BIT(mainBit, bit);   \
-} while (SEC_BOOLEAN_FALSE)
+} while (BA_BOOLEAN_FALSE)

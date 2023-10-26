@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
 
 #include "../AntiClientGuard.h"
 #include "BaconEngine/Math/Vector.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 void BE_PrivateWindow_Initialize(const char* windowTitle, BE_Vector2_Unsigned windowSize);
 void BE_PrivateWindow_Destroy(void);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

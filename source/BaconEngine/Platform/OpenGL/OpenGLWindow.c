@@ -3,8 +3,8 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <SharedEngineCode/Internal/OperatingSystem.h>
-#include <SharedEngineCode/Debugging/Assert.h>
+#include <BaconAPI/Internal/OperatingSystem.h>
+#include <BaconAPI/Debugging/Assert.h>
 
 #include "OpenGLWindow.h"
 #include "BaconEngine/Input/Keyboard.h"
@@ -15,7 +15,7 @@
 #define BE_OPENGL_THREE_NULL BE_KEYBOARD_KEY_CODE_NULL, BE_KEYBOARD_KEY_CODE_NULL, BE_KEYBOARD_KEY_CODE_NULL
 #define BE_OPENGL_NINE_NULL BE_OPENGL_THREE_NULL, BE_OPENGL_THREE_NULL, BE_OPENGL_THREE_NULL
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 static GLFWwindow* window;
 static const char* windowTitle;
 static const BE_Keyboard_KeyCodes glToEngineCodes[GLFW_KEY_LAST + 1] = {
@@ -92,7 +92,7 @@ void BE_OpenGLWindow_KeyEvent(GLFWwindow* theWindow, int key, int scanCode, int 
     if (!BE_Keyboard_IsEngineKeyCodeValid(keyCode))
         return;
 
-    BE_PrivateLayer_OnEvent(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
+    BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = action != GLFW_RELEASE ? BE_EVENT_TYPE_KEYBOARD_KEY_DOWN : BE_EVENT_TYPE_KEYBOARD_KEY_UP,
         .data = {
             .keyboard = {
@@ -110,11 +110,11 @@ void BE_OpenGLWindow_MouseButtonEvent(GLFWwindow* theWindow, int button, int act
     double y;
 
     glfwGetCursorPos(window, &x, &y);
-    BE_PrivateLayer_OnEvent(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
+    BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = action != GLFW_RELEASE ? BE_EVENT_TYPE_MOUSE_BUTTON_DOWN : BE_EVENT_TYPE_MOUSE_BUTTON_UP,
         .data = {
             .mouse = {
-                .position = SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Float, (float) x, (float) y),
+                .position = BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Float, (float) x, (float) y),
                 .unionVariables = {
                     .whichButton = button
                 }
@@ -126,11 +126,11 @@ void BE_OpenGLWindow_MouseButtonEvent(GLFWwindow* theWindow, int button, int act
 void BE_OpenGLWindow_CursorPositionMovedEvent(GLFWwindow* theWindow, double x, double y) {
     (void) theWindow;
 
-    BE_PrivateLayer_OnEvent(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
+    BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = BE_EVENT_TYPE_MOUSE_MOVED,
         .data = {
             .mouse = {
-                .position = SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Float, (float) x, (float) y)
+                .position = BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Float, (float) x, (float) y)
             }
         }
     ));
@@ -139,7 +139,7 @@ void BE_OpenGLWindow_CursorPositionMovedEvent(GLFWwindow* theWindow, double x, d
 void BE_OpenGLWindow_CursorEnterEvent(GLFWwindow* theWindow, int entered) {
     (void) theWindow;
 
-    BE_PrivateLayer_OnEvent(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
+    BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = entered ? BE_EVENT_TYPE_MOUSE_ENTER : BE_EVENT_TYPE_MOUSE_LEAVE
     ));
 }
@@ -151,13 +151,13 @@ void BE_OpenGLWindow_ScrollEvent(GLFWwindow* theWindow, double x, double y) {
     double yPos;
 
     glfwGetCursorPos(window, &xPos, &yPos);
-    BE_PrivateLayer_OnEvent(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
+    BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
             .type = BE_EVENT_TYPE_MOUSE_WHEEL,
             .data = {
             .mouse = {
-                .position = SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Float, (float) xPos, (float) yPos),
+                .position = BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Float, (float) xPos, (float) yPos),
                 .unionVariables = {
-                    .wheelScrollAmount = SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Float, (float) x, (float) y)
+                    .wheelScrollAmount = BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Float, (float) x, (float) y)
                 }
             }
         }
@@ -167,7 +167,7 @@ void BE_OpenGLWindow_ScrollEvent(GLFWwindow* theWindow, double x, double y) {
 void BE_OpenGLWindow_FocusEvent(GLFWwindow* theWindow, int focused) {
     (void) theWindow;
 
-    BE_PrivateLayer_OnEvent(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
+    BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = focused ? BE_EVENT_TYPE_WINDOW_FOCUS_GAINED : BE_EVENT_TYPE_WINDOW_FOCUS_LOST
     ));
 }
@@ -175,7 +175,7 @@ void BE_OpenGLWindow_FocusEvent(GLFWwindow* theWindow, int focused) {
 void BE_OpenGLWindow_CloseEvent(GLFWwindow* theWindow) {
     (void) theWindow;
 
-    BE_PrivateLayer_OnEvent(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
+    BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = BE_EVENT_TYPE_WINDOW_CLOSE
     ));
 }
@@ -183,7 +183,7 @@ void BE_OpenGLWindow_CloseEvent(GLFWwindow* theWindow) {
 void BE_OpenGLWindow_MaximizeEvent(GLFWwindow* theWindow, int maximized) {
     (void) theWindow;
 
-    BE_PrivateLayer_OnEvent(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
+    BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = maximized ? BE_EVENT_TYPE_WINDOW_MAXIMIZED : BE_EVENT_TYPE_WINDOW_RESTORED
     ));
 }
@@ -191,12 +191,12 @@ void BE_OpenGLWindow_MaximizeEvent(GLFWwindow* theWindow, int maximized) {
 void BE_OpenGLWindow_MovedEvent(GLFWwindow* theWindow, int x, int y) {
     (void) theWindow;
 
-    BE_PrivateLayer_OnEvent(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
+    BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = BE_EVENT_TYPE_WINDOW_MOVED,
         .data = {
             .window = {
                 .unionVariables = {
-                    .newPosition = SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer, x, y)
+                    .newPosition = BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer, x, y)
                 }
             }
         }
@@ -207,12 +207,12 @@ void BE_OpenGLWindow_ResizedEvent(GLFWwindow* theWindow, int width, int height) 
     (void) theWindow;
 
     glViewport(0, 0, width, height);
-    BE_PrivateLayer_OnEvent(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
+    BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = BE_EVENT_TYPE_WINDOW_RESIZED,
         .data = {
             .window = {
                 .unionVariables = {
-                    .newSize = SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer, width, height)
+                    .newSize = BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer, width, height)
                 }
             }
         }
@@ -226,13 +226,13 @@ void BE_OpenGLWindow_Create(const char* title, BE_Vector2_Unsigned size, int mon
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-#if SEC_OPERATINGSYSTEM_APPLE
+#if BA_OPERATINGSYSTEM_APPLE
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
     window = glfwCreateWindow((int) size.x, (int) size.y, title, NULL, NULL);
 
-    SEC_ASSERT(window != NULL, "Failed to create GLFW window\n");
+    BA_ASSERT(window != NULL, "Failed to create GLFW window\n");
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, &BE_OpenGLWindow_KeyEvent);
     glfwSetMouseButtonCallback(window, &BE_OpenGLWindow_MouseButtonEvent);
@@ -244,7 +244,7 @@ void BE_OpenGLWindow_Create(const char* title, BE_Vector2_Unsigned size, int mon
     glfwSetWindowMaximizeCallback(window, &BE_OpenGLWindow_MaximizeEvent);
     glfwSetWindowPosCallback(window, &BE_OpenGLWindow_MovedEvent);
     glfwSetWindowSizeCallback(window, &BE_OpenGLWindow_ResizedEvent);
-    SEC_ASSERT(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "Failed to initialize Glad\n");
+    BA_ASSERT(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "Failed to initialize Glad\n");
     glViewport(0, 0, (int) size.x, (int) size.y);
     BE_OpenGLRenderer_CompileShaders();
 
@@ -261,7 +261,7 @@ BE_Vector2_Unsigned BE_OpenGLWindow_GetSize(void) {
 
     glfwGetWindowSize(window, &width, &height);
 
-    return SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, (unsigned) width, (unsigned) height);
+    return BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, (unsigned) width, (unsigned) height);
 }
 
 BE_Vector2_Integer BE_OpenGLWindow_GetPosition(void) {
@@ -270,7 +270,7 @@ BE_Vector2_Integer BE_OpenGLWindow_GetPosition(void) {
 
     glfwGetWindowPos(window, &x, &y);
 
-    return SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer, x, y);
+    return BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer, x, y);
 }
 
 int BE_OpenGLWindow_IsVisible(void) {
@@ -314,4 +314,4 @@ void BE_OpenGLWindow_Close(void) {
 void BE_OpenGLWindow_UpdateEvents(void) {
     glfwPollEvents();
 }
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

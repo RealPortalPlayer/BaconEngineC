@@ -8,7 +8,7 @@
 #include "BaconEngine/I18N.h"
 #include "InterfaceFunctions.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 const char* BE_I18N_TranslateFromFile(FILE* languageFile, const char* key) {
 #ifndef BE_CLIENT_BINARY
     SEC_STRICTMODE_CHECK(strlen(key) != 0, key, "Key cannot be empty\n");
@@ -18,9 +18,9 @@ const char* BE_I18N_TranslateFromFile(FILE* languageFile, const char* key) {
     ssize_t length;
     size_t keyLength = strlen(key);
 
-    while ((length = SEC_String_GetLine(languageFile, &line, NULL)) != -1) {
+    while ((length = BA_String_GetLine(languageFile, &line, NULL)) != -1) {
         if (length == -2) {
-            SEC_LOGGER_TRACE("Failed to allocate enough memory for translated buffer: %s\n", key);
+            BA_LOGGER_TRACE("Failed to allocate enough memory for translated buffer: %s\n", key);
             return key;
         }
 
@@ -32,7 +32,7 @@ const char* BE_I18N_TranslateFromFile(FILE* languageFile, const char* key) {
         return line + keyLength + 1;
     }
     
-    SEC_LOGGER_ERROR("Failed to translate: %s\n", key);
+    BA_LOGGER_ERROR("Failed to translate: %s\n", key);
     return key;
 #else
     BE_INTERFACEFUNCTION(const char*, FILE*, const char*);
@@ -44,12 +44,12 @@ const char* BE_I18N_Translate(const char* buffer, const char* key) {
 #ifndef BE_CLIENT_BINARY
     SEC_STRICTMODE_CHECK(strlen(key) != 0, key, "Key cannot be empty\n");
     
-    SEC_DynamicArray* translations = SEC_String_Split(buffer, "\n");
+    BA_DynamicArray* translations = BA_String_Split(buffer, "\n");
     size_t keyLength = strlen(key);
     char* chosenLine = NULL;
 
     for (int i = 0; i < translations->used; i++) {
-        char* line = SEC_DYNAMICARRAY_GET_ELEMENT_POINTER(char, translations, i);
+        char* line = BA_DYNAMICARRAY_GET_ELEMENT_POINTER(char, translations, i);
         size_t lineLength = strlen(line);
         
         if (lineLength == 0 || lineLength <= keyLength || line[keyLength] != '=' || memcmp(line, key, keyLength) != 0) {
@@ -67,11 +67,11 @@ const char* BE_I18N_Translate(const char* buffer, const char* key) {
     if (chosenLine != NULL)
         return chosenLine;
 
-    SEC_LOGGER_ERROR("Failed to translate: %s\n", key);
+    BA_LOGGER_ERROR("Failed to translate: %s\n", key);
     return key;
 #else
     BE_INTERFACEFUNCTION(const char*, const char*, const char*);
     return function(buffer, key);
 #endif
 }
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

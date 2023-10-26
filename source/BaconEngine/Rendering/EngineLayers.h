@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
-#include <SharedEngineCode/Storage/DynamicArray.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Storage/DynamicArray.h>
 
 #include "../AntiClientGuard.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 int BE_EngineLayers_GetUIWindowRenderCount(void);
 
 void BE_EngineLayers_Initialize(void);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

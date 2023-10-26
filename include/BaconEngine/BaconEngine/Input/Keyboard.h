@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
-#include <SharedEngineCode/Internal/Boolean.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/Boolean.h>
 
 #include "BaconEngine/BinaryExport.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     /**
      * Not a real key
@@ -93,8 +93,8 @@ typedef enum {
  * @return The character that represents the keycode, 0 if there is none
  */
 BE_BINARYEXPORT char BE_Keyboard_ConvertKeyCodeToCharacter(BE_Keyboard_KeyCodes keyCode);
-BE_BINARYEXPORT SEC_Boolean BE_Keyboard_IsKeyDown(BE_Keyboard_KeyCodes keyCode);
-BE_BINARYEXPORT SEC_Boolean BE_Keyboard_IsKeyPressed(BE_Keyboard_KeyCodes keyCode);
-BE_BINARYEXPORT SEC_Boolean BE_Keyboard_IsEngineKeyCodeValid(BE_Keyboard_KeyCodes keyCode);
-BE_BINARYEXPORT SEC_Boolean BE_Keyboard_IsKeyCodeFromKeyPad(BE_Keyboard_KeyCodes keyCode);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BE_BINARYEXPORT BA_Boolean BE_Keyboard_IsKeyDown(BE_Keyboard_KeyCodes keyCode);
+BE_BINARYEXPORT BA_Boolean BE_Keyboard_IsKeyPressed(BE_Keyboard_KeyCodes keyCode);
+BE_BINARYEXPORT BA_Boolean BE_Keyboard_IsEngineKeyCodeValid(BE_Keyboard_KeyCodes keyCode);
+BE_BINARYEXPORT BA_Boolean BE_Keyboard_IsKeyCodeFromKeyPad(BE_Keyboard_KeyCodes keyCode);
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

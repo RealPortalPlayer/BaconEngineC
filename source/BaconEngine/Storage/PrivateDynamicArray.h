@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
-#include <SharedEngineCode/Internal/Boolean.h>
-#include <SharedEngineCode/Storage/DynamicArray.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/Boolean.h>
+#include <BaconAPI/Storage/DynamicArray.h>
 
 #include "../AntiClientGuard.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
-SEC_Boolean BE_PrivateDynamicArray_Create(SEC_DynamicArray* array, size_t size);
-SEC_Boolean BE_PrivateDynamicArray_CheckResize(SEC_DynamicArray* array);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_Boolean BE_PrivateDynamicArray_Create(BA_DynamicArray* array, size_t size);
+BA_Boolean BE_PrivateDynamicArray_CheckResize(BA_DynamicArray* array);
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

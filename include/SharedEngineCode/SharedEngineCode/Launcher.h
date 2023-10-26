@@ -7,13 +7,13 @@
 #pragma once
 
 #include <limits.h>
+#include <BaconAPI/Internal/OperatingSystem.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/Boolean.h>
 
-#include "Internal/OperatingSystem.h"
-#include "Internal/CPlusPlusSupport.h"
-#include "Internal/Boolean.h"
 #include "Paths.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     SEC_LAUNCHER_ERROR_CODE_NULL, // No error.
     SEC_LAUNCHER_ERROR_CODE_BINARY, // Errored while opening binary file.
@@ -23,7 +23,7 @@ typedef enum {
 typedef void (*SEC_Launcher_ClientInitialize)(const char*, const char*, const char*, void*, int, char**);
 typedef int (*SEC_Launcher_ClientStart)(int, char**);
 typedef int (*SEC_Launcher_ClientShutdown)(void);
-typedef SEC_Boolean (*SEC_Launcher_ClientSupportsServer)(void);
+typedef BA_Boolean (*SEC_Launcher_ClientSupportsServer)(void);
 typedef const char* (*SEC_Launcher_ClientGetName)(void);
 typedef const char* (*SEC_Launcher_ClientGetEngineVersion)(void);
 
@@ -47,7 +47,7 @@ typedef struct {
 } SEC_Launcher_EngineDetails;
 
 typedef struct {
-    SEC_Boolean success;
+    BA_Boolean success;
     union {
         int returnCode; // Set if success
         const char* errorMessage; // Set if it didn't succeed
@@ -61,7 +61,7 @@ typedef struct {
     union {
         struct {
             const char* errorMessage; // The message from something like dlopen.
-            SEC_Boolean isEngine; // If the error code is related to the engine.
+            BA_Boolean isEngine; // If the error code is related to the engine.
         } errorReason;
         struct {
             const char* clientName;
@@ -93,4 +93,4 @@ SEC_Launcher_StartEngineResults SEC_Launcher_StartEngine(const SEC_Launcher_Conf
 
 void SEC_Launcher_SetEnginePath(void);
 void SEC_Launcher_SetLauncherPath(void);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

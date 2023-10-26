@@ -6,15 +6,15 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CPlusPlusSupport.h>
-#include <SharedEngineCode/String.h>
-#include <SharedEngineCode/Storage/DynamicArray.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/String.h>
+#include <BaconAPI/Storage/DynamicArray.h>
 
 #include "BaconEngine/Math/Vector.h"
 #include "BaconEngine/Event.h"
 #include "BaconEngine/BinaryExport.h"
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 struct BE_UI_Element;
 
 typedef struct {
@@ -26,8 +26,8 @@ typedef struct BE_UI_Element {
     BE_UI_ElementFunctions functions;
     BE_Vector2_Unsigned position;
     BE_Vector2_Unsigned size;
-    SEC_Boolean enabled;
-    SEC_DynamicArray elements;
+    BA_Boolean enabled;
+    BA_DynamicArray elements;
 } BE_UI_Element;
 
 typedef enum {
@@ -44,14 +44,14 @@ typedef enum {
 } BE_UI_WindowFlags;
 
 BE_BINARYEXPORT const char* BE_UI_GetWindowName(int windowId);
-BE_BINARYEXPORT SEC_Boolean BE_UI_IsWindowStillOpen(int windowId);
-BE_BINARYEXPORT SEC_DynamicArray* BE_UI_GetWindowElements(int windowId);
+BE_BINARYEXPORT BA_Boolean BE_UI_IsWindowStillOpen(int windowId);
+BE_BINARYEXPORT BA_DynamicArray* BE_UI_GetWindowElements(int windowId);
 BE_BINARYEXPORT int BE_UI_GetWindowAmount(void);
 BE_BINARYEXPORT int BE_UI_GetAllocatedWindowsAmount(void);
 BE_BINARYEXPORT int BE_UI_GetWindowReallocationAmount(void);
 
 BE_BINARYEXPORT int BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector2_Integer position, BE_Vector2_Unsigned size);
-BE_BINARYEXPORT SEC_Boolean BE_UI_RegisterElement(int windowId, BE_UI_Element* element);
-BE_BINARYEXPORT SEC_Boolean BE_UI_ToggleWindowFlag(int windowId, BE_UI_WindowFlags flag, SEC_Boolean toggle);
-BE_BINARYEXPORT SEC_Boolean BE_UI_SetActiveWindow(int windowId);
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BE_BINARYEXPORT BA_Boolean BE_UI_RegisterElement(int windowId, BE_UI_Element* element);
+BE_BINARYEXPORT BA_Boolean BE_UI_ToggleWindowFlag(int windowId, BE_UI_WindowFlags flag, BA_Boolean toggle);
+BE_BINARYEXPORT BA_Boolean BE_UI_SetActiveWindow(int windowId);
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <SharedEngineCode/Debugging/StrictMode.h>
-#include <SharedEngineCode/Debugging/Assert.h>
+#include <BaconAPI/Debugging/Assert.h>
 
 #include "BaconEngine/Console/Console.h"
 #include "../InterfaceFunctions.h"
@@ -19,14 +19,14 @@
 #   include "../Storage/PrivateDynamicDictionary.h"
 #endif
 
-SEC_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
-static SEC_DynamicArray beConsolePrivateCommands;
-static SEC_DynamicArray beConsoleCommands;
+static BA_DynamicArray beConsolePrivateCommands;
+static BA_DynamicArray beConsoleCommands;
 static BE_PrivateConsole_Command* beConsoleLastCommand;
-static SEC_Boolean beConsoleDuplicateCommand = SEC_BOOLEAN_FALSE;
-static SEC_Boolean beConsoleInitialized = SEC_BOOLEAN_FALSE;
-static SEC_Boolean beConsoleAddingEngineCommands = SEC_BOOLEAN_TRUE;
+static BA_Boolean beConsoleDuplicateCommand = BA_BOOLEAN_FALSE;
+static BA_Boolean beConsoleInitialized = BA_BOOLEAN_FALSE;
+static BA_Boolean beConsoleAddingEngineCommands = BA_BOOLEAN_TRUE;
 
 extern void BE_EngineCommands_HelpPrint(BE_Command*);
 
@@ -37,7 +37,7 @@ static BE_PrivateConsole_Command* BE_Console_GetPrivateCommand(const char* name)
         return cachedCommand;
 
     for (int commandId = 0; commandId < beConsolePrivateCommands.used; commandId++) {
-        BE_PrivateConsole_Command* foundCommand = SEC_DYNAMICARRAY_GET_ELEMENT(BE_PrivateConsole_Command, beConsolePrivateCommands, commandId);
+        BE_PrivateConsole_Command* foundCommand = BA_DYNAMICARRAY_GET_ELEMENT(BE_PrivateConsole_Command, beConsolePrivateCommands, commandId);
 
         if (strcmp(foundCommand->publicCommand.name, name) != 0)
             continue;
@@ -49,16 +49,16 @@ static BE_PrivateConsole_Command* BE_Console_GetPrivateCommand(const char* name)
     return NULL;
 }
 
-SEC_Boolean BE_Console_CheckRegisterLogsEnabled(void) {
-#   if BE_ALLOW_DEBUG_LOGS
+BA_Boolean BE_Console_CheckRegisterLogsEnabled(void) {
+#   if BA_ALLOW_DEBUG_LOGS
     static int enabled = -1;
 
     if (enabled == -1)
-        enabled = !SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_DONT_PRINT_COMMAND_REGISTER, SEC_BUILTINARGUMENTS_DONT_PRINT_COMMAND_REGISTER_SHORT, SEC_BOOLEAN_FALSE);
+        enabled = !BA_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_DONT_PRINT_COMMAND_REGISTER, SEC_BUILTINARGUMENTS_DONT_PRINT_COMMAND_REGISTER_SHORT, BA_BOOLEAN_FALSE);
     
     return enabled;
 #   else
-    return SEC_BOOLEAN_FALSE;
+    return BA_BOOLEAN_FALSE;
 #   endif
 }
 #endif
@@ -112,31 +112,31 @@ int BE_Console_GetCommandReallocationAmount(void) {
 
 #ifndef BE_CLIENT_BINARY
 void BE_PrivateConsole_Initialize(void) {
-    SEC_ASSERT(!beConsoleInitialized, "Already initialized the console\n");
-    SEC_LOGGER_INFO("Initializing console\n");
+    BA_ASSERT(!beConsoleInitialized, "Already initialized the console\n");
+    BA_LOGGER_INFO("Initializing console\n");
 
-    beConsoleInitialized = SEC_BOOLEAN_TRUE;
+    beConsoleInitialized = BA_BOOLEAN_TRUE;
 
     BE_PrivateDynamicArray_Create(&beConsoleCommands, 100);
     BE_PrivateDynamicArray_Create(&beConsolePrivateCommands, 100);
 
 #   ifndef BE_NO_ENGINE_COMMANDS
-    SEC_LOGGER_INFO("Registering engine commands\n");
+    BA_LOGGER_INFO("Registering engine commands\n");
     BE_EngineCommands_Initialize();
 #   endif
 
-    beConsoleAddingEngineCommands = SEC_BOOLEAN_FALSE;
+    beConsoleAddingEngineCommands = BA_BOOLEAN_FALSE;
 }
 #endif
 
 void BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context)) {
 #ifndef BE_CLIENT_BINARY
     for (int i = 0; i < (int) beConsoleCommands.used; i++)
-        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(strcmp(SEC_DYNAMICARRAY_GET_ELEMENT(BE_Command, beConsoleCommands, i)->name, name) != 0,
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(strcmp(BA_DYNAMICARRAY_GET_ELEMENT(BE_Command, beConsoleCommands, i)->name, name) != 0,
                                              "The command '%s' is already registered\n", name);
 
     if (!beConsoleDuplicateCommand && BE_Console_CheckRegisterLogsEnabled())
-        SEC_LOGGER_TRACE("Registering command\n"
+        BA_LOGGER_TRACE("Registering command\n"
                          "Name: %s\n"
                          "Description: %s\n"
                          "Flags: %i\n"
@@ -151,7 +151,7 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
                                              "Invalid command flags, cannot be both client only but also only runs on the server\n");
 
         if (BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_SERVER_ONLY) && BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAGS_RAN_ON_SERVER))
-            SEC_LOGGER_WARN("Redundant command flags, server commands will only run on servers\n");
+            BA_LOGGER_WARN("Redundant command flags, server commands will only run on servers\n");
     }
 
     BE_PrivateConsole_Command* privateConsoleCommand = (BE_PrivateConsole_Command*) BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateConsole_Command), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
@@ -170,38 +170,38 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
     beConsoleLastCommand = privateConsoleCommand;
 
     BE_PrivateDynamicArray_CheckResize(&beConsolePrivateCommands);
-    SEC_DynamicArray_AddElementToLast(&beConsolePrivateCommands, (void*) privateConsoleCommand);
+    BA_DynamicArray_AddElementToLast(&beConsolePrivateCommands, (void*) privateConsoleCommand);
     BE_PrivateDynamicArray_CheckResize(&beConsolePrivateCommands);
-    SEC_DynamicArray_AddElementToLast(&beConsoleCommands, (void*) &privateConsoleCommand->publicCommand);
+    BA_DynamicArray_AddElementToLast(&beConsoleCommands, (void*) &privateConsoleCommand->publicCommand);
 
-    beConsoleDuplicateCommand = SEC_BOOLEAN_FALSE;
+    beConsoleDuplicateCommand = BA_BOOLEAN_FALSE;
 #else
     BE_INTERFACEFUNCTION(void, const char*, const char*, BE_Command_Flags, void (*)(BE_Command_Context))(name, description, flags, Run);
 #endif
 }
 
-void BE_Command_AddArgument(const char* name, SEC_Boolean required) {
+void BE_Command_AddArgument(const char* name, BA_Boolean required) {
 #ifndef BE_CLIENT_BINARY
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beConsoleCommands.used != 0, "There is no command to add arguments to\n");
 
-    BE_PrivateConsole_Command* command = SEC_DYNAMICARRAY_GET_LAST_ELEMENT(BE_PrivateConsole_Command, beConsolePrivateCommands);
+    BE_PrivateConsole_Command* command = BA_DYNAMICARRAY_GET_LAST_ELEMENT(BE_PrivateConsole_Command, beConsolePrivateCommands);
 
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(command->publicCommand.arguments.used == 0 ||
-                                         SEC_DYNAMICARRAY_GET_LAST_ELEMENT(BE_Command_Argument, command->publicCommand.arguments)->required ||
+                                         BA_DYNAMICARRAY_GET_LAST_ELEMENT(BE_Command_Argument, command->publicCommand.arguments)->required ||
                                          !required, "Required arguments cannot be added after an optional argument\n");
 
     BE_Command_Argument* argument = BE_EngineMemory_AllocateMemory(sizeof(BE_Command_Argument), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
 
-    argument->name = SEC_String_Copy(name);
+    argument->name = BA_String_Copy(name);
     argument->required = required;
 
     if (required)
         command->requiredArgumentCount++;
 
     BE_PrivateDynamicArray_CheckResize(&command->publicCommand.arguments);
-    SEC_DynamicArray_AddElementToLast(&command->publicCommand.arguments, (void*) argument);
+    BA_DynamicArray_AddElementToLast(&command->publicCommand.arguments, (void*) argument);
 #else
-    BE_INTERFACEFUNCTION(void, const char*, SEC_Boolean)(name, required);
+    BE_INTERFACEFUNCTION(void, const char*, BA_Boolean)(name, required);
 #endif
 }
 
@@ -210,14 +210,14 @@ void BE_Command_DuplicatePrevious(const char* name, const char* description) {
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beConsoleCommands.used != 0, "There is no command to duplicate\n");
 
     if (BE_Console_CheckRegisterLogsEnabled())
-        SEC_LOGGER_TRACE("Duplicating command\n"
+        BA_LOGGER_TRACE("Duplicating command\n"
                          "Original name: %s\n"
                          "Original description: %s\n"
                          "New name: %s\n"
                          "New description: %s\n", beConsoleLastCommand->publicCommand.name, beConsoleLastCommand->publicCommand.description, name,
                          description != NULL ? description : beConsoleLastCommand->publicCommand.description);
 
-    beConsoleDuplicateCommand = SEC_BOOLEAN_TRUE;
+    beConsoleDuplicateCommand = BA_BOOLEAN_TRUE;
 
     BE_PrivateConsole_Command* lastCommand = beConsoleLastCommand;
 
@@ -238,7 +238,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
     char* name = BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
     BE_PrivateConsole_Command* command = NULL;
-    SEC_DynamicDictionary arguments;
+    BA_DynamicDictionary arguments;
     size_t inputLength = strlen(input);
     
     name[0] = 0;
@@ -249,7 +249,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
     int argumentStartingIndex;
 
     {
-        SEC_Boolean trimmed = SEC_BOOLEAN_FALSE;
+        BA_Boolean trimmed = BA_BOOLEAN_FALSE;
 
         for (index = 0; index < (int) inputLength; index++) {
             if (input[index] == ' ') {
@@ -260,9 +260,9 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
                 break;
             }
             
-            trimmed = SEC_BOOLEAN_TRUE;
+            trimmed = BA_BOOLEAN_TRUE;
 
-            SEC_String_AppendCharacter(&name, input[index]);
+            BA_String_AppendCharacter(&name, input[index]);
             BE_EngineMemory_AddSize(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
         }
     }
@@ -271,7 +271,7 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
     argumentStartingIndex = index;
 
     if (command == NULL) { // TODO: Tell the client.
-        SEC_LOGGER_ERROR("'%s' is not a valid command\n", name);
+        BA_LOGGER_ERROR("'%s' is not a valid command\n", name);
         goto destroy;
     }
 
@@ -279,16 +279,16 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         char* argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
         int current = 0;
         int quotePosition = -1;
-        SEC_Boolean doubleQuote = SEC_BOOLEAN_FALSE;
-        SEC_Boolean escaped = SEC_BOOLEAN_FALSE;
-        SEC_Boolean added = SEC_BOOLEAN_FALSE;
-        SEC_Boolean trimmed = SEC_BOOLEAN_FALSE;
-        SEC_Boolean quoteAdded = SEC_BOOLEAN_FALSE;
+        BA_Boolean doubleQuote = BA_BOOLEAN_FALSE;
+        BA_Boolean escaped = BA_BOOLEAN_FALSE;
+        BA_Boolean added = BA_BOOLEAN_FALSE;
+        BA_Boolean trimmed = BA_BOOLEAN_FALSE;
+        BA_Boolean quoteAdded = BA_BOOLEAN_FALSE;
 
         argument[0] = 0;
 
         for (; index < (int) inputLength && current < command->publicCommand.arguments.used; index++) {
-            SEC_Boolean validEscapeCharacter = SEC_BOOLEAN_FALSE;
+            BA_Boolean validEscapeCharacter = BA_BOOLEAN_FALSE;
             
             if (added) {
                 argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
@@ -296,34 +296,34 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
                 argument[0] = 0;
             }
 
-            added = SEC_BOOLEAN_FALSE;
+            added = BA_BOOLEAN_FALSE;
 
             if (input[index] == ' ' && (quoteAdded || !trimmed))
                 continue;
 
-            quoteAdded = SEC_BOOLEAN_FALSE;
+            quoteAdded = BA_BOOLEAN_FALSE;
 
             if (input[index] == ' ' && quotePosition == -1 && !escaped) {
                 publish_argument:
                 BE_PrivateDynamicArray_CheckResize(&arguments.keys);
                 BE_PrivateDynamicArray_CheckResize(&arguments.values);
-                SEC_DynamicDictionary_AddElementToLast(&arguments,
-                                                       (void*) SEC_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument,
+                BA_DynamicDictionary_AddElementToLast(&arguments,
+                                                       (void*) BA_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument,
                                                                                             command->publicCommand.arguments,
                                                                                             current++)->name, argument);
 
-                added = SEC_BOOLEAN_TRUE;
-                trimmed = SEC_BOOLEAN_FALSE;
+                added = BA_BOOLEAN_TRUE;
+                trimmed = BA_BOOLEAN_FALSE;
                 continue;
             }
 
             if (input[index] == '\\' && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING)) {
                 if (!escaped) {
-                    escaped = SEC_BOOLEAN_TRUE;
+                    escaped = BA_BOOLEAN_TRUE;
                     continue;
                 }
                 
-                validEscapeCharacter = SEC_BOOLEAN_TRUE;
+                validEscapeCharacter = BA_BOOLEAN_TRUE;
             }
             
             if (input[index] == '\'' || input[index] == '"') {
@@ -341,36 +341,36 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 
                     if (doubleQuote == (input[index] == '"')) {
                         quotePosition = -1;
-                        doubleQuote = SEC_BOOLEAN_FALSE;
-                        quoteAdded = SEC_BOOLEAN_TRUE;
+                        doubleQuote = BA_BOOLEAN_FALSE;
+                        quoteAdded = BA_BOOLEAN_TRUE;
                         goto publish_argument;
                     }
                 }
                 
-                validEscapeCharacter = SEC_BOOLEAN_TRUE;
+                validEscapeCharacter = BA_BOOLEAN_TRUE;
             }
 
-            trimmed = SEC_BOOLEAN_TRUE;
+            trimmed = BA_BOOLEAN_TRUE;
 
             if (escaped && !validEscapeCharacter && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING)) {
-                SEC_LOGGER_ERROR("Parsing error: invalid escape character '%c', use double backslashes instead of one\n", input[index]);
+                BA_LOGGER_ERROR("Parsing error: invalid escape character '%c', use double backslashes instead of one\n", input[index]);
                 BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * (strlen(argument) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
                 goto destroy;
             }
 
-            SEC_String_AppendCharacter(&argument, input[index]);
+            BA_String_AppendCharacter(&argument, input[index]);
             BE_EngineMemory_AddSize(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
             
-            escaped = SEC_BOOLEAN_FALSE;
+            escaped = BA_BOOLEAN_FALSE;
         }
 
         if (quotePosition != -1 && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING)) {
-            SEC_LOGGER_ERROR("Parsing error: unescaped %s quote at %i\n", doubleQuote ? "double" : "single", quotePosition);
+            BA_LOGGER_ERROR("Parsing error: unescaped %s quote at %i\n", doubleQuote ? "double" : "single", quotePosition);
             goto destroy;
         }
 
         if (escaped && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING)) {
-            SEC_LOGGER_ERROR("Parsing error: stray escape character\n");
+            BA_LOGGER_ERROR("Parsing error: stray escape character\n");
             goto destroy;
         }
 
@@ -378,12 +378,12 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
             if (argument[0] != '\0') {
                 BE_PrivateDynamicArray_CheckResize(&arguments.keys);
                 BE_PrivateDynamicArray_CheckResize(&arguments.values);
-                SEC_DynamicDictionary_AddElementToLast(&arguments,
-                                                       (void*) SEC_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument,
+                BA_DynamicDictionary_AddElementToLast(&arguments,
+                                                       (void*) BA_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument,
                                                                                             command->publicCommand.arguments,
                                                                                             current)->name, argument);
 
-                added = SEC_BOOLEAN_TRUE;
+                added = BA_BOOLEAN_TRUE;
             }
 
             if (!added)
@@ -395,30 +395,30 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         // TODO: Kick client.
 
         if (!BE_ClientInformation_IsServerModeEnabled()) {
-            SEC_LOGGER_ERROR("This command can only be ran by the server\n");
+            BA_LOGGER_ERROR("This command can only be ran by the server\n");
             goto destroy;
         }
     }
 
     if (BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()) {
-        SEC_LOGGER_ERROR("This command can only be ran by a client\n"); // TODO: Kick client if the client is the one who ran it.
+        BA_LOGGER_ERROR("This command can only be ran by a client\n"); // TODO: Kick client if the client is the one who ran it.
         goto destroy;
     }
 
     if ((command->publicCommand.flags & BE_COMMAND_FLAG_CHEATS_ONLY) != 0 && !BE_ClientInformation_IsCheatsEnabled()) {
         // TODO: Tell client.
-        SEC_LOGGER_ERROR("This command requires cheats to be enabled\n");
+        BA_LOGGER_ERROR("This command requires cheats to be enabled\n");
         goto destroy;
     }
 
     if (command->requiredArgumentCount > arguments.keys.used) {
-        SEC_LOGGER_ERROR("Help: (not enough arguments)\n"
+        BA_LOGGER_ERROR("Help: (not enough arguments)\n"
                          "    %s Command:\n", command->engineCommand ? "Engine" : "Client");
         BE_EngineCommands_HelpPrint(&command->publicCommand);
         goto destroy;
     }
 
-    command->publicCommand.Run(SEC_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Command_Context, input, input + argumentStartingIndex, arguments));
+    command->publicCommand.Run(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Command_Context, input, input + argumentStartingIndex, arguments));
 
     destroy:
     BE_EngineMemory_DeallocateMemory(name, sizeof(char) * (strlen(name) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
@@ -433,24 +433,24 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
 #endif
 }
 
-SEC_Boolean BE_Console_IsEngineCommand(BE_Command command) {
+BA_Boolean BE_Console_IsEngineCommand(BE_Command command) {
 #ifndef BE_CLIENT_BINARY
     return BE_Console_GetPrivateCommand(command.name)->engineCommand;
 #else
-    BE_INTERFACEFUNCTION(SEC_Boolean, BE_Command);
+    BE_INTERFACEFUNCTION(BA_Boolean, BE_Command);
     return function(command);
 #endif
 }
 
 #ifndef BE_CLIENT_BINARY
 void BE_PrivateConsole_Destroy(void) {
-    SEC_ASSERT(beConsoleInitialized, "Console are not initialized\n");
-    SEC_LOGGER_INFO("Destroying console\n");
+    BA_ASSERT(beConsoleInitialized, "Console are not initialized\n");
+    BA_LOGGER_INFO("Destroying console\n");
 
-    beConsoleInitialized = SEC_BOOLEAN_FALSE;
+    beConsoleInitialized = BA_BOOLEAN_FALSE;
 
     for (int commandId = 0; commandId < beConsoleCommands.used; commandId++) {
-        BE_PrivateConsole_Command* command = SEC_DYNAMICARRAY_GET_ELEMENT(BE_PrivateConsole_Command, beConsoleCommands, commandId);
+        BE_PrivateConsole_Command* command = BA_DYNAMICARRAY_GET_ELEMENT(BE_PrivateConsole_Command, beConsoleCommands, commandId);
 
         for (int argumentId = 0; argumentId < command->publicCommand.arguments.used; argumentId++)
             BE_EngineMemory_DeallocateMemory(command->publicCommand.arguments.internalArray[argumentId], sizeof(BE_Command_Argument),
@@ -466,4 +466,4 @@ void BE_PrivateConsole_Destroy(void) {
     BE_EngineMemory_DeallocateMemory(beConsoleCommands.internalArray, sizeof(void*) * beConsoleCommands.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 #endif
-SEC_CPLUSPLUS_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()
