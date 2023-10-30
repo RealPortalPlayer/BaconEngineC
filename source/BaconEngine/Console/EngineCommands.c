@@ -141,7 +141,7 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
         int commandIdClient = -1;
 
         BA_LOGGER_INFO("Help:\n"
-                        "    Engine Commands:\n");
+                       "    Engine Commands:\n");
 
         for (; commandId < BE_Console_GetCommandAmount(); commandId++) {
             BE_Command* command = BE_Console_GetCommands()[commandId];

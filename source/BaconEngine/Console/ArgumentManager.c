@@ -11,10 +11,7 @@
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
 static int BE_ArgumentManager_EqualsStringBoolean(const char* value) {
-    if (BA_String_Equals(value, "true", BA_BOOLEAN_TRUE))
-        return 2;
-
-    return BA_String_Equals(value, "false", BA_BOOLEAN_TRUE) ? 1 : 0;
+    return BA_String_Equals(value, "true", BA_BOOLEAN_TRUE) ? 2 : BA_String_Equals(value, "false", BA_BOOLEAN_TRUE);
 }
 #endif
 
