@@ -4,6 +4,7 @@
 #include <SharedEngineCode/Paths.h>
 #include <BaconAPI/Debugging/Assert.h>
 #include <SharedEngineCode/Debugging/StrictMode.h>
+#include <BaconAPI/String.h>
 
 #include "BaconEngine/Storage/DefaultPackage.h"
 #include "BaconEngine/Storage/Package.h"
@@ -17,10 +18,11 @@ BA_Boolean BE_PrivateDefaultPackage_Open(void) {
     BA_ASSERT(beDefaultPackage == NULL, "Default package is already opened\n");
     BA_LOGGER_INFO("Opening default engine package\n");
     
-    char* filePath = malloc(sizeof(char));
+    char* filePath = BA_String_CreateEmpty();
     
-    filePath[0] = 0;
-
+    if (filePath == NULL)
+        return BA_BOOLEAN_FALSE;
+    
     SEC_Paths_GetItemInsideEngineDirectory(&filePath, "Default.package");
     
     beDefaultPackage = BE_Package_Open(filePath);

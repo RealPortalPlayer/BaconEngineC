@@ -79,8 +79,7 @@ float BE_ArgumentManager_GetFloat(BA_DynamicDictionary arguments, const char* na
 
 const char* BE_ArgumentManager_GetString(BA_DynamicDictionary arguments, const char* name, const char* defaultValue) {
 #ifndef BE_CLIENT_BINARY
-    const char* value = BA_DynamicDictionary_GetElementValueViaKey(arguments, (void*) name,
-                                                                    sizeof(char) + strlen(name));
+    const char* value = BA_DynamicDictionary_GetElementValueViaKey(&arguments, (void*) name, sizeof(char) + strlen(name));
 
     return value != NULL ? value : defaultValue;
 #else
