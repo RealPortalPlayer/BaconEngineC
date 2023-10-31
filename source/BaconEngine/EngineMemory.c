@@ -8,11 +8,11 @@
 #include "EngineMemory.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
-BE_EngineMemoryInformation beEngineMemoryInformation = {
-        {0, 0},
-        {0, 0},
-        {0, 0},
-        {0, 0}
+static BE_EngineMemoryInformation beEngineMemoryInformation = {
+    {0, 0},
+    {0, 0},
+    {0, 0},
+    {0, 0}
 };
 
 BA_Boolean BE_EngineMemory_AllocateDeallocateLogsEnabled(void) {
@@ -63,8 +63,8 @@ void* BE_EngineMemory_AllocateMemory(size_t size, BE_EngineMemory_MemoryType mem
 
     if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
         BA_LOGGER_TRACE("Allocating memory\n"
-                         "Size: %zu\n"
-                         "Type: %i\n", size, memoryType);
+                        "Size: %zu\n"
+                        "Type: %i\n", size, memoryType);
 
     BA_ASSERT(size > 0, "Size cannot be zero or below\n");
     BA_ASSERT((pointer = malloc(size)) != NULL, "Failed to allocate %zu bytes of data\n", size);
@@ -82,9 +82,9 @@ void* BE_EngineMemory_ReallocateMemory(void* pointer, size_t oldSize, size_t new
 
     if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
         BA_LOGGER_TRACE("Reallocating memory\n"
-                         "Old Size: %zu\n"
-                         "New Size: %zu\n"
-                         "Type: %i\n", oldSize, newSize, memoryType);
+                        "Old Size: %zu\n"
+                        "New Size: %zu\n"
+                        "Type: %i\n", oldSize, newSize, memoryType);
 
     BA_ASSERT(pointer != NULL, "Pointer cannot be null\n");
     BA_ASSERT(oldSize > 0 && newSize > 0, "Size cannot be zero or below\n");
@@ -99,8 +99,8 @@ void BE_EngineMemory_DeallocateMemory(void* pointer, size_t oldSize, BE_EngineMe
 
     if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
         BA_LOGGER_TRACE("Deallocating memory\n"
-                         "Size: %zu\n"
-                         "Type: %i\n", oldSize, memoryType);
+                        "Size: %zu\n"
+                        "Type: %i\n", oldSize, memoryType);
 
     BA_ASSERT(pointer != NULL, "Pointer cannot be null\n");
     BA_ASSERT(oldSize > 0, "Size cannot be zero or below\n");
@@ -113,8 +113,8 @@ void BE_EngineMemory_DeallocateMemory(void* pointer, size_t oldSize, BE_EngineMe
 void BE_EngineMemory_AddSize(size_t size, BE_EngineMemory_MemoryType memoryType) {
     if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
         BA_LOGGER_TRACE("Adding to allocated bytes\n"
-                         "Size: %zu\n"
-                         "Type: %i\n", size, memoryType);
+                        "Size: %zu\n"
+                        "Type: %i\n", size, memoryType);
     
     BE_EngineMemory_GetMemoryTypeInformation(memoryType)->allocatedBytes += size;
 }
@@ -122,8 +122,8 @@ void BE_EngineMemory_AddSize(size_t size, BE_EngineMemory_MemoryType memoryType)
 void BE_EngineMemory_RemoveSize(size_t size, BE_EngineMemory_MemoryType memoryType) {
     if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
         BA_LOGGER_TRACE("Removing from allocated bytes\n"
-                         "Size: %zu\n"
-                         "Type: %i\n", size, memoryType);
+                        "Size: %zu\n"
+                        "Type: %i\n", size, memoryType);
     
     BE_EngineMemory_GetMemoryTypeInformation(memoryType)->allocatedBytes -= size;
 }

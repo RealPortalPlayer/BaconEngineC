@@ -48,6 +48,11 @@ const char* BE_I18N_Translate(const char* buffer, const char* key) {
     size_t keyLength = strlen(key);
     char* chosenLine = NULL;
 
+    if (translations == NULL) {
+        BA_LOGGER_TRACE("Failed to allocate enough memory for split buffer\n");
+        return key;
+    }
+
     for (int i = 0; i < translations->used; i++) {
         char* line = BA_DYNAMICARRAY_GET_ELEMENT_POINTER(char, translations, i);
         size_t lineLength = strlen(line);
