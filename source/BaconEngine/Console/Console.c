@@ -466,4 +466,63 @@ void BE_PrivateConsole_Destroy(void) {
     BE_EngineMemory_DeallocateMemory(beConsoleCommands.internalArray, sizeof(void*) * beConsoleCommands.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 #endif
+
+BE_BINARYEXPORT void BE_Console_ExecuteFile(FILE* file) {
+#ifndef BE_CLIENT_BINARY
+    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(file != NULL, "File cannot be null\n");
+    BA_LOGGER_TRACE("Executing list of commands\n");
+    
+    char* line;
+    ssize_t length;
+    
+    while((length = BA_String_GetLine(file, &line, NULL)) != -1) {
+        if (length == -2) {
+            BA_LOGGER_TRACE("Failed to allocate enough memory for buffer\n");
+            return;
+        }
+
+        if (length == 0) {
+            free(line);
+            continue;
+        }
+
+        BE_Console_ExecuteCommand(line);
+        free(line);
+    }
+#else
+    BE_INTERFACEFUNCTION(void, FILE*);
+    function(file);
+#endif
+}
+
+BE_BINARYEXPORT void BE_Console_ExecuteFileContents(const char* contents) {
+#ifndef BE_CLIENT_BINARY
+    BA_LOGGER_TRACE("Executing list of commands\n");
+    
+    BA_DynamicArray* commandLines = BA_String_Split(contents, "\n");
+    
+    if (commandLines == NULL) {
+        BA_LOGGER_TRACE("Failed to allocate enough memory for split buffer\n");
+        return;
+    }
+    
+    for (int i = 0; i < commandLines->used; i++) {
+        char* line = BA_DYNAMICARRAY_GET_ELEMENT_POINTER(char, commandLines, i);
+
+        if (strlen(line) == 0) {
+            free(commandLines->internalArray[i]);
+            continue;
+        }
+
+        BE_Console_ExecuteCommand(line);
+        free(commandLines->internalArray[i]);
+    }
+
+    free(commandLines->internalArray);
+    free(commandLines);
+#else
+    BE_INTERFACEFUNCTION(void, const char*);
+    function(contents);
+#endif
+}
 BA_CPLUSPLUS_SUPPORT_GUARD_END()
