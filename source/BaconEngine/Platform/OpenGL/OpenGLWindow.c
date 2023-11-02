@@ -79,7 +79,7 @@ void* BE_OpenGLWindow_GetWindow(void) {
     return window;
 }
 
-void BE_OpenGLWindow_KeyEvent(GLFWwindow* theWindow, int key, int scanCode, int action, int mods) {
+static void BE_OpenGLWindow_KeyEvent(GLFWwindow* theWindow, int key, int scanCode, int action, int mods) {
     (void) theWindow;
     (void) mods;
     (void) scanCode;
@@ -102,7 +102,7 @@ void BE_OpenGLWindow_KeyEvent(GLFWwindow* theWindow, int key, int scanCode, int 
     ));
 }
 
-void BE_OpenGLWindow_MouseButtonEvent(GLFWwindow* theWindow, int button, int action, int mods) {
+static void BE_OpenGLWindow_MouseButtonEvent(GLFWwindow* theWindow, int button, int action, int mods) {
     (void) theWindow;
     (void) mods;
 
@@ -123,7 +123,7 @@ void BE_OpenGLWindow_MouseButtonEvent(GLFWwindow* theWindow, int button, int act
     ));
 }
 
-void BE_OpenGLWindow_CursorPositionMovedEvent(GLFWwindow* theWindow, double x, double y) {
+static void BE_OpenGLWindow_CursorPositionMovedEvent(GLFWwindow* theWindow, double x, double y) {
     (void) theWindow;
 
     BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
@@ -136,7 +136,7 @@ void BE_OpenGLWindow_CursorPositionMovedEvent(GLFWwindow* theWindow, double x, d
     ));
 }
 
-void BE_OpenGLWindow_CursorEnterEvent(GLFWwindow* theWindow, int entered) {
+static void BE_OpenGLWindow_CursorEnterEvent(GLFWwindow* theWindow, int entered) {
     (void) theWindow;
 
     BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
@@ -144,7 +144,7 @@ void BE_OpenGLWindow_CursorEnterEvent(GLFWwindow* theWindow, int entered) {
     ));
 }
 
-void BE_OpenGLWindow_ScrollEvent(GLFWwindow* theWindow, double x, double y) {
+static void BE_OpenGLWindow_ScrollEvent(GLFWwindow* theWindow, double x, double y) {
     (void) theWindow;
 
     double xPos;
@@ -164,7 +164,7 @@ void BE_OpenGLWindow_ScrollEvent(GLFWwindow* theWindow, double x, double y) {
     ));
 }
 
-void BE_OpenGLWindow_FocusEvent(GLFWwindow* theWindow, int focused) {
+static void BE_OpenGLWindow_FocusEvent(GLFWwindow* theWindow, int focused) {
     (void) theWindow;
 
     BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
@@ -172,7 +172,7 @@ void BE_OpenGLWindow_FocusEvent(GLFWwindow* theWindow, int focused) {
     ));
 }
 
-void BE_OpenGLWindow_CloseEvent(GLFWwindow* theWindow) {
+static void BE_OpenGLWindow_CloseEvent(GLFWwindow* theWindow) {
     (void) theWindow;
 
     BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
@@ -180,7 +180,7 @@ void BE_OpenGLWindow_CloseEvent(GLFWwindow* theWindow) {
     ));
 }
 
-void BE_OpenGLWindow_MaximizeEvent(GLFWwindow* theWindow, int maximized) {
+static void BE_OpenGLWindow_MaximizeEvent(GLFWwindow* theWindow, int maximized) {
     (void) theWindow;
 
     BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
@@ -188,7 +188,7 @@ void BE_OpenGLWindow_MaximizeEvent(GLFWwindow* theWindow, int maximized) {
     ));
 }
 
-void BE_OpenGLWindow_MovedEvent(GLFWwindow* theWindow, int x, int y) {
+static void BE_OpenGLWindow_MovedEvent(GLFWwindow* theWindow, int x, int y) {
     (void) theWindow;
 
     BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
@@ -203,10 +203,9 @@ void BE_OpenGLWindow_MovedEvent(GLFWwindow* theWindow, int x, int y) {
     ));
 }
 
-void BE_OpenGLWindow_ResizedEvent(GLFWwindow* theWindow, int width, int height) {
+static void BE_OpenGLWindow_ResizedEvent(GLFWwindow* theWindow, int width, int height) {
     (void) theWindow;
 
-    glViewport(0, 0, width, height);
     BE_PrivateLayer_OnEvent(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Event,
         .type = BE_EVENT_TYPE_WINDOW_RESIZED,
         .data = {
@@ -217,6 +216,10 @@ void BE_OpenGLWindow_ResizedEvent(GLFWwindow* theWindow, int width, int height) 
             }
         }
     ));
+}
+
+static void BE_OpenGLWindow_FramebufferResizedEvent(GLFWwindow* theWindow, int width, int height) {
+    glViewport(0, 0, width, height);
 }
 
 void BE_OpenGLWindow_Create(const char* title, BE_Vector2_Unsigned size, int monitor) {
@@ -244,6 +247,7 @@ void BE_OpenGLWindow_Create(const char* title, BE_Vector2_Unsigned size, int mon
     glfwSetWindowMaximizeCallback(window, &BE_OpenGLWindow_MaximizeEvent);
     glfwSetWindowPosCallback(window, &BE_OpenGLWindow_MovedEvent);
     glfwSetWindowSizeCallback(window, &BE_OpenGLWindow_ResizedEvent);
+    glfwSetFramebufferSizeCallback(window, &BE_OpenGLWindow_FramebufferResizedEvent);
     BA_ASSERT(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "Failed to initialize Glad\n");
     glViewport(0, 0, (int) size.x, (int) size.y);
     BE_OpenGLRenderer_CompileShaders();
