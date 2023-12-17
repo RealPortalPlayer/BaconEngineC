@@ -144,4 +144,8 @@ add_custom_target(BaconEngineDefaultPackage
         COMMAND ${CMAKE_COMMAND} -E tar cvf "${BE_OUTPUT_DIRECTORY}/Default.package" --format=zip .
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../assets/BaconEngine/Default)
 
+if(EMSCRIPTEN)
+    set_target_properties(BaconEngine PROPERTIES LINK_FLAGS "-sSIDE_MODULE=1")
+endif()
+
 include(BaconEngineClient.cmake)

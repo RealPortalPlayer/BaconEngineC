@@ -19,6 +19,10 @@ endif()
 
 target_compile_definitions(BaconLauncher PUBLIC BE_ENGINE_VERSION="${BE_ENGINE_VERSION}" BE_LAUNCHER_VERSION="${BE_LAUNCHER_VERSION}")
 
+if(EMSCRIPTEN)
+    set_target_properties(BaconLauncher PROPERTIES LINK_FLAGS "-sMAIN_MODULE=1")
+endif()
+
 if(WIN32)
     include(BaconLauncherWindows.cmake)
 endif()
