@@ -108,12 +108,13 @@ void BE_EntryPoint_CommandThreadFunction(void) {
 
         fgets(input, sizeof(input), stdin); // TODO: Arrow keys to go back in history.
 
-        input[strcspn(input, "\n")] = '\0';
-
         if (input[0] == '\0')
             continue;
+        
+        input[strcspn(input, "\n")] = '\0';
 
-        BE_Console_ExecuteCommand(input);
+        if (input[0] != '\0')
+            BE_Console_ExecuteCommand(input);
 
         printedCursor = BA_BOOLEAN_FALSE;
     }
