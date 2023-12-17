@@ -47,24 +47,28 @@ const char* BE_I18N_Translate(const char* buffer, const char* key) {
     BA_DynamicArray* translations = BA_String_Split(buffer, "\n");
     size_t keyLength = strlen(key);
     char* chosenLine = NULL;
+    int index = 0;
 
     if (translations == NULL) {
         BA_LOGGER_TRACE("Failed to allocate enough memory for split buffer\n");
         return key;
     }
 
-    for (int i = 0; i < translations->used; i++) {
-        char* line = BA_DYNAMICARRAY_GET_ELEMENT_POINTER(char, translations, i);
+    for (; index < translations->used; index++) {
+        char* line = BA_DYNAMICARRAY_GET_ELEMENT_POINTER(char, translations, index);
         size_t lineLength = strlen(line);
         
         if (lineLength == 0 || lineLength <= keyLength || line[keyLength] != '=' || memcmp(line, key, keyLength) != 0) {
-            free(translations->internalArray[i]);
+            free(translations->internalArray[index]);
             continue;
         }
         
         chosenLine = line + keyLength + 1;
         break;
     }
+
+    for (index++; index < translations->used; index++)
+        free(translations->internalArray[index]);
 
     free(translations->internalArray);
     free(translations);
