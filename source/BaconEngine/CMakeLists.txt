@@ -56,7 +56,8 @@ set(BE_SOURCE_FILES
         Rendering/UI.c
         DeltaTime.c
         Storage/Package.c
-        Storage/DefaultPackage.c)
+        Storage/DefaultPackage.c
+        Configuration.c)
 
 add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         # Header files

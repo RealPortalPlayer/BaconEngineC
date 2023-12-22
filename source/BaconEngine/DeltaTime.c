@@ -21,7 +21,7 @@ double BE_DeltaTime_GetMilliseconds(void) {
 #ifndef BE_CLIENT_BINARY
     return beDeltaTimeCurrentTime;
 #else
-    BE_INTERFACEFUNCTION(double, void);
+     BE_INTERFACEFUNCTION(double, void);
     return function();
 #endif
 }

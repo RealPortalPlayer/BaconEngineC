@@ -4,36 +4,50 @@
 #include <string.h>
 #include <stdio.h>
 #include <SharedEngineCode/Debugging/StrictMode.h>
+#include <BaconAPI/Storage/DynamicDictionary.h>
 
 #include "BaconEngine/I18N.h"
 #include "InterfaceFunctions.h"
+#include "BaconEngine/Configuration.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
+#ifndef BE_CLIENT_BINARY
+static const char* BE_I18N_InternalTranslate(BA_DynamicDictionary* configuration, const char* key) {
+    if (configuration == NULL)
+        return key;
+
+    int index = 0;
+    char* value = NULL;
+    
+    for (; index < configuration->keys.used; index++) {
+        if (strcmp(BA_DYNAMICARRAY_GET_ELEMENT(char, configuration->keys, index), key) != 0) {
+            free(configuration->keys.internalArray[index]);
+            free(configuration->values.internalArray[index]);
+            continue;
+        }
+
+        value = BA_DYNAMICARRAY_GET_ELEMENT(char, configuration->values, index);
+        break;
+    }
+
+    for (index++; index < configuration->keys.used; index++) {
+        free(configuration->keys.internalArray[index]);
+        free(configuration->values.internalArray[index]);
+    }
+
+    if (value != NULL)
+        return value;
+
+    BA_LOGGER_ERROR("Failed to translate: %s\n", key);
+    return key;
+}
+#endif
+
 const char* BE_I18N_TranslateFromFile(FILE* languageFile, const char* key) {
 #ifndef BE_CLIENT_BINARY
     SEC_STRICTMODE_CHECK(strlen(key) != 0, key, "Key cannot be empty\n");
     SEC_STRICTMODE_CHECK(languageFile != NULL, key, "Language file cannot be null\n");
-
-    char* line;
-    ssize_t length;
-    size_t keyLength = strlen(key);
-
-    while ((length = BA_String_GetLine(languageFile, &line, NULL)) != -1) {
-        if (length == -2) {
-            BA_LOGGER_TRACE("Failed to allocate enough memory for translated buffer: %s\n", key);
-            return key;
-        }
-
-        if (length == 0 || length <= keyLength || line[keyLength] != '=' || memcmp(line, key, keyLength) != 0) {
-            free(line);
-            continue;
-        }
-        
-        return line + keyLength + 1;
-    }
-    
-    BA_LOGGER_ERROR("Failed to translate: %s\n", key);
-    return key;
+    return BE_I18N_InternalTranslate(BE_Configuration_ParseFromFile(languageFile), key);
 #else
     BE_INTERFACEFUNCTION(const char*, FILE*, const char*);
     return function(languageFile, key);
@@ -43,41 +57,7 @@ const char* BE_I18N_TranslateFromFile(FILE* languageFile, const char* key) {
 const char* BE_I18N_Translate(const char* buffer, const char* key) {
 #ifndef BE_CLIENT_BINARY
     SEC_STRICTMODE_CHECK(strlen(key) != 0, key, "Key cannot be empty\n");
-    
-    BA_DynamicArray* translations = BA_String_Split(buffer, "\n");
-    size_t keyLength = strlen(key);
-    char* chosenLine = NULL;
-    int index = 0;
-
-    if (translations == NULL) {
-        BA_LOGGER_TRACE("Failed to allocate enough memory for split buffer\n");
-        return key;
-    }
-
-    for (; index < translations->used; index++) {
-        char* line = BA_DYNAMICARRAY_GET_ELEMENT_POINTER(char, translations, index);
-        size_t lineLength = strlen(line);
-        
-        if (lineLength == 0 || lineLength <= keyLength || line[keyLength] != '=' || memcmp(line, key, keyLength) != 0) {
-            free(translations->internalArray[index]);
-            continue;
-        }
-        
-        chosenLine = line + keyLength + 1;
-        break;
-    }
-
-    for (index++; index < translations->used; index++)
-        free(translations->internalArray[index]);
-
-    free(translations->internalArray);
-    free(translations);
-    
-    if (chosenLine != NULL)
-        return chosenLine;
-
-    BA_LOGGER_ERROR("Failed to translate: %s\n", key);
-    return key;
+    return BE_I18N_InternalTranslate(BE_Configuration_Parse(buffer), key);
 #else
     BE_INTERFACEFUNCTION(const char*, const char*, const char*);
     return function(buffer, key);
