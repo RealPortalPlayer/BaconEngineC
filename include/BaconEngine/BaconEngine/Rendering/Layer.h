@@ -6,13 +6,14 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
-#include <SharedEngineCode/Internal/Boolean.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/Boolean.h>
+#include <BaconAPI/String.h>
 
 #include "BaconEngine/Event.h"
-#include "BaconEngine/DllExport.h"
+#include "BaconEngine/BinaryExport.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     BE_LAYER_UPDATE_TYPE_BEFORE_RENDERING,
     BE_LAYER_UPDATE_TYPE_AFTER_RENDERING
@@ -21,17 +22,17 @@ typedef enum {
 typedef struct {
     void (*OnStart)(void);
     void (*OnUpdate)(BE_Layer_UpdateTypes updateType);
-    void (*OnToggle)(SEC_Boolean enabled);
-    SEC_Boolean (*OnEvent)(BE_Event event);
+    void (*OnToggle)(BA_Boolean enabled);
+    BA_Boolean (*OnEvent)(BE_Event event);
     void (*OnStop)(void);
 } BE_Layer_Functions;
 
-BE_DLLEXPORT int BE_Layer_GetAmount(void);
-BE_DLLEXPORT int BE_Layer_GetAllocatedLayersAmount(void);
-BE_DLLEXPORT int BE_Layer_GetLayersReallocationAmount(void);
-BE_DLLEXPORT SEC_Boolean BE_Layer_Toggle(const char* name, SEC_Boolean enable);
-BE_DLLEXPORT SEC_Boolean BE_Layer_IsToggled(const char* name);
-BE_DLLEXPORT SEC_Boolean BE_Layer_Exists(const char* name);
+BE_BINARYEXPORT int BE_Layer_GetAmount(void);
+BE_BINARYEXPORT int BE_Layer_GetAllocatedLayersAmount(void);
+BE_BINARYEXPORT int BE_Layer_GetLayersReallocationAmount(void);
+BE_BINARYEXPORT BA_Boolean BE_Layer_Toggle(const char* name, BA_Boolean enable);
+BE_BINARYEXPORT BA_Boolean BE_Layer_IsToggled(const char* name);
+BE_BINARYEXPORT BA_Boolean BE_Layer_Exists(const char* name);
 
-BE_DLLEXPORT void BE_Layer_Register(const char* name, SEC_Boolean enabled, BE_Layer_Functions functions);
-SEC_CPP_SUPPORT_GUARD_END()
+BE_BINARYEXPORT void BE_Layer_Register(const char* name, BA_Boolean enabled, BE_Layer_Functions functions);
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

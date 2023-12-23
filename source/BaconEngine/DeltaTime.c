@@ -8,7 +8,7 @@
 #   include "PrivateDeltaTime.h"
 #endif
 
-SEC_CPP_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
 static double beDeltaTimeCurrentTime;
 
@@ -21,7 +21,7 @@ double BE_DeltaTime_GetMilliseconds(void) {
 #ifndef BE_CLIENT_BINARY
     return beDeltaTimeCurrentTime;
 #else
-    BE_INTERFACEFUNCTION(double, void);
+     BE_INTERFACEFUNCTION(double, void);
     return function();
 #endif
 }
@@ -34,4 +34,4 @@ double BE_DeltaTime_GetSeconds(void) {
     return function();
 #endif
 }
-SEC_CPP_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

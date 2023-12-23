@@ -51,15 +51,13 @@ set(BE_SOURCE_FILES
         Console/Console.c
         Rendering/Layer.c
         Input/Keyboard.c
-        Storage/DynamicArray.c
-        Storage/DynamicDictionary.c
         I18N.c
         Input/Mouse.c
         Rendering/UI.c
         DeltaTime.c
-        Debugging/Assert.c
-        Debugging/StrictMode.c
-        Package.c
+        Storage/Package.c
+        Storage/DefaultPackage.c
+        Configuration.c
         Server/Server.c)
 
 add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
@@ -77,6 +75,7 @@ add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         AntiClientGuard.h
         Storage/PrivateDynamicArray.h
         Storage/PrivateDynamicDictionary.h
+        Storage/PrivateDefaultPackage.h
 
         # Source files
         EntryPoint.c
@@ -85,7 +84,9 @@ add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         Platform/SpecificPlatformFunctions.c
         Platform/TextMode/TextMode.c
         Rendering/EngineUIs.c
-        Rendering/EngineLayers.c)
+        Rendering/EngineLayers.c
+        Storage/PrivateDynamicArray.c
+        Storage/PrivateDynamicDictionary.c)
 
 if(NOT BE_DISABLE_OPENGL)
     set(BE_LIBRARIES glfw OpenGL::GL glad)
@@ -131,23 +132,22 @@ if(MSVC) # I hate MSVC
     target_compile_options(BaconEngine PUBLIC /wd4204)
 endif()
 
+set(BE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+
 if(NOT BE_DONT_SET_BINARY_OUTPUT_PATH)
-    set_target_properties(BaconEngine PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out")
-    set_target_properties(BaconEngine PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out")
+    set(BE_OUTPUT_DIRECTORY "${BE_OUTPUT_DIRECTORY}/out/Engines/Official")
+    set_target_properties(BaconEngine PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${BE_OUTPUT_DIRECTORY}")
+    set_target_properties(BaconEngine PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${BE_OUTPUT_DIRECTORY}")
 endif()
 
 target_compile_definitions(BaconEngine PUBLIC BE_ENGINE_VERSION="${BE_ENGINE_VERSION}")
 
-# --- PROJECT SEPARATOR ---
+add_custom_target(BaconEngineDefaultPackage
+        COMMAND ${CMAKE_COMMAND} -E tar cvf "${BE_OUTPUT_DIRECTORY}/Default.package" --format=zip .
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../assets/BaconEngine/Default)
 
-project(BaconEngineClient)
+if(EMSCRIPTEN)
+    set_target_properties(BaconEngine PROPERTIES LINK_FLAGS "-sSIDE_MODULE=1")
+endif()
 
-add_library(BaconEngineClient STATIC ${BE_SOURCE_FILES})
-
-target_include_directories(BaconEngineClient PUBLIC ../../include/BaconEngine)
-target_compile_definitions(BaconEngineClient PUBLIC BE_CLIENT_BINARY)
-
-# TODO: Should we worry about stuff like pedantic mode?
-
-target_link_libraries(BaconEngineClient LINK_PUBLIC Interface zip)
-add_dependencies(BaconEngineClient BaconEngine)
+include(BaconEngineClient.cmake)

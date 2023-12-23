@@ -3,7 +3,7 @@
 
 #include <Interface/EntryPoint.h>
 
-SEC_Boolean I_EntryPoint_SupportsServer() {
+BA_Boolean I_EntryPoint_SupportsServer() {
     return true;
 }
 

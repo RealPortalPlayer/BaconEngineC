@@ -1,28 +1,30 @@
 // Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include <SharedEngineCode/ArgumentHandler.h>
-#include <SharedEngineCode/Logger.h>
+#include <BaconAPI/ArgumentHandler.h>
+#include <BaconAPI/Logger.h>
 #include <string.h>
 #include <SharedEngineCode/BuiltInArguments.h>
-#include <SharedEngineCode/Threads.h>
-#include <SharedEngineCode/Internal/PlatformSpecific.h>
+#include <BaconAPI/Threads.h>
+#include <BaconAPI/Internal/PlatformSpecific.h>
+#include <SharedEngineCode/Paths.h>
+#include <SharedEngineCode/Launcher.h>
+#include <BaconAPI/Debugging/Assert.h>
+#include <SharedEngineCode/Debugging/StrictMode.h>
 #include <errno.h>
 
-#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
+#if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <unistd.h>
 #   include <signal.h>
 #   include <fcntl.h>
 #   include <netinet/in.h>
-#elif SEC_OPERATINGSYSTEM_WINDOWS
+#elif BA_OPERATINGSYSTEM_WINDOWS
 #   include <signal.h>
 #   include <io.h>
 #   define fileno _fileno
 #   define write(file, message, size) _write(file, message, (unsigned) size) // HACK: This is a stupid idea, but it's the only way to make MSVC shut up.
 #endif
 
-#include "BaconEngine/Debugging/Assert.h"
-#include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Rendering/Window.h"
 #include "BaconEngine/Rendering/Renderer.h"
 #include "BaconEngine/EngineMemoryInformation.h"
@@ -34,17 +36,21 @@
 #include "Console/PrivateConsole.h"
 #include "Rendering/PrivateRenderer.h"
 #include "BaconEngine/Console/Console.h"
-#include "BaconEngine/DllExport.h"
+#include "Storage/PrivateDefaultPackage.h"
+#include "BaconEngine/ClientInformation.h"
 #include "BaconEngine/Server/Server.h"
 #include "Server/PrivateServer.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
+BA_Boolean printedCursor = BA_BOOLEAN_FALSE;
+BA_Boolean commandThreadRunning = BA_BOOLEAN_FALSE;
+
 void BE_EntryPoint_SignalDetected(int receivedSignal) {
     switch (receivedSignal) {
         case SIGSEGV:
-            if (SEC_Logger_IsLevelEnabled(SEC_LOGGER_LOG_LEVEL_FATAL)) {
+            if (BA_Logger_IsLevelEnabled(BA_LOGGER_LOG_LEVEL_FATAL)) {
 #define BE_ENTRYPOINT_SAFE_PUTS(message) write(fileno(stdout), message, strlen(message))
-                SEC_Logger_LogHeader(stdout, SEC_LOGGER_LOG_LEVEL_FATAL);
+                BA_Logger_LogHeader(stdout, BA_LOGGER_LOG_LEVEL_FATAL);
                 BE_ENTRYPOINT_SAFE_PUTS("A segmentation fault was detected\n"
                                         "This means something tried to access bad memory (for example, tried to dereference a null pointer)\n"
                                         "If you're a user, then your only option is to report it to the developers\n"
@@ -60,16 +66,18 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
             abort();
 
         case SIGINT:
-            if (!BE_ClientInformation_IsRunning())
-                return;
+            if (!BE_ClientInformation_IsRunning() || !commandThreadRunning) {
+                if (!commandThreadRunning)
+                    BA_LOGGER_WARN("Command thread is not running, using default behavior\n");
 
-            // TODO: Windows?
-#if SEC_OPERATINGSYSTEM_UNIX
-            // TODO: Reprint cursor
-            siginterrupt(SIGINT, SEC_FALSE);
-#endif
+                signal(SIGINT, SIG_DFL);
+                raise(SIGINT);
+                return;
+            }
 
             printf(" (type 'exit' to quit)\n");
+
+            printedCursor = BA_BOOLEAN_FALSE;
             return;
 
         default:
@@ -78,13 +86,15 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
 }
 
 void BE_EntryPoint_CommandThreadFunction(void) {
-    SEC_Boolean printedCursor = SEC_FALSE;
+    commandThreadRunning = BA_BOOLEAN_TRUE;
 
     // FIXME: Find out why this is not working on Serenity.
     // TODO: Find fcntl replacement for Windows.
-#if !SEC_OPERATINGSYSTEM_SERENITY && !SEC_OPERATINGSYSTEM_WINDOWS
-    fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
+#if !BA_OPERATINGSYSTEM_SERENITY && !BA_OPERATINGSYSTEM_WINDOWS
+    fcntl(STDIN_FILENO, F_SETFL, fcntl(STDIN_FILENO, F_GETFL) | O_NONBLOCK);
 #endif
+
+    BA_LOGGER_DEBUG("Command thread started\n");
 
     while (BE_ClientInformation_IsRunning()) {
         if (BE_Console_GetCommandAmount() == 0)
@@ -95,22 +105,25 @@ void BE_EntryPoint_CommandThreadFunction(void) {
         memset(input, 0, 4024);
 
         if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT && !printedCursor) {
-            SEC_Logger_LogImplementation(SEC_FALSE, SEC_LOGGER_LOG_LEVEL_INFO, "%s ", BE_ClientInformation_IsCheatsEnabled() ? "#" : "$");
+            BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "%s ", BE_ClientInformation_IsCheatsEnabled() ? "#" : "$");
 
-            printedCursor = SEC_TRUE;
+            printedCursor = BA_BOOLEAN_TRUE;
         }
 
         fgets(input, sizeof(input), stdin); // TODO: Arrow keys to go back in history.
 
-        input[strcspn(input, "\n")] = '\0';
-
         if (input[0] == '\0')
             continue;
+        
+        input[strcspn(input, "\n")] = '\0';
 
-        BE_Console_ExecuteCommand(input, NULL);
+        if (input[0] != '\0')
+            BE_Console_ExecuteCommand(input, NULL);
 
-        printedCursor = SEC_FALSE;
+        printedCursor = BA_BOOLEAN_FALSE;
     }
+
+    commandThreadRunning = BA_BOOLEAN_FALSE;
 }
 
 void BE_EntryPoint_ServerThreadFunction(void) {
@@ -126,7 +139,7 @@ void BE_EntryPoint_ServerThreadFunction(void) {
             if (errno == EWOULDBLOCK)
                 continue;
 
-            SEC_LOGGER_ERROR("Errored while client connecting: %s\n", strerror(errno));
+            BA_LOGGER_ERROR("Errored while client connecting: %s\n", strerror(errno));
             continue;
         }
 
@@ -140,80 +153,60 @@ void BE_EntryPoint_ServerThreadFunction(void) {
     }
 }
 
-BE_DLLEXPORT const char* BE_EntryPoint_GetVersion(void) {
+BE_BINARYEXPORT const char* BE_EntryPoint_GetVersion(void) {
     return BE_ENGINE_VERSION;
 }
 
-BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* clientBinary, int argc, char** argv) {
-    static SEC_Boolean alreadyStarted = SEC_FALSE;
+BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDetails* engineDetails) {
+    static BA_Boolean alreadyStarted = BA_BOOLEAN_FALSE;
 
-    SEC_ArgumentHandler_Initialize(argc, argv);
-    BE_STRICTMODE_CHECK(!alreadyStarted, 1, "Reinitializing the engine is not supported\n");
-    SEC_LOGGER_TRACE("Entered engine code\n");
+    BA_ArgumentHandler_Initialize(engineDetails->argc, engineDetails->argv);
+    SEC_Paths_SetLauncherPath(engineDetails->launcherPath);
+    SEC_Paths_SetEnginePath(engineDetails->enginePath);
+    SEC_Paths_SetClientPath(engineDetails->clientPath);
+    SEC_STRICTMODE_CHECK(!alreadyStarted, 1, "Reinitializing the engine is not supported\n");
+    BA_LOGGER_TRACE("Entered engine code\n");
 
-    alreadyStarted = SEC_TRUE;
+    alreadyStarted = BA_BOOLEAN_TRUE;
 
 #ifndef BE_ASAN_ENABLED
-    SEC_LOGGER_DEBUG("Registering important signals\n");
+    BA_LOGGER_DEBUG("Registering important signals\n");
     signal(SIGSEGV, BE_EntryPoint_SignalDetected);
 #endif
 
-    SEC_LOGGER_DEBUG("Getting client interface initializer\n");
+    BA_LOGGER_DEBUG("Initializing client interface\n");
+    
+    engineDetails->clientInitialize(engineDetails->launcherPath, engineDetails->enginePath, engineDetails->clientPath, engineDetails->engineBinary, engineDetails->argc, engineDetails->argv);
+    
+    if (engineDetails->clientStart == NULL)
+        BA_LOGGER_DEBUG("Client has no start function\n");
 
-    // FIXME: Compilation errors here due to pedantic mode in Linux
+    if (engineDetails->clientShutdown == NULL)
+        BA_LOGGER_DEBUG("Client has no shutdown function\n");
 
-    {
-        void (*initialize)(void*, int, char**) = (void (*)(void*, int, char**)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_InitializeWrapper");
+    if (engineDetails->clientSupportsServer == NULL)
+        BA_LOGGER_DEBUG("Client doesn't specify if it supports servers, assuming it doesn't\n");
 
-        if (initialize == NULL) {
-            SEC_LOGGER_FATAL("Unable to find interface initializer\n");
-
-            const char* errorMessage = NULL;
-
-            SEC_PLATFORMSPECIFIC_GET_ERROR(errorMessage);
-            SEC_LOGGER_FATAL("%s\n", errorMessage);
-            abort();
-        }
-
-        initialize(engineBinary, argc, argv);
-    }
-
-    SEC_LOGGER_DEBUG("Getting client functions\n");
-
-    int (*start)(int, char**) = (int (*)(int, char**)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Start");
-    int (*shutdown)(void) = (int (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_Shutdown");
-    SEC_Boolean (*supportsServer)(void) = (SEC_Boolean (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_SupportsServer");
-    const char* (*getName)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetName");
-    const char* (*getEngineVersion)(void) = (const char* (*)(void)) SEC_PLATFORMSPECIFIC_GET_ADDRESS(clientBinary, "I_EntryPoint_GetEngineVersion");
-
-    if (start == NULL)
-        SEC_LOGGER_DEBUG("Client has no start function\n");
-
-    if (shutdown == NULL)
-        SEC_LOGGER_DEBUG("Client has no shutdown function\n");
-
-    if (supportsServer == NULL)
-        SEC_LOGGER_DEBUG("Client doesn't specify if it supports servers, assuming it doesn't\n");
-
-    if (getName == NULL)
-        SEC_LOGGER_DEBUG("Client doesn't specify a name, defaulting to nothing\n");
+    if (engineDetails->clientGetName == NULL)
+        BA_LOGGER_DEBUG("Client doesn't specify a name, defaulting to nothing\n");
 
     {
-        const char* clientEngineVersion = getEngineVersion != NULL ? getEngineVersion() : BE_ENGINE_VERSION;
+        const char* clientEngineVersion = engineDetails->clientGetEngineVersion != NULL ? engineDetails->clientGetEngineVersion() : BE_ENGINE_VERSION;
 
-        if (strcmp(clientEngineVersion, BE_ENGINE_VERSION) == 0)
-            SEC_LOGGER_INFO("Starting BaconEngine %s\n", BE_ENGINE_VERSION);
-        else
-            SEC_LOGGER_INFO("Starting BaconEngine %s (client was compiled with %s)\n", BE_ENGINE_VERSION, clientEngineVersion);
+        BA_LOGGER_INFO("Starting BaconEngine %s", BE_ENGINE_VERSION);
+
+        if (strcmp(clientEngineVersion, BE_ENGINE_VERSION) != 0)
+            BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, " (client was compiled with %s)", clientEngineVersion);
+
+        BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "\n");
     }
 
-    if (BE_ClientInformation_IsServerModeEnabled() && (supportsServer == NULL || !supportsServer())) {
-        SEC_LOGGER_FATAL("Client does not support servers\n");
+    if (BE_ClientInformation_IsServerModeEnabled() && (engineDetails->clientSupportsServer == NULL || !engineDetails->clientSupportsServer())) {
+        BA_LOGGER_FATAL("Client does not support servers\n");
         return 1;
     }
 
-    SEC_LOGGER_DEBUG("Registering signals\n");
-    signal(SIGINT, BE_EntryPoint_SignalDetected);
+    BE_PrivateDefaultPackage_Open();
     BE_PrivateRenderer_Initialize();
 
     if (BE_ClientInformation_IsServerModeEnabled())
@@ -226,15 +219,15 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
         int height = 720;
 
         {
-            const char* preParsedWidth = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_WIDTH, 0);
-            const char* preParsedHeight = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_HEIGHT, 0);
+            const char* preParsedWidth = BA_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_WIDTH, 0);
+            const char* preParsedHeight = BA_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_HEIGHT, 0);
 
             if (preParsedWidth != NULL) {
                 char* error;
                 int parsedWith = (int) strtol(preParsedWidth, &error, 0);
 
                 if (error != NULL && strlen(error) != 0) {
-                    SEC_LOGGER_ERROR("Invalid width was supplied, ignoring...\n");
+                    BA_LOGGER_ERROR("Invalid width was supplied, ignoring...\n");
 
                     parsedWith = 1080;
                 }
@@ -247,7 +240,7 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
                 int parsedHeight = (int) strtol(preParsedHeight, &error, 0);
 
                 if (error != NULL && strlen(error) != 0) {
-                    SEC_LOGGER_ERROR("Invalid height was supplied, ignoring...\n");
+                    BA_LOGGER_ERROR("Invalid height was supplied, ignoring...\n");
 
                     parsedHeight = 720;
                 }
@@ -256,22 +249,24 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
             }
         }
 
-        BE_PrivateWindow_Initialize(getName != NULL ? getName() : "", SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2U, (unsigned) width, (unsigned) height));
+        BE_PrivateWindow_Initialize(engineDetails->clientGetName != NULL ? engineDetails->clientGetName() : "", BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, (unsigned) width, (unsigned) height));
     }
 
     BE_PrivateUI_Initialize();
     BE_PrivateConsole_Initialize();
-    BE_ASSERT(start == NULL || start(argc, argv) == 0, "Client start returned non-zero\n");
+    BA_ASSERT(engineDetails->clientStart == NULL || engineDetails->clientStart(engineDetails->argc, engineDetails->argv) == 0, "Client start returned non-zero\n");
+    BA_LOGGER_DEBUG("Registering signals\n");
+    signal(SIGINT, &BE_EntryPoint_SignalDetected);
 
     {
-        const char* preParsedExitCode = SEC_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_EXIT, 0);
+        const char* preParsedExitCode = BA_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_EXIT, 0);
 
         if (preParsedExitCode != NULL) {
             char* error;
             int parsedExitCode = (int) strtol(preParsedExitCode, &error, 0);
 
             if (error != NULL && strlen(error) != 0) {
-                SEC_LOGGER_ERROR("Invalid exit code, defaulting to 0\n");
+                BA_LOGGER_ERROR("Invalid exit code, defaulting to 0\n");
 
                 parsedExitCode = 0;
             }
@@ -280,19 +275,16 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
         }
     }
 
-    SEC_LOGGER_INFO("Starting threads\n");
+    BA_LOGGER_INFO("Starting threads\n");
 
-    SEC_Thread commandThread;
-    SEC_Thread serverThread;
+    BA_Thread commandThread;
+    BA_Thread serverThread;
 
-    SEC_Thread_Create(&commandThread, &BE_EntryPoint_CommandThreadFunction);
+    BA_Thread_Create(&commandThread, &BE_EntryPoint_CommandThreadFunction);
 
     if (BE_ClientInformation_IsServerModeEnabled())
-        SEC_Thread_Create(&serverThread, &BE_EntryPoint_ServerThreadFunction);
-
+        BA_Thread_Create(&serverThread, &BE_EntryPoint_ServerThreadFunction);
     double deltaStart = 0;
-
-    // TODO: Command running inside of terminal.
 
     while (BE_ClientInformation_IsRunning()) {
         if (!BE_Window_IsStillOpened()) {
@@ -316,17 +308,16 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
         BE_SpecificPlatformFunctions_Get().windowFunctions.UpdateEvents();
     }
 
-    SEC_LOGGER_TRACE("Client loop ended, shutting down\n");
-    BE_ASSERT(shutdown == NULL || shutdown() == 0, "Client shutdown returned non-zero\n");
-    SEC_LOGGER_INFO("Waiting for thread shutdown (press CTRL+C if frozen)\n");
-    SEC_Thread_Join(commandThread);
-    SEC_LOGGER_DEBUG("Command thread ended\n");
+    BA_LOGGER_TRACE("Client loop ended, shutting down\n");
+    BA_ASSERT(engineDetails->clientShutdown == NULL || engineDetails->clientShutdown() == 0, "Client shutdown returned non-zero\n");
+    BA_LOGGER_INFO("Waiting for thread shutdown (press CTRL+C if frozen)\n");
+    BA_Thread_Join(commandThread);
+    BA_LOGGER_DEBUG("Command thread ended\n");
 
     if (BE_ClientInformation_IsServerModeEnabled()) {
-        SEC_Thread_Join(serverThread);
-        SEC_LOGGER_DEBUG("Server thread ended\n");
+        BA_Thread_Join(serverThread);
+        BA_LOGGER_DEBUG("Server thread ended\n");
     }
-
     BE_PrivateLayer_DestroyLayers();
 
     if (BE_Server_IsRunning())
@@ -337,17 +328,20 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
     BE_PrivateWindow_Destroy();
     BE_SpecificPlatformFunctions_Get().Destroy();
 
-    if (BE_EngineMemory_GetAllocatedBytes() > 0) {
-        BE_EngineMemory_MemoryInformation memoryInformation = BE_EngineMemory_GetMemoryInformation();
+    if (BE_PrivateDefaultPackage_IsOpen())
+        BE_PrivateDefaultPackage_Close();
 
-        SEC_LOGGER_WARN("Memory leak detected:\n"
+    if (BE_EngineMemoryInformation_GetAllocatedBytes() > 0) {
+        BE_EngineMemoryInformation memoryInformation = BE_EngineMemoryInformation_Get();
+
+        BA_LOGGER_WARN("Memory leak detected:\n"
                         "Leaked: %zu bytes\n"
                         "Command: %zu allocated, %zu bytes\n"
                         "UI: %zu allocated, %zu bytes\n"
                         "DynamicArray: %zu allocated, %zu bytes\n"
                         "Layer: %zu allocated, %zu bytes\n"
                         "Server: %zu allocated, %zu bytes\n",
-                        BE_EngineMemory_GetAllocatedBytes(),
+                        BE_EngineMemoryInformation_GetAllocatedBytes(),
                         memoryInformation.command.allocatedAmount, memoryInformation.command.allocatedBytes,
                         memoryInformation.ui.allocatedAmount, memoryInformation.ui.allocatedBytes,
                         memoryInformation.dynamicArray.allocatedAmount, memoryInformation.dynamicArray.allocatedBytes,
@@ -358,9 +352,9 @@ BE_DLLEXPORT int BE_EntryPoint_StartBaconEngine(void* engineBinary, void* client
     return 0;
 }
 
-BE_DLLEXPORT void I_EntryPoint_InitializeWrapper(void* engineBinary) {
+BE_BINARYEXPORT void I_EntryPoint_InitializeWrapper(void* engineBinary) {
     (void) engineBinary;
 
-    BE_ASSERT_ALWAYS("I am not a client\n");
+    BA_ASSERT_ALWAYS("I am not a client\n");
 }
-SEC_CPP_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

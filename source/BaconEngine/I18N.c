@@ -3,37 +3,64 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <SharedEngineCode/Debugging/StrictMode.h>
+#include <BaconAPI/Storage/DynamicDictionary.h>
 
 #include "BaconEngine/I18N.h"
-#include "BaconEngine/Debugging/StrictMode.h"
 #include "InterfaceFunctions.h"
+#include "BaconEngine/Configuration.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
-const char* BE_I18N_Translate(FILE* languageFile, const char* key) {
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
-    BE_STRICTMODE_CHECK(key[0] != '\0', key, "Key cannot be empty\n");
-    BE_STRICTMODE_CHECK(languageFile != NULL, key, "Language file cannot be null\n");
+static const char* BE_I18N_InternalTranslate(BA_DynamicDictionary* configuration, const char* key) {
+    if (configuration == NULL)
+        return key;
 
-    //char* line = NULL;
-    //size_t lineCap;
-    //ssize_t length;
-    //size_t keyLength = strlen(key);
-
-    // FIXME: getline is not a compliant function.
-    // TODO: Should we free line?
-    /*while ((length = getline(&line, &lineCap, languageFile)) != -1) {
-        if (length == 0 || length <= keyLength || line[keyLength] != '=' || memcmp(line, key, keyLength) != 0)
+    int index = 0;
+    char* value = NULL;
+    
+    for (; index < configuration->keys.used; index++) {
+        if (strcmp(BA_DYNAMICARRAY_GET_ELEMENT(char, configuration->keys, index), key) != 0) {
+            free(configuration->keys.internalArray[index]);
+            free(configuration->values.internalArray[index]);
             continue;
+        }
 
-        return line + keyLength + 1;
-    }*/
+        value = BA_DYNAMICARRAY_GET_ELEMENT(char, configuration->values, index);
+        break;
+    }
 
-    SEC_LOGGER_ERROR("Failed to translate: %s\n", key);
+    for (index++; index < configuration->keys.used; index++) {
+        free(configuration->keys.internalArray[index]);
+        free(configuration->values.internalArray[index]);
+    }
 
+    if (value != NULL)
+        return value;
+
+    BA_LOGGER_ERROR("Failed to translate: %s\n", key);
     return key;
+}
+#endif
+
+const char* BE_I18N_TranslateFromFile(FILE* languageFile, const char* key) {
+#ifndef BE_CLIENT_BINARY
+    SEC_STRICTMODE_CHECK(strlen(key) != 0, key, "Key cannot be empty\n");
+    SEC_STRICTMODE_CHECK(languageFile != NULL, key, "Language file cannot be null\n");
+    return BE_I18N_InternalTranslate(BE_Configuration_ParseFromFile(languageFile), key);
 #else
     BE_INTERFACEFUNCTION(const char*, FILE*, const char*);
     return function(languageFile, key);
 #endif
 }
-SEC_CPP_SUPPORT_GUARD_END()
+
+const char* BE_I18N_Translate(const char* buffer, const char* key) {
+#ifndef BE_CLIENT_BINARY
+    SEC_STRICTMODE_CHECK(strlen(key) != 0, key, "Key cannot be empty\n");
+    return BE_I18N_InternalTranslate(BE_Configuration_Parse(buffer), key);
+#else
+    BE_INTERFACEFUNCTION(const char*, const char*, const char*);
+    return function(buffer, key);
+#endif
+}
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

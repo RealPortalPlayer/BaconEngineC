@@ -6,31 +6,61 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
-#include <SharedEngineCode/Internal/Boolean.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/Boolean.h>
+#include <BaconAPI/String.h>
+#include <BaconAPI/Storage/DynamicDictionary.h>
 
-#include "BaconEngine/Storage/DynamicDictionary.h"
 #include "ArgumentManager.h"
-#include "BaconEngine/DllExport.h"
+#include "BaconEngine/BinaryExport.h"
+#include "BaconEngine/BinaryExport.h"
 #include "BaconEngine/Server/Client.h"
 
 // TODO: Validate that none of the commands go over this limit.
 
-#define BE_COMMAND_MAX_NAME_LENGTH 1024
-
-SEC_CPP_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     BE_COMMAND_FLAG_NULL,
+    
+    /**
+     * Requires cheats enabled to run this command.
+     * Clients can have cheats fake enabled, so don't trust any output from client-sided cheat commands
+     */
     BE_COMMAND_FLAG_CHEATS_ONLY,
+    
+    /**
+     * Can only be ran on the server, clients cannot run this command
+     */
     BE_COMMAND_FLAG_SERVER_ONLY = (1 << 1),
+    
+    /**
+     * Servers cannot run this command
+     */
     BE_COMMAND_FLAG_CLIENT_ONLY = (1 << 2),
-    BE_COMMAND_FLAGS_RAN_ON_SERVER = (1 << 3)
+    
+    /**
+     * The command is ran on the server.
+     * Useful for cheats only commands
+     */
+    BE_COMMAND_FLAGS_RAN_ON_SERVER = (1 << 3),
+    
+    /**
+     * Don't apply backslash, or quote parsing.
+     * Also disables any parsing errors
+     */
+    BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING = (1 << 4),
+    
+    /**
+     * Don't parse arguments at all.
+     * Use this if you don't use any of the parsed arguments
+     */
+    BE_COMMAND_FLAGS_NO_ARGUMENT_PARSING = (1 << 5)
 } BE_Command_Flags;
 
 typedef struct { // TODO: Client
     const char* fullInput;
     const char* unparsedArguments;
-    BE_DynamicDictionary arguments;
+    BA_DynamicDictionary arguments;
 
     /**
      * The client who ran the command.
@@ -40,25 +70,25 @@ typedef struct { // TODO: Client
 } BE_Command_Context;
 
 typedef struct {
-    const char* name;
-    SEC_Boolean required;
+    char* name;
+    BA_Boolean required;
 } BE_Command_Argument;
 
 typedef struct {
     const char* name;
     const char* description;
-    BE_DynamicArray arguments;
+    BA_DynamicArray arguments;
     BE_Command_Flags flags;
     void (*Run)(BE_Command_Context context);
 } BE_Command;
 
-BE_DLLEXPORT void BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context));
-BE_DLLEXPORT void BE_Command_AddArgument(const char* name, SEC_Boolean required);
+BE_BINARYEXPORT void BE_Command_Register(const char* name, const char* description, BE_Command_Flags flags, void (*Run)(BE_Command_Context context));
+BE_BINARYEXPORT void BE_Command_AddArgument(const char* name, BA_Boolean required);
 
 /**
  * Duplicates the previously added command
  * @param name Name for the duplicated command
  * @param description If this is NULL, then it will use the description of the previous command
  */
-BE_DLLEXPORT void BE_Command_DuplicatePrevious(const char* name, const char* description);
-SEC_CPP_SUPPORT_GUARD_END()
+BE_BINARYEXPORT void BE_Command_DuplicatePrevious(const char* name, const char* description);
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

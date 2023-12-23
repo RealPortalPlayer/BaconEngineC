@@ -6,14 +6,14 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/OperatingSystem.h>
+#include <BaconAPI/Internal/OperatingSystem.h>
 
 #ifndef BE_CLIENT_BINARY
-#   if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
-#       define BE_DLLEXPORT __attribute__((visibility("default")))
-#   elif SEC_OPERATINGSYSTEM_WINDOWS
-#       define BE_DLLEXPORT __declspec(dllexport)
+#   if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
+#       define BE_BINARYEXPORT __attribute__((visibility("default")))
+#   elif BA_OPERATINGSYSTEM_WINDOWS
+#       define BE_BINARYEXPORT __declspec(dllexport)
 #   endif
 #else
-#   define BE_DLLEXPORT
+#   define BE_BINARYEXPORT
 #endif

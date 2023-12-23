@@ -1,6 +1,15 @@
 project(BaconLauncher C)
 
 add_executable(BaconLauncher Main.c)
+
+if(NOT BE_DISABLE_PEDANTIC_MODE)
+    if(MSVC)
+        target_compile_options(BaconLauncher PRIVATE /W4 /WX)
+    else()
+        target_compile_options(BaconLauncher PRIVATE -Wall -Wpedantic -Werror)
+    endif()
+endif()
+
 target_link_libraries(BaconLauncher LINK_PRIVATE SharedEngineCode)
 
 if(NOT BE_DONT_SET_BINARY_OUTPUT_PATH)
@@ -9,3 +18,11 @@ if(NOT BE_DONT_SET_BINARY_OUTPUT_PATH)
 endif()
 
 target_compile_definitions(BaconLauncher PUBLIC BE_ENGINE_VERSION="${BE_ENGINE_VERSION}" BE_LAUNCHER_VERSION="${BE_LAUNCHER_VERSION}")
+
+if(EMSCRIPTEN)
+    set_target_properties(BaconLauncher PROPERTIES LINK_FLAGS "-sMAIN_MODULE=1")
+endif()
+
+if(WIN32)
+    include(BaconLauncherWindows.cmake)
+endif()

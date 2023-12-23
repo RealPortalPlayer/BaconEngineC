@@ -12,29 +12,30 @@
 
 #define I_INCLUDED_THE_ENTRY_POINT
 
-#include <SharedEngineCode/Internal/CppSupport.h>
-#include <SharedEngineCode/Internal/Boolean.h>
-#include <SharedEngineCode/Internal/OperatingSystem.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/Boolean.h>
+#include <BaconAPI/Internal/OperatingSystem.h>
+#include <BaconAPI/String.h>
 
-#if SEC_OPERATINGSYSTEM_POSIX_COMPLIANT
-#   define I_DLLEXPORT __attribute__((visibility("default")))
-#elif SEC_OPERATINGSYSTEM_WINDOWS
-#   define I_DLLEXPORT __declspec(dllexport)
+#if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
+#   define I_BINARYEXPORT __attribute__((visibility("default")))
+#elif BA_OPERATINGSYSTEM_WINDOWS
+#   define I_BINARYEXPORT __declspec(dllexport)
 #endif
 
-SEC_CPP_SUPPORT_GUARD_START()
-void I_EntryPoint_Initialize(void* binary, int argc, char** argv);
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
+void I_EntryPoint_Initialize(const char* launcherPath, const char* enginePath, const char* clientPath, void* binary, int argc, char** argv);
 
-I_DLLEXPORT void I_EntryPoint_InitializeWrapper(void* binary, int argc, char** argv) {
-    I_EntryPoint_Initialize(binary, argc, argv);
+I_BINARYEXPORT void I_EntryPoint_InitializeWrapper(const char* launcherPath, const char* enginePath, const char* clientPath, void* binary, int argc, char** argv) {
+    I_EntryPoint_Initialize(launcherPath, enginePath, clientPath, binary, argc, argv);
 }
 
-I_DLLEXPORT const char* I_EntryPoint_GetEngineVersion(void) {
+I_BINARYEXPORT const char* I_EntryPoint_GetEngineVersion(void) {
     return BE_ENGINE_VERSION;
 }
 
-I_DLLEXPORT int I_EntryPoint_Start(int argc, char** argv);
-I_DLLEXPORT int I_EntryPoint_Shutdown(void);
-I_DLLEXPORT SEC_Boolean I_EntryPoint_SupportsServer(void);
-I_DLLEXPORT const char* I_EntryPoint_GetName(void);
-SEC_CPP_SUPPORT_GUARD_END()
+I_BINARYEXPORT int I_EntryPoint_Start(int argc, char** argv);
+I_BINARYEXPORT int I_EntryPoint_Shutdown(void);
+I_BINARYEXPORT BA_Boolean I_EntryPoint_SupportsServer(void);
+I_BINARYEXPORT const char* I_EntryPoint_GetName(void);
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

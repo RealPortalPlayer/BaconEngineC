@@ -1,19 +1,19 @@
 // Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include "SharedEngineCode/MessageBox.h"
-#include "SharedEngineCode/Internal/OperatingSystem.h"
-#include "SharedEngineCode/Internal/CppSupport.h"
+#include <BaconAPI/Internal/OperatingSystem.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/String.h>
 
-#if SEC_OPERATINGSYSTEM_WINDOWS
+#include "SharedEngineCode/MessageBox.h"
+
+#if BA_OPERATINGSYSTEM_WINDOWS
 #   include <Windows.h>
 #endif
 
-// TODO: This code is very ugly, and platform specific.
-
-SEC_CPP_SUPPORT_GUARD_START()
-SEC_MessageBox_Results SEC_MessageBox_Display(const char* message, const char* caption, SEC_MessageBox_Icons icon, SEC_MessageBox_Buttons buttons) {
-#if SEC_OPERATINGSYSTEM_WINDOWS
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
+SEC_MessageBox_Results SEC_MessageBox_Display(SEC_MessageBox_Icons icon, SEC_MessageBox_Buttons buttons, const char* caption, const char* message, ...) {
+#if BA_OPERATINGSYSTEM_WINDOWS
     UINT flags = MB_OK;
 
     switch (icon) {
@@ -32,10 +32,22 @@ SEC_MessageBox_Results SEC_MessageBox_Display(const char* message, const char* c
         case SEC_MESSAGEBOX_BUTTON_RETRY_CANCEL:              flags |= MB_RETRYCANCEL; break;
         case SEC_MESSAGEBOX_BUTTON_CANCEL_TRY_AGAIN_CONTINUE: flags |= MB_CANCELTRYCONTINUE; break;
     }
+    
+    va_list arguments;
+    char* messageClone = BA_String_Copy(message);
 
-    return MessageBox(NULL, message, caption, flags);
+    if (messageClone != NULL) {
+        va_start(arguments, message);
+        BA_String_FormatPremadeList(&messageClone, arguments);
+        va_end(arguments);   
+    }
+    
+    SEC_MessageBox_Results result = MessageBox(NULL, messageClone != NULL ? messageClone : message, caption, flags);
+
+    free(messageClone);
+    return result;
 #else // TODO: Everything else.
     return 0;
 #endif
 }
-SEC_CPP_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

@@ -1,61 +1,47 @@
 // Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#include <SharedEngineCode/ArgumentHandler.h>
-#include <SharedEngineCode/Logger.h>
+#include <BaconAPI/ArgumentHandler.h>
+#include <BaconAPI/Logger.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 
 #include "BaconEngine/ClientInformation.h"
 #include "InterfaceFunctions.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
-static SEC_Boolean beClientInformationRunning = SEC_TRUE;
-static SEC_Boolean beClientInformationCheats = SEC_FALSE;
+static BA_Boolean beClientInformationRunning = BA_BOOLEAN_TRUE;
+static BA_Boolean beClientInformationCheats = BA_BOOLEAN_FALSE;
 #endif
 
-SEC_Boolean BE_ClientInformation_IsRunning(void) {
+BA_Boolean BE_ClientInformation_IsRunning(void) {
 #ifndef BE_CLIENT_BINARY
     return beClientInformationRunning;
 #else
-    BE_INTERFACEFUNCTION(SEC_Boolean, void);
+    BE_INTERFACEFUNCTION(BA_Boolean, void);
     return function();
 #endif
 }
 
-SEC_Boolean BE_ClientInformation_IsCheatsEnabled(void) {
+BA_Boolean BE_ClientInformation_IsCheatsEnabled(void) {
 #ifndef BE_CLIENT_BINARY
     return beClientInformationCheats;
 #else
-    BE_INTERFACEFUNCTION(SEC_Boolean, void);
+    BE_INTERFACEFUNCTION(BA_Boolean, void);
     return function();
 #endif
 }
 
-SEC_Boolean BE_ClientInformation_IsServerModeEnabled(void) {
+BA_Boolean BE_ClientInformation_IsServerModeEnabled(void) {
 #ifndef BE_CLIENT_BINARY
     static int enabled = -1;
 
     if (enabled == -1)
-        enabled = SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_SERVER, SEC_BUILTINARGUMENTS_SERVER_SHORT, 0);
+        enabled = BA_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_SERVER, SEC_BUILTINARGUMENTS_SERVER_SHORT, 0);
 
     return enabled;
 #else
-    BE_INTERFACEFUNCTION(SEC_Boolean, void);
-    return function();
-#endif
-}
-
-SEC_Boolean BE_ClientInformation_IsStrictModeEnabled(void) {
-#ifndef BE_CLIENT_BINARY
-    static int enabled = -1;
-
-    if (enabled == -1)
-        enabled = !SEC_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_NO_STRICT, SEC_BUILTINARGUMENTS_NO_STRICT_SHORT, 0);
-
-    return enabled;
-#else
-    BE_INTERFACEFUNCTION(SEC_Boolean, void);
+    BE_INTERFACEFUNCTION(BA_Boolean, void);
     return function();
 #endif
 }
@@ -63,21 +49,21 @@ SEC_Boolean BE_ClientInformation_IsStrictModeEnabled(void) {
 void BE_ClientInformation_StopRunning(void) {
 #ifndef BE_CLIENT_BINARY
     if (!beClientInformationRunning) {
-        SEC_LOGGER_WARN("Client is already stopping\n");
+        BA_LOGGER_WARN("Client is already stopping\n");
         return;
     }
 
-    beClientInformationRunning = SEC_FALSE;
+    beClientInformationRunning = BA_BOOLEAN_FALSE;
 #else
     BE_INTERFACEFUNCTION(void, void)();
 #endif
 }
 
-void BE_ClientInformation_SetCheats(SEC_Boolean enable) {
+void BE_ClientInformation_SetCheats(BA_Boolean enable) {
 #ifndef BE_CLIENT_BINARY
     beClientInformationCheats = enable;
 #else
-    BE_INTERFACEFUNCTION(void, SEC_Boolean)(enable);
+    BE_INTERFACEFUNCTION(void, BA_Boolean)(enable);
 #endif
 }
-SEC_CPP_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

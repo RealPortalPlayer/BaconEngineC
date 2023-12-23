@@ -3,26 +3,26 @@
 
 #include "WindowsRenderer.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 void BE_WindowsRenderer_CompileShaders(void) {
 
 }
 
 void BE_WindowsRenderer_ClearScreen(void) {}
 
-void BE_WindowsRenderer_SetClearColor(BE_Color_3U color) {
+void BE_WindowsRenderer_SetClearColor(BE_Color3_Unsigned color) {
     (void) color;
 }
 
-BE_Color_3U BE_WindowsRenderer_GetClearColor(void) {
-    return SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Color_3U, 0, 0, 0);
+BE_Color3_Unsigned BE_WindowsRenderer_GetClearColor(void) {
+    return BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Color3_Unsigned, 0, 0, 0);
 }
 
 void BE_WindowsRenderer_Render(void) {}
 
-void BE_WindowsRenderer_DrawFilledRectangle(BE_Vector_2I position, BE_Vector_2U size, BE_Color_4U color) {
+void BE_WindowsRenderer_DrawFilledRectangle(BE_Vector2_Integer position, BE_Vector2_Unsigned size, BE_Color4_Unsigned color) {
     (void) position;
     (void) size;
     (void) color;
 }
-SEC_CPP_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

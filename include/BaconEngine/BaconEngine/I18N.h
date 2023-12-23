@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
 #include <stdio.h>
+#include <BaconAPI/String.h>
 
-#include "DllExport.h"
+#include "BinaryExport.h"
 
-// TODO: Variables.
-
-SEC_CPP_SUPPORT_GUARD_START()
-BE_DLLEXPORT const char* BE_I18N_Translate(FILE* languageFile, const char* key);
-SEC_CPP_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
+BE_BINARYEXPORT const char* BE_I18N_TranslateFromFile(FILE* languageFile, const char* key);
+BE_BINARYEXPORT const char* BE_I18N_Translate(const char* buffer, const char* key);
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

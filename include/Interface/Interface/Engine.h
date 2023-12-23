@@ -6,8 +6,11 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/PlatformSpecific.h>
 
-SEC_CPP_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 void* I_Engine_GetBinary(void);
-SEC_CPP_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()
+
+#define I_ENGINE_FUNCTION_EXISTS(functionName) BA_PLATFORMSPECIFIC_GET_ADDRESS(I_Engine_GetBinary(), functionName) != NULL

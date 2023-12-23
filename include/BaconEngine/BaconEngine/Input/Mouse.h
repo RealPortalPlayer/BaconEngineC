@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
-#include <SharedEngineCode/Internal/Boolean.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/Boolean.h>
 
-#include "BaconEngine/DllExport.h"
+#include "BaconEngine/BinaryExport.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     BE_MOUSE_BUTTON_TYPE_FIRST = 1,
     BE_MOUSE_BUTTON_TYPE_SECOND,
@@ -24,5 +24,5 @@ typedef enum {
     BE_MOUSE_BUTTON_TYPE_RIGHT = BE_MOUSE_BUTTON_TYPE_SECOND
 } BE_Mouse_ButtonType;
 
-BE_DLLEXPORT SEC_Boolean BE_Mouse_IsButtonDown(BE_Mouse_ButtonType button);
-SEC_CPP_SUPPORT_GUARD_END()
+BE_BINARYEXPORT BA_Boolean BE_Mouse_IsButtonDown(BE_Mouse_ButtonType button);
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

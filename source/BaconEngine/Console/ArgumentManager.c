@@ -3,25 +3,22 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <SharedEngineCode/StringExtension.h>
+#include <limits.h>
 
 #include "BaconEngine/Console/ArgumentManager.h"
 #include "../InterfaceFunctions.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
-static int BE_ArgumentManager_EqualsStringBoolean(char* value) {
-    if (SEC_StringExtension_CompareCaseless(value, "true") == 0)
-        return 2;
-
-    return SEC_StringExtension_CompareCaseless(value, "false") == 0 ? 1 : 0;
+static int BE_ArgumentManager_EqualsStringBoolean(const char* value) {
+    return BA_String_Equals(value, "true", BA_BOOLEAN_TRUE) ? 2 : BA_String_Equals(value, "false", BA_BOOLEAN_TRUE);
 }
 #endif
 
-int BE_ArgumentManager_GetInt(BE_DynamicDictionary arguments, const char* name, int defaultValue) {
+int BE_ArgumentManager_GetInteger(BA_DynamicDictionary arguments, const char* name, int defaultValue) {
 #ifndef BE_CLIENT_BINARY
     if (arguments.keys.size != 0) {
-        char* value = (char*) BE_ArgumentManager_GetString(arguments, name, "");
+        const char* value = BE_ArgumentManager_GetString(arguments, name, "");
         {
             int parsedValue = BE_ArgumentManager_EqualsStringBoolean(value);
 
@@ -30,32 +27,32 @@ int BE_ArgumentManager_GetInt(BE_DynamicDictionary arguments, const char* name, 
         }
 
         char* errored;
-        int parsedValue = (int) strtol(value, &errored, 0); // FIXME: This isn't a good idea.
+        long parsedValue = strtol(value, &errored, 0);
 
-        if (errored == NULL || strlen(errored) == 0)
-            return parsedValue;
+        if (errored == NULL || strlen(errored) == 0 || parsedValue <= INT_MAX)
+            return (int) parsedValue;
     }
 
     return defaultValue;
 #else
-    BE_INTERFACEFUNCTION(int, BE_DynamicDictionary, const char*, int);
+    BE_INTERFACEFUNCTION(int, BA_DynamicDictionary, const char*, int);
     return function(arguments, name, defaultValue);
 #endif
 }
 
-SEC_Boolean BE_ArgumentManager_GetBoolean(BE_DynamicDictionary arguments, const char* name, int defaultValue) {
+BA_Boolean BE_ArgumentManager_GetBoolean(BA_DynamicDictionary arguments, const char* name, int defaultValue) {
 #ifndef BE_CLIENT_BINARY
-    return BE_ArgumentManager_GetInt(arguments, name, defaultValue) >= 1;
+    return BE_ArgumentManager_GetInteger(arguments, name, defaultValue) >= 1;
 #else
-    BE_INTERFACEFUNCTION(SEC_Boolean, BE_DynamicDictionary, const char*, int);
+    BE_INTERFACEFUNCTION(BA_Boolean, BA_DynamicDictionary, const char*, int);
     return function(arguments, name, defaultValue);
 #endif
 }
 
-float BE_ArgumentManager_GetFloat(BE_DynamicDictionary arguments, const char* name, float defaultValue) {
+float BE_ArgumentManager_GetFloat(BA_DynamicDictionary arguments, const char* name, float defaultValue) {
 #ifndef BE_CLIENT_BINARY
     if (arguments.keys.size != 0) {
-        char* value = (char*) BE_ArgumentManager_GetString(arguments, name, "");
+        const char* value = BE_ArgumentManager_GetString(arguments, name, "");
         {
             int parsedValue = BE_ArgumentManager_EqualsStringBoolean(value);
 
@@ -72,20 +69,19 @@ float BE_ArgumentManager_GetFloat(BE_DynamicDictionary arguments, const char* na
 
     return defaultValue;
 #else
-    BE_INTERFACEFUNCTION(float, BE_DynamicDictionary, const char*, float);
+    BE_INTERFACEFUNCTION(float, BA_DynamicDictionary, const char*, float);
     return function(arguments, name, defaultValue);
 #endif
 }
 
-const char* BE_ArgumentManager_GetString(BE_DynamicDictionary arguments, const char* name, const char* defaultValue) {
+const char* BE_ArgumentManager_GetString(BA_DynamicDictionary arguments, const char* name, const char* defaultValue) {
 #ifndef BE_CLIENT_BINARY
-    const char* value = BE_DynamicDictionary_GetElementValueViaKey(arguments, (void *) name,
-                                                                   sizeof(char) * strlen(name) + 1);
+    const char* value = BA_DynamicDictionary_GetElementValueViaKey(&arguments, (void*) name, sizeof(char) + strlen(name));
 
     return value != NULL ? value : defaultValue;
 #else
-    BE_INTERFACEFUNCTION(const char*, BE_DynamicDictionary, const char*, const char*);
+    BE_INTERFACEFUNCTION(const char*, BA_DynamicDictionary, const char*, const char*);
     return function(arguments, name, defaultValue);
 #endif
 }
-SEC_CPP_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

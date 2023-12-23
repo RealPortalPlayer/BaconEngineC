@@ -6,14 +6,15 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/String.h>
+#include <BaconAPI/Storage/DynamicArray.h>
 
 #include "BaconEngine/Math/Vector.h"
 #include "BaconEngine/Event.h"
-#include "BaconEngine/Storage/DynamicArray.h"
-#include "BaconEngine/DllExport.h"
+#include "BaconEngine/BinaryExport.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 struct BE_UI_Element;
 
 typedef struct {
@@ -23,10 +24,10 @@ typedef struct {
 
 typedef struct BE_UI_Element {
     BE_UI_ElementFunctions functions;
-    BE_Vector_2U position;
-    BE_Vector_2U size;
-    SEC_Boolean enabled;
-    BE_DynamicArray elements;
+    BE_Vector2_Unsigned position;
+    BE_Vector2_Unsigned size;
+    BA_Boolean enabled;
+    BA_DynamicArray elements;
 } BE_UI_Element;
 
 typedef enum {
@@ -42,15 +43,15 @@ typedef enum {
     BE_UI_WINDOW_FLAG_MAXIMIZED = (1 << 8)
 } BE_UI_WindowFlags;
 
-BE_DLLEXPORT const char* BE_UI_GetWindowName(int windowId);
-BE_DLLEXPORT SEC_Boolean BE_UI_IsWindowStillOpen(int windowId);
-BE_DLLEXPORT BE_DynamicArray* BE_UI_GetWindowElements(int windowId);
-BE_DLLEXPORT int BE_UI_GetWindowAmount(void);
-BE_DLLEXPORT int BE_UI_GetAllocatedWindowsAmount(void);
-BE_DLLEXPORT int BE_UI_GetWindowReallocationAmount(void);
+BE_BINARYEXPORT const char* BE_UI_GetWindowName(int windowId);
+BE_BINARYEXPORT BA_Boolean BE_UI_IsWindowStillOpen(int windowId);
+BE_BINARYEXPORT BA_DynamicArray* BE_UI_GetWindowElements(int windowId);
+BE_BINARYEXPORT int BE_UI_GetWindowAmount(void);
+BE_BINARYEXPORT int BE_UI_GetAllocatedWindowsAmount(void);
+BE_BINARYEXPORT int BE_UI_GetWindowReallocationAmount(void);
 
-BE_DLLEXPORT int BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector_2I position, BE_Vector_2U size);
-BE_DLLEXPORT SEC_Boolean BE_UI_RegisterElement(int windowId, BE_UI_Element* element);
-BE_DLLEXPORT SEC_Boolean BE_UI_ToggleWindowFlag(int windowId, BE_UI_WindowFlags flag, SEC_Boolean toggle);
-BE_DLLEXPORT SEC_Boolean BE_UI_SetActiveWindow(int windowId);
-SEC_CPP_SUPPORT_GUARD_END()
+BE_BINARYEXPORT int BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector2_Integer position, BE_Vector2_Unsigned size);
+BE_BINARYEXPORT BA_Boolean BE_UI_RegisterElement(int windowId, BE_UI_Element* element);
+BE_BINARYEXPORT BA_Boolean BE_UI_ToggleWindowFlag(int windowId, BE_UI_WindowFlags flag, BA_Boolean toggle);
+BE_BINARYEXPORT BA_Boolean BE_UI_SetActiveWindow(int windowId);
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

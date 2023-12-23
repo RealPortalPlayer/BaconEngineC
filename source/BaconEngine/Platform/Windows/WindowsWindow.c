@@ -2,11 +2,11 @@
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <Windows.h>
+#include <BaconAPI/Debugging/Assert.h>
 
 #include "WindowsWindow.h"
-#include "BaconEngine/Debugging/Assert.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 HWND beWindowsWindowHandle;
 const char beWindowsWindowClassName[] = "BaconEngineSoftwareWindow";
 
@@ -35,7 +35,7 @@ void* BE_WindowsWindow_GetInternal(void) {
     return beWindowsWindowHandle;
 }
 
-void BE_WindowsWindow_Create(const char* title, BE_Vector_2U size, int monitor) {
+void BE_WindowsWindow_Create(const char* title, BE_Vector2_Unsigned size, int monitor) {
     HINSTANCE instance = GetModuleHandle(0);
 
     (void) monitor;
@@ -55,50 +55,57 @@ void BE_WindowsWindow_Create(const char* title, BE_Vector_2U size, int monitor) 
         LoadIcon(NULL, IDI_APPLICATION)
     };
 
-    BE_ASSERT(RegisterClassEx(&windowClass), "Failed to register window class: %u\n", GetLastError());
+    BA_ASSERT(RegisterClassEx(&windowClass), "Failed to register window class: %u\n", GetLastError());
 
     beWindowsWindowHandle = CreateWindowEx(WS_EX_CLIENTEDGE, beWindowsWindowClassName, title, WS_OVERLAPPEDWINDOW,
                                            CW_USEDEFAULT, CW_USEDEFAULT, (int) size.x, (int) size.y, NULL, NULL, instance, NULL);
 
-    BE_ASSERT(beWindowsWindowHandle != NULL, "Failed to create window: %u\n", GetLastError());
+    BA_ASSERT(beWindowsWindowHandle != NULL, "Failed to create window: %u\n", GetLastError());
     ShowWindow(beWindowsWindowHandle, SW_SHOW);
     UpdateWindow(beWindowsWindowHandle);
 }
 
 const char* BE_WindowsWindow_GetTitle(void) {
-    char* title;
+    static char* title = NULL;
     int length = GetWindowTextLength(beWindowsWindowHandle);
 
-    // FIXME: Is this a memory leak?
-    title = VirtualAlloc(NULL, length + 1, MEM_COMMIT, PAGE_READWRITE);
+    {
+        char* newTitle = VirtualAlloc(NULL, length + 1, MEM_COMMIT, PAGE_READWRITE);
 
-    GetWindowText(beWindowsWindowHandle, title, length + 1);
+        GetWindowText(beWindowsWindowHandle, newTitle, length + 1);
+
+        if (title == NULL || strcmp(title, newTitle) != 0)
+            title = newTitle;
+        else
+            VirtualFree(newTitle, 0, MEM_RELEASE);
+    }
+    
 
     return title;
 }
 
-BE_Vector_2U BE_WindowsWindow_GetSize(void) {
-    RECT rectangle = SEC_CPP_SUPPORT_CREATE_STRUCT(RECT, 0);
+BE_Vector2_Unsigned BE_WindowsWindow_GetSize(void) {
+    RECT rectangle = BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(RECT, 0);
 
     GetWindowRect(beWindowsWindowHandle, &rectangle);
 
-    return SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2U, rectangle.right - rectangle.left,
+    return BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, rectangle.right - rectangle.left,
                                                        rectangle.bottom - rectangle.top);
 }
 
-BE_Vector_2I BE_WindowsWindow_GetPosition(void) {
-    RECT rectangle = SEC_CPP_SUPPORT_CREATE_STRUCT(RECT, 0);
+BE_Vector2_Integer BE_WindowsWindow_GetPosition(void) {
+    RECT rectangle = BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(RECT, 0);
 
     GetWindowRect(beWindowsWindowHandle, &rectangle);
 
-    return SEC_CPP_SUPPORT_CREATE_STRUCT(BE_Vector_2I, rectangle.left, rectangle.top);
+    return BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer, rectangle.left, rectangle.top);
 }
 
-SEC_Boolean BE_WindowsWindow_IsVisible(void) {
+BA_Boolean BE_WindowsWindow_IsVisible(void) {
     return IsWindowVisible(beWindowsWindowHandle);
 }
 
-SEC_Boolean BE_WindowsWindow_IsStillOpened(void) {
+BA_Boolean BE_WindowsWindow_IsStillOpened(void) {
     return beWindowsWindowHandle != NULL;
 }
 
@@ -106,19 +113,19 @@ void BE_WindowsWindow_SetTitle(const char* title) {
     SetWindowText(beWindowsWindowHandle, title);
 }
 
-void BE_WindowsWindow_SetSize(BE_Vector_2U newSize) {
-    BE_Vector_2I position = BE_WindowsWindow_GetPosition();
+void BE_WindowsWindow_SetSize(BE_Vector2_Unsigned newSize) {
+    BE_Vector2_Integer position = BE_WindowsWindow_GetPosition();
 
     SetWindowPos(beWindowsWindowHandle, HWND_TOP, position.x, position.y, (int) newSize.x, (int) newSize.y, SWP_NOOWNERZORDER);
 }
 
-void BE_WindowsWindow_SetPosition(BE_Vector_2I newPosition) {
-    BE_Vector_2U size = BE_WindowsWindow_GetSize();
+void BE_WindowsWindow_SetPosition(BE_Vector2_Integer newPosition) {
+    BE_Vector2_Unsigned size = BE_WindowsWindow_GetSize();
 
     SetWindowPos(beWindowsWindowHandle, HWND_TOP, newPosition.x, newPosition.y, (int) size.x, (int) size.y, SWP_NOOWNERZORDER);
 }
 
-void BE_WindowsWindow_SetVisibility(SEC_Boolean visible) {
+void BE_WindowsWindow_SetVisibility(BA_Boolean visible) {
     ShowWindow(beWindowsWindowHandle, visible ? SW_SHOW : SW_HIDE);
 }
 
@@ -134,4 +141,4 @@ void BE_WindowsWindow_UpdateEvents(void) {
         DispatchMessage(&message);
     }
 }
-SEC_CPP_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

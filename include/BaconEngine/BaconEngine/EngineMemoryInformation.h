@@ -6,25 +6,25 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
 #include <stddef.h>
 
-#include "DllExport.h"
+#include "BinaryExport.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef struct {
     size_t allocatedBytes;
     size_t allocatedAmount;
-} BE_EngineMemory_MemoryTypeInformation;
+} BE_EngineMemoryInformation_MemoryType;
 
 typedef struct {
-    BE_EngineMemory_MemoryTypeInformation command;
-    BE_EngineMemory_MemoryTypeInformation ui;
-    BE_EngineMemory_MemoryTypeInformation dynamicArray;
-    BE_EngineMemory_MemoryTypeInformation layer;
-    BE_EngineMemory_MemoryTypeInformation server;
-} BE_EngineMemory_MemoryInformation;
+    BE_EngineMemoryInformation_MemoryType command;
+    BE_EngineMemoryInformation_MemoryType ui;
+    BE_EngineMemoryInformation_MemoryType dynamicArray;
+    BE_EngineMemoryInformation_MemoryType layer;
+    BE_EngineMemoryInformation_MemoryType server;
+} BE_EngineMemoryInformation;
 
-BE_DLLEXPORT BE_EngineMemory_MemoryInformation BE_EngineMemory_GetMemoryInformation(void);
-BE_DLLEXPORT size_t BE_EngineMemory_GetAllocatedBytes(void);
-SEC_CPP_SUPPORT_GUARD_END()
+BE_BINARYEXPORT BE_EngineMemoryInformation BE_EngineMemoryInformation_Get(void);
+BE_BINARYEXPORT size_t BE_EngineMemoryInformation_GetAllocatedBytes(void);
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

@@ -1,14 +1,14 @@
 // Purpose: Allows you to show a messagebox.
 // Created on: 10/18/22 @ 4:21 PM
 
-// Copyright (c) 2022, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
 
-#include "Internal/CppSupport.h"
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
 
-SEC_CPP_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     SEC_MESSAGEBOX_BUTTON_OK,
     SEC_MESSAGEBOX_BUTTON_OK_CANCEL,
@@ -38,5 +38,5 @@ typedef enum {
     SEC_MESSAGEBOX_RESULT_CONTINUE
 } SEC_MessageBox_Results;
 
-SEC_MessageBox_Results SEC_MessageBox_Display(const char* message, const char* caption, SEC_MessageBox_Icons icon, SEC_MessageBox_Buttons buttons);
-SEC_CPP_SUPPORT_GUARD_END()
+SEC_MessageBox_Results SEC_MessageBox_Display(SEC_MessageBox_Icons icon, SEC_MessageBox_Buttons buttons, const char* caption, const char* message, ...);
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

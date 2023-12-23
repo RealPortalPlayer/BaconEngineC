@@ -3,15 +3,15 @@
 
 #pragma once
 
-#include <SharedEngineCode/Internal/CppSupport.h>
-#include <SharedEngineCode/Internal/Boolean.h>
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/Boolean.h>
 
-#include "BaconEngine/DllExport.h"
+#include "BaconEngine/BinaryExport.h"
 
-SEC_CPP_SUPPORT_GUARD_START()
-BE_DLLEXPORT SEC_Boolean BE_Server_IsRunning(void);
-BE_DLLEXPORT unsigned BE_Server_GetPort(void);
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
+BE_BINARYEXPORT BA_Boolean BE_Server_IsRunning(void);
+BE_BINARYEXPORT unsigned BE_Server_GetPort(void);
 
-BE_DLLEXPORT void BE_Server_Start(unsigned port);
-BE_DLLEXPORT void BE_Server_Stop(void);
-SEC_CPP_SUPPORT_GUARD_END()
+BE_BINARYEXPORT void BE_Server_Start(unsigned port);
+BE_BINARYEXPORT void BE_Server_Stop(void);
+BA_CPLUSPLUS_SUPPORT_GUARD_END()

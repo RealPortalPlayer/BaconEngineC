@@ -3,18 +3,19 @@
 #include <errno.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <SharedEngineCode/Debugging/StrictMode.h>
 
 #include "BaconEngine/Server/Server.h"
-#include "BaconEngine/Debugging/StrictMode.h"
 #include "BaconEngine/Server/Client.h"
 #include "../InterfaceFunctions.h"
+#include "BaconEngine/ClientInformation.h"
 
 #ifndef BE_CLIENT_BINARY
 #   include "../EngineMemory.h"
 #   include "PrivateServer.h"
 #endif
 
-SEC_CPP_SUPPORT_GUARD_START()
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
 static int beServerSocket = -1;
 static unsigned beServerPort;
@@ -23,11 +24,11 @@ static int beServerConnectedAmount;
 static int beServerMaxPlayers;
 #endif
 
-SEC_Boolean BE_Server_IsRunning(void) {
+BA_Boolean BE_Server_IsRunning(void) {
 #ifndef BE_CLIENT_BINARY
     return beServerSocket != -1;
 #else
-    BE_INTERFACEFUNCTION(SEC_Boolean, void);
+    BE_INTERFACEFUNCTION(BA_Boolean, void);
     return function();
 #endif
 }
@@ -49,9 +50,9 @@ int BE_PrivateServer_GetSocketDescriptor(void) {
 
 void BE_Server_Start(unsigned port) {
 #ifndef BE_CLIENT_BINARY
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket == -1, "Server is already running\n");
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(BE_ClientInformation_IsServerModeEnabled(), "Cannot start a server on a non-server client\n");
-    SEC_LOGGER_INFO("Starting server\n");
+    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket == -1, "Server is already running\n");
+    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(BE_ClientInformation_IsServerModeEnabled(), "Cannot start a server on a non-server client\n");
+    BA_LOGGER_INFO("Starting server\n");
 
     // TODO: Custom max players
 
@@ -61,7 +62,7 @@ void BE_Server_Start(unsigned port) {
     beServerSocket = socket(AF_INET, SOCK_STREAM, 0);
     beServerPort = port;
 
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket != -1, "Failed to create socket: %s\n", strerror(errno));
+    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket != -1, "Failed to create socket: %s\n", strerror(errno));
 
     struct sockaddr_in serverAddress;
 
@@ -71,9 +72,9 @@ void BE_Server_Start(unsigned port) {
     serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
     serverAddress.sin_port = htons(beServerPort);
 
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(bind(beServerSocket, (struct sockaddr*) &serverAddress, sizeof(serverAddress)) == 0,
+    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(bind(beServerSocket, (struct sockaddr*) &serverAddress, sizeof(serverAddress)) == 0,
                                         "Failed to bind to socket: %s\n", strerror(errno));
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(listen(beServerSocket, 5) == 0, "Failed to listen to socket: %s\n", strerror(errno));
+    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(listen(beServerSocket, 5) == 0, "Failed to listen to socket: %s\n", strerror(errno));
 #else
     BE_INTERFACEFUNCTION(void, unsigned)(port);
 #endif
@@ -96,8 +97,8 @@ void BE_PrivateServer_AddConnection(int clientDescriptor) {
 
 void BE_Server_Stop(void) {
 #ifndef BE_CLIENT_BINARY
-    BE_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket != -1, "Server is not running\n");
-    SEC_LOGGER_INFO("Closing server\n");
+    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket != -1, "Server is not running\n");
+    BA_LOGGER_INFO("Closing server\n");
 
     // TODO: Kick clients
 
@@ -108,4 +109,4 @@ void BE_Server_Stop(void) {
     BE_INTERFACEFUNCTION(void, void)();
 #endif
 }
-SEC_CPP_SUPPORT_GUARD_END()
+BA_CPLUSPLUS_SUPPORT_GUARD_END()
