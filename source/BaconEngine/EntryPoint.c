@@ -85,7 +85,7 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
     }
 }
 
-void BE_EntryPoint_CommandThreadFunction(void) {
+void* BE_EntryPoint_CommandThreadFunction(BA_Thread_ArgumentType argument) {
     commandThreadRunning = BA_BOOLEAN_TRUE;
 
     // FIXME: Find out why this is not working on Serenity.
@@ -124,9 +124,10 @@ void BE_EntryPoint_CommandThreadFunction(void) {
     }
 
     commandThreadRunning = BA_BOOLEAN_FALSE;
+    return NULL;
 }
 
-void BE_EntryPoint_ServerThreadFunction(void) {
+void* BE_EntryPoint_ServerThreadFunction(BA_Thread_ArgumentType argument) {
     fcntl(BE_PrivateServer_GetSocketDescriptor(), F_SETFL, O_NONBLOCK);
 
     while (BE_ClientInformation_IsRunning()) {
@@ -146,11 +147,13 @@ void BE_EntryPoint_ServerThreadFunction(void) {
         if (fork() != 0) {
             close(BE_PrivateServer_GetSocketDescriptor());
             BE_PrivateServer_AddConnection(connectionDescriptor);
-            return;
+            return NULL;
         }
 
         close(connectionDescriptor);
     }
+    
+    return NULL;
 }
 
 BE_BINARYEXPORT const char* BE_EntryPoint_GetVersion(void) {
@@ -280,10 +283,10 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     BA_Thread commandThread;
     BA_Thread serverThread;
 
-    BA_Thread_Create(&commandThread, &BE_EntryPoint_CommandThreadFunction);
+    BA_Thread_Create(&commandThread, &BE_EntryPoint_CommandThreadFunction, NULL);
 
     if (BE_ClientInformation_IsServerModeEnabled())
-        BA_Thread_Create(&serverThread, &BE_EntryPoint_ServerThreadFunction);
+        BA_Thread_Create(&serverThread, &BE_EntryPoint_ServerThreadFunction, NULL);
     double deltaStart = 0;
 
     while (BE_ClientInformation_IsRunning()) {
