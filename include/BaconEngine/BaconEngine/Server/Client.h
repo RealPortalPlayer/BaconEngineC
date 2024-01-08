@@ -3,7 +3,9 @@
 
 #pragma once
 
+#include <netinet/in.h>
+
 typedef struct {
     int clientId;
-    int clientDescriptor; // TODO: Make this private
+    struct sockaddr_in* clientDescriptor;
 } BE_Client_Connected;

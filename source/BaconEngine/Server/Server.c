@@ -83,7 +83,7 @@ void BE_Server_Start(unsigned port) {
 }
 
 #ifndef BE_CLIENT_BINARY
-void BE_PrivateServer_AddConnection(int clientDescriptor) {
+void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor) {
     if (beServerMaxPlayers == beServerConnectedAmount) {
         // TODO: Kick client: server full
         return;
@@ -104,8 +104,14 @@ void BE_Server_Stop(void) {
 
     // TODO: Kick clients
 
-    BE_EngineMemory_DeallocateMemory(beServerConnected, sizeof(BE_Client_Connected) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+    for (int i = 0; i < beServerMaxPlayers; i++) {
+        if (beServerConnected[i] == NULL)
+            continue;
 
+        BE_EngineMemory_DeallocateMemory(beServerConnected[i], sizeof(BE_Client_Connected), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+    }
+
+    BE_EngineMemory_DeallocateMemory(beServerConnected, sizeof(BE_Client_Connected) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
     close(beServerSocket);
 #else
     BE_INTERFACEFUNCTION(void, void)();
