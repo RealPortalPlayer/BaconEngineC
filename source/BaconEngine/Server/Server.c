@@ -1,3 +1,6 @@
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #include <sys/socket.h>
 #include <string.h>
 #include <errno.h>
@@ -59,7 +62,7 @@ void BE_Server_Start(unsigned port) {
     beServerConnectedAmount = 0;
     beServerMaxPlayers = 10;
     beServerConnected = BE_EngineMemory_AllocateMemory(sizeof(BE_Client_Connected) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
-    beServerSocket = socket(AF_INET, SOCK_STREAM, 0);
+    beServerSocket = socket(AF_INET, SOCK_DGRAM, 0);
     beServerPort = port;
 
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket != -1, "Failed to create socket: %s\n", strerror(errno));
@@ -74,7 +77,6 @@ void BE_Server_Start(unsigned port) {
 
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(bind(beServerSocket, (struct sockaddr*) &serverAddress, sizeof(serverAddress)) == 0,
                                         "Failed to bind to socket: %s\n", strerror(errno));
-    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(listen(beServerSocket, 5) == 0, "Failed to listen to socket: %s\n", strerror(errno));
 #else
     BE_INTERFACEFUNCTION(void, unsigned)(port);
 #endif

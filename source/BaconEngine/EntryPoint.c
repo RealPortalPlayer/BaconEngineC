@@ -1,4 +1,4 @@
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <BaconAPI/ArgumentHandler.h>
@@ -18,6 +18,7 @@
 #   include <signal.h>
 #   include <fcntl.h>
 #   include <netinet/in.h>
+#   include <arpa/inet.h>
 #elif BA_OPERATINGSYSTEM_WINDOWS
 #   include <signal.h>
 #   include <io.h>
@@ -133,24 +134,22 @@ void* BE_EntryPoint_ServerThreadFunction(BA_Thread_ArgumentType argument) {
     while (BE_ClientInformation_IsRunning()) {
         struct sockaddr_in clientInterface;
         socklen_t clientSize = sizeof(clientInterface);
+        char buffer[1024];
+        ssize_t packetLength = recvfrom(BE_PrivateServer_GetSocketDescriptor(), (char*) &buffer, 1024, MSG_WAITALL, (struct sockaddr*) &clientInterface, &clientSize);
 
-        int connectionDescriptor = accept(BE_PrivateServer_GetSocketDescriptor(), (struct sockaddr*)&clientInterface, &clientSize);
-
-        if (connectionDescriptor < 0) {
+        if (packetLength == -1) {
             if (errno == EWOULDBLOCK)
                 continue;
-
-            BA_LOGGER_ERROR("Errored while client connecting: %s\n", strerror(errno));
+            
+            BA_LOGGER_ERROR("Errored while getting unconnected packet from client: %s\n", strerror(errno));
             continue;
         }
 
-        if (fork() != 0) {
-            close(BE_PrivateServer_GetSocketDescriptor());
-            BE_PrivateServer_AddConnection(connectionDescriptor);
-            return NULL;
-        }
-
-        close(connectionDescriptor);
+        // TODO: Actually manage the packets
+        
+        buffer[packetLength] = '\0';
+        
+        BA_LOGGER_INFO("(%s:%d) %s\n", inet_ntoa(clientInterface.sin_addr), ntohs(clientInterface.sin_port), buffer);
     }
     
     return NULL;
@@ -287,6 +286,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
 
     if (BE_ClientInformation_IsServerModeEnabled())
         BA_Thread_Create(&serverThread, &BE_EntryPoint_ServerThreadFunction, NULL);
+    
     double deltaStart = 0;
 
     while (BE_ClientInformation_IsRunning()) {
