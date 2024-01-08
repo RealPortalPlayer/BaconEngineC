@@ -41,6 +41,7 @@
 #include "BaconEngine/ClientInformation.h"
 #include "BaconEngine/Server/Server.h"
 #include "Server/PrivateServer.h"
+#include "Server/PrivatePacket.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 BA_Boolean printedCursor = BA_BOOLEAN_FALSE;
@@ -145,11 +146,7 @@ void* BE_EntryPoint_ServerThreadFunction(BA_Thread_ArgumentType argument) {
             continue;
         }
 
-        // TODO: Actually manage the packets
-        
-        buffer[packetLength] = '\0';
-        
-        BA_LOGGER_INFO("(%s:%d) %s\n", inet_ntoa(clientInterface.sin_addr), ntohs(clientInterface.sin_port), buffer);
+        BE_PrivatePacket_Parse(NULL, &clientInterface, buffer);
     }
     
     return NULL;
@@ -256,6 +253,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
 
     BE_PrivateUI_Initialize();
     BE_PrivateConsole_Initialize();
+    BE_PrivatePacket_Initialize();
     BA_ASSERT(engineDetails->clientStart == NULL || engineDetails->clientStart(engineDetails->argc, engineDetails->argv) == 0, "Client start returned non-zero\n");
     BA_LOGGER_DEBUG("Registering signals\n");
     signal(SIGINT, &BE_EntryPoint_SignalDetected);
@@ -321,6 +319,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
         BA_Thread_Join(serverThread);
         BA_LOGGER_DEBUG("Server thread ended\n");
     }
+    
     BE_PrivateLayer_DestroyLayers();
 
     if (BE_Server_IsRunning())
@@ -330,6 +329,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     BE_PrivateConsole_Destroy();
     BE_PrivateWindow_Destroy();
     BE_SpecificPlatformFunctions_Get().Destroy();
+    BE_PrivatePacket_Destroy();
 
     if (BE_PrivateDefaultPackage_IsOpen())
         BE_PrivateDefaultPackage_Close();

@@ -76,6 +76,9 @@ add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         Storage/PrivateDynamicArray.h
         Storage/PrivateDynamicDictionary.h
         Storage/PrivateDefaultPackage.h
+        Server/PrivateServer.h
+        Server/PrivatePacket.h
+        Server/EnginePackets.h
 
         # Source files
         EntryPoint.c
@@ -86,7 +89,10 @@ add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         Rendering/EngineUIs.c
         Rendering/EngineLayers.c
         Storage/PrivateDynamicArray.c
-        Storage/PrivateDynamicDictionary.c)
+        Storage/PrivateDynamicDictionary.c
+        Server/Server.c
+        Server/Packet.c
+        Server/EnginePackets.c)
 
 if(NOT BE_DISABLE_OPENGL)
     set(BE_LIBRARIES glfw OpenGL::GL glad)
