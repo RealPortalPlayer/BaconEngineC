@@ -15,6 +15,11 @@
 #include "BaconEngine/BinaryExport.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
+typedef struct {
+    char* name;
+    BA_Boolean required;
+} BE_ArgumentManager_Argument;
+
 BE_BINARYEXPORT int BE_ArgumentManager_GetInteger(BA_DynamicDictionary arguments, const char* name, int defaultValue);
 BE_BINARYEXPORT BA_Boolean BE_ArgumentManager_GetBoolean(BA_DynamicDictionary arguments, const char* name, BA_Boolean defaultValue);
 BE_BINARYEXPORT float BE_ArgumentManager_GetFloat(BA_DynamicDictionary arguments, const char* name, float defaultValue);

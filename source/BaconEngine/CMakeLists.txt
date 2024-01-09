@@ -47,7 +47,7 @@ set(BE_SOURCE_FILES
         Rendering/Window.c
         Rendering/Renderer.c
         ClientInformation.c
-        Console/ArgumentManager.c
+        ArgumentManager.c
         Console/Console.c
         Rendering/Layer.c
         Input/Keyboard.c
@@ -79,6 +79,7 @@ add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         Server/PrivateServer.h
         Server/PrivatePacket.h
         Server/EnginePackets.h
+        PrivateArgumentManager.h
 
         # Source files
         EntryPoint.c

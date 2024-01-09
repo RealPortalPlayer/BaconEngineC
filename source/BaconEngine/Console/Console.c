@@ -17,6 +17,7 @@
 #   include "../Storage/PrivateDynamicArray.h"
 #   include "../EngineMemory.h"
 #   include "../Storage/PrivateDynamicDictionary.h"
+#   include "../PrivateArgumentManager.h"
 #endif
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
@@ -187,10 +188,10 @@ void BE_Command_AddArgument(const char* name, BA_Boolean required) {
     BE_PrivateConsole_Command* command = BA_DYNAMICARRAY_GET_LAST_ELEMENT(BE_PrivateConsole_Command, beConsolePrivateCommands);
 
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(command->publicCommand.arguments.used == 0 ||
-                                         BA_DYNAMICARRAY_GET_LAST_ELEMENT(BE_Command_Argument, command->publicCommand.arguments)->required ||
+                                         BA_DYNAMICARRAY_GET_LAST_ELEMENT(BE_ArgumentManager_Argument, command->publicCommand.arguments)->required ||
                                          !required, "Required arguments cannot be added after an optional argument\n");
 
-    BE_Command_Argument* argument = BE_EngineMemory_AllocateMemory(sizeof(BE_Command_Argument), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+    BE_ArgumentManager_Argument* argument = BE_EngineMemory_AllocateMemory(sizeof(BE_ArgumentManager_Argument), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
 
     argument->name = BA_String_Copy(name);
     argument->required = required;
@@ -236,160 +237,23 @@ void BE_Console_ExecuteCommand(const char* input, BE_Client_Connected* client) {
     if (input == NULL || input[0] == '\0')
         return;
 
-    char* name = BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
-    BE_PrivateConsole_Command* command = NULL;
+    char* name;
     BA_DynamicDictionary arguments;
-    size_t inputLength = strlen(input);
-    
-    name[0] = 0;
-    
-    BE_PrivateDynamicDictionary_Create(&arguments, 20);
-
-    int index;
     int argumentStartingIndex;
 
-    {
-        BA_Boolean trimmed = BA_BOOLEAN_FALSE;
+    BE_PrivateArgumentManager_ParseName(input, &name, &argumentStartingIndex);
 
-        for (index = 0; index < (int) inputLength; index++) {
-            if (input[index] == ' ') {
-                if (!trimmed)
-                    continue;
-
-                index++;
-                break;
-            }
-            
-            trimmed = BA_BOOLEAN_TRUE;
-
-            BA_String_AppendCharacter(&name, input[index]);
-            BE_EngineMemory_AddSize(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
-        }
-    }
-
-    command = BE_Console_GetPrivateCommand(name);
-    argumentStartingIndex = index;
-
+    BE_PrivateConsole_Command* command = BE_Console_GetPrivateCommand(name);
+    
     if (command == NULL) { // TODO: Tell the client.
         BA_LOGGER_ERROR("'%s' is not a valid command\n", name);
         goto destroy;
     }
 
-    if (command->publicCommand.arguments.used != 0 && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_ARGUMENT_PARSING)) {
-        char* argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
-        int current = 0;
-        int quotePosition = -1;
-        BA_Boolean doubleQuote = BA_BOOLEAN_FALSE;
-        BA_Boolean escaped = BA_BOOLEAN_FALSE;
-        BA_Boolean added = BA_BOOLEAN_FALSE;
-        BA_Boolean trimmed = BA_BOOLEAN_FALSE;
-        BA_Boolean quoteAdded = BA_BOOLEAN_FALSE;
+    BE_PrivateDynamicDictionary_Create(&arguments, 20);
 
-        argument[0] = 0;
-
-        for (; index < (int) inputLength && current < command->publicCommand.arguments.used; index++) {
-            BA_Boolean validEscapeCharacter = BA_BOOLEAN_FALSE;
-            
-            if (added) {
-                argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
-
-                argument[0] = 0;
-            }
-
-            added = BA_BOOLEAN_FALSE;
-
-            if (input[index] == ' ' && (quoteAdded || !trimmed))
-                continue;
-
-            quoteAdded = BA_BOOLEAN_FALSE;
-
-            if (input[index] == ' ' && quotePosition == -1 && !escaped) {
-                publish_argument:
-                BE_PrivateDynamicArray_CheckResize(&arguments.keys);
-                BE_PrivateDynamicArray_CheckResize(&arguments.values);
-                BA_DynamicDictionary_AddElementToLast(&arguments,
-                                                       (void*) BA_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument,
-                                                                                            command->publicCommand.arguments,
-                                                                                            current++)->name, argument);
-
-                added = BA_BOOLEAN_TRUE;
-                trimmed = BA_BOOLEAN_FALSE;
-                continue;
-            }
-
-            if (input[index] == '\\' && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING)) {
-                if (!escaped) {
-                    escaped = BA_BOOLEAN_TRUE;
-                    continue;
-                }
-                
-                validEscapeCharacter = BA_BOOLEAN_TRUE;
-            }
-            
-            if (input[index] == '\'' || input[index] == '"') {
-                if (!escaped) {
-                    if (quotePosition == -1) {
-                        if (argument[0] != 0) {
-                            index--;
-                            goto publish_argument;
-                        }
-
-                        quotePosition = index;
-                        doubleQuote = input[index] == '"';
-                        continue;
-                    }
-
-                    if (doubleQuote == (input[index] == '"')) {
-                        quotePosition = -1;
-                        doubleQuote = BA_BOOLEAN_FALSE;
-                        quoteAdded = BA_BOOLEAN_TRUE;
-                        goto publish_argument;
-                    }
-                }
-                
-                validEscapeCharacter = BA_BOOLEAN_TRUE;
-            }
-
-            trimmed = BA_BOOLEAN_TRUE;
-
-            if (escaped && !validEscapeCharacter && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING)) {
-                BA_LOGGER_ERROR("Parsing error: invalid escape character '%c', use double backslashes instead of one\n", input[index]);
-                BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * (strlen(argument) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
-                goto destroy;
-            }
-
-            BA_String_AppendCharacter(&argument, input[index]);
-            BE_EngineMemory_AddSize(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
-            
-            escaped = BA_BOOLEAN_FALSE;
-        }
-
-        if (quotePosition != -1 && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING)) {
-            BA_LOGGER_ERROR("Parsing error: unescaped %s quote at %i\n", doubleQuote ? "double" : "single", quotePosition);
-            goto destroy;
-        }
-
-        if (escaped && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING)) {
-            BA_LOGGER_ERROR("Parsing error: stray escape character\n");
-            goto destroy;
-        }
-
-        if (!added) {
-            if (argument[0] != '\0') {
-                BE_PrivateDynamicArray_CheckResize(&arguments.keys);
-                BE_PrivateDynamicArray_CheckResize(&arguments.values);
-                BA_DynamicDictionary_AddElementToLast(&arguments,
-                                                       (void*) BA_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument,
-                                                                                            command->publicCommand.arguments,
-                                                                                            current)->name, argument);
-
-                added = BA_BOOLEAN_TRUE;
-            }
-
-            if (!added)
-                BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * (strlen(argument) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
-        }
-    }
+    if (command->publicCommand.arguments.used != 0 && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_ARGUMENT_PARSING) && !BE_PrivateArgumentManager_ParseArguments(input, argumentStartingIndex, !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING), command->publicCommand.arguments, &arguments))
+        goto destroy;
 
     if (BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_RAN_ON_SERVER) && !BE_ClientInformation_IsServerModeEnabled()) {
         // TODO: Send command packet to server
@@ -466,7 +330,7 @@ void BE_PrivateConsole_Destroy(void) {
         BE_PrivateConsole_Command* command = BA_DYNAMICARRAY_GET_ELEMENT(BE_PrivateConsole_Command, beConsoleCommands, commandId);
 
         for (int argumentId = 0; argumentId < command->publicCommand.arguments.used; argumentId++)
-            BE_EngineMemory_DeallocateMemory(command->publicCommand.arguments.internalArray[argumentId], sizeof(BE_Command_Argument),
+            BE_EngineMemory_DeallocateMemory(command->publicCommand.arguments.internalArray[argumentId], sizeof(BE_ArgumentManager_Argument),
                                              BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
 
         if (!command->duplicate)

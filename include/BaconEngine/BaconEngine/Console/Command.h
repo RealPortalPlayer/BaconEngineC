@@ -11,7 +11,7 @@
 #include <BaconAPI/String.h>
 #include <BaconAPI/Storage/DynamicDictionary.h>
 
-#include "ArgumentManager.h"
+#include "BaconEngine/ArgumentManager.h"
 #include "BaconEngine/BinaryExport.h"
 #include "BaconEngine/BinaryExport.h"
 #include "BaconEngine/Server/Client.h"
@@ -68,11 +68,6 @@ typedef struct { // TODO: Client
      */
     BE_Client_Connected* client;
 } BE_Command_Context;
-
-typedef struct {
-    char* name;
-    BA_Boolean required;
-} BE_Command_Argument;
 
 typedef struct {
     const char* name;

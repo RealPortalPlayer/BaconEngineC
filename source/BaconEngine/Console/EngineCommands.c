@@ -117,7 +117,7 @@ void BE_EngineCommands_HelpPrint(BE_Command* command) {
 #endif
 
     for (int argumentId = 0; argumentId < command->arguments.used; argumentId++) {
-        BE_Command_Argument* argument = BA_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, argumentId);
+        BE_ArgumentManager_Argument* argument = BA_DYNAMICARRAY_GET_ELEMENT(BE_ArgumentManager_Argument, command->arguments, argumentId);
 
         BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "%s", argumentId != 0 ? " " : " - args: ");
 
