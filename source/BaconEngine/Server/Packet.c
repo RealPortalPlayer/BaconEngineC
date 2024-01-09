@@ -9,6 +9,7 @@
 #include "BaconEngine/Server/Packet.h"
 #include "../InterfaceFunctions.h"
 #include "../EngineMemory.h"
+#include "BaconEngine/ClientInformation.h"
 
 #ifndef BE_CLIENT_BINARY
 #   include "PrivatePacket.h"
@@ -78,7 +79,19 @@ void BE_PrivatePacket_Parse(BE_Client_Connected* client, struct sockaddr_in* des
     }
 
     if (packet == NULL) {
-        // TODO: Kick the client if server, leave if client. Invalid packets shouldn't happen
+        if (BE_ClientInformation_IsServerModeEnabled()) {
+            if (client != NULL) {
+                // TODO: Kick the client
+                return;
+            }
+
+            BE_Packet_Send(descriptor, "error invalid packet");
+            return;
+        } else {
+            // TODO: Leave the server
+        }
+        
+        BA_LOGGER_FATAL("Invalid packet (%s)\n", buffer);
         return;
     }
 
