@@ -16,8 +16,6 @@
 #include "BaconEngine/BinaryExport.h"
 #include "BaconEngine/Server/Client.h"
 
-// TODO: Validate that none of the commands go over this limit.
-
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef enum {
     BE_COMMAND_FLAG_NULL,

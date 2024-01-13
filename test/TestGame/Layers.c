@@ -117,7 +117,7 @@ int ColorModifierOnEvent(BE_Event event) {
         }
 
         if (event.data.keyboard.key == BE_KEYBOARD_KEY_CODE_D) {
-            BE_Console_ExecuteCommand("debuginfo", NULL); // TODO: Get the client
+            BE_Console_ExecuteCommand("debuginfo", NULL);
             return 1;
         }
     }
