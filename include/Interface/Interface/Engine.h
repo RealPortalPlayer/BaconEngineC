@@ -1,5 +1,5 @@
 // Purpose: Manages the engine binary
-// Created on: 4/22/2023 @ 2:01 PM
+// Created on: 4/22/23 @ 2:01 PM
 
 // Copyright (c) 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>

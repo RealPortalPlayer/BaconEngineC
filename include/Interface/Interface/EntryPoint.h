@@ -1,5 +1,5 @@
 // Purpose: Main entry-point for the client
-// Created on: 4/22/2023 @ 2:02 PM
+// Created on: 4/22/23 @ 2:02 PM
 
 // Copyright (c) 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>

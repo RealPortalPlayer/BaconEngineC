@@ -1,7 +1,7 @@
 // Purpose: A basic command.
 // Created on: 8/7/22 @ 10:05 AM
 
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once

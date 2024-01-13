@@ -1,4 +1,4 @@
-// Purpose: 
+// Purpose: Initialize engine packets
 // Created on: 1/8/24 @ 4:22 PM
 
 // Copyright (c) 2024, PortalPlayer <email@portalplayer.xyz>

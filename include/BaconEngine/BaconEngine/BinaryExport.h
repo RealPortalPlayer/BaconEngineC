@@ -1,5 +1,5 @@
 // Purpose: Export function without being platform specific
-// Created on: 4/22/2023 @ 2:03 PM
+// Created on: 4/22/23 @ 2:03 PM
 
 // Copyright (c) 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>

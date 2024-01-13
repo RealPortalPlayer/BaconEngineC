@@ -1,5 +1,5 @@
 // Purpose: Helps manage package files (zip files)
-// Created on: 4/26/2023 @ 12:10 PM
+// Created on: 4/26/23 @ 12:10 PM
 
 // Copyright (c) 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>

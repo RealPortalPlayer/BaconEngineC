@@ -1,5 +1,5 @@
 // Purpose: Manage important paths for the engine
-// Created on: 6/30/2023 @ 10:39 AM
+// Created on: 6/30/23 @ 10:39 AM
 
 // Copyright (c) 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>

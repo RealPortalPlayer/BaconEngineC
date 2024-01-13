@@ -1,6 +1,9 @@
 // Purpose: The engines server implementation.
 // Created on: 10/22/22 @ 5:03 AM
 
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
+// Licensed under MIT <https://opensource.org/licenses/MIT>
+
 #pragma once
 
 #include <BaconAPI/Internal/CPlusPlusSupport.h>
