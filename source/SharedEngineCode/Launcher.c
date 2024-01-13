@@ -54,12 +54,11 @@ const char* SEC_Launcher_GetDefaultHelpList(void) {
            SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOCATION " (" SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOCATION_SHORT "): Do not log when the engine allocates memory, does nothing if log level is not trace\n"
 #endif
            BA_BUILTINARGUMENTS_DISABLE_LOG_HEADER " (" BA_BUILTINARGUMENTS_DISABLE_LOG_HEADER_SHORT "): Do not log the log level header\n"
-           SEC_BUILTINARGUMENTS_ENGINE " <engine binary> (" SEC_BUILTINARGUMENTS_ENGINE_SHORT "): Use a custom engine binary"
+           SEC_BUILTINARGUMENTS_ENGINE " <engine binary> (" SEC_BUILTINARGUMENTS_ENGINE_SHORT "): Use a custom engine binary\n"
 #ifdef BA_ALLOW_DEBUG_LOGS
-           "\n"
-           SEC_BUILTINARGUMENTS_DONT_PRINT_COMMAND_REGISTER " (" SEC_BUILTINARGUMENTS_DONT_PRINT_COMMAND_REGISTER_SHORT "): Do not log when a command gets registered, does nothing if log level is not trace"
+           SEC_BUILTINARGUMENTS_DONT_PRINT_COMMAND_REGISTER " (" SEC_BUILTINARGUMENTS_DONT_PRINT_COMMAND_REGISTER_SHORT "): Do not log when a command gets registered, does nothing if log level is not trace\n"
 #endif
-            ;
+           SEC_BUILTINARGUMENTS_PORT " (" SEC_BUILTINARGUMENTS_PORT_SHORT "): Custom server port, useless outside server mode";
 }
 
 void SEC_Launcher_InitializeEngine(SEC_Launcher_Configuration* configuration) {

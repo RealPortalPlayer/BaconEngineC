@@ -183,6 +183,7 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
 
 void BE_Command_AddArgument(const char* name, BA_Boolean required) {
 #ifndef BE_CLIENT_BINARY
+    // TODO: Packets can use this code, too. Perhaps it can be moved to its own function
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beConsoleCommands.used != 0, "There is no command to add arguments to\n");
 
     BE_PrivateConsole_Command* command = BA_DYNAMICARRAY_GET_LAST_ELEMENT(BE_PrivateConsole_Command, beConsolePrivateCommands);

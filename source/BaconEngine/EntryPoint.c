@@ -208,8 +208,25 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     BE_PrivateDefaultPackage_Open();
     BE_PrivateRenderer_Initialize();
 
-    if (BE_ClientInformation_IsServerModeEnabled())
-        BE_Server_Start(5000); // TODO: Custom port number.
+    if (BE_ClientInformation_IsServerModeEnabled()) {
+        // TODO: Simplified call to convert string to int
+        BA_ArgumentHandler_ShortResults portResults;
+        int port = 5000;
+
+        if (BA_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_PORT, SEC_BUILTINARGUMENTS_PORT_SHORT, BA_BOOLEAN_FALSE, &portResults) != 0) {
+            char* error;
+            
+            port = (int) strtol(*portResults.value, &error, 0);
+
+            if (error != NULL && error[0] != '\0') {
+                BA_LOGGER_ERROR("Invalid port was supplied, defaulting to 5000\n");
+                
+                port = 5000;
+            }
+        }
+
+        BE_Server_Start(port);
+    }
 
     BE_PrivateLayer_InitializeLayers();
 

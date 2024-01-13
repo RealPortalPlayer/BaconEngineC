@@ -303,5 +303,6 @@ void BE_EngineCommands_Echo(BE_Command_Context context) {
 
 void BE_EngineCommands_Crash(void) {
     raise(SIGSEGV);
+    BA_LOGGER_WARN("Failed to crash the engine?\n");
 }
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

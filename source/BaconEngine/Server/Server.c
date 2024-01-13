@@ -55,7 +55,7 @@ void BE_Server_Start(unsigned port) {
 #ifndef BE_CLIENT_BINARY
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket == -1, "Server is already running\n");
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(BE_ClientInformation_IsServerModeEnabled(), "Cannot start a server on a non-server client\n");
-    BA_LOGGER_INFO("Starting server\n");
+    BA_LOGGER_INFO("Starting server: 0.0.0.0:%d\n", port);
 
     // TODO: Custom max players
 
