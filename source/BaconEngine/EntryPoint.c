@@ -5,7 +5,7 @@
 #include <BaconAPI/Logger.h>
 #include <string.h>
 #include <SharedEngineCode/BuiltInArguments.h>
-#include <BaconAPI/Threads.h>
+#include <BaconAPI/Thread.h>
 #include <BaconAPI/Internal/PlatformSpecific.h>
 #include <SharedEngineCode/Paths.h>
 #include <SharedEngineCode/Launcher.h>
@@ -87,7 +87,7 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
     }
 }
 
-void* BE_EntryPoint_CommandThreadFunction(BA_Thread_ArgumentType argument) {
+void* BE_EntryPoint_CommandThreadFunction(void* argument) {
     commandThreadRunning = BA_BOOLEAN_TRUE;
 
     // FIXME: Find out why this is not working on Serenity.
@@ -129,7 +129,7 @@ void* BE_EntryPoint_CommandThreadFunction(BA_Thread_ArgumentType argument) {
     return NULL;
 }
 
-void* BE_EntryPoint_ServerThreadFunction(BA_Thread_ArgumentType argument) {
+void* BE_EntryPoint_ServerThreadFunction(void* argument) {
     fcntl(BE_PrivateServer_GetSocketDescriptor(), F_SETFL, O_NONBLOCK);
 
     while (BE_ClientInformation_IsRunning()) {
@@ -329,11 +329,11 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     BA_LOGGER_TRACE("Client loop ended, shutting down\n");
     BA_ASSERT(engineDetails->clientShutdown == NULL || engineDetails->clientShutdown() == 0, "Client shutdown returned non-zero\n");
     BA_LOGGER_INFO("Waiting for thread shutdown (press CTRL+C if frozen)\n");
-    BA_Thread_Join(commandThread);
+    BA_Thread_Join(commandThread, NULL);
     BA_LOGGER_DEBUG("Command thread ended\n");
 
     if (BE_ClientInformation_IsServerModeEnabled()) {
-        BA_Thread_Join(serverThread);
+        BA_Thread_Join(serverThread, NULL);
         BA_LOGGER_DEBUG("Server thread ended\n");
     }
     
