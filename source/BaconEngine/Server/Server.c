@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <SharedEngineCode/Debugging/StrictMode.h>
+#include <BaconAPI/Number.h>
 
 #include "BaconEngine/Server/Server.h"
 #include "BaconEngine/Server/Client.h"
@@ -24,7 +25,7 @@ static int beServerSocket = -1;
 static unsigned beServerPort;
 static BE_Client_Connected** beServerConnected;
 static int beServerConnectedAmount;
-static int beServerMaxPlayers;
+static unsigned beServerMaxPlayers;
 #endif
 
 BA_Boolean BE_Server_IsRunning(void) {
@@ -56,15 +57,21 @@ void BE_Server_Start(unsigned port) {
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket == -1, "Server is already running\n");
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(BE_ClientInformation_IsServerModeEnabled(), "Cannot start a server on a non-server client\n");
     BA_LOGGER_INFO("Starting server: 0.0.0.0:%d\n", port);
-
-    // TODO: Custom max players
-
+    
     beServerConnectedAmount = 0;
     beServerMaxPlayers = 10;
     beServerConnected = BE_EngineMemory_AllocateMemory(sizeof(BE_Client_Connected) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
     beServerSocket = socket(AF_INET, SOCK_DGRAM, 0);
     beServerPort = port;
 
+    {
+        BA_ArgumentHandler_ShortResults maxPlayersResults;
+
+        if (BA_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_MAX_PLAYERS, SEC_BUILTINARGUMENTS_MAX_PLAYERS_SHORT, BA_BOOLEAN_FALSE, &maxPlayersResults) != 0)
+            beServerMaxPlayers = BA_Number_StringToUnsigned(*maxPlayersResults.value, NULL, NULL, "Invalid max players, defaulting with 10\n", 10);
+    }
+    
+    BA_LOGGER_INFO("Allocating player list: %u player%s\n", beServerMaxPlayers, beServerMaxPlayers != 1 ? "s" : "");
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket != -1, "Failed to create socket: %s\n", strerror(errno));
 
     struct sockaddr_in serverAddress;
