@@ -12,6 +12,7 @@
 #include <BaconAPI/Debugging/Assert.h>
 #include <SharedEngineCode/Debugging/StrictMode.h>
 #include <errno.h>
+#include <BaconAPI/Number.h>
 
 #if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <unistd.h>
@@ -209,21 +210,11 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     BE_PrivateRenderer_Initialize();
 
     if (BE_ClientInformation_IsServerModeEnabled()) {
-        // TODO: Simplified call to convert string to int
         BA_ArgumentHandler_ShortResults portResults;
         int port = 5000;
 
-        if (BA_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_PORT, SEC_BUILTINARGUMENTS_PORT_SHORT, BA_BOOLEAN_FALSE, &portResults) != 0) {
-            char* error;
-            
-            port = (int) strtol(*portResults.value, &error, 0);
-
-            if (error != NULL && error[0] != '\0') {
-                BA_LOGGER_ERROR("Invalid port was supplied, defaulting to 5000\n");
-                
-                port = 5000;
-            }
-        }
+        if (BA_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_PORT, SEC_BUILTINARGUMENTS_PORT_SHORT, BA_BOOLEAN_FALSE, &portResults) != 0)
+            port = BA_Number_StringToInteger(*portResults.value, NULL, NULL, "Invalid port was supplied, defaulting to 5000\n", port);
 
         BE_Server_Start(port);
     }
@@ -238,31 +229,11 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
             const char* preParsedWidth = BA_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_WIDTH, 0);
             const char* preParsedHeight = BA_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_HEIGHT, 0);
 
-            if (preParsedWidth != NULL) {
-                char* error;
-                int parsedWith = (int) strtol(preParsedWidth, &error, 0);
+            if (preParsedWidth != NULL)
+                width = BA_Number_StringToInteger(preParsedWidth, NULL, NULL, "Invalid width was supplied, ignoring...\n", width);
 
-                if (error != NULL && strlen(error) != 0) {
-                    BA_LOGGER_ERROR("Invalid width was supplied, ignoring...\n");
-
-                    parsedWith = 1080;
-                }
-
-                width = parsedWith;
-            }
-
-            if (preParsedHeight != NULL) {
-                char* error;
-                int parsedHeight = (int) strtol(preParsedHeight, &error, 0);
-
-                if (error != NULL && strlen(error) != 0) {
-                    BA_LOGGER_ERROR("Invalid height was supplied, ignoring...\n");
-
-                    parsedHeight = 720;
-                }
-
-                height = parsedHeight;
-            }
+            if (preParsedHeight != NULL)
+                height = BA_Number_StringToInteger(preParsedHeight, NULL, NULL, "Invalid height was supplied, ignoring...\n", height);
         }
 
         BE_PrivateWindow_Initialize(engineDetails->clientGetName != NULL ? engineDetails->clientGetName() : "", BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, (unsigned) width, (unsigned) height));
@@ -278,18 +249,8 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     {
         const char* preParsedExitCode = BA_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_EXIT, 0);
 
-        if (preParsedExitCode != NULL) {
-            char* error;
-            int parsedExitCode = (int) strtol(preParsedExitCode, &error, 0);
-
-            if (error != NULL && strlen(error) != 0) {
-                BA_LOGGER_ERROR("Invalid exit code, defaulting to 0\n");
-
-                parsedExitCode = 0;
-            }
-
-            return parsedExitCode;
-        }
+        if (preParsedExitCode != NULL)
+            return BA_Number_StringToInteger(preParsedExitCode, NULL, NULL, "Invalid exit code, defaulting to 0\n", 0);
     }
 
     BA_LOGGER_INFO("Starting threads\n");

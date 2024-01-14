@@ -3,8 +3,8 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <limits.h>
 #include <BaconAPI/Logger.h>
+#include <BaconAPI/Number.h>
 
 #include "BaconEngine/ArgumentManager.h"
 #include "InterfaceFunctions.h"
@@ -24,23 +24,18 @@ static int BE_ArgumentManager_EqualsStringBoolean(const char* value) {
 
 int BE_ArgumentManager_GetInteger(BA_DynamicDictionary arguments, const char* name, int defaultValue) {
 #ifndef BE_CLIENT_BINARY
-    if (arguments.keys.size != 0) {
-        const char* value = BE_ArgumentManager_GetString(arguments, name, "");
-        {
-            int parsedValue = BE_ArgumentManager_EqualsStringBoolean(value);
+    if (arguments.keys.size == 0)
+        return defaultValue;
+    
+    const char* value = BE_ArgumentManager_GetString(arguments, name, "");
+    {
+        int result = BE_ArgumentManager_EqualsStringBoolean(value);
 
-            if (parsedValue != 0)
-                return parsedValue == 2;
-        }
-
-        char* errored;
-        long parsedValue = strtol(value, &errored, 0);
-
-        if (errored == NULL || strlen(errored) == 0 || parsedValue <= INT_MAX)
-            return (int) parsedValue;
+        if (result != 0)
+            return result == 2;
     }
-
-    return defaultValue;
+    
+    return BA_Number_StringToInteger(value, NULL, NULL, NULL, defaultValue);
 #else
     BE_INTERFACEFUNCTION(int, BA_DynamicDictionary, const char*, int);
     return function(arguments, name, defaultValue);
@@ -200,7 +195,7 @@ BA_Boolean BE_PrivateArgumentManager_ParseArguments(const char* input, int start
 
         trimmed = BA_BOOLEAN_TRUE;
 
-        if (escaped && !validEscapeCharacter && fancyArgumentParsing) {
+        if (escaped && !validEscapeCharacter) {
             BA_LOGGER_ERROR("Parsing error: invalid escape character '%c', use double backslashes instead of one\n", input[index]);
             BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * (strlen(argument) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
             return BA_BOOLEAN_FALSE;
@@ -217,7 +212,7 @@ BA_Boolean BE_PrivateArgumentManager_ParseArguments(const char* input, int start
         return BA_BOOLEAN_FALSE;
     }
 
-    if (escaped && fancyArgumentParsing) {
+    if (escaped) {
         BA_LOGGER_ERROR("Parsing error: stray escape character\n");
         return BA_BOOLEAN_FALSE;
     }

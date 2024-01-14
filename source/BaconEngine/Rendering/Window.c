@@ -1,4 +1,4 @@
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <BaconAPI/Logger.h>
@@ -6,6 +6,7 @@
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <string.h>
 #include <BaconAPI/Debugging/Assert.h>
+#include <BaconAPI/Number.h>
 
 #include "BaconEngine/Rendering/Window.h"
 #include "BaconEngine/Rendering/Renderer.h"
@@ -23,18 +24,8 @@ void BE_PrivateWindow_Initialize(const char* windowTitle, BE_Vector2_Unsigned wi
     {
         const char* preParsedMonitor = BA_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_MONITOR, BA_BOOLEAN_FALSE);
 
-        if (preParsedMonitor != NULL) {
-            char* error;
-            int parsedMonitor = (int) strtol(preParsedMonitor, &error, 0);
-
-            if (error != NULL && strlen(error) != 0) {
-                BA_LOGGER_ERROR("Invalid display was supplied, ignoring...\n");
-
-                parsedMonitor = 0;
-            }
-
-            monitorNumber = parsedMonitor;
-        }
+        if (preParsedMonitor != NULL)
+            monitorNumber = BA_Number_StringToInteger(preParsedMonitor, NULL, NULL, "Invalid display was supplied, ignoring...\n", monitorNumber);
     }
 
     BA_LOGGER_INFO("Creating window\nTitle: %s\nSize: (%u, %u)\nMonitor: %i\n", windowTitle, windowSize.x, windowSize.y, monitorNumber);
