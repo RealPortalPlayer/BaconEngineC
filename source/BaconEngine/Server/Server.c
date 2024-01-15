@@ -102,10 +102,8 @@ void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor) {
     BE_Client_Connected* client = BE_EngineMemory_AllocateMemory(sizeof(BE_Client_Connected), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
     
     client->clientId = beServerConnectedAmount;
-    client->addressPort = BA_String_Copy("%s:%d");
-
-    BA_String_Format(&client->addressPort, inet_ntoa(clientDescriptor->sin_addr), ntohs(clientDescriptor->sin_port));
-    
+    client->address = BA_String_Copy(inet_ntoa(clientDescriptor->sin_addr));
+    client->port = ntohs(clientDescriptor->sin_port);
     beServerConnected[beServerConnectedAmount++] = client;
 }
 #endif
@@ -121,7 +119,7 @@ void BE_Server_Stop(void) {
         if (beServerConnected[i] == NULL)
             continue;
 
-        free(beServerConnected[i]->addressPort);
+        free(beServerConnected[i]->address);
         BE_EngineMemory_DeallocateMemory(beServerConnected[i], sizeof(BE_Client_Connected), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
     }
 
@@ -135,17 +133,9 @@ void BE_Server_Stop(void) {
 #ifndef BE_CLIENT_BINARY
 BE_Client_Connected* BE_PrivateServer_GetClientFromAddress(struct sockaddr_in* clientDescriptor) {
     for (int i = 0; i < beServerConnectedAmount; i++) {
-        // FIXME: This is so stupid. This can be very time sensitive, so allocating memory can be a bad idea
-        char* addressPort = BA_String_Copy("%s:%d");
-
-        BA_String_Format(&addressPort, inet_ntoa(clientDescriptor->sin_addr), ntohs(clientDescriptor->sin_port));
-        
-        if (strcmp(beServerConnected[i]->addressPort, addressPort) != 0) {
-            free(addressPort);
+        if (strcmp(beServerConnected[i]->address, inet_ntoa(clientDescriptor->sin_addr)) != 0)
             continue;
-        }
 
-        free(addressPort);
         return beServerConnected[i];
     }
     

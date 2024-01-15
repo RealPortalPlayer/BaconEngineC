@@ -10,5 +10,6 @@
 
 typedef struct {
     int clientId;
-    char* addressPort;
+    char* address;
+    int port;
 } BE_Client_Connected;
