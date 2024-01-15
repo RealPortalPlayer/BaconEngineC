@@ -8,7 +8,6 @@
 
 #include <netinet/in.h>
 
-typedef struct {
-    unsigned clientId;
-    struct sockaddr_in* socket;
-} BE_Client_Connected;
+typedef unsigned BE_Client;
+
+#define BE_CLIENT_UNCONNECTED (-1)

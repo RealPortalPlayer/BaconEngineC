@@ -121,7 +121,7 @@ void* BE_EntryPoint_CommandThreadFunction(void* argument) {
         input[strcspn(input, "\n")] = '\0';
 
         if (input[0] != '\0')
-            BE_Console_ExecuteCommand(input, NULL);
+            BE_Console_ExecuteCommand(input, BE_CLIENT_UNCONNECTED);
 
         printedCursor = BA_BOOLEAN_FALSE;
     }

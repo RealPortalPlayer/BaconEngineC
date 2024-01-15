@@ -9,26 +9,26 @@
 #include <SharedEngineCode/Debugging/StrictMode.h>
 #include <BaconAPI/Number.h>
 #include <BaconAPI/String.h>
-#include <arpa/inet.h>
 
 #include "BaconEngine/Server/Server.h"
-#include "BaconEngine/Server/Client.h"
 #include "../InterfaceFunctions.h"
 #include "BaconEngine/ClientInformation.h"
 #include "BaconEngine/Server/Packet.h"
+#include "BaconAPI/Debugging/Assert.h"
 
 #ifndef BE_CLIENT_BINARY
 #   include "../EngineMemory.h"
 #   include "PrivateServer.h"
+#   include "PrivateClient.h"
 #endif
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
 static int beServerSocket = -1;
 static unsigned beServerPort;
-static BE_Client_Connected** beServerConnected;
-static int beServerConnectedAmount;
+static BE_PrivateClient** beServerConnected;
 static unsigned beServerMaxPlayers;
+static BA_Boolean beServerConnectedCountDirty = BA_BOOLEAN_TRUE;
 #endif
 
 BA_Boolean BE_Server_IsRunning(void) {
@@ -61,7 +61,6 @@ void BE_Server_Start(unsigned port) {
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(BE_ClientInformation_IsServerModeEnabled(), "Cannot start a server on a non-server client\n");
     BA_LOGGER_INFO("Starting server: 0.0.0.0:%d\n", port);
     
-    beServerConnectedAmount = 0;
     beServerMaxPlayers = 10;
     beServerSocket = socket(AF_INET, SOCK_DGRAM, 0);
     beServerPort = port;
@@ -75,8 +74,15 @@ void BE_Server_Start(unsigned port) {
     
     BA_LOGGER_INFO("Allocating player list: %u player%s\n", beServerMaxPlayers, beServerMaxPlayers != 1 ? "s" : "");
 
-    beServerConnected = BE_EngineMemory_AllocateMemory(sizeof(BE_Client_Connected*) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+    beServerConnected = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateClient*) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
 
+    for (int i = 0; i < beServerMaxPlayers; i++) {
+        BE_PrivateClient* privateClient = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateClient), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+        
+        privateClient->publicClient = -1;
+        beServerConnected[i] = privateClient;
+    }
+    
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket != -1, "Failed to create socket: %s\n", strerror(errno));
 
     struct sockaddr_in serverAddress;
@@ -96,16 +102,26 @@ void BE_Server_Start(unsigned port) {
 
 #ifndef BE_CLIENT_BINARY
 void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor) {
-    if (beServerMaxPlayers == beServerConnectedAmount) {
-        BE_Packet_Send(clientDescriptor, "error server full");
+    if (beServerMaxPlayers == BE_Server_GetConnectedAmount()) {
+        BE_Packet_Send(clientDescriptor, "error server_full");
         return;
     }
 
-    BE_Client_Connected* client = BE_EngineMemory_AllocateMemory(sizeof(BE_Client_Connected), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
-    
-    client->clientId = beServerConnectedAmount;
-    client->socket = clientDescriptor;
-    beServerConnected[beServerConnectedAmount++] = client;
+    for (int i = 0; i < beServerMaxPlayers; i++) {
+        if (beServerConnected[i]->publicClient != BE_CLIENT_UNCONNECTED)
+            continue;
+
+        // TODO: Is this even necessary? I would assume so
+        beServerConnected[i]->publicClient = i;
+        beServerConnected[i]->socket = BE_EngineMemory_AllocateMemory(sizeof(struct sockaddr_in), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+        beServerConnectedCountDirty = BA_BOOLEAN_TRUE;
+
+        memcpy(beServerConnected[i]->socket, clientDescriptor, sizeof(struct sockaddr_in));
+        return;
+    }
+
+    BE_Packet_Send(clientDescriptor, "error crash");
+    BA_ASSERT_ALWAYS("No more free client slots while also not being full, this shouldn't happen\n");
 }
 #endif
 
@@ -113,17 +129,17 @@ void BE_Server_Stop(void) {
 #ifndef BE_CLIENT_BINARY
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket != -1, "Server is not running\n");
     BA_LOGGER_INFO("Closing server\n");
-
-    // TODO: Kick clients
-
+    
     for (int i = 0; i < beServerMaxPlayers; i++) {
-        if (beServerConnected[i] == NULL)
-            continue;
+        if (beServerConnected[i]->publicClient != BE_CLIENT_UNCONNECTED) {
+            // TODO: Kick client
+        }
 
-        BE_EngineMemory_DeallocateMemory(beServerConnected[i], sizeof(BE_Client_Connected), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+        BE_EngineMemory_DeallocateMemory(beServerConnected[i]->socket, sizeof(struct sockaddr_in), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+        BE_EngineMemory_DeallocateMemory(beServerConnected[i], sizeof(BE_PrivateClient), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
     }
 
-    BE_EngineMemory_DeallocateMemory(beServerConnected, sizeof(BE_Client_Connected*) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+    BE_EngineMemory_DeallocateMemory(beServerConnected, sizeof(BE_PrivateClient*) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
     close(beServerSocket);
 #else
     BE_INTERFACEFUNCTION(void, void)();
@@ -131,31 +147,38 @@ void BE_Server_Stop(void) {
 }
 
 #ifndef BE_CLIENT_BINARY
-BE_Client_Connected* BE_PrivateServer_GetClientFromSocket(struct sockaddr_in* clientDescriptor) {
-    for (int i = 0; i < beServerConnectedAmount; i++) {
-        if (beServerConnected[i]->socket != clientDescriptor)
+BE_Client BE_PrivateServer_GetClientFromSocket(struct sockaddr_in* clientDescriptor) {
+    for (int i = 0; i < beServerMaxPlayers; i++) {
+        if (beServerConnected[i]->socket == NULL || memcmp(beServerConnected[i]->socket, clientDescriptor, sizeof(struct sockaddr_in)) != 0)
             continue;
 
-        return beServerConnected[i];
+        return beServerConnected[i]->publicClient;
     }
     
-    return NULL;
+    return BE_CLIENT_UNCONNECTED;
 }
 #endif
 
-BE_BINARYEXPORT BE_Client_Connected* BE_Server_GetClient(unsigned clientId) {
+BE_BINARYEXPORT unsigned BE_Server_GetConnectedAmount(void) {
 #ifndef BE_CLIENT_BINARY
-    for (int i = 0; i < beServerConnectedAmount; i++) {
-        if (beServerConnected[i]->clientId != clientId)
+    static unsigned count = 0;
+
+    if (!beServerConnectedCountDirty)
+        return count;
+    
+    count = 0;
+    
+    for (int i = 0; i < beServerMaxPlayers; i++) {
+        if (beServerConnected[i]->publicClient == BE_CLIENT_UNCONNECTED)
             continue;
-
-        return beServerConnected[i];
+        
+        count++;
     }
-
-    return NULL;
+    
+    return count;
 #else
-    BE_INTERFACEFUNCTION(BE_Client_Connected*, unsigned);
-    return function(clientId);
+    BE_INTERFACEFUNCTION(unsigned, void);
+    return function();
 #endif
 }
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

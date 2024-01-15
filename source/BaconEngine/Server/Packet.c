@@ -35,7 +35,7 @@ void BE_PrivatePacket_Initialize(void) {
 }
 #endif
 
-BE_BINARYEXPORT void BE_Packet_Register(const char* name, BA_Boolean acceptUnconnected, void (*Run)(BE_Client_Connected* client, struct sockaddr_in* descriptor)) {
+BE_BINARYEXPORT void BE_Packet_Register(const char* name, BA_Boolean acceptUnconnected, void (*Run)(BE_Client client, struct sockaddr_in* descriptor)) {
 #ifndef BE_CLIENT_BINARY
     BE_PrivatePacket* packet = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivatePacket), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
     
@@ -46,7 +46,7 @@ BE_BINARYEXPORT void BE_Packet_Register(const char* name, BA_Boolean acceptUncon
     BE_PrivateDynamicArray_CheckResize(&bePacketRegistered);
     BA_DynamicArray_AddElementToLast(&bePacketRegistered, packet);
 #else
-    BE_INTERFACEFUNCTION(void, const char*, BA_Boolean, void (*)(BE_Client_Connected*, struct sockaddr_in*))(name, acceptUnconnected, Run);
+    BE_INTERFACEFUNCTION(void, const char*, BA_Boolean, void (*)(BE_Client, struct sockaddr_in*))(name, acceptUnconnected, Run);
 #endif
 }
 
@@ -64,7 +64,7 @@ BE_BINARYEXPORT void BE_Packet_Send(struct sockaddr_in* descriptor, const char* 
 }
 
 #ifndef BE_CLIENT_BINARY
-void BE_PrivatePacket_Parse(BE_Client_Connected* client, struct sockaddr_in* descriptor, const char* buffer) {
+void BE_PrivatePacket_Parse(BE_Client client, struct sockaddr_in* descriptor, const char* buffer) {
     BE_PrivatePacket* packet;
     
     for (int i = 0; i < bePacketRegistered.used; i++) {
@@ -80,12 +80,12 @@ void BE_PrivatePacket_Parse(BE_Client_Connected* client, struct sockaddr_in* des
 
     if (packet == NULL) {
         if (BE_ClientInformation_IsServerModeEnabled()) {
-            if (client != NULL) {
+            if (client != BE_CLIENT_UNCONNECTED) {
                 // TODO: Kick the client
                 return;
             }
 
-            BE_Packet_Send(descriptor, "error invalid packet");
+            BE_Packet_Send(descriptor, "error invalid_packet");
             return;
         } else {
             // TODO: Leave the server

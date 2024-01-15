@@ -230,7 +230,7 @@ void BE_Command_DuplicatePrevious(const char* name, const char* description) {
 #endif
 }
 
-void BE_Console_ExecuteCommand(const char* input, BE_Client_Connected* client) {
+void BE_Console_ExecuteCommand(const char* input, BE_Client client) {
 #ifndef BE_CLIENT_BINARY
     // Do not put any logs outside an if check.
     // We do not want to trick users into thinking something is part of the command.
@@ -267,14 +267,14 @@ void BE_Console_ExecuteCommand(const char* input, BE_Client_Connected* client) {
         if (!BE_ClientInformation_IsServerModeEnabled()) {
             BA_LOGGER_ERROR("This command can only be ran by the server\n");
             goto destroy;
-        } else if (client != NULL) {
+        } else if (client != BE_CLIENT_UNCONNECTED) {
             // TODO: Kick client: invalid packet (client doesn't send a command packet if command is server only)
             goto destroy;
         }
     }
 
     if (BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()) {
-        if (client != NULL) {
+        if (client != BE_CLIENT_UNCONNECTED) {
             // TODO: Kick client: invalid packet (client should never **ever** send a command packet if command is client only)
             goto destroy;
         }
@@ -353,7 +353,7 @@ BE_BINARYEXPORT void BE_Console_ExecuteFile(FILE* file) {
     char* line;
     ssize_t length;
     
-    while((length = BA_String_GetLine(file, &line, NULL)) != -1) {
+    while ((length = BA_String_GetLine(file, &line, NULL)) != -1) {
         if (length == -2) {
             BA_LOGGER_TRACE("Failed to allocate enough memory for buffer\n");
             return;
@@ -364,7 +364,7 @@ BE_BINARYEXPORT void BE_Console_ExecuteFile(FILE* file) {
             continue;
         }
 
-        BE_Console_ExecuteCommand(line, NULL);
+        BE_Console_ExecuteCommand(line, BE_CLIENT_UNCONNECTED);
         free(line);
     }
 #else
@@ -392,7 +392,7 @@ BE_BINARYEXPORT void BE_Console_ExecuteFileContents(const char* contents) {
             continue;
         }
 
-        BE_Console_ExecuteCommand(line, NULL);
+        BE_Console_ExecuteCommand(line, BE_CLIENT_UNCONNECTED);
         free(commandLines->internalArray[i]);
     }
 

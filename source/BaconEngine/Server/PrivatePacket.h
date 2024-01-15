@@ -20,10 +20,10 @@ typedef struct {
     /**
      * @param client - NULL if it's unconnected
      */
-    void (*Run)(BE_Client_Connected* client, struct sockaddr_in* descriptor);
+    void (*Run)(BE_Client client, struct sockaddr_in* descriptor);
 } BE_PrivatePacket;
 
 void BE_PrivatePacket_Initialize(void);
-void BE_PrivatePacket_Parse(BE_Client_Connected* client, struct sockaddr_in* descriptor, const char* buffer);
+void BE_PrivatePacket_Parse(BE_Client client, struct sockaddr_in* descriptor, const char* buffer);
 void BE_PrivatePacket_Destroy(void);
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

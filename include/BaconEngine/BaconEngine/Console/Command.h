@@ -62,9 +62,9 @@ typedef struct { // TODO: Client
 
     /**
      * The client who ran the command.
-     * NULL when either the command was ran by the server, or the command is client only.
+     * BE_CLIENT_UNCONNECTED when either the command was ran by the server, or the command is client only.
      */
-    BE_Client_Connected* client;
+    BE_Client client;
 } BE_Command_Context;
 
 typedef struct {
