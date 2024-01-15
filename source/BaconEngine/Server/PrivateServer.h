@@ -14,5 +14,5 @@
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 int BE_PrivateServer_GetSocketDescriptor(void);
 void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor);
-BE_Client_Connected* BE_PrivateServer_GetClientFromAddress(const char* addressPort);
+BE_Client_Connected* BE_PrivateServer_GetClientFromAddress(struct sockaddr_in* clientDescriptor);
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

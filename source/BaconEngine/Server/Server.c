@@ -15,6 +15,7 @@
 #include "BaconEngine/Server/Client.h"
 #include "../InterfaceFunctions.h"
 #include "BaconEngine/ClientInformation.h"
+#include "BaconEngine/Server/Packet.h"
 
 #ifndef BE_CLIENT_BINARY
 #   include "../EngineMemory.h"
@@ -94,7 +95,7 @@ void BE_Server_Start(unsigned port) {
 #ifndef BE_CLIENT_BINARY
 void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor) {
     if (beServerMaxPlayers == beServerConnectedAmount) {
-        // TODO: Kick client: server full
+        BE_Packet_Send(clientDescriptor, "error server full");
         return;
     }
 
@@ -132,11 +133,19 @@ void BE_Server_Stop(void) {
 }
 
 #ifndef BE_CLIENT_BINARY
-BE_Client_Connected* BE_PrivateServer_GetClientFromAddress(const char* addressPort) {
+BE_Client_Connected* BE_PrivateServer_GetClientFromAddress(struct sockaddr_in* clientDescriptor) {
     for (int i = 0; i < beServerConnectedAmount; i++) {
-        if (strcmp(beServerConnected[i]->addressPort, addressPort) != 0)
-            continue;
+        // FIXME: This is so stupid. This can be very time sensitive, so allocating memory can be a bad idea
+        char* addressPort = BA_String_Copy("%s:%d");
+
+        BA_String_Format(&addressPort, inet_ntoa(clientDescriptor->sin_addr), ntohs(clientDescriptor->sin_port));
         
+        if (strcmp(beServerConnected[i]->addressPort, addressPort) != 0) {
+            free(addressPort);
+            continue;
+        }
+
+        free(addressPort);
         return beServerConnected[i];
     }
     
