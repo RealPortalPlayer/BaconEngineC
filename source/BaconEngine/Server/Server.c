@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include <SharedEngineCode/Debugging/StrictMode.h>
 #include <BaconAPI/Number.h>
+#include <BaconAPI/String.h>
+#include <arpa/inet.h>
 
 #include "BaconEngine/Server/Server.h"
 #include "BaconEngine/Server/Client.h"
@@ -97,9 +99,12 @@ void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor) {
     }
 
     BE_Client_Connected* client = BE_EngineMemory_AllocateMemory(sizeof(BE_Client_Connected), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
-
+    
     client->clientId = beServerConnectedAmount;
-    client->clientDescriptor = clientDescriptor;
+    client->addressPort = BA_String_Copy("%s:%d");
+
+    BA_String_Format(&client->addressPort, inet_ntoa(clientDescriptor->sin_addr), ntohs(clientDescriptor->sin_port));
+    
     beServerConnected[beServerConnectedAmount++] = client;
 }
 #endif
@@ -115,6 +120,7 @@ void BE_Server_Stop(void) {
         if (beServerConnected[i] == NULL)
             continue;
 
+        free(beServerConnected[i]->addressPort);
         BE_EngineMemory_DeallocateMemory(beServerConnected[i], sizeof(BE_Client_Connected), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
     }
 
@@ -124,4 +130,17 @@ void BE_Server_Stop(void) {
     BE_INTERFACEFUNCTION(void, void)();
 #endif
 }
+
+#ifndef BE_CLIENT_BINARY
+BE_Client_Connected* BE_PrivateServer_GetClientFromAddress(const char* addressPort) {
+    for (int i = 0; i < beServerConnectedAmount; i++) {
+        if (strcmp(beServerConnected[i]->addressPort, addressPort) != 0)
+            continue;
+        
+        return beServerConnected[i];
+    }
+    
+    return NULL;
+}
+#endif
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

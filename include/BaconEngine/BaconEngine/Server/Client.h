@@ -10,5 +10,5 @@
 
 typedef struct {
     int clientId;
-    struct sockaddr_in* clientDescriptor;
+    char* addressPort;
 } BE_Client_Connected;
