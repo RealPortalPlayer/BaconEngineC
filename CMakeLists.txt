@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.2)
 project(BaconEngine C CXX)
 
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_CXX_STANDARD 11) # TODO: See if lowering to 98 can cause issues
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 set(BE_ENGINE_VERSION 1.0.0-incomplete)
