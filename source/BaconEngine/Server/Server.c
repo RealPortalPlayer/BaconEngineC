@@ -142,4 +142,15 @@ BE_Client_Connected* BE_PrivateServer_GetClientFromAddress(struct sockaddr_in* c
     return NULL;
 }
 #endif
+
+BE_BINARYEXPORT BE_Client_Connected* BE_Server_GetClient(unsigned clientId) {
+    for (int i = 0; i < beServerConnectedAmount; i++) {
+        if (beServerConnected[i]->clientId != clientId)
+            continue;
+        
+        return beServerConnected[i];
+    }
+    
+    return NULL;
+}
 BA_CPLUSPLUS_SUPPORT_GUARD_END()
