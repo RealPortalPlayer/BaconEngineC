@@ -11,6 +11,7 @@
 
 #include "BaconEngine/Server/Client.h"
 #include "../AntiClientGuard.h"
+#include "PrivateClient.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef struct {
@@ -20,10 +21,11 @@ typedef struct {
     /**
      * @param client - NULL if it's unconnected
      */
-    void (*Run)(BE_Client client, struct sockaddr_in* descriptor);
+    void (*Run)(BE_Client client);
 } BE_PrivatePacket;
 
 void BE_PrivatePacket_Initialize(void);
-void BE_PrivatePacket_Parse(BE_Client client, struct sockaddr_in* descriptor, const char* buffer);
+void BE_PrivatePacket_Parse(BE_PrivateClient* client, struct sockaddr_in* descriptor, const char* buffer);
 void BE_PrivatePacket_Destroy(void);
+void BE_PrivatePacket_Send(struct sockaddr_in* socket, const char* buffer);
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

@@ -143,11 +143,11 @@ void* BE_EntryPoint_ServerThreadFunction(void* argument) {
             if (errno == EWOULDBLOCK)
                 continue;
             
-            BA_LOGGER_ERROR("Errored while getting unconnected packet from client: %s\n", strerror(errno));
+            BA_LOGGER_ERROR("Errored while getting packet from client: %s\n", strerror(errno));
             continue;
         }
 
-        BE_PrivatePacket_Parse(BE_PrivateServer_GetClientFromSocket(&clientInterface), &clientInterface, buffer);
+        BE_PrivatePacket_Parse(BE_PrivateServer_GetPrivateClientFromSocket(&clientInterface), &clientInterface, buffer);
     }
     
     return NULL;

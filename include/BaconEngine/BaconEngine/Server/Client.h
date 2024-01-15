@@ -8,6 +8,6 @@
 
 #include <netinet/in.h>
 
-typedef unsigned BE_Client;
+typedef int BE_Client;
 
 #define BE_CLIENT_UNCONNECTED (-1)

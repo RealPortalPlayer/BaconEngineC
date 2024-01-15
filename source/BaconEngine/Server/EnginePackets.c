@@ -8,24 +8,24 @@
 #include "PrivateServer.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
-void BE_EnginePackets_Ping(BE_Client client, struct sockaddr_in* descriptor);
-void BE_EnginePackets_Connect(BE_Client client, struct sockaddr_in* descriptor);
+void BE_EnginePackets_Ping(BE_Client client);
+void BE_EnginePackets_Connect(BE_Client client);
 
 void BE_EnginePackets_Initialize(void) {
     BE_Packet_Register("ping", BA_BOOLEAN_TRUE, &BE_EnginePackets_Ping);
     BE_Packet_Register("connect", BA_BOOLEAN_TRUE, &BE_EnginePackets_Connect);
 }
 
-void BE_EnginePackets_Ping(BE_Client client, struct sockaddr_in* descriptor) {
-    BE_Packet_Send(descriptor, "pong");
+void BE_EnginePackets_Ping(BE_Client client) {
+    BE_Packet_Send(client, "pong");
 }
 
-void BE_EnginePackets_Connect(BE_Client client, struct sockaddr_in* descriptor) {
+void BE_EnginePackets_Connect(BE_Client client) {
     if (client != BE_CLIENT_UNCONNECTED) {
-        BE_Packet_Send(descriptor, "error already_connected");
+        BE_Packet_Send(client, "error already_connected");
         return;
     }
     
-    BE_PrivateServer_AddConnection(descriptor);
+    BE_PrivateServer_AddConnection(BE_PrivateServer_GetPrivateClientFromClient(client)->socket);
 }
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

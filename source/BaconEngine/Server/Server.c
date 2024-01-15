@@ -20,6 +20,7 @@
 #   include "../EngineMemory.h"
 #   include "PrivateServer.h"
 #   include "PrivateClient.h"
+#   include "PrivatePacket.h"
 #endif
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
@@ -29,6 +30,7 @@ static unsigned beServerPort;
 static BE_PrivateClient** beServerConnected;
 static unsigned beServerMaxPlayers;
 static BA_Boolean beServerConnectedCountDirty = BA_BOOLEAN_TRUE;
+static BE_PrivateClient* beServerGenericUnconnected;
 #endif
 
 BA_Boolean BE_Server_IsRunning(void) {
@@ -83,6 +85,10 @@ void BE_Server_Start(unsigned port) {
         privateClient->socket = NULL;
         beServerConnected[i] = privateClient;
     }
+
+    beServerGenericUnconnected = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateClient), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+    beServerGenericUnconnected->publicClient = BE_CLIENT_UNCONNECTED;
+    beServerGenericUnconnected->socket = NULL;
     
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket != -1, "Failed to create socket: %s\n", strerror(errno));
 
@@ -104,7 +110,7 @@ void BE_Server_Start(unsigned port) {
 #ifndef BE_CLIENT_BINARY
 void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor) {
     if (beServerMaxPlayers == BE_Server_GetConnectedAmount()) {
-        BE_Packet_Send(clientDescriptor, "error server_full");
+        BE_PrivatePacket_Send(clientDescriptor, "error server_full");
         return;
     }
 
@@ -121,7 +127,7 @@ void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor) {
         return;
     }
 
-    BE_Packet_Send(clientDescriptor, "error crash");
+    BE_PrivatePacket_Send(clientDescriptor, "error crash");
     BA_ASSERT_ALWAYS("No more free client slots while also not being full, this shouldn't happen\n");
 }
 #endif
@@ -143,6 +149,7 @@ void BE_Server_Stop(void) {
     }
 
     BE_EngineMemory_DeallocateMemory(beServerConnected, sizeof(BE_PrivateClient*) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+    BE_EngineMemory_DeallocateMemory(beServerGenericUnconnected, sizeof(BE_PrivateClient), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
     close(beServerSocket);
 #else
     BE_INTERFACEFUNCTION(void, void)();
@@ -150,15 +157,15 @@ void BE_Server_Stop(void) {
 }
 
 #ifndef BE_CLIENT_BINARY
-BE_Client BE_PrivateServer_GetClientFromSocket(struct sockaddr_in* clientDescriptor) {
+BE_PrivateClient* BE_PrivateServer_GetPrivateClientFromSocket(struct sockaddr_in* clientDescriptor) {
     for (int i = 0; i < beServerMaxPlayers; i++) {
         if (beServerConnected[i]->socket == NULL || memcmp(beServerConnected[i]->socket, clientDescriptor, sizeof(struct sockaddr_in)) != 0)
             continue;
 
-        return beServerConnected[i]->publicClient;
+        return beServerConnected[i];
     }
     
-    return BE_CLIENT_UNCONNECTED;
+    return beServerGenericUnconnected;
 }
 #endif
 
@@ -184,4 +191,20 @@ BE_BINARYEXPORT unsigned BE_Server_GetConnectedAmount(void) {
     return function();
 #endif
 }
+
+#ifndef BE_CLIENT_BINARY
+BE_PrivateClient* BE_PrivateServer_GetPrivateClientFromClient(BE_Client client) {
+    if (client == BE_CLIENT_UNCONNECTED)
+        return beServerGenericUnconnected;
+    
+    for (int i = 0; i < beServerMaxPlayers; i++) {
+        if (beServerConnected[i]->publicClient != client)
+            continue;
+        
+        return beServerConnected[i];
+    }
+
+    return beServerGenericUnconnected;
+}
+#endif
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

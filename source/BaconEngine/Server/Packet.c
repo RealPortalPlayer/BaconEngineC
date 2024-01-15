@@ -35,7 +35,7 @@ void BE_PrivatePacket_Initialize(void) {
 }
 #endif
 
-BE_BINARYEXPORT void BE_Packet_Register(const char* name, BA_Boolean acceptUnconnected, void (*Run)(BE_Client client, struct sockaddr_in* descriptor)) {
+BE_BINARYEXPORT void BE_Packet_Register(const char* name, BA_Boolean acceptUnconnected, void (*Run)(BE_Client client)) {
 #ifndef BE_CLIENT_BINARY
     BE_PrivatePacket* packet = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivatePacket), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
     
@@ -50,22 +50,25 @@ BE_BINARYEXPORT void BE_Packet_Register(const char* name, BA_Boolean acceptUncon
 #endif
 }
 
-BE_BINARYEXPORT void BE_Packet_Send(struct sockaddr_in* descriptor, const char* buffer) {
+BE_BINARYEXPORT void BE_Packet_Send(BE_Client client, const char* buffer) {
 #ifndef BE_CLIENT_BINARY
-    if (descriptor == NULL) {
+    if (client == BE_CLIENT_UNCONNECTED) {
         // TODO: Send packet to server
         return;
     }
-    
-    sendto(BE_PrivateServer_GetSocketDescriptor(), buffer, strlen(buffer), MSG_CONFIRM, (const struct sockaddr*) descriptor, sizeof(struct sockaddr_in));
+
+    BE_PrivatePacket_Send(BE_PrivateServer_GetPrivateClientFromClient(client)->socket, buffer);
 #else
     BE_INTERFACEFUNCTION(void, struct sockaddr_in*, const char*)(descriptor, buffer);
 #endif
 }
 
 #ifndef BE_CLIENT_BINARY
-void BE_PrivatePacket_Parse(BE_Client client, struct sockaddr_in* descriptor, const char* buffer) {
+void BE_PrivatePacket_Parse(BE_PrivateClient* client, struct sockaddr_in* descriptor, const char* buffer) {
     BE_PrivatePacket* packet;
+
+    if (client->publicClient == BE_CLIENT_UNCONNECTED)
+        client->socket = descriptor;
     
     for (int i = 0; i < bePacketRegistered.used; i++) {
         packet = BA_DYNAMICARRAY_GET_ELEMENT(BE_PrivatePacket, bePacketRegistered, i);
@@ -80,12 +83,12 @@ void BE_PrivatePacket_Parse(BE_Client client, struct sockaddr_in* descriptor, co
 
     if (packet == NULL) {
         if (BE_ClientInformation_IsServerModeEnabled()) {
-            if (client != BE_CLIENT_UNCONNECTED) {
+            if (client->publicClient != BE_CLIENT_UNCONNECTED) {
                 // TODO: Kick the client
                 return;
             }
 
-            BE_Packet_Send(descriptor, "error invalid_packet");
+            BE_PrivatePacket_Send(client->socket, "error invalid_packet");
             return;
         } else {
             // TODO: Leave the server
@@ -95,7 +98,7 @@ void BE_PrivatePacket_Parse(BE_Client client, struct sockaddr_in* descriptor, co
         return;
     }
 
-    packet->Run(client, descriptor);
+    packet->Run(client->publicClient);
 }
 
 void BE_PrivatePacket_Destroy(void) {
@@ -110,6 +113,10 @@ void BE_PrivatePacket_Destroy(void) {
     }
 
     BE_EngineMemory_DeallocateMemory(bePacketRegistered.internalArray, sizeof(void*) * bePacketRegistered.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+}
+
+void BE_PrivatePacket_Send(struct sockaddr_in* socket, const char* buffer) {
+    sendto(BE_PrivateServer_GetSocketDescriptor(), buffer, strlen(buffer), MSG_CONFIRM, (struct sockaddr*) socket, sizeof(struct sockaddr_in));
 }
 #endif
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

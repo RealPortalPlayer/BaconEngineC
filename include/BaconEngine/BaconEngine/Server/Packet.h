@@ -15,7 +15,7 @@
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 // TODO: Packet arguments
 
-BE_BINARYEXPORT void BE_Packet_Register(const char* name, BA_Boolean acceptUnconnected, void (*Run)(BE_Client client, struct sockaddr_in* descriptor));
+BE_BINARYEXPORT void BE_Packet_Register(const char* name, BA_Boolean acceptUnconnected, void (*Run)(BE_Client client));
 
-BE_BINARYEXPORT void BE_Packet_Send(struct sockaddr_in* descriptor, const char* buffer);
+BE_BINARYEXPORT void BE_Packet_Send(BE_Client client, const char* buffer);
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

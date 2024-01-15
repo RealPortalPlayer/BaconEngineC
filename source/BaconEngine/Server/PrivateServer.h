@@ -10,9 +10,11 @@
 #include <netinet/in.h>
 
 #include "../AntiClientGuard.h"
+#include "PrivateClient.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 int BE_PrivateServer_GetSocketDescriptor(void);
 void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor);
-BE_Client BE_PrivateServer_GetClientFromSocket(struct sockaddr_in* clientDescriptor);
+BE_PrivateClient* BE_PrivateServer_GetPrivateClientFromSocket(struct sockaddr_in* clientDescriptor);
+BE_PrivateClient* BE_PrivateServer_GetPrivateClientFromClient(BE_Client client);
 BA_CPLUSPLUS_SUPPORT_GUARD_END()
