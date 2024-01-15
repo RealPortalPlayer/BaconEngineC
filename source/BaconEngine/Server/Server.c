@@ -80,6 +80,7 @@ void BE_Server_Start(unsigned port) {
         BE_PrivateClient* privateClient = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateClient), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
         
         privateClient->publicClient = -1;
+        privateClient->socket = NULL;
         beServerConnected[i] = privateClient;
     }
     
@@ -135,7 +136,9 @@ void BE_Server_Stop(void) {
             // TODO: Kick client
         }
 
-        BE_EngineMemory_DeallocateMemory(beServerConnected[i]->socket, sizeof(struct sockaddr_in), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+        if (beServerConnected[i]->socket != NULL)
+            BE_EngineMemory_DeallocateMemory(beServerConnected[i]->socket, sizeof(struct sockaddr_in), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+        
         BE_EngineMemory_DeallocateMemory(beServerConnected[i], sizeof(BE_PrivateClient), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
     }
 
