@@ -9,7 +9,6 @@
 #include <netinet/in.h>
 
 typedef struct {
-    int clientId;
-    char* address;
-    int port;
+    unsigned clientId;
+    struct sockaddr_in* socket;
 } BE_Client_Connected;

@@ -63,7 +63,6 @@ void BE_Server_Start(unsigned port) {
     
     beServerConnectedAmount = 0;
     beServerMaxPlayers = 10;
-    beServerConnected = BE_EngineMemory_AllocateMemory(sizeof(BE_Client_Connected) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
     beServerSocket = socket(AF_INET, SOCK_DGRAM, 0);
     beServerPort = port;
 
@@ -71,10 +70,13 @@ void BE_Server_Start(unsigned port) {
         BA_ArgumentHandler_ShortResults maxPlayersResults;
 
         if (BA_ArgumentHandler_GetInformationWithShort(SEC_BUILTINARGUMENTS_MAX_PLAYERS, SEC_BUILTINARGUMENTS_MAX_PLAYERS_SHORT, BA_BOOLEAN_FALSE, &maxPlayersResults) != 0)
-            beServerMaxPlayers = BA_Number_StringToUnsigned(*maxPlayersResults.value, NULL, NULL, "Invalid max players, defaulting with 10\n", 10);
+            beServerMaxPlayers = BA_Number_StringToUnsigned(*maxPlayersResults.value, NULL, NULL, "Invalid max players, defaulting with 10\n", beServerMaxPlayers);
     }
     
     BA_LOGGER_INFO("Allocating player list: %u player%s\n", beServerMaxPlayers, beServerMaxPlayers != 1 ? "s" : "");
+
+    beServerConnected = BE_EngineMemory_AllocateMemory(sizeof(BE_Client_Connected*) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket != -1, "Failed to create socket: %s\n", strerror(errno));
 
     struct sockaddr_in serverAddress;
@@ -102,8 +104,7 @@ void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor) {
     BE_Client_Connected* client = BE_EngineMemory_AllocateMemory(sizeof(BE_Client_Connected), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
     
     client->clientId = beServerConnectedAmount;
-    client->address = BA_String_Copy(inet_ntoa(clientDescriptor->sin_addr));
-    client->port = ntohs(clientDescriptor->sin_port);
+    client->socket = clientDescriptor;
     beServerConnected[beServerConnectedAmount++] = client;
 }
 #endif
@@ -119,11 +120,10 @@ void BE_Server_Stop(void) {
         if (beServerConnected[i] == NULL)
             continue;
 
-        free(beServerConnected[i]->address);
         BE_EngineMemory_DeallocateMemory(beServerConnected[i], sizeof(BE_Client_Connected), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
     }
 
-    BE_EngineMemory_DeallocateMemory(beServerConnected, sizeof(BE_Client_Connected) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+    BE_EngineMemory_DeallocateMemory(beServerConnected, sizeof(BE_Client_Connected*) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
     close(beServerSocket);
 #else
     BE_INTERFACEFUNCTION(void, void)();
@@ -131,9 +131,9 @@ void BE_Server_Stop(void) {
 }
 
 #ifndef BE_CLIENT_BINARY
-BE_Client_Connected* BE_PrivateServer_GetClientFromAddress(struct sockaddr_in* clientDescriptor) {
+BE_Client_Connected* BE_PrivateServer_GetClientFromSocket(struct sockaddr_in* clientDescriptor) {
     for (int i = 0; i < beServerConnectedAmount; i++) {
-        if (strcmp(beServerConnected[i]->address, inet_ntoa(clientDescriptor->sin_addr)) != 0)
+        if (beServerConnected[i]->socket != clientDescriptor)
             continue;
 
         return beServerConnected[i];
@@ -144,13 +144,18 @@ BE_Client_Connected* BE_PrivateServer_GetClientFromAddress(struct sockaddr_in* c
 #endif
 
 BE_BINARYEXPORT BE_Client_Connected* BE_Server_GetClient(unsigned clientId) {
+#ifndef BE_CLIENT_BINARY
     for (int i = 0; i < beServerConnectedAmount; i++) {
         if (beServerConnected[i]->clientId != clientId)
             continue;
-        
+
         return beServerConnected[i];
     }
-    
+
     return NULL;
+#else
+    BE_INTERFACEFUNCTION(BE_Client_Connected*, unsigned);
+    return function(clientId);
+#endif
 }
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

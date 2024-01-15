@@ -147,7 +147,7 @@ void* BE_EntryPoint_ServerThreadFunction(void* argument) {
             continue;
         }
 
-        BE_PrivatePacket_Parse(NULL, &clientInterface, buffer);
+        BE_PrivatePacket_Parse(BE_PrivateServer_GetClientFromSocket(&clientInterface), &clientInterface, buffer);
     }
     
     return NULL;

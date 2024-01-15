@@ -104,8 +104,10 @@ void BE_PrivatePacket_Destroy(void) {
     
     bePacketInitialized = BA_BOOLEAN_FALSE;
 
-    for (int i = 0; i < bePacketRegistered.used; i++)
+    for (int i = 0; i < bePacketRegistered.used; i++) {
+        free(BA_DYNAMICARRAY_GET_ELEMENT(BE_PrivatePacket, bePacketRegistered, i)->name);
         BE_EngineMemory_DeallocateMemory(bePacketRegistered.internalArray[i], sizeof(BE_PrivatePacket), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+    }
 
     BE_EngineMemory_DeallocateMemory(bePacketRegistered.internalArray, sizeof(void*) * bePacketRegistered.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
 }

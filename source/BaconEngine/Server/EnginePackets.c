@@ -21,7 +21,7 @@ void BE_EnginePackets_Ping(BE_Client_Connected* client, struct sockaddr_in* desc
 }
 
 void BE_EnginePackets_Connect(BE_Client_Connected* client, struct sockaddr_in* descriptor) {
-    if (BE_PrivateServer_GetClientFromAddress(descriptor) != NULL) {
+    if (client != NULL) {
         BE_Packet_Send(descriptor, "error already connected");
         return;
     }
