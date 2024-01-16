@@ -87,8 +87,8 @@ void BE_Server_Start(unsigned port) {
     
     BA_LOGGER_INFO("Allocating player list: %u player%s\n", beServerMaxPlayers, beServerMaxPlayers != 1 ? "s" : "");
 
-    beServerConnected = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateClient*) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
-    beServerGenericUnconnected = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateClient), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+    beServerConnected = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateClient*) * beServerMaxPlayers, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CONNECTED);
+    beServerGenericUnconnected = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateClient), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CLIENT);
     beServerGenericUnconnected->publicClient = BE_CLIENT_UNCONNECTED;
     beServerGenericUnconnected->socket = NULL;
     
@@ -121,12 +121,12 @@ void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor) {
         if (beServerConnected[i]->publicClient != BE_CLIENT_UNCONNECTED)
             continue;
 
-        BE_PrivateClient* client = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateClient), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+        BE_PrivateClient* client = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateClient), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CLIENT);
         
         beServerConnected[i] = client;
         beServerConnected[i]->publicClient = i;
         // TODO: Is this even necessary? I would assume so
-        beServerConnected[i]->socket = BE_EngineMemory_AllocateMemory(sizeof(struct sockaddr_in), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+        beServerConnected[i]->socket = BE_EngineMemory_AllocateMemory(sizeof(struct sockaddr_in), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CLIENT_SOCKET);
         beServerConnectedCountDirty = BA_BOOLEAN_TRUE;
 
         memcpy(beServerConnected[i]->socket, clientDescriptor, sizeof(struct sockaddr_in));
@@ -150,13 +150,13 @@ void BE_Server_Stop(void) {
         // TODO: Kick client
         
         if (beServerConnected[i]->socket != NULL)
-            BE_EngineMemory_DeallocateMemory(beServerConnected[i]->socket, sizeof(struct sockaddr_in), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+            BE_EngineMemory_DeallocateMemory(beServerConnected[i]->socket, sizeof(struct sockaddr_in), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CLIENT_SOCKET);
         
-        BE_EngineMemory_DeallocateMemory(beServerConnected[i], sizeof(BE_PrivateClient), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+        BE_EngineMemory_DeallocateMemory(beServerConnected[i], sizeof(BE_PrivateClient), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CLIENT);
     }
 
-    BE_EngineMemory_DeallocateMemory(beServerConnected, sizeof(BE_PrivateClient*) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
-    BE_EngineMemory_DeallocateMemory(beServerGenericUnconnected, sizeof(BE_PrivateClient), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+    BE_EngineMemory_DeallocateMemory(beServerConnected, sizeof(BE_PrivateClient*) * beServerMaxPlayers, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CONNECTED);
+    BE_EngineMemory_DeallocateMemory(beServerGenericUnconnected, sizeof(BE_PrivateClient), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CLIENT);
 
 #   if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
     close(beServerSocket);

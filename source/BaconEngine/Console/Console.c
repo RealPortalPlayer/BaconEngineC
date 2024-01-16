@@ -155,7 +155,7 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
             BA_LOGGER_WARN("Redundant command flags, server commands will only run on servers\n");
     }
 
-    BE_PrivateConsole_Command* privateConsoleCommand = (BE_PrivateConsole_Command*) BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateConsole_Command), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+    BE_PrivateConsole_Command* privateConsoleCommand = (BE_PrivateConsole_Command*) BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateConsole_Command), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_COMMAND);
 
     if (!beConsoleDuplicateCommand)
         BE_PrivateDynamicArray_Create(&privateConsoleCommand->publicCommand.arguments, 10);
@@ -192,7 +192,7 @@ void BE_Command_AddArgument(const char* name, BA_Boolean required) {
                                          BA_DYNAMICARRAY_GET_LAST_ELEMENT(BE_ArgumentManager_Argument, command->publicCommand.arguments)->required ||
                                          !required, "Required arguments cannot be added after an optional argument\n");
 
-    BE_ArgumentManager_Argument* argument = BE_EngineMemory_AllocateMemory(sizeof(BE_ArgumentManager_Argument), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+    BE_ArgumentManager_Argument* argument = BE_EngineMemory_AllocateMemory(sizeof(BE_ArgumentManager_Argument), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_ARGUMENT);
 
     argument->name = BA_String_Copy(name);
     argument->required = required;
@@ -299,13 +299,13 @@ void BE_Console_ExecuteCommand(const char* input, BE_Client client) {
     command->publicCommand.Run(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Command_Context, input, input + argumentStartingIndex, arguments));
 
     destroy:
-    BE_EngineMemory_DeallocateMemory(name, sizeof(char) * (strlen(name) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+    BE_EngineMemory_DeallocateMemory(name, sizeof(char) * (strlen(name) + 1), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_NAME);
     
     for (int argumentId = 0; argumentId < arguments.keys.used; argumentId++)
-        BE_EngineMemory_DeallocateMemory(arguments.values.internalArray[argumentId], sizeof(char) * (strlen(arguments.values.internalArray[argumentId]) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+        BE_EngineMemory_DeallocateMemory(arguments.values.internalArray[argumentId], sizeof(char) * (strlen(arguments.values.internalArray[argumentId]) + 1), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_TEMPORARY_ARGUMENT);
 
-    BE_EngineMemory_DeallocateMemory(arguments.keys.internalArray, sizeof(void*) * arguments.keys.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
-    BE_EngineMemory_DeallocateMemory(arguments.values.internalArray, sizeof(void*) * arguments.keys.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BE_EngineMemory_DeallocateMemory(arguments.keys.internalArray, sizeof(void*) * arguments.keys.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BE_EngineMemory_DeallocateMemory(arguments.values.internalArray, sizeof(void*) * arguments.keys.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
 #else
     BE_INTERFACEFUNCTION(void, const char*)(input);
 #endif
@@ -332,16 +332,16 @@ void BE_PrivateConsole_Destroy(void) {
 
         for (int argumentId = 0; argumentId < command->publicCommand.arguments.used; argumentId++)
             BE_EngineMemory_DeallocateMemory(command->publicCommand.arguments.internalArray[argumentId], sizeof(BE_ArgumentManager_Argument),
-                                             BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+                                             BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_ARGUMENT);
 
         if (!command->duplicate)
-            BE_EngineMemory_DeallocateMemory(command->publicCommand.arguments.internalArray, sizeof(void*) * command->publicCommand.arguments.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+            BE_EngineMemory_DeallocateMemory(command->publicCommand.arguments.internalArray, sizeof(void*) * command->publicCommand.arguments.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
 
-        BE_EngineMemory_DeallocateMemory(command, sizeof(BE_PrivateConsole_Command), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+        BE_EngineMemory_DeallocateMemory(command, sizeof(BE_PrivateConsole_Command), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_COMMAND);
     }
 
-    BE_EngineMemory_DeallocateMemory(beConsolePrivateCommands.internalArray, sizeof(void*) * beConsolePrivateCommands.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
-    BE_EngineMemory_DeallocateMemory(beConsoleCommands.internalArray, sizeof(void*) * beConsoleCommands.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BE_EngineMemory_DeallocateMemory(beConsolePrivateCommands.internalArray, sizeof(void*) * beConsolePrivateCommands.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BE_EngineMemory_DeallocateMemory(beConsoleCommands.internalArray, sizeof(void*) * beConsoleCommands.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 #endif
 

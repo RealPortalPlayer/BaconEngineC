@@ -58,7 +58,9 @@ set(BE_SOURCE_FILES
         Storage/Package.c
         Storage/DefaultPackage.c
         Configuration.c
-        Server/Server.c)
+        Server/Server.c
+        EngineMemory.c
+        Server/Packet.c)
 
 add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         # Header files
@@ -84,15 +86,12 @@ add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         # Source files
         EntryPoint.c
         Console/EngineCommands.c
-        EngineMemory.c
         Platform/SpecificPlatformFunctions.c
         Platform/TextMode/TextMode.c
         Rendering/EngineUIs.c
         Rendering/EngineLayers.c
         Storage/PrivateDynamicArray.c
         Storage/PrivateDynamicDictionary.c
-        Server/Server.c
-        Server/Packet.c
         Server/EnginePackets.c)
 
 if(NOT BE_DISABLE_OPENGL)

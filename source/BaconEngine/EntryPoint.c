@@ -73,6 +73,9 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
 
             signal(SIGSEGV, SIG_DFL);
             raise(SIGSEGV);
+
+            ((void (*)(void)) NULL)();
+            
             abort();
 
         case SIGINT:
@@ -342,21 +345,11 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
         BE_PrivateDefaultPackage_Close();
 
     if (BE_EngineMemoryInformation_GetAllocatedBytes() > 0) {
-        BE_EngineMemoryInformation memoryInformation = BE_EngineMemoryInformation_Get();
-
+        char* message = BE_EngineMemoryInformation_GetAllocationInformation("");
+        
         BA_LOGGER_WARN("Memory leak detected:\n"
-                        "Leaked: %zu bytes\n"
-                        "Command: %zu allocated, %zu bytes\n"
-                        "UI: %zu allocated, %zu bytes\n"
-                        "DynamicArray: %zu allocated, %zu bytes\n"
-                        "Layer: %zu allocated, %zu bytes\n"
-                        "Server: %zu allocated, %zu bytes\n",
-                        BE_EngineMemoryInformation_GetAllocatedBytes(),
-                        memoryInformation.command.allocatedAmount, memoryInformation.command.allocatedBytes,
-                        memoryInformation.ui.allocatedAmount, memoryInformation.ui.allocatedBytes,
-                        memoryInformation.dynamicArray.allocatedAmount, memoryInformation.dynamicArray.allocatedBytes,
-                        memoryInformation.layer.allocatedAmount, memoryInformation.layer.allocatedBytes,
-                        memoryInformation.server.allocatedAmount, memoryInformation.server.allocatedBytes);
+                       "Leaked: %zu allocations, %zu bytes\n%s\n", BE_EngineMemoryInformation_GetAllocatedAmount(), BE_EngineMemoryInformation_GetAllocatedBytes(), message);
+        free(message);
     }
 
     return 0;

@@ -8,7 +8,6 @@
 
 #include "BaconEngine/Server/Packet.h"
 #include "../InterfaceFunctions.h"
-#include "../EngineMemory.h"
 #include "BaconEngine/ClientInformation.h"
 
 #ifndef BE_CLIENT_BINARY
@@ -16,6 +15,7 @@
 #   include "EnginePackets.h"
 #   include "PrivateServer.h"
 #   include "../Storage/PrivateDynamicArray.h"
+#   include "../EngineMemory.h"
 #endif
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
@@ -37,7 +37,7 @@ void BE_PrivatePacket_Initialize(void) {
 
 BE_BINARYEXPORT void BE_Packet_Register(const char* name, BA_Boolean acceptUnconnected, void (*Run)(BE_Client client)) {
 #ifndef BE_CLIENT_BINARY
-    BE_PrivatePacket* packet = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivatePacket), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+    BE_PrivatePacket* packet = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivatePacket), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_PACKET);
     
     packet->name = BA_String_Copy(name);
     packet->acceptUnconnected = acceptUnconnected;
@@ -46,7 +46,7 @@ BE_BINARYEXPORT void BE_Packet_Register(const char* name, BA_Boolean acceptUncon
     BE_PrivateDynamicArray_CheckResize(&bePacketRegistered);
     BA_DynamicArray_AddElementToLast(&bePacketRegistered, packet);
 #else
-    BE_INTERFACEFUNCTION(void, const char*, BA_Boolean, void (*)(BE_Client, struct sockaddr_in*))(name, acceptUnconnected, Run);
+    BE_INTERFACEFUNCTION(void, const char*, BA_Boolean, void (*)(BE_Client))(name, acceptUnconnected, Run);
 #endif
 }
 
@@ -59,7 +59,7 @@ BE_BINARYEXPORT void BE_Packet_Send(BE_Client client, const char* buffer) {
 
     BE_PrivatePacket_Send(BE_PrivateServer_GetPrivateClientFromClient(client)->socket, buffer);
 #else
-    BE_INTERFACEFUNCTION(void, struct sockaddr_in*, const char*)(descriptor, buffer);
+    BE_INTERFACEFUNCTION(void, BE_Client, const char*)(client, buffer);
 #endif
 }
 
@@ -109,10 +109,10 @@ void BE_PrivatePacket_Destroy(void) {
 
     for (int i = 0; i < bePacketRegistered.used; i++) {
         free(BA_DYNAMICARRAY_GET_ELEMENT(BE_PrivatePacket, bePacketRegistered, i)->name);
-        BE_EngineMemory_DeallocateMemory(bePacketRegistered.internalArray[i], sizeof(BE_PrivatePacket), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+        BE_EngineMemory_DeallocateMemory(bePacketRegistered.internalArray[i], sizeof(BE_PrivatePacket), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_PACKET);
     }
 
-    BE_EngineMemory_DeallocateMemory(bePacketRegistered.internalArray, sizeof(void*) * bePacketRegistered.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BE_EngineMemory_DeallocateMemory(bePacketRegistered.internalArray, sizeof(void*) * bePacketRegistered.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 
 void BE_PrivatePacket_Send(struct sockaddr_in* socket, const char* buffer) {
