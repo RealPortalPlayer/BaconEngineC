@@ -88,18 +88,12 @@ void BE_Server_Start(unsigned port) {
     BA_LOGGER_INFO("Allocating player list: %u player%s\n", beServerMaxPlayers, beServerMaxPlayers != 1 ? "s" : "");
 
     beServerConnected = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateClient*) * beServerMaxPlayers, BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
-
-    for (int i = 0; i < beServerMaxPlayers; i++) {
-        BE_PrivateClient* privateClient = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateClient), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
-        
-        privateClient->publicClient = -1;
-        privateClient->socket = NULL;
-        beServerConnected[i] = privateClient;
-    }
-
     beServerGenericUnconnected = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateClient), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
     beServerGenericUnconnected->publicClient = BE_CLIENT_UNCONNECTED;
     beServerGenericUnconnected->socket = NULL;
+    
+    for (int i = 0; i < beServerMaxPlayers; i++)
+        beServerConnected[i] = beServerGenericUnconnected;
     
     struct sockaddr_in serverAddress;
 
@@ -127,8 +121,11 @@ void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor) {
         if (beServerConnected[i]->publicClient != BE_CLIENT_UNCONNECTED)
             continue;
 
-        // TODO: Is this even necessary? I would assume so
+        BE_PrivateClient* client = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateClient), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
+        
+        beServerConnected[i] = client;
         beServerConnected[i]->publicClient = i;
+        // TODO: Is this even necessary? I would assume so
         beServerConnected[i]->socket = BE_EngineMemory_AllocateMemory(sizeof(struct sockaddr_in), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
         beServerConnectedCountDirty = BA_BOOLEAN_TRUE;
 
@@ -147,10 +144,11 @@ void BE_Server_Stop(void) {
     BA_LOGGER_INFO("Closing server\n");
     
     for (int i = 0; i < beServerMaxPlayers; i++) {
-        if (beServerConnected[i]->publicClient != BE_CLIENT_UNCONNECTED) {
-            // TODO: Kick client
-        }
+        if (beServerConnected[i]->publicClient == BE_CLIENT_UNCONNECTED)
+            continue;
 
+        // TODO: Kick client
+        
         if (beServerConnected[i]->socket != NULL)
             BE_EngineMemory_DeallocateMemory(beServerConnected[i]->socket, sizeof(struct sockaddr_in), BE_ENGINEMEMORY_MEMORY_TYPE_SERVER);
         

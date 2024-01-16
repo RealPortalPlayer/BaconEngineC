@@ -168,7 +168,7 @@ BA_THREAD_RETURN_VALUE BE_EntryPoint_ServerThreadFunction(void* argument) {
                 continue;
 #endif
             
-            BA_LOGGER_ERROR("Errored while getting packet from client: %i\n", WSAGetLastError());
+            BA_LOGGER_ERROR("Errored while getting packet from client: %s\n", strerror(errno));
             continue;
         }
         
