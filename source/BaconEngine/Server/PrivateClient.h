@@ -7,6 +7,13 @@
 #pragma once
 
 #include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <BaconAPI/Internal/OperatingSystem.h>
+
+#if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
+#   include <netinet/in.h>
+#elif BA_OPERATINGSYSTEM_WINDOWS
+#   include <Windows.h>
+#endif
 
 #include "../AntiClientGuard.h"
 #include "BaconEngine/Server/Client.h"

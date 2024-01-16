@@ -155,6 +155,8 @@ add_custom_target(BaconEngineDefaultPackage
 
 if(EMSCRIPTEN)
     set_target_properties(BaconEngine PROPERTIES LINK_FLAGS "-sSIDE_MODULE=1")
+elseif(WIN32)
+    target_link_libraries(BaconEngine LINK_PRIVATE wsock32 ws2_32)    
 endif()
 
 include(BaconEngineClient.cmake)

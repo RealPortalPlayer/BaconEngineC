@@ -1,6 +1,12 @@
 // Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
+#include <BaconAPI/Internal/OperatingSystem.h>
+
+#if BA_OPERATINGSYSTEM_WINDOWS
+#   include <ws2tcpip.h>
+#endif
+
 #include <BaconAPI/ArgumentHandler.h>
 #include <BaconAPI/Logger.h>
 #include <string.h>
@@ -23,6 +29,7 @@
 #elif BA_OPERATINGSYSTEM_WINDOWS
 #   include <signal.h>
 #   include <io.h>
+#   include <Windows.h>
 #   define fileno _fileno
 #   define write(file, message, size) _write(file, message, (unsigned) size) // HACK: This is a stupid idea, but it's the only way to make MSVC shut up.
 #endif
@@ -88,7 +95,7 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
     }
 }
 
-void* BE_EntryPoint_CommandThreadFunction(void* argument) {
+BA_THREAD_RETURN_VALUE BE_EntryPoint_CommandThreadFunction(void* argument) {
     commandThreadRunning = BA_BOOLEAN_TRUE;
 
     // FIXME: Find out why this is not working on Serenity.
@@ -127,30 +134,52 @@ void* BE_EntryPoint_CommandThreadFunction(void* argument) {
     }
 
     commandThreadRunning = BA_BOOLEAN_FALSE;
+
+#if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
     return NULL;
+#else
+    return 0;
+#endif
 }
 
-void* BE_EntryPoint_ServerThreadFunction(void* argument) {
+BA_THREAD_RETURN_VALUE BE_EntryPoint_ServerThreadFunction(void* argument) {
+#if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
     fcntl(BE_PrivateServer_GetSocketDescriptor(), F_SETFL, O_NONBLOCK);
-
+#elif BA_OPERATINGSYSTEM_WINDOWS
+    {
+        ULONG enable = 1;
+        
+        ioctlsocket(BE_PrivateServer_GetSocketDescriptor(), FIONBIO, &enable);
+    }
+#endif
+    
     while (BE_ClientInformation_IsRunning()) {
         struct sockaddr_in clientInterface;
         socklen_t clientSize = sizeof(clientInterface);
         char buffer[1024];
-        ssize_t packetLength = recvfrom(BE_PrivateServer_GetSocketDescriptor(), (char*) &buffer, 1024, MSG_WAITALL, (struct sockaddr*) &clientInterface, &clientSize);
+        ssize_t packetLength = recvfrom(BE_PrivateServer_GetSocketDescriptor(), (char*) &buffer, 1024, 0, (struct sockaddr*) &clientInterface, &clientSize);
 
         if (packetLength == -1) {
+#if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
             if (errno == EWOULDBLOCK)
                 continue;
+#elif BA_OPERATINGSYSTEM_WINDOWS
+            if (WSAGetLastError() == WSAEWOULDBLOCK)
+                continue;
+#endif
             
-            BA_LOGGER_ERROR("Errored while getting packet from client: %s\n", strerror(errno));
+            BA_LOGGER_ERROR("Errored while getting packet from client: %i\n", WSAGetLastError());
             continue;
         }
-
+        
         BE_PrivatePacket_Parse(BE_PrivateServer_GetPrivateClientFromSocket(&clientInterface), &clientInterface, buffer);
     }
-    
+
+#if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
     return NULL;
+#else
+    return 0;
+#endif
 }
 
 BE_BINARYEXPORT const char* BE_EntryPoint_GetVersion(void) {

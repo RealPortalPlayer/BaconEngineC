@@ -116,7 +116,7 @@ void BE_PrivatePacket_Destroy(void) {
 }
 
 void BE_PrivatePacket_Send(struct sockaddr_in* socket, const char* buffer) {
-    sendto(BE_PrivateServer_GetSocketDescriptor(), buffer, strlen(buffer), MSG_CONFIRM, (struct sockaddr*) socket, sizeof(struct sockaddr_in));
+    sendto(BE_PrivateServer_GetSocketDescriptor(), buffer, strlen(buffer), 0, (struct sockaddr*) socket, sizeof(struct sockaddr_in));
 }
 #endif
 BA_CPLUSPLUS_SUPPORT_GUARD_END()
