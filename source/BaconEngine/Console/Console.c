@@ -243,6 +243,7 @@ void BE_Console_ExecuteCommand(const char* input, BE_Client client) {
     int argumentStartingIndex;
 
     BE_PrivateArgumentManager_ParseName(input, &name, &argumentStartingIndex);
+    BE_PrivateDynamicDictionary_Create(&arguments, 20);
 
     BE_PrivateConsole_Command* command = BE_Console_GetPrivateCommand(name);
     
@@ -250,9 +251,7 @@ void BE_Console_ExecuteCommand(const char* input, BE_Client client) {
         BA_LOGGER_ERROR("'%s' is not a valid command\n", name);
         goto destroy;
     }
-
-    BE_PrivateDynamicDictionary_Create(&arguments, 20);
-
+    
     if (command->publicCommand.arguments.used != 0 && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_ARGUMENT_PARSING) && !BE_PrivateArgumentManager_ParseArguments(input, argumentStartingIndex, !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING), command->publicCommand.arguments, &arguments))
         goto destroy;
 
