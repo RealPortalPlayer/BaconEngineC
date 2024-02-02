@@ -73,9 +73,7 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
 
             signal(SIGSEGV, SIG_DFL);
             raise(SIGSEGV);
-
             ((void (*)(void)) NULL)();
-            
             abort();
 
         case SIGINT:
