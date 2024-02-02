@@ -86,7 +86,9 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
                 return;
             }
 
-            printf(" (type 'exit' to quit)\n");
+
+            if (BA_Logger_IsLevelEnabled(BA_LOGGER_LOG_LEVEL_INFO))
+                printf(" (type 'exit' to quit)\n");
 
             printedCursor = BA_BOOLEAN_FALSE;
             return;
