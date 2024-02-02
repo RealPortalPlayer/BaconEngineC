@@ -23,6 +23,8 @@ if(EMSCRIPTEN)
     set_target_properties(BaconLauncher PROPERTIES LINK_FLAGS "-sMAIN_MODULE=1")
 endif()
 
+ba_strip(BaconLauncher)
+
 if(WIN32)
     include(BaconLauncherWindows.cmake)
 endif()

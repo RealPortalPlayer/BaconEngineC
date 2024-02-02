@@ -17,3 +17,5 @@ target_link_libraries(BaconEngineLauncher LINK_PUBLIC BaconEngineClient)
 if(NOT WIN32)
     target_compile_options(BaconEngineLauncher PUBLIC -rdynamic)
 endif()
+
+ba_strip_static(BaconEngineLauncher)

@@ -38,3 +38,5 @@ endif()
 if(BA_DISABLE_HACKS)
     target_compile_definitions(SharedEngineCode PUBLIC BA_DISABLE_HACKS)
 endif()
+
+ba_strip_static(SharedEngineCode)

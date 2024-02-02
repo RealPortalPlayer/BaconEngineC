@@ -15,3 +15,4 @@ endif()
 
 target_link_libraries(BaconEngineClient LINK_PUBLIC Interface zip)
 add_dependencies(BaconEngineClient BaconEngine)
+ba_strip_static(BaconEngineClient)

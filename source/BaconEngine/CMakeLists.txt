@@ -158,4 +158,6 @@ elseif(WIN32)
     target_link_libraries(BaconEngine LINK_PRIVATE wsock32 ws2_32)    
 endif()
 
+ba_strip(BaconEngine)
+
 include(BaconEngineClient.cmake)

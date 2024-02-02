@@ -20,3 +20,5 @@ if(NOT BE_DONT_SET_BINARY_OUTPUT_PATH)
 endif()
 
 target_compile_definitions(BaconLauncherWindows PUBLIC BE_ENGINE_VERSION="${BE_ENGINE_VERSION}" BE_LAUNCHER_VERSION="${BE_LAUNCHER_VERSION}")
+
+ba_strip(BaconEngineWindows)
