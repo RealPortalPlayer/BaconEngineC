@@ -21,4 +21,4 @@ endif()
 
 target_compile_definitions(BaconLauncherWindows PUBLIC BE_ENGINE_VERSION="${BE_ENGINE_VERSION}" BE_LAUNCHER_VERSION="${BE_LAUNCHER_VERSION}")
 
-ba_strip(BaconEngineWindows)
+ba_strip(BaconLauncherWindows)
