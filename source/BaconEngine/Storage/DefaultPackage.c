@@ -6,12 +6,9 @@
 #include <SharedEngineCode/Debugging/StrictMode.h>
 #include <BaconAPI/String.h>
 
-#include "BaconEngine/Storage/DefaultPackage.h"
 #include "BaconEngine/Storage/Package.h"
-#include "../InterfaceFunctions.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
-#ifndef BE_CLIENT_BINARY
 static BE_Package beDefaultPackage = NULL;
 
 BA_Boolean BE_PrivateDefaultPackage_Open(void) {
@@ -43,17 +40,8 @@ void BE_PrivateDefaultPackage_Close(void) {
     
     beDefaultPackage = NULL;
 }
-#endif
 
-BE_BINARYEXPORT BA_Boolean BE_DefaultPackage_GetFile(const char* filePath, void** buffer, size_t* bufferSize) {
-#ifndef BE_CLIENT_BINARY
-    if (!BE_PrivateDefaultPackage_IsOpen())
-        return BA_BOOLEAN_FALSE;
-    
-    return BE_Package_GetFile(beDefaultPackage, filePath, buffer, bufferSize);
-#else
-    BE_INTERFACEFUNCTION(BA_Boolean, const char*, void**, size_t*);
-    return function(filePath, buffer, bufferSize);
-#endif
+BE_Package BE_PrivateDefaultPackage_Get(void) {
+    return beDefaultPackage;
 }
 BA_CPLUSPLUS_SUPPORT_GUARD_END()
