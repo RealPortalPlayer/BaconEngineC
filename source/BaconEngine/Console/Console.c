@@ -9,7 +9,7 @@
 #include "BaconEngine/Console/Console.h"
 #include "../InterfaceFunctions.h"
 #include "BaconEngine/Math/Bitwise.h"
-#include "BaconEngine/ClientInformation.h"
+#include "BaconEngine/Client/Information.h"
 
 #ifndef BE_CLIENT_BINARY
 #   include "EngineCommands.h"

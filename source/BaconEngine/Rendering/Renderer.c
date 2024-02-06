@@ -1,4 +1,4 @@
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <BaconAPI/Internal/OperatingSystem.h>
@@ -22,7 +22,7 @@
 #endif
 
 #include "../InterfaceFunctions.h"
-#include "BaconEngine/ClientInformation.h"
+#include "BaconEngine/Client/Information.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY

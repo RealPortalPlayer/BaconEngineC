@@ -7,7 +7,7 @@
 #include "BaconEngine/Rendering/UI.h"
 #include "BaconEngine/Math/Bitwise.h"
 #include "../InterfaceFunctions.h"
-#include "BaconEngine/ClientInformation.h"
+#include "BaconEngine/Client/Information.h"
 
 #ifndef BE_CLIENT_BINARY
 #   include "../EngineMemory.h"

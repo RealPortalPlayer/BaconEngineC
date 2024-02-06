@@ -46,7 +46,7 @@
 #include "Rendering/PrivateRenderer.h"
 #include "BaconEngine/Console/Console.h"
 #include "Storage/PrivateDefaultPackage.h"
-#include "BaconEngine/ClientInformation.h"
+#include "BaconEngine/Client/Information.h"
 #include "BaconEngine/Server/Server.h"
 #include "Server/PrivateServer.h"
 #include "Server/PrivatePacket.h"

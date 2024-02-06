@@ -11,7 +11,7 @@
 #include "BaconEngine/Rendering/Renderer.h"
 #include "../Rendering/EngineLayers.h"
 #include "BaconEngine/Rendering/Layer.h"
-#include "BaconEngine/ClientInformation.h"
+#include "BaconEngine/Client/Information.h"
 #include "BaconEngine/EngineMemoryInformation.h"
 #include "BaconEngine/Rendering/UI.h"
 #include "BaconEngine/Math/Bitwise.h"

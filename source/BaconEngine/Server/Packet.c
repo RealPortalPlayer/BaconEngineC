@@ -8,7 +8,7 @@
 
 #include "BaconEngine/Server/Packet.h"
 #include "../InterfaceFunctions.h"
-#include "BaconEngine/ClientInformation.h"
+#include "BaconEngine/Client/Information.h"
 
 #ifndef BE_CLIENT_BINARY
 #   include "PrivatePacket.h"

@@ -46,7 +46,7 @@ set(BE_SOURCE_FILES
         # Source files
         Rendering/Window.c
         Rendering/Renderer.c
-        ClientInformation.c
+        Client/Information.c
         ArgumentManager.c
         Console/Console.c
         Rendering/Layer.c

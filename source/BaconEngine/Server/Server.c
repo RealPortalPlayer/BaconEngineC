@@ -11,7 +11,7 @@
 
 #include "BaconEngine/Server/Server.h"
 #include "../InterfaceFunctions.h"
-#include "BaconEngine/ClientInformation.h"
+#include "BaconEngine/Client/Information.h"
 #include "BaconEngine/Server/Packet.h"
 #include "BaconAPI/Debugging/Assert.h"
 
