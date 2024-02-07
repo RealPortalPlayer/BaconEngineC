@@ -42,7 +42,7 @@ int BE_ArgumentManager_GetInteger(BA_DynamicDictionary arguments, const char* na
 #endif
 }
 
-BA_Boolean BE_ArgumentManager_GetBoolean(BA_DynamicDictionary arguments, const char* name, int defaultValue) {
+BA_Boolean BE_ArgumentManager_GetBoolean(BA_DynamicDictionary arguments, const char* name, BA_Boolean defaultValue) {
 #ifndef BE_CLIENT_BINARY
     return BE_ArgumentManager_GetInteger(arguments, name, defaultValue) >= 1;
 #else
