@@ -17,17 +17,17 @@
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
 static BE_EngineMemoryInformation_MemoryTypeData beEngineMemoryInformation[] = {
-        {0, 0},
-        {0, 0},
-        {0, 0},
-        {0, 0},
-        {0, 0},
-        {0, 0},
-        {0, 0},
-        {0, 0},
-        {0, 0},
-        {0, 0},
-        {0, 0}
+    {0, 0},
+    {0, 0},
+    {0, 0},
+    {0, 0},
+    {0, 0},
+    {0, 0},
+    {0, 0},
+    {0, 0},
+    {0, 0},
+    {0, 0},
+    {0, 0}
 };
 
 BA_STATIC_ASSERT_LOOKUP_TABLE_CHECK(beEngineMemoryInformation, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SIZE);
@@ -152,11 +152,11 @@ char* BE_EngineMemoryInformation_GetAllocationInformation(const char* prefix) {
                                        "%sUI: %zu allocated, %zu bytes\n"
                                        "%sDynamicArray: %zu allocated, %zu bytes\n"
                                        "%sLayer: %zu allocated, %zu bytes\n"
-                                       "%sServer:\n"
+                                       "%sServer: %zu allocated, %zu bytes\n"
                                        "%s  Connected: %zu allocated, %zu bytes\n"
                                        "%s  Client: %zu allocated, %zu bytes\n"
                                        "%s  Client Socket: %zu allocated, %zu bytes\n"
-                                       "%sArgumentManager:\n"
+                                       "%sArgumentManager: %zu allocated, %zu bytes\n"
                                        "%s  Name: %zu allocated, %zu bytes\n"
                                        "%s  Argument: %zu allocated, %zu bytes\n"
                                        "%s  Temporary Argument: %zu allocated, %zu bytes");
@@ -164,20 +164,20 @@ char* BE_EngineMemoryInformation_GetAllocationInformation(const char* prefix) {
     BA_ASSERT(finalString != NULL, "Failed to allocate memory for a string\n");
     
 #   define BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(memoryType) prefix, beEngineMemoryInformation[memoryType].allocatedAmount, beEngineMemoryInformation[memoryType].allocatedBytes
+
+#   define BE_ENGINEMEMORY_ADD_INFORMATION(memoryType1, memoryType2, memoryType3) \
+prefix, beEngineMemoryInformation[memoryType1].allocatedAmount + beEngineMemoryInformation[memoryType2].allocatedAmount + beEngineMemoryInformation[memoryType3].allocatedAmount, beEngineMemoryInformation[memoryType1].allocatedBytes + beEngineMemoryInformation[memoryType2].allocatedBytes + beEngineMemoryInformation[memoryType3].allocatedBytes, \
+BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(memoryType1),                              \
+BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(memoryType2),                              \
+BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(memoryType3)
     
     BA_ASSERT(BA_String_Format(&finalString,
                                BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_COMMAND),
                                BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_UI),
                                BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY),
                                BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_LAYER),
-                               prefix,
-                               BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CONNECTED),
-                               BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CLIENT),
-                               BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CLIENT_SOCKET),
-                               prefix,
-                               BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_NAME),
-                               BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_ARGUMENT),
-                               BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_TEMPORARY_ARGUMENT)) != NULL, "Failed to format string\n");
+                               BE_ENGINEMEMORY_ADD_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CONNECTED, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CLIENT, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CLIENT_SOCKET),
+                               BE_ENGINEMEMORY_ADD_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_NAME, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_ARGUMENT, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_TEMPORARY_ARGUMENT)) != NULL, "Failed to format string\n");
 
 #   undef BE_ENGINEMEMORY_GET_MEMORY_INFORMATION
     
