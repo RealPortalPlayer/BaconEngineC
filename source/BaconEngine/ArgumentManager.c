@@ -89,32 +89,21 @@ const char* BE_ArgumentManager_GetString(BA_DynamicDictionary arguments, const c
 
 #ifndef BE_CLIENT_BINARY
 void BE_PrivateArgumentManager_ParseName(const char* input, char** name, int* argumentStartingIndex) {
-    size_t inputLength = strlen(input);
-    int index;
+    BA_DynamicArray* array = BA_String_SplitCharacter(input, ' ');
 
     *name = BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_NAME);
-    (*name)[0] = 0;
+    (*name)[0] = '\0';
+
+    if (array->used >= 1)
+        BA_String_Append(name, array->internalArray[0]);
     
-    {
-        BA_Boolean trimmed = BA_BOOLEAN_FALSE;
+    *argumentStartingIndex = (int) strlen(*name) + 1;
 
-        for (index = 0; index < (int) inputLength; index++) {
-            if (input[index] == ' ') {
-                if (!trimmed)
-                    continue;
+    for (int i = 1; i < array->used; i++)
+        free(array->internalArray[i]);
 
-                index++;
-                break;
-            }
-
-            trimmed = BA_BOOLEAN_TRUE;
-
-            BA_String_AppendCharacter(name, input[index]);
-            BE_EngineMemory_AddSize(sizeof(char), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_NAME);
-        }
-    }
-
-    *argumentStartingIndex = index;
+    free(array->internalArray);
+    free(array);
 }
 
 BA_Boolean BE_PrivateArgumentManager_ParseArguments(const char* input, int startingIndex, BA_Boolean fancyArgumentParsing, BA_DynamicArray comparedArguments, BA_DynamicDictionary* arguments) {
