@@ -30,7 +30,8 @@ BA_Boolean BE_Package_GetFile(BE_Package package, const char* filePath, void** b
         package = BE_PrivateDefaultPackage_Get();
     }
     
-    BA_LOGGER_TRACE("Getting file in a package: %s\n", filePath);
+    // TODO: This doesn't support large files
+    BA_LOGGER_TRACE("Getting file in %s package: %s\n", package == BE_PrivateDefaultPackage_Get() ? "the engine" : "a client", filePath);
     return zip_entry_open(package, filePath) == 0 &&
            zip_entry_read(package, buffer, bufferSize) >= 0 &&
            zip_entry_close(package) == 0;
