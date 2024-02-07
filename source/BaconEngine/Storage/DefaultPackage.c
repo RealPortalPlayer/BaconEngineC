@@ -24,6 +24,7 @@ void BE_PrivateDefaultPackage_Open(void) {
     
     beDefaultPackage = BE_Package_Open(filePath);
 
+    free(filePath);
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beDefaultPackage != NULL, "Failed to open default package\n");
 }
 
