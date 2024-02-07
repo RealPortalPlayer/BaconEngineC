@@ -300,12 +300,8 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     double deltaStart = 0;
 
     while (BE_ClientInformation_IsRunning()) {
-        if (!BE_Window_IsStillOpened()) {
-            if (BE_ClientInformation_IsRunning())
-                BE_ClientInformation_StopRunning();
-
+        if (!BE_Window_IsStillOpened())
             break;
-        }
 
         BE_Renderer_ClearScreen();
 
@@ -320,6 +316,9 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
         BE_PrivateLayer_OnUpdate(BE_LAYER_UPDATE_TYPE_AFTER_RENDERING);
         BE_SpecificPlatformFunctions_Get().windowFunctions.UpdateEvents();
     }
+
+    if (BE_ClientInformation_IsRunning())
+        BE_ClientInformation_StopRunning();
 
     BA_LOGGER_TRACE("Client loop ended, shutting down\n");
     BA_ASSERT(engineDetails->clientShutdown == NULL || engineDetails->clientShutdown() == 0, "Client shutdown returned non-zero\n");
