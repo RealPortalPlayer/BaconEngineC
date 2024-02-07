@@ -1,4 +1,4 @@
-// Copyright (c) 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <SharedEngineCode/Paths.h>
@@ -16,10 +16,8 @@ void BE_PrivateDefaultPackage_Open(void) {
     BA_LOGGER_INFO("Opening default engine package\n");
     
     char* filePath = BA_String_CreateEmpty();
-    
-    if (filePath == NULL)
-        return;
-    
+
+    BA_ASSERT(filePath != NULL, "Failed to allocate empty string\n");
     SEC_Paths_GetItemInsideEngineDirectory(&filePath, "Default.package");
     
     beDefaultPackage = BE_Package_Open(filePath);
