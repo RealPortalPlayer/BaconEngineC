@@ -23,8 +23,12 @@ BE_Package BE_Package_Open(const char* fileName) {
 
 BA_Boolean BE_Package_GetFile(BE_Package package, const char* filePath, void** buffer, size_t* bufferSize) {
 #ifndef BE_CLIENT_BINARY
-    if (package == NULL)
+    if (package == NULL) {
+        if (!BE_PrivateDefaultPackage_IsOpen())
+            return BA_BOOLEAN_FALSE;
+
         package = BE_PrivateDefaultPackage_Get();
+    }
     
     BA_LOGGER_TRACE("Getting file in a package: %s\n", filePath);
     return zip_entry_open(package, filePath) == 0 &&
