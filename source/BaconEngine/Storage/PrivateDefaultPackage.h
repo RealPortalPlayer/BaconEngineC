@@ -15,7 +15,7 @@
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 BE_Package BE_PrivateDefaultPackage_Get(void);
 
-BA_Boolean BE_PrivateDefaultPackage_Open(void);
+void BE_PrivateDefaultPackage_Open(void);
 BA_Boolean BE_PrivateDefaultPackage_IsOpen(void);
 void BE_PrivateDefaultPackage_Close(void);
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

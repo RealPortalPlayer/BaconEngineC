@@ -11,21 +11,20 @@
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 static BE_Package beDefaultPackage = NULL;
 
-BA_Boolean BE_PrivateDefaultPackage_Open(void) {
+void BE_PrivateDefaultPackage_Open(void) {
     BA_ASSERT(beDefaultPackage == NULL, "Default package is already opened\n");
     BA_LOGGER_INFO("Opening default engine package\n");
     
     char* filePath = BA_String_CreateEmpty();
     
     if (filePath == NULL)
-        return BA_BOOLEAN_FALSE;
+        return;
     
     SEC_Paths_GetItemInsideEngineDirectory(&filePath, "Default.package");
     
     beDefaultPackage = BE_Package_Open(filePath);
 
-    SEC_STRICTMODE_CHECK(beDefaultPackage != NULL, BA_BOOLEAN_FALSE, "Failed to open default package\n");
-    return BA_BOOLEAN_TRUE;
+    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beDefaultPackage != NULL, "Failed to open default package\n");
 }
 
 BA_Boolean BE_PrivateDefaultPackage_IsOpen(void) {
