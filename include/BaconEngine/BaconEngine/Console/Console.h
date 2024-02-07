@@ -33,5 +33,5 @@ BE_BINARYEXPORT int BE_Console_GetCommandReallocationAmount(void);
 BE_BINARYEXPORT void BE_Console_ExecuteCommand(const char* input, BE_Client client); // TODO: Client
 BE_BINARYEXPORT BA_Boolean BE_Console_IsEngineCommand(BE_Command command);
 BE_BINARYEXPORT void BE_Console_ExecuteFile(FILE* file);
-BE_BINARYEXPORT void BE_Console_ExecuteFileContents(const char* contents);
+BE_BINARYEXPORT void BE_Console_ExecuteListOfCommands(const char* contents);
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

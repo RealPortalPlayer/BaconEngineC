@@ -372,7 +372,7 @@ BE_BINARYEXPORT void BE_Console_ExecuteFile(FILE* file) {
 #endif
 }
 
-BE_BINARYEXPORT void BE_Console_ExecuteFileContents(const char* contents) {
+BE_BINARYEXPORT void BE_Console_ExecuteListOfCommands(const char* contents) {
 #ifndef BE_CLIENT_BINARY
     BA_LOGGER_TRACE("Executing list of commands\n");
     
