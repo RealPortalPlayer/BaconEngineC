@@ -87,7 +87,7 @@ int main(int argc, char** argv) {
         if (getName != NULL)
             BA_LOGGER_INFO("Ready, starting: %s\n", getName());
         else
-            BA_LOGGER_INFO("Ready, starting\n");
+            BA_LOGGER_INFO("Ready, starting unnamed client\n");
     }
     
     BA_LOGGER_TRACE("Entering engine code\n");

@@ -134,7 +134,7 @@ int APIENTRY WinMain(HINSTANCE instanceHandle, HINSTANCE previousInstanceHandle,
     if (configuration.unionVariables.data.clientName[0] != '\0')
         BA_LOGGER_INFO("Ready, starting: %s\n", configuration.unionVariables.data.clientName);
     else
-        BA_LOGGER_INFO("Ready, starting\n");
+        BA_LOGGER_INFO("Ready, starting unnamed client\n");
 
     BA_LOGGER_TRACE("Entering engine code\n");
 
