@@ -362,4 +362,8 @@ BE_BINARYEXPORT void I_EntryPoint_InitializeWrapper(void* engineBinary) {
 
     BA_ASSERT_ALWAYS("I am not a client\n");
 }
+
+BE_BINARYEXPORT const char* I_EntryPoint_GetName(void) {
+    return "BaconEngine " BE_ENGINE_VERSION;
+}
 BA_CPLUSPLUS_SUPPORT_GUARD_END()
