@@ -240,6 +240,11 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
         return 1;
     }
 
+    if (BE_ClientInformation_IsServerModeEnabled() && BA_Thread_IsSingleThreaded()) {
+        BA_LOGGER_FATAL("Single-threaded server is not supported\n");
+        return 1;
+    }
+
     BE_PrivateDefaultPackage_Open();
     BE_PrivateRenderer_Initialize();
 
@@ -287,13 +292,15 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
             return BA_Number_StringToInteger(preParsedExitCode, NULL, NULL, "Invalid exit code, defaulting to 0\n", 0);
     }
 
-    BA_LOGGER_INFO("Starting threads\n");
-
     BA_Thread commandThread;
     BA_Thread serverThread;
 
-    BA_Thread_Create(&commandThread, &BE_EntryPoint_CommandThreadFunction, NULL);
+    if (!BA_Thread_IsSingleThreaded()) {
+        BA_LOGGER_INFO("Starting threads\n");
 
+        BA_Thread_Create(&commandThread, &BE_EntryPoint_CommandThreadFunction, NULL);
+    }
+    
     if (BE_ClientInformation_IsServerModeEnabled())
         BA_Thread_Create(&serverThread, &BE_EntryPoint_ServerThreadFunction, NULL);
     
@@ -322,13 +329,16 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
 
     BA_LOGGER_TRACE("Client loop ended, shutting down\n");
     BA_ASSERT(engineDetails->clientShutdown == NULL || engineDetails->clientShutdown() == 0, "Client shutdown returned non-zero\n");
-    BA_LOGGER_INFO("Waiting for thread shutdown (press CTRL+C if frozen)\n");
-    BA_Thread_Join(commandThread, NULL);
-    BA_LOGGER_DEBUG("Command thread ended\n");
 
-    if (BE_ClientInformation_IsServerModeEnabled()) {
-        BA_Thread_Join(serverThread, NULL);
-        BA_LOGGER_DEBUG("Server thread ended\n");
+    if (!BA_Thread_IsSingleThreaded()) {
+        BA_LOGGER_INFO("Waiting for thread shutdown (press CTRL+C if frozen)\n");
+        BA_Thread_Join(commandThread, NULL);
+        BA_LOGGER_DEBUG("Command thread ended\n");
+
+        if (BE_ClientInformation_IsServerModeEnabled()) {
+            BA_Thread_Join(serverThread, NULL);
+            BA_LOGGER_DEBUG("Server thread ended\n");
+        }
     }
     
     BE_PrivateLayer_DestroyLayers();
