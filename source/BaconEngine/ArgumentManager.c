@@ -94,8 +94,10 @@ void BE_PrivateArgumentManager_ParseName(const char* input, char** name, int* ar
     *name = BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_NAME);
     (*name)[0] = '\0';
 
-    if (array->used >= 1)
+    if (array->used >= 1) {
         BA_String_Append(name, array->internalArray[0]);
+        BE_EngineMemory_AddSize(sizeof(char) * strlen(array->internalArray[0]), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_NAME);
+    }
     
     *argumentStartingIndex = (int) strlen(*name) + 1;
 
