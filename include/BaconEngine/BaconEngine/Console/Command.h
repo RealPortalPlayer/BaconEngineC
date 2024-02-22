@@ -17,6 +17,8 @@
 #include "BaconEngine/Server/Client.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
+struct BE_Command;
+
 typedef enum {
     BE_COMMAND_FLAG_NULL,
     
@@ -65,9 +67,11 @@ typedef struct { // TODO: Client
      * BE_CLIENT_UNCONNECTED when either the command was ran by the server, or the command is client only.
      */
     BE_Client client;
+
+    struct BE_Command* self;
 } BE_Command_Context;
 
-typedef struct {
+typedef struct BE_Command {
     const char* name;
     const char* description;
     BA_DynamicArray arguments;

@@ -295,7 +295,7 @@ void BE_Console_ExecuteCommand(const char* input, BE_Client client) {
         goto destroy;
     }
 
-    command->publicCommand.Run(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Command_Context, input, input + argumentStartingIndex, arguments));
+    command->publicCommand.Run(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Command_Context, input, input + argumentStartingIndex, arguments, client, &command->publicCommand));
 
     destroy:
     BE_EngineMemory_DeallocateMemory(name, sizeof(char) * (strlen(name) + 1), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_NAME);

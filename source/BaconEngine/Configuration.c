@@ -1,4 +1,4 @@
-// Copyright (c) 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <BaconAPI/String.h>
@@ -47,7 +47,6 @@ static BA_Boolean BE_Configuration_AddLine(BA_DynamicDictionary* results, char* 
     }
 
     BA_DynamicDictionary_AddElementToLast(results, BA_DYNAMICARRAY_GET_ELEMENT_POINTER(char, configurationInformation, 0), value);
-    
     free(configurationInformation->internalArray);
     free(configurationInformation);
     return BA_BOOLEAN_TRUE;
