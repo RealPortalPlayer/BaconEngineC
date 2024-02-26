@@ -1,6 +1,6 @@
 project(BaconEngineLauncher C)
 
-add_library(BaconEngineLauncher STATIC Main.c)
+add_library(BaconEngineLauncher STATIC ../BaconLauncher/Main.c)
 
 target_compile_definitions(BaconEngineLauncher PUBLIC BE_STANDALONE_CLIENT BE_ENGINE_VERSION="${BE_ENGINE_VERSION}" BE_LAUNCHER_VERSION="${BE_LAUNCHER_VERSION}")
 
