@@ -225,12 +225,13 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
         BA_LOGGER_DEBUG("Client doesn't specify a name, defaulting to nothing\n");
 
     {
+        const char* clientEngineName = engineDetails->clientGetName != NULL ? engineDetails->clientGetEngineName() : BE_ENGINE_NAME;
         const char* clientEngineVersion = engineDetails->clientGetEngineVersion != NULL ? engineDetails->clientGetEngineVersion() : BE_ENGINE_VERSION;
+        
+        BA_LOGGER_INFO("Starting %s %s", BE_ENGINE_NAME, BE_ENGINE_VERSION);
 
-        BA_LOGGER_INFO("Starting BaconEngine %s", BE_ENGINE_VERSION);
-
-        if (strcmp(clientEngineVersion, BE_ENGINE_VERSION) != 0)
-            BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, " (client was compiled with %s)", clientEngineVersion);
+        if (strcmp(clientEngineName, BE_ENGINE_NAME) != 0 || strcmp(clientEngineVersion, BE_ENGINE_VERSION) != 0)
+            BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, " (client was compiled with %s %s)", clientEngineName, clientEngineVersion);
 
         BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "\n");
     }
@@ -373,6 +374,10 @@ BE_BINARYEXPORT void I_EntryPoint_InitializeWrapper(void* engineBinary) {
 }
 
 BE_BINARYEXPORT const char* I_EntryPoint_GetName(void) {
-    return "BaconEngine " BE_ENGINE_VERSION;
+    return BE_ENGINE_NAME " " BE_ENGINE_VERSION;
+}
+
+BE_BINARYEXPORT const char* BE_EntryPoint_GetName(void) {
+    return BE_ENGINE_NAME;
 }
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

@@ -131,13 +131,15 @@ SEC_Launcher_StartEngineResults SEC_Launcher_StartEngine(const SEC_Launcher_Conf
     SEC_Launcher_ClientSupportsServer clientSupportsServer;
     SEC_Launcher_ClientGetName clientGetName;
     SEC_Launcher_ClientGetEngineVersion clientGetEngineVersion;
+    SEC_Launcher_ClientGetEngineName clientGetEngineName;
 
     BA_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(SEC_Launcher_ClientStart, clientStart, BA_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_Start"));
     BA_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(SEC_Launcher_ClientShutdown, clientShutdown, BA_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_Shutdown"));
     BA_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(SEC_Launcher_ClientSupportsServer, clientSupportsServer, BA_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_SupportsServer"));
     BA_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(SEC_Launcher_ClientGetName, clientGetName, BA_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_GetName"));
     BA_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(SEC_Launcher_ClientGetEngineVersion, clientGetEngineVersion, BA_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_GetEngineVersion"));
-
+    BA_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(SEC_Launcher_ClientGetEngineName, clientGetEngineName, BA_PLATFORMSPECIFIC_GET_ADDRESS(configuration->unionVariables.data.clientBinary, "I_EntryPoint_GetEngineName"));
+    
     SEC_Launcher_EngineDetails details = BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(SEC_Launcher_EngineDetails,
         BA_ArgumentHandler_GetCount(),
         BA_ArgumentHandler_GetVector(),
@@ -150,7 +152,8 @@ SEC_Launcher_StartEngineResults SEC_Launcher_StartEngine(const SEC_Launcher_Conf
         clientShutdown,
         clientSupportsServer,
         clientGetName,
-        clientGetEngineVersion);
+        clientGetEngineVersion,
+        clientGetEngineName);
     
     SEC_Launcher_StartEngineResults results = BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(SEC_Launcher_StartEngineResults, BA_BOOLEAN_TRUE);
     

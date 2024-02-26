@@ -1,4 +1,4 @@
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <BaconAPI/ArgumentHandler.h>
@@ -46,9 +46,9 @@ int APIENTRY WinMain(HINSTANCE instanceHandle, HINSTANCE previousInstanceHandle,
 
     if (BA_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_VERSION, SEC_BUILTINARGUMENTS_VERSION_SHORT, 0)) {
         char* message = BA_String_Copy("Launcher version: %s\n"
-                                        "Built with engine version: %s\n");
+                                        "Built with engine version: %s %s\n");
 
-        BA_String_Format(&message, BE_LAUNCHER_VERSION, BE_ENGINE_VERSION);
+        BA_String_Format(&message, BE_LAUNCHER_VERSION, BE_ENGINE_NAME, BE_ENGINE_VERSION);
         SEC_Launcher_SetLauncherPath();
         SEC_Launcher_SetEnginePath();
         
@@ -58,14 +58,15 @@ int APIENTRY WinMain(HINSTANCE instanceHandle, HINSTANCE previousInstanceHandle,
         SEC_Launcher_InitializeEngine(&configuration);
 
         if (configuration.code == SEC_LAUNCHER_ERROR_CODE_NULL) {
-            typedef const char* (*GetVersion)(void);
-            GetVersion getVersion;
+            const char* (*getName)(void);
+            const char* (*getVersion)(void);
 
-            BA_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(GetVersion, getVersion, BA_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.engineBinary, "BE_EntryPoint_GetVersion"));
+            BA_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(const char* (*)(void), getName, BA_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.engineBinary, "BE_EntryPoint_GetName"));
+            BA_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(const char* (*)(void), getVersion, BA_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.engineBinary, "BE_EntryPoint_GetVersion"));
             
             if (getVersion != NULL) {
-                BA_String_Append(&message, "Engine version: %s\n");
-                BA_String_Format(&message, getVersion());
+                BA_String_Append(&message, "Engine version: %s %s\n");
+                BA_String_Format(&message, getName != NULL ? getName() : BE_ENGINE_NAME, getVersion());
             }
 
             BA_PLATFORMSPECIFIC_CLOSE_BINARY(configuration.unionVariables.data.engineBinary);
@@ -84,15 +85,16 @@ int APIENTRY WinMain(HINSTANCE instanceHandle, HINSTANCE previousInstanceHandle,
             BL_MAIN_INFO("Version", "%s", message);
             return 0;
         }
+        
+        const char* (*getName)(void);
+        const char* (*getVersion)(void);
 
-        typedef const char* (*GetVersion)(void);
-        GetVersion getVersion;
-
-        BA_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(GetVersion, getVersion, BA_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.clientBinary, "I_EntryPoint_GetEngineVersion"));
+        BA_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(const char* (*)(void), getName, BA_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.clientBinary, "I_EntryPoint_GetEngineName"));
+        BA_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(const char* (*)(void), getVersion, BA_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.clientBinary, "I_EntryPoint_GetEngineVersion"));
         
         if (getVersion != NULL) {
-            BA_String_Append(&message, "Client was compiled with engine version: %s\n");
-            BA_String_Format(&message, getVersion());
+            BA_String_Append(&message, "Client was compiled with engine version: %s %s\n");
+            BA_String_Format(&message, getName != NULL ? getName() : BE_ENGINE_NAME, getVersion());
         }
         
         BL_MAIN_INFO("Version", "%s", message);

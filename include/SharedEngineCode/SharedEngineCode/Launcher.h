@@ -1,7 +1,7 @@
 // Purpose: Allows making launchers easier.
 // Created on: 3/28/22 @ 9:54 PM
 
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
@@ -26,6 +26,7 @@ typedef int (*SEC_Launcher_ClientShutdown)(void);
 typedef BA_Boolean (*SEC_Launcher_ClientSupportsServer)(void);
 typedef const char* (*SEC_Launcher_ClientGetName)(void);
 typedef const char* (*SEC_Launcher_ClientGetEngineVersion)(void);
+typedef const char* (*SEC_Launcher_ClientGetEngineName)(void);
 
 // Do NOT edit this structure. Not even to move the variables around.
 // Do NOT edit the typedef's these variables use.
@@ -44,6 +45,7 @@ typedef struct {
     SEC_Launcher_ClientSupportsServer clientSupportsServer;
     SEC_Launcher_ClientGetName clientGetName;
     SEC_Launcher_ClientGetEngineVersion clientGetEngineVersion;
+    SEC_Launcher_ClientGetEngineName clientGetEngineName;
 } SEC_Launcher_EngineDetails;
 
 typedef struct {

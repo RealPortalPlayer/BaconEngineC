@@ -1,4 +1,4 @@
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <BaconAPI/ArgumentHandler.h>
@@ -15,6 +15,7 @@
 
 void I_EntryPoint_InitializeWrapper(const char*, const char*, const char*, void*, int, char**);
 const char* I_EntryPoint_GetEngineVersion(void);
+const char* I_EntryPoint_GetEngineName(void);
 int I_EntryPoint_Start(int, char**);
 int I_EntryPoint_Shutdown(void);
 BA_Boolean I_EntryPoint_SupportsServer(void);
@@ -39,17 +40,19 @@ int main(int argc, char** argv) {
         BA_LOGGER_INFO("Based on launcher version: %s\n", BE_LAUNCHER_VERSION);
         
         if (configuration.code == SEC_LAUNCHER_ERROR_CODE_NULL) {
+            const char* (*getName)(void);
             const char* (*getVersion)(void);
 
+            BA_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(const char* (*)(void), getName, BA_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.engineBinary, "BE_EntryPoint_GetName"));
             BA_PLATFORMSPECIFIC_FUNCTION_VARIABLE_SETTER(const char* (*)(void), getVersion, BA_PLATFORMSPECIFIC_GET_ADDRESS(configuration.unionVariables.data.engineBinary, "BE_EntryPoint_GetVersion"));
             
             if (getVersion != NULL)
-                BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "Engine version: %s\n", getVersion());
+                BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "Engine version: %s %s\n", getName != NULL ? getName() : BE_ENGINE_NAME, getVersion());
 
             BA_PLATFORMSPECIFIC_CLOSE_BINARY(configuration.unionVariables.data.engineBinary);
         }
 
-        BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "Client was compiled with engine version: %s\n", BE_ENGINE_VERSION);
+        BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "Client was compiled with engine version: %s %s\n", BE_ENGINE_NAME, BE_ENGINE_VERSION);
         return 0;
     }
 
@@ -104,7 +107,8 @@ int main(int argc, char** argv) {
         &I_EntryPoint_Shutdown,
         &I_EntryPoint_SupportsServer,
         &I_EntryPoint_GetName,
-        &I_EntryPoint_GetEngineVersion
+        &I_EntryPoint_GetEngineVersion,
+        &I_EntryPoint_GetEngineName
     };
     
     int returnValue = configuration.unionVariables.data.Start(&engineDetails);
