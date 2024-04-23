@@ -57,7 +57,6 @@ set(BE_SOURCE_FILES
         DeltaTime.c
         Storage/Package.c
         Storage/DefaultPackage.c
-        Configuration.c
         Server/Server.c
         EngineMemory.c
         Server/Packet.c)
