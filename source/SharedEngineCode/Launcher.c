@@ -27,45 +27,28 @@ void SEC_Launcher_CreateConfiguration(SEC_Launcher_Configuration* configuration,
 }
 
 const char* SEC_Launcher_GetDefaultHelpList(void) {
-#define SEC_LAUNCHER_HELP_MESSAGE_NO_SHORT(argument, description) argument ": " description
-#define SEC_LAUNCHER_HELP_MESSAGE(argument, short, description) SEC_LAUNCHER_HELP_MESSAGE_NO_SHORT(argument " (" short ")", description)
-
-#ifdef BA_ALLOW_DEBUG_LOGS
-#   define BA_LAUNCHER_HELP_LOGGER_EXTRA_ARGUMENTS "/trace/trc/debug/dbg"
-#else
-#   define BA_LAUNCHER_HELP_LOGGER_EXTRA_ARGUMENTS
-#endif
-    
-    return SEC_LAUNCHER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_HELP, SEC_BUILTINARGUMENTS_HELP_SHORT, "Shows information about each argument\n")
-           SEC_LAUNCHER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_CLIENT " <path>", SEC_BUILTINARGUMENTS_CLIENT_SHORT, "Specifies what client you want to run, does nothing for standalone builds\n")
-           SEC_LAUNCHER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_SERVER, SEC_BUILTINARGUMENTS_SERVER_SHORT, "Starts the client as a server instance\n")
-           SEC_LAUNCHER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_NO_STRICT, SEC_BUILTINARGUMENTS_NO_STRICT_SHORT, "Don't crash the client when an API error occurs\n")
-           SEC_LAUNCHER_HELP_MESSAGE_NO_SHORT(BA_BUILTINARGUMENTS_DONT_PARSE " <argument>", "Do not parse arguments beyond this point\n")
-           SEC_LAUNCHER_HELP_MESSAGE_NO_SHORT(SEC_BUILTINARGUMENTS_WIDTH " <width>", "Changes the width of the window\n")
-           SEC_LAUNCHER_HELP_MESSAGE_NO_SHORT(SEC_BUILTINARGUMENTS_HEIGHT " <height>", "Changes the height of the window\n")
-           SEC_LAUNCHER_HELP_MESSAGE_NO_SHORT(SEC_BUILTINARGUMENTS_RENDERER "<opengl/vulkan/text/software>", "Changes the default rendering system\n")
-           SEC_LAUNCHER_HELP_MESSAGE_NO_SHORT(SEC_BUILTINARGUMENTS_MONITOR " <id>", "Create the window on a different display\n")
-           SEC_LAUNCHER_HELP_MESSAGE(BA_BUILTINARGUMENTS_DISABLE_ANSI_COLORING, BA_BUILTINARGUMENTS_DISABLE_ANSI_COLORING_SHORT, "Disable log colors\n")
-           SEC_LAUNCHER_HELP_MESSAGE(BA_BUILTINARGUMENTS_LOG_LEVEL " <null" BA_LAUNCHER_HELP_LOGGER_EXTRA_ARGUMENTS "/warn/wrn/error/err/fatal/ftl>", BA_BUILTINARGUMENTS_LOG_LEVEL_SHORT, "Sets the current log level\n")
-           SEC_LAUNCHER_HELP_MESSAGE(BA_BUILTINARGUMENTS_DONT_CHANGE_LOG_LEVELS, BA_BUILTINARGUMENTS_DONT_CHANGE_LOG_LEVELS_SHORT, "Prevent the client from changing the log level\n")
-           SEC_LAUNCHER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING, SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING_SHORT, "Don't render the UI\n")
-           SEC_LAUNCHER_HELP_MESSAGE_NO_SHORT(SEC_BUILTINARGUMENTS_EXIT " <code>", "Exit the engine after initializing\n")
-           SEC_LAUNCHER_HELP_MESSAGE_NO_SHORT(SEC_BUILTINARGUMENTS_CONSOLE, "Start with the console opened\n")
-           SEC_LAUNCHER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_VERSION, SEC_BUILTINARGUMENTS_VERSION_SHORT, "Show the version of the launcher/engine\n")
-           SEC_LAUNCHER_HELP_MESSAGE(BA_BUILTINARGUMENTS_ALWAYS_USE_STDOUT, BA_BUILTINARGUMENTS_ALWAYS_USE_STDOUT_SHORT, "Always use STDOUT, even for errors\n")
+    return BA_ARGUMENTHANDLER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_HELP, SEC_BUILTINARGUMENTS_HELP_SHORT, "Shows information about each argument\n")
+           BA_ARGUMENTHANDLER_HELP_MESSAGE_ARGUMENTS(SEC_BUILTINARGUMENTS_CLIENT, "<path>", SEC_BUILTINARGUMENTS_CLIENT_SHORT, "Specifies what client you want to run, does nothing for standalone builds\n")
+           BA_ARGUMENTHANDLER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_SERVER, SEC_BUILTINARGUMENTS_SERVER_SHORT, "Starts the client as a server instance\n")
+           BA_ARGUMENTHANDLER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_NO_STRICT, SEC_BUILTINARGUMENTS_NO_STRICT_SHORT, "Don't crash the client when an API error occurs\n")
+           BA_ARGUMENTHANDLER_HELP_MESSAGE_NO_SHORT_ARGUMENTS(SEC_BUILTINARGUMENTS_WIDTH, "<width>", "Changes the width of the window\n")
+           BA_ARGUMENTHANDLER_HELP_MESSAGE_NO_SHORT_ARGUMENTS(SEC_BUILTINARGUMENTS_HEIGHT, "<height>", "Changes the height of the window\n")
+           BA_ARGUMENTHANDLER_HELP_MESSAGE_NO_SHORT_ARGUMENTS(SEC_BUILTINARGUMENTS_RENDERER, "<opengl/vulkan/text/software>", "Changes the default rendering system\n")
+           BA_ARGUMENTHANDLER_HELP_MESSAGE_NO_SHORT_ARGUMENTS(SEC_BUILTINARGUMENTS_MONITOR, "<id>", "Create the window on a different display\n")
+           BA_ARGUMENTHANDLER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING, SEC_BUILTINARGUMENTS_DISABLE_UI_RENDERING_SHORT, "Don't render the UI\n")
+           BA_ARGUMENTHANDLER_HELP_MESSAGE_NO_SHORT_ARGUMENTS(SEC_BUILTINARGUMENTS_EXIT, "<code>", "Exit the engine after initializing\n")
+           BA_ARGUMENTHANDLER_HELP_MESSAGE_NO_SHORT(SEC_BUILTINARGUMENTS_CONSOLE, "Start with the console opened\n")
+           BA_ARGUMENTHANDLER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_VERSION, SEC_BUILTINARGUMENTS_VERSION_SHORT, "Show the version of the launcher/engine\n")
            #ifdef BA_ALLOW_DEBUG_LOGS
-           SEC_LAUNCHER_HELP_MESSAGE(BA_BUILTINARGUMENTS_DONT_PRINT_ASSERT_CHECKS, BA_BUILTINARGUMENTS_DONT_PRINT_ASSERT_CHECKS_SHORT, "Do not log assert checks, does nothing if log level is not trace\n")
-           SEC_LAUNCHER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_DONT_PRINT_STRICT_CHECKS, SEC_BUILTINARGUMENTS_DONT_PRINT_STRICT_CHECKS_SHORT, "Do not log strict checks, does nothing if log level is not trace\n")
-           SEC_LAUNCHER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOCATION, SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOCATION_SHORT, "Do not log when the engine allocates memory, does nothing if log level is not trace\n")
+           BA_ARGUMENTHANDLER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_DONT_PRINT_STRICT_CHECKS, SEC_BUILTINARGUMENTS_DONT_PRINT_STRICT_CHECKS_SHORT, "Do not log strict checks, does nothing if log level is not trace\n")
+           BA_ARGUMENTHANDLER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOCATION, SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOCATION_SHORT, "Do not log when the engine allocates memory, does nothing if log level is not trace\n")
            #endif
-           SEC_LAUNCHER_HELP_MESSAGE(BA_BUILTINARGUMENTS_DISABLE_LOG_HEADER, BA_BUILTINARGUMENTS_DISABLE_LOG_HEADER_SHORT, "Do not log the log level header\n")
-           SEC_LAUNCHER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_ENGINE " <engine binary>", SEC_BUILTINARGUMENTS_ENGINE_SHORT, "Use a custom engine binary\n")
+           BA_ARGUMENTHANDLER_HELP_MESSAGE_ARGUMENTS(SEC_BUILTINARGUMENTS_ENGINE, "<engine binary>", SEC_BUILTINARGUMENTS_ENGINE_SHORT, "Use a custom engine binary\n")
            #ifdef BA_ALLOW_DEBUG_LOGS
-           SEC_LAUNCHER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_DONT_PRINT_COMMAND_REGISTER, SEC_BUILTINARGUMENTS_DONT_PRINT_COMMAND_REGISTER_SHORT, "Do not log when a command gets registered, does nothing if log level is not trace\n")
+           BA_ARGUMENTHANDLER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_DONT_PRINT_COMMAND_REGISTER, SEC_BUILTINARGUMENTS_DONT_PRINT_COMMAND_REGISTER_SHORT, "Do not log when a command gets registered, does nothing if log level is not trace\n")
            #endif
-           SEC_LAUNCHER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_PORT " <port>", SEC_BUILTINARGUMENTS_PORT_SHORT, "Custom server port, useless outside server mode\n")
-           SEC_LAUNCHER_HELP_MESSAGE(SEC_BUILTINARGUMENTS_MAX_PLAYERS " <amount>", SEC_BUILTINARGUMENTS_MAX_PLAYERS_SHORT, "Tells how many players can connect, useless outside server mode\n")
-           SEC_LAUNCHER_HELP_MESSAGE(BA_BUILTINARGUMENTS_SINGLE_THREADED, BA_BUILTINARGUMENTS_SINGLE_THREADED_SHORT, "Don't allow thread creation");
+           BA_ARGUMENTHANDLER_HELP_MESSAGE_ARGUMENTS(SEC_BUILTINARGUMENTS_PORT, "<port>", SEC_BUILTINARGUMENTS_PORT_SHORT, "Custom server port, useless outside server mode\n")
+           BA_ARGUMENTHANDLER_HELP_MESSAGE_ARGUMENTS(SEC_BUILTINARGUMENTS_MAX_PLAYERS, "<amount>", SEC_BUILTINARGUMENTS_MAX_PLAYERS_SHORT, "Tells how many players can connect, useless outside server mode\n");
 
 #undef BA_LAUNCHER_HELP_LOGGER_EXTRA_ARGUMENTS
 #undef SEC_LAUNCHER_HELP_MESSAGE_NO_SHORT
