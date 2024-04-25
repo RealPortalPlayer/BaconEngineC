@@ -5,6 +5,7 @@
 #include <signal.h>
 #include <SharedEngineCode/Paths.h>
 #include <BaconAPI/Debugging/Assert.h>
+#include <BaconAPI/Math/Bitwise.h>
 
 #include "EngineCommands.h"
 #include "BaconEngine/Console/Console.h"
@@ -14,7 +15,6 @@
 #include "BaconEngine/Client/Information.h"
 #include "BaconEngine/EngineMemoryInformation.h"
 #include "BaconEngine/Rendering/UI.h"
-#include "BaconEngine/Math/Bitwise.h"
 #include "BaconEngine/DeltaTime.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
@@ -101,8 +101,8 @@ void BE_EngineCommands_Initialize(void) {
 }
 
 void BE_EngineCommands_HelpPrint(BE_Command* command) {
-    if ((BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY) && !BE_ClientInformation_IsServerModeEnabled()) ||
-        (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
+    if ((BA_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY) && !BE_ClientInformation_IsServerModeEnabled()) ||
+        (BA_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
         return;
 
     BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "        %s", command->name);
@@ -150,8 +150,8 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
                 if (commandIdClient == -1)
                     commandIdClient = commandId;
 
-                if ((BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY) && !BE_ClientInformation_IsServerModeEnabled()) ||
-                    (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
+                if ((BA_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY) && !BE_ClientInformation_IsServerModeEnabled()) ||
+                    (BA_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
                     continue;
 
                 showClient++;

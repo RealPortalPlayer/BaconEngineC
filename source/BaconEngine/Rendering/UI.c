@@ -3,9 +3,9 @@
 
 #include <SharedEngineCode/Debugging/StrictMode.h>
 #include <BaconAPI/Debugging/Assert.h>
+#include <BaconAPI/Math/Bitwise.h>
 
 #include "BaconEngine/Rendering/UI.h"
-#include "BaconEngine/Math/Bitwise.h"
 #include "../InterfaceFunctions.h"
 #include "BaconEngine/Client/Information.h"
 
@@ -59,9 +59,9 @@ int BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector2_I
                                                                                           BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_UI);
 
     if (flags != BE_UI_WINDOW_FLAG_NULL) {
-        SEC_STRICTMODE_CHECK(!BE_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_NO_TITLE_BAR) || !BE_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_MINIMIZED), -1,
+        SEC_STRICTMODE_CHECK(!BA_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_NO_TITLE_BAR) || !BA_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_MINIMIZED), -1,
                             "Invalid window flags, cannot both be missing a title-bar and also be minimized");
-        SEC_STRICTMODE_CHECK(!BE_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_MINIMIZED) || !BE_BITWISE_IS_BIT_SET(flags, BE_EVENT_TYPE_WINDOW_MAXIMIZED), -1,
+        SEC_STRICTMODE_CHECK(!BA_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_MINIMIZED) || !BA_BITWISE_IS_BIT_SET(flags, BE_EVENT_TYPE_WINDOW_MAXIMIZED), -1,
                             "Invalid window flags, cannot both be minimized and maximized");
     }
 
@@ -100,10 +100,10 @@ BA_Boolean BE_UI_ToggleWindowFlag(int windowId, BE_UI_WindowFlags flag, BA_Boole
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
-    if (uiWindow == NULL || BE_BITWISE_IS_BIT_SET(uiWindow->flags, flag) == toggle)
+    if (uiWindow == NULL || BA_BITWISE_IS_BIT_SET(uiWindow->flags, flag) == toggle)
         return BA_BOOLEAN_FALSE;
 
-    BE_BITWISE_TOGGLE_BIT(uiWindow->flags, flag);
+    BA_BITWISE_TOGGLE_BIT(uiWindow->flags, flag);
     return BA_BOOLEAN_TRUE;
 #else
     BE_INTERFACEFUNCTION(BA_Boolean, int, BE_UI_WindowFlags, BA_Boolean);
@@ -130,7 +130,7 @@ BA_Boolean BE_UI_IsWindowStillOpen(int windowId) {
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
-    return uiWindow != NULL && !BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_CLOSED);
+    return uiWindow != NULL && !BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_CLOSED);
 #else
     BE_INTERFACEFUNCTION(BA_Boolean, int);
     return function(windowId);

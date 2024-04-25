@@ -1,13 +1,13 @@
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <BaconAPI/ArgumentHandler.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <BaconAPI/Debugging/Assert.h>
+#include <BaconAPI/Math/Bitwise.h>
 
 #include "EngineUIs.h"
 #include "BaconEngine/Rendering/UI.h"
-#include "BaconEngine/Math/Bitwise.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 void BE_EngineUIs_Initialize(void) {
@@ -20,7 +20,7 @@ void BE_EngineUIs_Initialize(void) {
     BE_UI_WindowFlags flags = BE_UI_WINDOW_FLAG_NO_MAXIMIZE | BE_UI_WINDOW_FLAG_NO_MINIMIZE;
 
     if (BA_ArgumentHandler_GetIndex(SEC_BUILTINARGUMENTS_CONSOLE, 0) == -1)
-        BE_BITWISE_SET_BIT(flags, BE_UI_WINDOW_FLAG_CLOSED);
+        BA_BITWISE_SET_BIT(flags, BE_UI_WINDOW_FLAG_CLOSED);
 
     BE_UI_RegisterWindow("Console", flags, BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Integer, 5, 5),
                          BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, 300, 350));

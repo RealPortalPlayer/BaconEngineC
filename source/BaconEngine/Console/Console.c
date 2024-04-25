@@ -5,10 +5,10 @@
 #include <string.h>
 #include <SharedEngineCode/Debugging/StrictMode.h>
 #include <BaconAPI/Debugging/Assert.h>
+#include <BaconAPI/Math/Bitwise.h>
 
 #include "BaconEngine/Console/Console.h"
 #include "../InterfaceFunctions.h"
-#include "BaconEngine/Math/Bitwise.h"
 #include "BaconEngine/Client/Information.h"
 
 #ifndef BE_CLIENT_BINARY
@@ -144,14 +144,14 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
                          "Spot: %i/%zu\n", name, description, flags, beConsoleCommands.used, beConsoleCommands.size);
 
     if (flags != BE_COMMAND_FLAG_NULL) {
-        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_SERVER_ONLY) || !BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY),
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BA_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_SERVER_ONLY) || !BA_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY),
                                              "Invalid command flags, cannot be both for server and client only\n");
-        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CHEATS_ONLY) || !BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY),
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BA_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CHEATS_ONLY) || !BA_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY),
                                              "Invalid command flags, the client cannot run any cheat commands\n");
-        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY) || !BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAGS_RAN_ON_SERVER),
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BA_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY) || !BA_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAGS_RAN_ON_SERVER),
                                              "Invalid command flags, cannot be both client only but also only runs on the server\n");
 
-        if (BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_SERVER_ONLY) && BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAGS_RAN_ON_SERVER))
+        if (BA_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_SERVER_ONLY) && BA_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAGS_RAN_ON_SERVER))
             BA_LOGGER_WARN("Redundant command flags, server commands will only run on servers\n");
     }
 
@@ -252,15 +252,15 @@ void BE_Console_ExecuteCommand(const char* input, BE_Client client) {
         goto destroy;
     }
     
-    if (command->publicCommand.arguments.used != 0 && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_ARGUMENT_PARSING) && !BE_PrivateArgumentManager_ParseArguments(input, argumentStartingIndex, !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING), command->publicCommand.arguments, &arguments))
+    if (command->publicCommand.arguments.used != 0 && !BA_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_ARGUMENT_PARSING) && !BE_PrivateArgumentManager_ParseArguments(input, argumentStartingIndex, !BA_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING), command->publicCommand.arguments, &arguments))
         goto destroy;
 
-    if (BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_RAN_ON_SERVER) && !BE_ClientInformation_IsServerModeEnabled()) {
+    if (BA_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_RAN_ON_SERVER) && !BE_ClientInformation_IsServerModeEnabled()) {
         // TODO: Send command packet to server
         goto destroy;
     }
 
-    if (BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAG_SERVER_ONLY)) {
+    if (BA_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAG_SERVER_ONLY)) {
         // TODO: Kick client.
 
         if (!BE_ClientInformation_IsServerModeEnabled()) {
@@ -272,7 +272,7 @@ void BE_Console_ExecuteCommand(const char* input, BE_Client client) {
         }
     }
 
-    if (BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()) {
+    if (BA_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()) {
         if (client != BE_CLIENT_UNCONNECTED) {
             // TODO: Kick client: invalid packet (client should never **ever** send a command packet if command is client only)
             goto destroy;
