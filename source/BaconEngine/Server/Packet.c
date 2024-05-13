@@ -19,7 +19,7 @@
 #endif
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
-#ifndef BE_CLIENT_BINARY
+#if !defined(BE_CLIENT_BINARY) && !defined(BE_DISABLE_NETWORK)
 static BA_Boolean bePacketInitialized;
 static BA_DynamicArray bePacketRegistered;
 
@@ -37,6 +37,7 @@ void BE_PrivatePacket_Initialize(void) {
 
 BE_BINARYEXPORT void BE_Packet_Register(const char* name, BA_Boolean acceptUnconnected, void (*Run)(BE_Client client)) {
 #ifndef BE_CLIENT_BINARY
+#   ifndef BE_DISABLE_NETWORK
     BE_PrivatePacket* packet = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivatePacket), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_PACKET);
     
     packet->name = BA_String_Copy(name);
@@ -45,6 +46,7 @@ BE_BINARYEXPORT void BE_Packet_Register(const char* name, BA_Boolean acceptUncon
 
     BE_PrivateDynamicArray_CheckResize(&bePacketRegistered);
     BA_DynamicArray_AddElementToLast(&bePacketRegistered, packet);
+#   endif
 #else
     BE_INTERFACEFUNCTION(void, const char*, BA_Boolean, void (*)(BE_Client))(name, acceptUnconnected, Run);
 #endif
@@ -52,18 +54,20 @@ BE_BINARYEXPORT void BE_Packet_Register(const char* name, BA_Boolean acceptUncon
 
 BE_BINARYEXPORT void BE_Packet_Send(BE_Client client, const char* buffer) {
 #ifndef BE_CLIENT_BINARY
+#   ifndef BE_DISABLE_NETWORK
     if (client == BE_CLIENT_UNCONNECTED) {
         // TODO: Send packet to server
         return;
     }
 
     BE_PrivatePacket_Send(BE_PrivateServer_GetPrivateClientFromClient(client)->socket, buffer);
+#   endif
 #else
     BE_INTERFACEFUNCTION(void, BE_Client, const char*)(client, buffer);
 #endif
 }
 
-#ifndef BE_CLIENT_BINARY
+#if !defined(BE_CLIENT_BINARY) && !defined(BE_DISABLE_NETWORK)
 void BE_PrivatePacket_Parse(BE_PrivateClient* client, struct sockaddr_in* descriptor, const char* buffer) {
     BE_PrivatePacket* packet;
 

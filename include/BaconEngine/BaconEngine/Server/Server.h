@@ -16,6 +16,7 @@ BA_CPLUSPLUS_SUPPORT_GUARD_START()
 BE_BINARYEXPORT BA_Boolean BE_Server_IsRunning(void);
 BE_BINARYEXPORT unsigned BE_Server_GetPort(void);
 BE_BINARYEXPORT unsigned BE_Server_GetConnectedAmount(void);
+BE_BINARYEXPORT BA_Boolean BE_Server_IsDisabled(void);
 
 BE_BINARYEXPORT void BE_Server_Start(unsigned port);
 BE_BINARYEXPORT void BE_Server_Stop(void);

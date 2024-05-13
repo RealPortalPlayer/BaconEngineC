@@ -12,10 +12,13 @@ void BE_EnginePackets_Ping(BE_Client client);
 void BE_EnginePackets_Connect(BE_Client client);
 
 void BE_EnginePackets_Initialize(void) {
+#ifndef BE_DISABLE_NETWORK
     BE_Packet_Register("ping", BA_BOOLEAN_TRUE, &BE_EnginePackets_Ping);
     BE_Packet_Register("connect", BA_BOOLEAN_TRUE, &BE_EnginePackets_Connect);
+#endif
 }
 
+#ifndef BE_DISABLE_NETWORK
 void BE_EnginePackets_Ping(BE_Client client) {
     BE_Packet_Send(client, "pong");
 }
@@ -28,4 +31,5 @@ void BE_EnginePackets_Connect(BE_Client client) {
     
     BE_PrivateServer_AddConnection(BE_PrivateServer_GetPrivateClientFromClient(client)->socket);
 }
+#endif
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

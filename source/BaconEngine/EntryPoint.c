@@ -147,6 +147,7 @@ BA_THREAD_RETURN_VALUE BE_EntryPoint_CommandThreadFunction(void* argument) {
 #endif
 }
 
+#ifndef BE_DISABLE_NETWORK
 BA_THREAD_RETURN_VALUE BE_EntryPoint_ServerThreadFunction(void* argument) {
 #if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
     fcntl(BE_PrivateServer_GetSocketDescriptor(), F_SETFL, O_NONBLOCK);
@@ -186,6 +187,7 @@ BA_THREAD_RETURN_VALUE BE_EntryPoint_ServerThreadFunction(void* argument) {
     return 0;
 #endif
 }
+#endif
 
 BE_BINARYEXPORT const char* BE_EntryPoint_GetVersion(void) {
     return BE_ENGINE_VERSION;
@@ -281,7 +283,11 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
 
     BE_PrivateUI_Initialize();
     BE_PrivateConsole_Initialize();
+
+#ifndef BE_DISABLE_NETWORK
     BE_PrivatePacket_Initialize();
+#endif
+    
     BA_ASSERT(engineDetails->clientStart == NULL || engineDetails->clientStart(engineDetails->argc, engineDetails->argv) == 0, "Client start returned non-zero\n");
     BA_LOGGER_DEBUG("Registering signals\n");
     signal(SIGINT, &BE_EntryPoint_SignalDetected);
@@ -294,16 +300,19 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     }
 
     BA_Thread commandThread;
-    BA_Thread serverThread;
 
     if (!BA_Thread_IsSingleThreaded()) {
         BA_LOGGER_INFO("Starting threads\n");
 
         BA_Thread_Create(&commandThread, &BE_EntryPoint_CommandThreadFunction, NULL);
     }
-    
+
+#ifndef BE_DISABLE_NETWORK
+    BA_Thread serverThread;
+
     if (BE_ClientInformation_IsServerModeEnabled())
         BA_Thread_Create(&serverThread, &BE_EntryPoint_ServerThreadFunction, NULL);
+#endif
     
     double deltaStart = 0;
 
@@ -336,10 +345,12 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
         BA_Thread_Join(commandThread, NULL);
         BA_LOGGER_DEBUG("Command thread ended\n");
 
+#ifndef BE_DISABLE_NETWORK
         if (BE_ClientInformation_IsServerModeEnabled()) {
             BA_Thread_Join(serverThread, NULL);
             BA_LOGGER_DEBUG("Server thread ended\n");
         }
+#endif
     }
     
     BE_PrivateLayer_DestroyLayers();
@@ -351,7 +362,10 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     BE_PrivateConsole_Destroy();
     BE_PrivateWindow_Destroy();
     BE_SpecificPlatformFunctions_Get().Destroy();
+
+#ifndef BE_DISABLE_NETWORK
     BE_PrivatePacket_Destroy();
+#endif
 
     if (BE_PrivateDefaultPackage_IsOpen())
         BE_PrivateDefaultPackage_Close();

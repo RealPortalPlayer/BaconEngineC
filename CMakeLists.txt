@@ -18,6 +18,7 @@ option(BE_DONT_SET_BINARY_OUTPUT_PATH "Don't change the binary output path" OFF)
 option(BE_NO_ENGINE_COMMANDS "Disable every engine command" OFF)
 option(BE_NO_IDE_FOLDERS "Don't make any IDE folders" ON)
 option(BE_DISABLE_PEDANTIC_MODE "Don't enable pedantic checks" OFF)
+option(BE_DISABLE_NETWORK "Disable networking code" OFF)
 set(BE_GLFW_PATH "" CACHE STRING "Use GLFW from the specified path instead of trying to find it")
 set(BE_ASAN_SANITIZER "" CACHE STRING "Set what ASAN sanitizer to use")
 

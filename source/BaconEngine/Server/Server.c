@@ -23,7 +23,7 @@
 #endif
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
-#ifndef BE_CLIENT_BINARY
+#if !defined(BE_CLIENT_BINARY) && !defined(BE_DISABLE_NETWORK)
 static BE_SERVER_SOCKET_TYPE beServerSocket = BE_SERVER_INVALID_SOCKET;
 static unsigned beServerPort;
 static BE_PrivateClient** beServerConnected;
@@ -34,7 +34,11 @@ static BE_PrivateClient* beServerGenericUnconnected;
 
 BA_Boolean BE_Server_IsRunning(void) {
 #ifndef BE_CLIENT_BINARY
+#   ifndef BE_DISABLE_NETWORK
     return beServerSocket != BE_SERVER_INVALID_SOCKET;
+#   else
+    return BA_BOOLEAN_FALSE;
+#   endif
 #else
     BE_INTERFACEFUNCTION(BA_Boolean, void);
     return function();
@@ -43,14 +47,18 @@ BA_Boolean BE_Server_IsRunning(void) {
 
 unsigned BE_Server_GetPort(void) {
 #ifndef BE_CLIENT_BINARY
+#   ifndef BE_DISABLE_NETWORK
     return beServerPort;
+#   else
+    return 0;
+#   endif
 #else
     BE_INTERFACEFUNCTION(unsigned, void);
     return function();
 #endif
 }
 
-#ifndef BE_CLIENT_BINARY
+#if !defined(BE_CLIENT_BINARY) && !defined(BE_DISABLE_NETWORK)
 BE_SERVER_SOCKET_TYPE BE_PrivateServer_GetSocketDescriptor(void) {
     return beServerSocket;
 }
@@ -58,11 +66,12 @@ BE_SERVER_SOCKET_TYPE BE_PrivateServer_GetSocketDescriptor(void) {
 
 void BE_Server_Start(unsigned port) {
 #ifndef BE_CLIENT_BINARY
+#   ifndef BE_DISABLE_NETWORK
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket == BE_SERVER_INVALID_SOCKET, "Server is already running\n");
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(BE_ClientInformation_IsServerModeEnabled(), "Cannot start a server on a non-server client\n");
     BA_LOGGER_INFO("Starting server: 0.0.0.0:%d\n", port);
     
-#   if BA_OPERATINGSYSTEM_WINDOWS
+#       if BA_OPERATINGSYSTEM_WINDOWS
     {
         WSADATA data;
         
@@ -70,7 +79,7 @@ void BE_Server_Start(unsigned port) {
         BA_ASSERT(LOBYTE(data.wVersion) == 2 && HIBYTE(data.wVersion) == 2, "Incorrect Windows Socket version returned: %i.%i\n",
                   LOBYTE(data.wVersion), HIBYTE(data.wVersion));
     }
-#   endif
+#       endif
     
     beServerMaxPlayers = 10;
     beServerSocket = socket(AF_INET, SOCK_DGRAM, 0);
@@ -105,12 +114,15 @@ void BE_Server_Start(unsigned port) {
 
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(bind(beServerSocket, (struct sockaddr*) &serverAddress, sizeof(serverAddress)) == 0,
                                         "Failed to bind to socket: %s\n", strerror(errno));
+#   else
+    BA_LOGGER_ERROR("Networking code is disabled\n");
+#   endif
 #else
     BE_INTERFACEFUNCTION(void, unsigned)(port);
 #endif
 }
 
-#ifndef BE_CLIENT_BINARY
+#if !defined(BE_CLIENT_BINARY) && !defined(BE_DISABLE_NETWORK)
 void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor) {
     if (beServerMaxPlayers == BE_Server_GetConnectedAmount()) {
         BE_PrivatePacket_Send(clientDescriptor, "error server_full");
@@ -140,6 +152,7 @@ void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor) {
 
 void BE_Server_Stop(void) {
 #ifndef BE_CLIENT_BINARY
+#   ifndef BE_DISABLE_NETWORK
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket != BE_SERVER_INVALID_SOCKET, "Server is not running\n");
     BA_LOGGER_INFO("Closing server\n");
     
@@ -158,20 +171,23 @@ void BE_Server_Stop(void) {
     BE_EngineMemory_DeallocateMemory(beServerConnected, sizeof(BE_PrivateClient*) * beServerMaxPlayers, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CONNECTED);
     BE_EngineMemory_DeallocateMemory(beServerGenericUnconnected, sizeof(BE_PrivateClient), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CLIENT);
 
-#   if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
+#       if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
     close(beServerSocket);
-#   elif BA_OPERATINGSYSTEM_WINDOWS
+#       elif BA_OPERATINGSYSTEM_WINDOWS
     closesocket(beServerSocket);
     WSACleanup();
-#   endif
+#       endif
     
     beServerSocket = BE_SERVER_INVALID_SOCKET;
+#   else
+    BA_LOGGER_ERROR("Networking code is disabled\n");
+#   endif
 #else
     BE_INTERFACEFUNCTION(void, void)();
 #endif
 }
 
-#ifndef BE_CLIENT_BINARY
+#if !defined(BE_CLIENT_BINARY) && !defined(BE_DISABLE_NETWORK)
 BE_PrivateClient* BE_PrivateServer_GetPrivateClientFromSocket(struct sockaddr_in* clientDescriptor) {
     for (int i = 0; i < beServerMaxPlayers; i++) {
         if (beServerConnected[i]->socket == NULL || memcmp(beServerConnected[i]->socket, clientDescriptor, sizeof(struct sockaddr_in)) != 0)
@@ -186,6 +202,7 @@ BE_PrivateClient* BE_PrivateServer_GetPrivateClientFromSocket(struct sockaddr_in
 
 BE_BINARYEXPORT unsigned BE_Server_GetConnectedAmount(void) {
 #ifndef BE_CLIENT_BINARY
+#   ifndef BE_DISABLE_NETWORK
     static unsigned count = 0;
 
     if (!beServerConnectedCountDirty)
@@ -201,13 +218,16 @@ BE_BINARYEXPORT unsigned BE_Server_GetConnectedAmount(void) {
     }
     
     return count;
+#   else
+    return 0;
+#   endif
 #else
     BE_INTERFACEFUNCTION(unsigned, void);
     return function();
 #endif
 }
 
-#ifndef BE_CLIENT_BINARY
+#if !defined(BE_CLIENT_BINARY) && !defined(BE_DISABLE_NETWORK)
 BE_PrivateClient* BE_PrivateServer_GetPrivateClientFromClient(BE_Client client) {
     if (client == BE_CLIENT_UNCONNECTED)
         return beServerGenericUnconnected;
@@ -222,4 +242,18 @@ BE_PrivateClient* BE_PrivateServer_GetPrivateClientFromClient(BE_Client client) 
     return beServerGenericUnconnected;
 }
 #endif
+
+BE_BINARYEXPORT BA_Boolean BE_Server_IsDisabled(void) {
+#ifndef BE_CLIENT_BINARY
+#   ifndef BE_DISABLE_NETWORK
+    return BA_BOOLEAN_FALSE;
+#   else
+    return BA_BOOLEAN_FALSE;
+#   endif
+#else
+    BE_INTERFACEFUNCTION(BA_Boolean, void);
+    return function();
+#endif
+}
+
 BA_CPLUSPLUS_SUPPORT_GUARD_END()
