@@ -16,7 +16,7 @@
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 BE_PACKET_PACKED(struct BE_PrivatePacket_Sent {
     char magic[BE_PRIVATEPACKET_MAGIC_LENGTH];
-    uint16_t operationCode;
+    uint64_t operationCode;
     char data[BE_PACKET_MAXIMUM_DATA]; // TODO: char is limiting when it comes to numbers
     // TODO: Perhaps we can make data infinitely big by sending them in chunks?
 });
@@ -32,5 +32,5 @@ typedef struct {
 void BE_PrivatePacket_Initialize(void);
 void BE_PrivatePacket_Parse(BE_PrivateClient* client, struct sockaddr_in* descriptor, BE_PrivatePacket_Sent packet);
 void BE_PrivatePacket_Destroy(void);
-void BE_PrivatePacket_Send(struct sockaddr_in* socket, uint16_t operationCode, char data[BE_PACKET_MAXIMUM_DATA]);
+void BE_PrivatePacket_Send(struct sockaddr_in* socket, uint64_t operationCode, char data[BE_PACKET_MAXIMUM_DATA]);
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

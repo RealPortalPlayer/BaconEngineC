@@ -29,8 +29,8 @@ typedef void (*BE_Packet_Run)(BE_Client client, char data[BE_PACKET_MAXIMUM_DATA
 
 // TODO: Flags
 
-BE_BINARYEXPORT void BE_Packet_Register(uint16_t operationCode, BA_Boolean acceptUnconnected, BE_Packet_Run Run);
+BE_BINARYEXPORT void BE_Packet_Register(uint64_t operationCode, BA_Boolean acceptUnconnected, BE_Packet_Run Run);
 
-BE_BINARYEXPORT void BE_Packet_Send(BE_Client client, uint16_t operationCode, char data[BE_PACKET_MAXIMUM_DATA]);
+BE_BINARYEXPORT void BE_Packet_Send(BE_Client client, uint64_t operationCode, char data[BE_PACKET_MAXIMUM_DATA]);
 BA_CPLUSPLUS_SUPPORT_GUARD_END()
 
