@@ -35,12 +35,12 @@ void BE_PrivatePacket_Initialize(void) {
 }
 #endif
 
-BE_BINARYEXPORT void BE_Packet_Register(const char* name, BA_Boolean acceptUnconnected, void (*Run)(BE_Client client)) {
+BE_BINARYEXPORT void BE_Packet_Register(uint16_t operationCode, BA_Boolean acceptUnconnected, BE_Packet_Run Run) {
 #ifndef BE_CLIENT_BINARY
 #   ifndef BE_DISABLE_NETWORK
-    BE_PrivatePacket* packet = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivatePacket), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_PACKET);
+    BE_PrivatePacket_Registered* packet = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivatePacket_Registered), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_PACKET);
     
-    packet->name = BA_String_Copy(name);
+    packet->operationCode = operationCode;
     packet->acceptUnconnected = acceptUnconnected;
     packet->Run = Run;
 
@@ -48,11 +48,11 @@ BE_BINARYEXPORT void BE_Packet_Register(const char* name, BA_Boolean acceptUncon
     BA_DynamicArray_AddElementToLast(&bePacketRegistered, packet);
 #   endif
 #else
-    BE_INTERFACEFUNCTION(void, const char*, BA_Boolean, void (*)(BE_Client))(name, acceptUnconnected, Run);
+    BE_INTERFACEFUNCTION(void, uint16_t, BA_Boolean, BE_Packet_Run)(operationCode, acceptUnconnected, Run);
 #endif
 }
 
-BE_BINARYEXPORT void BE_Packet_Send(BE_Client client, const char* buffer) {
+BE_BINARYEXPORT void BE_Packet_Send(BE_Client client, uint16_t operationCode, char data[BE_PACKET_MAXIMUM_DATA]) {
 #ifndef BE_CLIENT_BINARY
 #   ifndef BE_DISABLE_NETWORK
     if (client == BE_CLIENT_UNCONNECTED) {
@@ -60,49 +60,44 @@ BE_BINARYEXPORT void BE_Packet_Send(BE_Client client, const char* buffer) {
         return;
     }
 
-    BE_PrivatePacket_Send(BE_PrivateServer_GetPrivateClientFromClient(client)->socket, buffer);
+    BE_PrivatePacket_Send(BE_PrivateServer_GetPrivateClientFromClient(client)->socket, operationCode, data);
 #   endif
 #else
-    BE_INTERFACEFUNCTION(void, BE_Client, const char*)(client, buffer);
+    BE_INTERFACEFUNCTION(void, BE_Client, uint16_t, char[BE_PACKET_MAXIMUM_DATA])(client, operationCode, data);
 #endif
 }
 
 #if !defined(BE_CLIENT_BINARY) && !defined(BE_DISABLE_NETWORK)
-void BE_PrivatePacket_Parse(BE_PrivateClient* client, struct sockaddr_in* descriptor, const char* buffer) {
-    BE_PrivatePacket* packet;
+void BE_PrivatePacket_Parse(BE_PrivateClient* client, struct sockaddr_in* descriptor, BE_PrivatePacket_Sent packet) {
+    BE_PrivatePacket_Registered* foundPacket = NULL;
 
     if (client->publicClient == BE_CLIENT_UNCONNECTED)
         client->socket = descriptor;
+
+    if (strncmp(packet.magic, BE_PRIVATEPACKET_MAGIC, BE_PRIVATEPACKET_MAGIC_LENGTH) != 0) {
+        BA_LOGGER_FATAL("Invalid packet: incorrect/missing magic\n");
+        // TODO: Disconnect
+        return;
+    }
     
     for (int i = 0; i < bePacketRegistered.used; i++) {
-        packet = BA_DYNAMICARRAY_GET_ELEMENT(BE_PrivatePacket, bePacketRegistered, i);
+        foundPacket = BA_DYNAMICARRAY_GET_ELEMENT(BE_PrivatePacket_Registered, bePacketRegistered, i);
 
-        if (!BA_String_Equals(packet->name, buffer, BA_BOOLEAN_TRUE)) {
-            packet = NULL;
+        if (foundPacket->operationCode != packet.operationCode) {
+            foundPacket = NULL;
             continue;
         }
 
         break;
     }
 
-    if (packet == NULL) {
-        if (BE_ClientInformation_IsServerModeEnabled()) {
-            if (client->publicClient != BE_CLIENT_UNCONNECTED) {
-                // TODO: Kick the client
-                return;
-            }
-
-            BE_PrivatePacket_Send(client->socket, "error invalid_packet");
-            return;
-        } else {
-            // TODO: Leave the server
-        }
-        
-        BA_LOGGER_FATAL("Invalid packet (%s)\n", buffer);
+    if (foundPacket == NULL) {
+        // TODO: Disconnect
+        BA_LOGGER_FATAL("Invalid packet: invalid operation code (%u)\n", packet.operationCode);
         return;
     }
 
-    packet->Run(client->publicClient);
+    foundPacket->Run(client->publicClient, packet.data);
 }
 
 void BE_PrivatePacket_Destroy(void) {
@@ -111,16 +106,23 @@ void BE_PrivatePacket_Destroy(void) {
     
     bePacketInitialized = BA_BOOLEAN_FALSE;
 
-    for (int i = 0; i < bePacketRegistered.used; i++) {
-        free(BA_DYNAMICARRAY_GET_ELEMENT(BE_PrivatePacket, bePacketRegistered, i)->name);
-        BE_EngineMemory_DeallocateMemory(bePacketRegistered.internalArray[i], sizeof(BE_PrivatePacket), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_PACKET);
-    }
+    for (int i = 0; i < bePacketRegistered.used; i++)
+        BE_EngineMemory_DeallocateMemory(bePacketRegistered.internalArray[i], sizeof(BE_PrivatePacket_Registered), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_PACKET);
 
     BE_EngineMemory_DeallocateMemory(bePacketRegistered.internalArray, sizeof(void*) * bePacketRegistered.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 
-void BE_PrivatePacket_Send(struct sockaddr_in* socket, const char* buffer) {
-    sendto(BE_PrivateServer_GetSocketDescriptor(), buffer, strlen(buffer), 0, (struct sockaddr*) socket, sizeof(struct sockaddr_in));
+void BE_PrivatePacket_Send(struct sockaddr_in* socket, uint16_t operationCode, char data[BE_PACKET_MAXIMUM_DATA]) {
+    BE_PrivatePacket_Sent packet = {0};
+
+    memcpy(&packet.magic, BE_PRIVATEPACKET_MAGIC, BE_PRIVATEPACKET_MAGIC_LENGTH);
+
+    packet.operationCode = operationCode; // TODO: Endianess
+
+    if (data != NULL)
+        memcpy(&packet.data, data, sizeof(char) * BE_PACKET_MAXIMUM_DATA);
+    
+    sendto(BE_PrivateServer_GetSocketDescriptor(), &packet, sizeof(BE_PrivatePacket_Sent), 0, (struct sockaddr*) socket, sizeof(struct sockaddr_in));
 }
 #endif
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

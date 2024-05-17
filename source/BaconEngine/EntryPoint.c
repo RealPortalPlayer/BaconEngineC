@@ -162,8 +162,8 @@ BA_THREAD_RETURN_VALUE BE_EntryPoint_ServerThreadFunction(void* argument) {
     while (BE_ClientInformation_IsRunning()) {
         struct sockaddr_in clientInterface;
         socklen_t clientSize = sizeof(clientInterface);
-        char buffer[1024];
-        ssize_t packetLength = recvfrom(BE_PrivateServer_GetSocketDescriptor(), (char*) &buffer, 1024, 0, (struct sockaddr*) &clientInterface, &clientSize);
+        BE_PrivatePacket_Sent packet = {0};
+        ssize_t packetLength = recvfrom(BE_PrivateServer_GetSocketDescriptor(), &packet, sizeof(BE_PrivatePacket_Sent), 0, (struct sockaddr*) &clientInterface, &clientSize);
 
         if (packetLength == -1) {
 #if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
@@ -177,8 +177,13 @@ BA_THREAD_RETURN_VALUE BE_EntryPoint_ServerThreadFunction(void* argument) {
             BA_LOGGER_ERROR("Errored while getting packet from client: %s\n", strerror(errno));
             continue;
         }
+
+        if (packetLength != sizeof(BE_PrivatePacket_Sent)) {
+            BA_LOGGER_ERROR("Invalid packet: size mismatch (%zu != %zu)\n", packetLength, sizeof(BE_PrivatePacket_Sent));
+            continue; // TODO: Disconnect
+        }
         
-        BE_PrivatePacket_Parse(BE_PrivateServer_GetPrivateClientFromSocket(&clientInterface), &clientInterface, buffer);
+        BE_PrivatePacket_Parse(BE_PrivateServer_GetPrivateClientFromSocket(&clientInterface), &clientInterface, packet);
     }
 
 #if BA_OPERATINGSYSTEM_POSIX_COMPLIANT

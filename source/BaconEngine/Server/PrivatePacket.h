@@ -6,26 +6,31 @@
 
 #pragma once
 
-#include <BaconAPI/Internal/CPlusPlusSupport.h>
-#include <BaconAPI/Internal/Boolean.h>
-
-#include "BaconEngine/Server/Client.h"
 #include "../AntiClientGuard.h"
 #include "PrivateClient.h"
+#include "BaconEngine/Server/Packet.h"
+
+#define BE_PRIVATEPACKET_MAGIC "PAK"
+#define BE_PRIVATEPACKET_MAGIC_LENGTH (sizeof(BE_PRIVATEPACKET_MAGIC) - 1)
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
-typedef struct {
-    BA_Boolean acceptUnconnected;
-    char* name;
+BE_PACKET_PACKED(struct BE_PrivatePacket_Sent {
+    char magic[BE_PRIVATEPACKET_MAGIC_LENGTH];
+    uint16_t operationCode;
+    char data[BE_PACKET_MAXIMUM_DATA]; // TODO: char is limiting when it comes to numbers
+    // TODO: Perhaps we can make data infinitely big by sending them in chunks?
+});
 
-    /**
-     * @param client - NULL if it's unconnected
-     */
-    void (*Run)(BE_Client client);
-} BE_PrivatePacket;
+typedef struct BE_PrivatePacket_Sent BE_PrivatePacket_Sent;
+
+typedef struct {
+    int16_t operationCode;
+    BA_Boolean acceptUnconnected;
+    BE_Packet_Run Run;
+} BE_PrivatePacket_Registered;
 
 void BE_PrivatePacket_Initialize(void);
-void BE_PrivatePacket_Parse(BE_PrivateClient* client, struct sockaddr_in* descriptor, const char* buffer);
+void BE_PrivatePacket_Parse(BE_PrivateClient* client, struct sockaddr_in* descriptor, BE_PrivatePacket_Sent packet);
 void BE_PrivatePacket_Destroy(void);
-void BE_PrivatePacket_Send(struct sockaddr_in* socket, const char* buffer);
+void BE_PrivatePacket_Send(struct sockaddr_in* socket, uint16_t operationCode, char data[BE_PACKET_MAXIMUM_DATA]);
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

@@ -125,7 +125,7 @@ void BE_Server_Start(unsigned port) {
 #if !defined(BE_CLIENT_BINARY) && !defined(BE_DISABLE_NETWORK)
 void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor) {
     if (beServerMaxPlayers == BE_Server_GetConnectedAmount()) {
-        BE_PrivatePacket_Send(clientDescriptor, "error server_full");
+        // BE_PrivatePacket_Send(clientDescriptor, "error server_full");
         return;
     }
 
@@ -145,7 +145,7 @@ void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor) {
         return;
     }
 
-    BE_PrivatePacket_Send(clientDescriptor, "error crash");
+    // BE_PrivatePacket_Send(clientDescriptor, "error crash");
     BA_ASSERT_ALWAYS("No more free client slots while also not being full, this shouldn't happen\n");
 }
 #endif
