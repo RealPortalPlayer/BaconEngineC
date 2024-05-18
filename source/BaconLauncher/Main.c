@@ -135,7 +135,7 @@ int APIENTRY WinMain(HINSTANCE instanceHandle, HINSTANCE previousInstanceHandle,
     }
 
     if (BA_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_HELP, SEC_BUILTINARGUMENTS_HELP_SHORT, BA_BOOLEAN_FALSE)) {
-        BA_LOGGER_INFO("Arguments:\n%s\n%s\n", BA_ArgumentHandler_GetHelpMessage(), SEC_Launcher_GetDefaultHelpList());
+        BL_MAIN_INFO("Arguments", "Arguments:\n%s\n%s\n", BA_ArgumentHandler_GetHelpMessage(), SEC_Launcher_GetDefaultHelpList());
         return 0;
     }
 
