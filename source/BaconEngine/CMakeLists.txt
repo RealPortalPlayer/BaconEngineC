@@ -59,7 +59,8 @@ set(BE_SOURCE_FILES
         Storage/DefaultPackage.c
         Server/Server.c
         EngineMemory.c
-        Server/Packet.c)
+        Server/Packet.c
+        Server/Packets.c)
 
 add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         # Header files

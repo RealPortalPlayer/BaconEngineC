@@ -20,7 +20,7 @@ void BE_EnginePackets_Initialize(void) {
 
 #ifndef BE_DISABLE_NETWORK
 void BE_EnginePackets_Ping(BE_Client client, char data[BE_PACKET_MAXIMUM_DATA]) {
-    BE_Packet_Send(client, 1000, NULL);
+    // TODO: Ping back without causing infinite loop
 }
 
 void BE_EnginePackets_Connect(BE_Client client, char data[BE_PACKET_MAXIMUM_DATA]) {
