@@ -119,7 +119,7 @@ BA_THREAD_RETURN_VALUE BE_EntryPoint_CommandThreadFunction(void* argument) {
         memset(input, 0, 4024);
 
         if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT && !printedCursor) {
-            BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "%s ", BE_ClientInformation_IsCheatsEnabled() ? "#" : "$");
+            BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "%c ", BE_ClientInformation_IsCheatsEnabled() ? '#' : '$');
 
             printedCursor = BA_BOOLEAN_TRUE;
         }
