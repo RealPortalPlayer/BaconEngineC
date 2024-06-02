@@ -216,7 +216,8 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     SEC_Paths_SetEnginePath(engineDetails->enginePath);
     SEC_Paths_SetClientPath(engineDetails->clientPath);
     SEC_STRICTMODE_CHECK(!alreadyStarted, 1, "Reinitializing the engine is not supported\n");
-    BA_LOGGER_TRACE("Entered engine code\n");
+    BA_LOGGER_TRACE("Entered engine code\n"
+                    "Built on: %s\n", __TIMESTAMP__);
 
     alreadyStarted = BA_BOOLEAN_TRUE;
 
