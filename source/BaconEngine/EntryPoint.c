@@ -103,14 +103,13 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
 BA_THREAD_RETURN_VALUE BE_EntryPoint_CommandThreadFunction(void* argument) {
     commandThreadRunning = BA_BOOLEAN_TRUE;
 
-    // FIXME: Find out why this is not working on Serenity.
     // TODO: Find fcntl replacement for Windows.
-#if !BA_OPERATINGSYSTEM_SERENITY && !BA_OPERATINGSYSTEM_WINDOWS
+#if !BA_OPERATINGSYSTEM_WINDOWS
     fcntl(STDIN_FILENO, F_SETFL, fcntl(STDIN_FILENO, F_GETFL) | O_NONBLOCK);
 #endif
 
     BA_LOGGER_DEBUG("Command thread started\n");
-
+    
     while (BE_ClientInformation_IsRunning()) {
         if (BE_Console_GetCommandAmount() == 0)
             continue;
@@ -125,13 +124,24 @@ BA_THREAD_RETURN_VALUE BE_EntryPoint_CommandThreadFunction(void* argument) {
             printedCursor = BA_BOOLEAN_TRUE;
         }
 
-        fgets(input, sizeof(input), stdin); // TODO: Arrow keys to go back in history.
+        {
+            int written = 0;
 
-        if (input[0] == '\0')
-            continue;
+            // TODO: Arrow keys to go back in history.
+            // TODO: Allow backspacing
+            while (BE_ClientInformation_IsRunning()) {
+                char character = getc(stdin);
+                
+                if (character == EOF)
+                    continue;
+                
+                if (written >= sizeof(input) - 1 || character == '\n')
+                    break;
+                
+                input[written++] = character;
+            }
+        }
         
-        input[strcspn(input, "\n")] = '\0';
-
         if (input[0] != '\0')
             BE_Console_ExecuteCommand(input, BE_CLIENT_UNCONNECTED);
 
