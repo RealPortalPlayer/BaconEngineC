@@ -1,7 +1,7 @@
 // Purpose: Main entry-point for the client
-// Created on: 4/22/2023 @ 2:02 PM
+// Created on: 4/22/23 @ 2:02 PM
 
-// Copyright (c) 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
@@ -32,6 +32,10 @@ I_BINARYEXPORT void I_EntryPoint_InitializeWrapper(const char* launcherPath, con
 
 I_BINARYEXPORT const char* I_EntryPoint_GetEngineVersion(void) {
     return BE_ENGINE_VERSION;
+}
+
+I_BINARYEXPORT const char* I_EntryPoint_GetEngineName(void) {
+    return BE_ENGINE_NAME;
 }
 
 I_BINARYEXPORT int I_EntryPoint_Start(int argc, char** argv);

@@ -1,5 +1,5 @@
 // Purpose: Prevent a header being included in a client binary context
-// Created on: 4/22/2023 @ 4:51 PM
+// Created on: 4/22/23 @ 4:51 PM
 
 // Copyright (c) 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>

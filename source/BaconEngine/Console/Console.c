@@ -1,15 +1,15 @@
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <stddef.h>
 #include <string.h>
 #include <SharedEngineCode/Debugging/StrictMode.h>
 #include <BaconAPI/Debugging/Assert.h>
+#include <BaconAPI/Math/Bitwise.h>
 
 #include "BaconEngine/Console/Console.h"
 #include "../InterfaceFunctions.h"
-#include "BaconEngine/Math/Bitwise.h"
-#include "BaconEngine/ClientInformation.h"
+#include "BaconEngine/Client/Information.h"
 
 #ifndef BE_CLIENT_BINARY
 #   include "EngineCommands.h"
@@ -17,6 +17,7 @@
 #   include "../Storage/PrivateDynamicArray.h"
 #   include "../EngineMemory.h"
 #   include "../Storage/PrivateDynamicDictionary.h"
+#   include "../PrivateArgumentManager.h"
 #endif
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
@@ -143,18 +144,18 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
                          "Spot: %i/%zu\n", name, description, flags, beConsoleCommands.used, beConsoleCommands.size);
 
     if (flags != BE_COMMAND_FLAG_NULL) {
-        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_SERVER_ONLY) || !BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY),
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BA_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_SERVER_ONLY) || !BA_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY),
                                              "Invalid command flags, cannot be both for server and client only\n");
-        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CHEATS_ONLY) || !BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY),
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BA_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CHEATS_ONLY) || !BA_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY),
                                              "Invalid command flags, the client cannot run any cheat commands\n");
-        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY) || !BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAGS_RAN_ON_SERVER),
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BA_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_CLIENT_ONLY) || !BA_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAGS_RAN_ON_SERVER),
                                              "Invalid command flags, cannot be both client only but also only runs on the server\n");
 
-        if (BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_SERVER_ONLY) && BE_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAGS_RAN_ON_SERVER))
+        if (BA_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAG_SERVER_ONLY) && BA_BITWISE_IS_BIT_SET(flags, BE_COMMAND_FLAGS_RAN_ON_SERVER))
             BA_LOGGER_WARN("Redundant command flags, server commands will only run on servers\n");
     }
 
-    BE_PrivateConsole_Command* privateConsoleCommand = (BE_PrivateConsole_Command*) BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateConsole_Command), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+    BE_PrivateConsole_Command* privateConsoleCommand = (BE_PrivateConsole_Command*) BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateConsole_Command), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_COMMAND);
 
     if (!beConsoleDuplicateCommand)
         BE_PrivateDynamicArray_Create(&privateConsoleCommand->publicCommand.arguments, 10);
@@ -182,15 +183,16 @@ void BE_Command_Register(const char* name, const char* description, BE_Command_F
 
 void BE_Command_AddArgument(const char* name, BA_Boolean required) {
 #ifndef BE_CLIENT_BINARY
+    // TODO: Packets can use this code, too. Perhaps it can be moved to its own function
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beConsoleCommands.used != 0, "There is no command to add arguments to\n");
 
     BE_PrivateConsole_Command* command = BA_DYNAMICARRAY_GET_LAST_ELEMENT(BE_PrivateConsole_Command, beConsolePrivateCommands);
 
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(command->publicCommand.arguments.used == 0 ||
-                                         BA_DYNAMICARRAY_GET_LAST_ELEMENT(BE_Command_Argument, command->publicCommand.arguments)->required ||
+                                         BA_DYNAMICARRAY_GET_LAST_ELEMENT(BE_ArgumentManager_Argument, command->publicCommand.arguments)->required ||
                                          !required, "Required arguments cannot be added after an optional argument\n");
 
-    BE_Command_Argument* argument = BE_EngineMemory_AllocateMemory(sizeof(BE_Command_Argument), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+    BE_ArgumentManager_Argument* argument = BE_EngineMemory_AllocateMemory(sizeof(BE_ArgumentManager_Argument), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_ARGUMENT);
 
     argument->name = BA_String_Copy(name);
     argument->required = required;
@@ -228,7 +230,7 @@ void BE_Command_DuplicatePrevious(const char* name, const char* description) {
 #endif
 }
 
-void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
+void BE_Console_ExecuteCommand(const char* input, BE_Client client) {
 #ifndef BE_CLIENT_BINARY
     // Do not put any logs outside an if check.
     // We do not want to trick users into thinking something is part of the command.
@@ -236,172 +238,47 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
     if (input == NULL || input[0] == '\0')
         return;
 
-    char* name = BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
-    BE_PrivateConsole_Command* command = NULL;
+    char* name;
     BA_DynamicDictionary arguments;
-    size_t inputLength = strlen(input);
-    
-    name[0] = 0;
-    
-    BE_PrivateDynamicDictionary_Create(&arguments, 20);
-
-    int index;
     int argumentStartingIndex;
 
-    {
-        BA_Boolean trimmed = BA_BOOLEAN_FALSE;
+    BE_PrivateArgumentManager_ParseName(input, &name, &argumentStartingIndex);
+    BE_PrivateDynamicDictionary_Create(&arguments, 20);
 
-        for (index = 0; index < (int) inputLength; index++) {
-            if (input[index] == ' ') {
-                if (!trimmed)
-                    continue;
-
-                index++;
-                break;
-            }
-            
-            trimmed = BA_BOOLEAN_TRUE;
-
-            BA_String_AppendCharacter(&name, input[index]);
-            BE_EngineMemory_AddSize(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
-        }
-    }
-
-    command = BE_Console_GetPrivateCommand(name);
-    argumentStartingIndex = index;
-
+    BE_PrivateConsole_Command* command = BE_Console_GetPrivateCommand(name);
+    
     if (command == NULL) { // TODO: Tell the client.
         BA_LOGGER_ERROR("'%s' is not a valid command\n", name);
         goto destroy;
     }
+    
+    if (command->publicCommand.arguments.used != 0 && !BA_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_ARGUMENT_PARSING) && !BE_PrivateArgumentManager_ParseArguments(input, argumentStartingIndex, !BA_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING), command->publicCommand.arguments, &arguments))
+        goto destroy;
 
-    if (command->publicCommand.arguments.used != 0 && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_ARGUMENT_PARSING)) {
-        char* argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
-        int current = 0;
-        int quotePosition = -1;
-        BA_Boolean doubleQuote = BA_BOOLEAN_FALSE;
-        BA_Boolean escaped = BA_BOOLEAN_FALSE;
-        BA_Boolean added = BA_BOOLEAN_FALSE;
-        BA_Boolean trimmed = BA_BOOLEAN_FALSE;
-        BA_Boolean quoteAdded = BA_BOOLEAN_FALSE;
-
-        argument[0] = 0;
-
-        for (; index < (int) inputLength && current < command->publicCommand.arguments.used; index++) {
-            BA_Boolean validEscapeCharacter = BA_BOOLEAN_FALSE;
-            
-            if (added) {
-                argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
-
-                argument[0] = 0;
-            }
-
-            added = BA_BOOLEAN_FALSE;
-
-            if (input[index] == ' ' && (quoteAdded || !trimmed))
-                continue;
-
-            quoteAdded = BA_BOOLEAN_FALSE;
-
-            if (input[index] == ' ' && quotePosition == -1 && !escaped) {
-                publish_argument:
-                BE_PrivateDynamicArray_CheckResize(&arguments.keys);
-                BE_PrivateDynamicArray_CheckResize(&arguments.values);
-                BA_DynamicDictionary_AddElementToLast(&arguments,
-                                                       (void*) BA_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument,
-                                                                                            command->publicCommand.arguments,
-                                                                                            current++)->name, argument);
-
-                added = BA_BOOLEAN_TRUE;
-                trimmed = BA_BOOLEAN_FALSE;
-                continue;
-            }
-
-            if (input[index] == '\\' && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING)) {
-                if (!escaped) {
-                    escaped = BA_BOOLEAN_TRUE;
-                    continue;
-                }
-                
-                validEscapeCharacter = BA_BOOLEAN_TRUE;
-            }
-            
-            if (input[index] == '\'' || input[index] == '"') {
-                if (!escaped) {
-                    if (quotePosition == -1) {
-                        if (argument[0] != 0) {
-                            index--;
-                            goto publish_argument;
-                        }
-
-                        quotePosition = index;
-                        doubleQuote = input[index] == '"';
-                        continue;
-                    }
-
-                    if (doubleQuote == (input[index] == '"')) {
-                        quotePosition = -1;
-                        doubleQuote = BA_BOOLEAN_FALSE;
-                        quoteAdded = BA_BOOLEAN_TRUE;
-                        goto publish_argument;
-                    }
-                }
-                
-                validEscapeCharacter = BA_BOOLEAN_TRUE;
-            }
-
-            trimmed = BA_BOOLEAN_TRUE;
-
-            if (escaped && !validEscapeCharacter && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING)) {
-                BA_LOGGER_ERROR("Parsing error: invalid escape character '%c', use double backslashes instead of one\n", input[index]);
-                BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * (strlen(argument) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
-                goto destroy;
-            }
-
-            BA_String_AppendCharacter(&argument, input[index]);
-            BE_EngineMemory_AddSize(sizeof(char), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
-            
-            escaped = BA_BOOLEAN_FALSE;
-        }
-
-        if (quotePosition != -1 && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING)) {
-            BA_LOGGER_ERROR("Parsing error: unescaped %s quote at %i\n", doubleQuote ? "double" : "single", quotePosition);
-            goto destroy;
-        }
-
-        if (escaped && !BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_NO_FANCY_ARGUMENT_PARSING)) {
-            BA_LOGGER_ERROR("Parsing error: stray escape character\n");
-            goto destroy;
-        }
-
-        if (!added) {
-            if (argument[0] != '\0') {
-                BE_PrivateDynamicArray_CheckResize(&arguments.keys);
-                BE_PrivateDynamicArray_CheckResize(&arguments.values);
-                BA_DynamicDictionary_AddElementToLast(&arguments,
-                                                       (void*) BA_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument,
-                                                                                            command->publicCommand.arguments,
-                                                                                            current)->name, argument);
-
-                added = BA_BOOLEAN_TRUE;
-            }
-
-            if (!added)
-                BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * (strlen(argument) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
-        }
+    if (BA_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAGS_RAN_ON_SERVER) && !BE_ClientInformation_IsServerModeEnabled()) {
+        // TODO: Send command packet to server
+        goto destroy;
     }
 
-    if (BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAG_SERVER_ONLY)) {
+    if (BA_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAG_SERVER_ONLY)) {
         // TODO: Kick client.
 
         if (!BE_ClientInformation_IsServerModeEnabled()) {
             BA_LOGGER_ERROR("This command can only be ran by the server\n");
             goto destroy;
+        } else if (client != BE_CLIENT_UNCONNECTED) {
+            // TODO: Kick client: invalid packet (client doesn't send a command packet if command is server only)
+            goto destroy;
         }
     }
 
-    if (BE_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()) {
-        BA_LOGGER_ERROR("This command can only be ran by a client\n"); // TODO: Kick client if the client is the one who ran it.
+    if (BA_BITWISE_IS_BIT_SET(command->publicCommand.flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()) {
+        if (client != BE_CLIENT_UNCONNECTED) {
+            // TODO: Kick client: invalid packet (client should never **ever** send a command packet if command is client only)
+            goto destroy;
+        }
+
+        BA_LOGGER_ERROR("This command can only be ran by a client\n");
         goto destroy;
     }
 
@@ -418,16 +295,16 @@ void BE_Console_ExecuteCommand(const char* input) { // TODO: Client
         goto destroy;
     }
 
-    command->publicCommand.Run(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Command_Context, input, input + argumentStartingIndex, arguments));
+    command->publicCommand.Run(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Command_Context, input, input + argumentStartingIndex, arguments, client, &command->publicCommand));
 
     destroy:
-    BE_EngineMemory_DeallocateMemory(name, sizeof(char) * (strlen(name) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+    BE_EngineMemory_DeallocateMemory(name, sizeof(char) * (strlen(name) + 1), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_NAME);
     
     for (int argumentId = 0; argumentId < arguments.keys.used; argumentId++)
-        BE_EngineMemory_DeallocateMemory(arguments.values.internalArray[argumentId], sizeof(char) * (strlen(arguments.values.internalArray[argumentId]) + 1), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+        BE_EngineMemory_DeallocateMemory(arguments.values.internalArray[argumentId], sizeof(char) * (strlen(arguments.values.internalArray[argumentId]) + 1), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_TEMPORARY_ARGUMENT);
 
-    BE_EngineMemory_DeallocateMemory(arguments.keys.internalArray, sizeof(void*) * arguments.keys.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
-    BE_EngineMemory_DeallocateMemory(arguments.values.internalArray, sizeof(void*) * arguments.keys.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BE_EngineMemory_DeallocateMemory(arguments.keys.internalArray, sizeof(void*) * arguments.keys.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BE_EngineMemory_DeallocateMemory(arguments.values.internalArray, sizeof(void*) * arguments.keys.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
 #else
     BE_INTERFACEFUNCTION(void, const char*)(input);
 #endif
@@ -444,7 +321,7 @@ BA_Boolean BE_Console_IsEngineCommand(BE_Command command) {
 
 #ifndef BE_CLIENT_BINARY
 void BE_PrivateConsole_Destroy(void) {
-    BA_ASSERT(beConsoleInitialized, "Console are not initialized\n");
+    BA_ASSERT(beConsoleInitialized, "Console is not initialized\n");
     BA_LOGGER_INFO("Destroying console\n");
 
     beConsoleInitialized = BA_BOOLEAN_FALSE;
@@ -453,17 +330,17 @@ void BE_PrivateConsole_Destroy(void) {
         BE_PrivateConsole_Command* command = BA_DYNAMICARRAY_GET_ELEMENT(BE_PrivateConsole_Command, beConsoleCommands, commandId);
 
         for (int argumentId = 0; argumentId < command->publicCommand.arguments.used; argumentId++)
-            BE_EngineMemory_DeallocateMemory(command->publicCommand.arguments.internalArray[argumentId], sizeof(BE_Command_Argument),
-                                             BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+            BE_EngineMemory_DeallocateMemory(command->publicCommand.arguments.internalArray[argumentId], sizeof(BE_ArgumentManager_Argument),
+                                             BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_ARGUMENT);
 
         if (!command->duplicate)
-            BE_EngineMemory_DeallocateMemory(command->publicCommand.arguments.internalArray, sizeof(void*) * command->publicCommand.arguments.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+            BE_EngineMemory_DeallocateMemory(command->publicCommand.arguments.internalArray, sizeof(void*) * command->publicCommand.arguments.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
 
-        BE_EngineMemory_DeallocateMemory(command, sizeof(BE_PrivateConsole_Command), BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND);
+        BE_EngineMemory_DeallocateMemory(command, sizeof(BE_PrivateConsole_Command), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_COMMAND);
     }
 
-    BE_EngineMemory_DeallocateMemory(beConsolePrivateCommands.internalArray, sizeof(void*) * beConsolePrivateCommands.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
-    BE_EngineMemory_DeallocateMemory(beConsoleCommands.internalArray, sizeof(void*) * beConsoleCommands.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BE_EngineMemory_DeallocateMemory(beConsolePrivateCommands.internalArray, sizeof(void*) * beConsolePrivateCommands.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BE_EngineMemory_DeallocateMemory(beConsoleCommands.internalArray, sizeof(void*) * beConsoleCommands.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 #endif
 
@@ -475,7 +352,7 @@ BE_BINARYEXPORT void BE_Console_ExecuteFile(FILE* file) {
     char* line;
     ssize_t length;
     
-    while((length = BA_String_GetLine(file, &line, NULL)) != -1) {
+    while ((length = BA_String_GetLine(file, &line, NULL)) != -1) {
         if (length == -2) {
             BA_LOGGER_TRACE("Failed to allocate enough memory for buffer\n");
             return;
@@ -486,7 +363,7 @@ BE_BINARYEXPORT void BE_Console_ExecuteFile(FILE* file) {
             continue;
         }
 
-        BE_Console_ExecuteCommand(line);
+        BE_Console_ExecuteCommand(line, BE_CLIENT_UNCONNECTED);
         free(line);
     }
 #else
@@ -495,7 +372,7 @@ BE_BINARYEXPORT void BE_Console_ExecuteFile(FILE* file) {
 #endif
 }
 
-BE_BINARYEXPORT void BE_Console_ExecuteFileContents(const char* contents) {
+BE_BINARYEXPORT void BE_Console_ExecuteListOfCommands(const char* contents) {
 #ifndef BE_CLIENT_BINARY
     BA_LOGGER_TRACE("Executing list of commands\n");
     
@@ -514,7 +391,7 @@ BE_BINARYEXPORT void BE_Console_ExecuteFileContents(const char* contents) {
             continue;
         }
 
-        BE_Console_ExecuteCommand(line);
+        BE_Console_ExecuteCommand(line, BE_CLIENT_UNCONNECTED);
         free(commandLines->internalArray[i]);
     }
 

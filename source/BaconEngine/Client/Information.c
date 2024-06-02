@@ -1,12 +1,12 @@
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <BaconAPI/ArgumentHandler.h>
 #include <BaconAPI/Logger.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 
-#include "BaconEngine/ClientInformation.h"
-#include "InterfaceFunctions.h"
+#include "BaconEngine/Client/Information.h"
+#include "../InterfaceFunctions.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY

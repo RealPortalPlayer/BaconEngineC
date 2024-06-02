@@ -1,50 +1,33 @@
 // Purpose: Data that represent color.
 // Created on: 4/26/22 @ 11:04 PM
 
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
 
 #include <BaconAPI/Internal/CPlusPlusSupport.h>
 
+#define BE_COLOR_CREATE3(type, name) \
+typedef struct {                     \
+    type r;                          \
+    type g;                          \
+    type b;                          \
+} BE_Color3_ ## name, BE_Colour3_ ## name
+
+#define BE_COLOR_CREATE4(type, name) \
+typedef struct {                     \
+    type r;                          \
+    type g;                          \
+    type b;                          \
+    type a;                          \
+} BE_Color4_ ## name, BE_Colour4_ ## name
+
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
-typedef struct {
-    int r;
-    int g;
-    int b;
-} BE_Color3_Integer, BE_Colour3_Integer;
-
-typedef struct {
-    unsigned r;
-    unsigned g;
-    unsigned b;
-} BE_Color3_Unsigned, BE_Colour3_Unsigned;
-
-typedef struct {
-    float r;
-    float g;
-    float b;
-} BE_Color3_Float, BE_Colour3_Float;
-
-typedef struct {
-    int r;
-    int g;
-    int b;
-    int a;
-} BE_Color4_Integer, BE_Colour4_Integer;
-
-typedef struct {
-    unsigned r;
-    unsigned g;
-    unsigned b;
-    unsigned a;
-} BE_Color4_Unsigned, BE_Colour4_Unsigned;
-
-typedef struct {
-    float r;
-    float g;
-    float b;
-    float a;
-} BE_Color4_Float, BE_Colour4_Float;
+BE_COLOR_CREATE3(int, Integer);
+BE_COLOR_CREATE3(unsigned, Unsigned);
+BE_COLOR_CREATE3(float, Float);
+BE_COLOR_CREATE4(int, Integer);
+BE_COLOR_CREATE4(unsigned, Unsigned);
+BE_COLOR_CREATE4(float, Float);
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

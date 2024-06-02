@@ -1,7 +1,7 @@
 // Purpose: Helps manage package files (zip files)
-// Created on: 4/26/2023 @ 12:10 PM
+// Created on: 4/26/23 @ 12:10 PM
 
-// Copyright (c) 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
@@ -27,6 +27,7 @@ typedef struct zip_t* BE_Package;
 BE_BINARYEXPORT BE_Package BE_Package_Open(const char* fileName);
 
 /**
+ * @param package If this is null, then it will use the engine package
  * @param filePath Path inside of the package file to the file you want
  * @param buffer A pointer to the output buffer
  * @param bufferSize How large that buffer is

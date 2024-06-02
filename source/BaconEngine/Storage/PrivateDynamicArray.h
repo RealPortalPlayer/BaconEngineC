@@ -1,5 +1,5 @@
 // Purpose: Private implementation of DynamicArray
-// Created on: 4/24/2023 @ 9:02 AM
+// Created on: 4/24/23 @ 9:02 AM
 
 // Copyright (c) 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>

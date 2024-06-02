@@ -1,10 +1,14 @@
-// Copyright (c) 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <BaconAPI/Logger.h>
 
 #include "BaconEngine/Storage/Package.h"
 #include "../InterfaceFunctions.h"
+
+#ifndef BE_CLIENT_BINARY
+#   include "./PrivateDefaultPackage.h"
+#endif
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 BE_Package BE_Package_Open(const char* fileName) {
@@ -19,7 +23,15 @@ BE_Package BE_Package_Open(const char* fileName) {
 
 BA_Boolean BE_Package_GetFile(BE_Package package, const char* filePath, void** buffer, size_t* bufferSize) {
 #ifndef BE_CLIENT_BINARY
-    BA_LOGGER_TRACE("Getting file in a package: %s\n", filePath);
+    if (package == NULL) {
+        if (!BE_PrivateDefaultPackage_IsOpen())
+            return BA_BOOLEAN_FALSE;
+
+        package = BE_PrivateDefaultPackage_Get();
+    }
+    
+    // TODO: This doesn't support large files
+    BA_LOGGER_TRACE("Getting file in %s package: %s\n", package == BE_PrivateDefaultPackage_Get() ? "the engine" : "a client", filePath);
     return zip_entry_open(package, filePath) == 0 &&
            zip_entry_read(package, buffer, bufferSize) >= 0 &&
            zip_entry_close(package) == 0;

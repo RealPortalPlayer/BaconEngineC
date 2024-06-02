@@ -1,5 +1,5 @@
 // Purpose: Metal window functions.
-// Created on: 1/1/2023 @ 1:42 PM
+// Created on: 1/1/23 @ 1:42 PM
 
 // Copyright (c) 2023, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>

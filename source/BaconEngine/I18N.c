@@ -5,10 +5,10 @@
 #include <stdio.h>
 #include <SharedEngineCode/Debugging/StrictMode.h>
 #include <BaconAPI/Storage/DynamicDictionary.h>
+#include <BaconAPI/Configuration.h>
 
 #include "BaconEngine/I18N.h"
 #include "InterfaceFunctions.h"
-#include "BaconEngine/Configuration.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
@@ -47,7 +47,7 @@ const char* BE_I18N_TranslateFromFile(FILE* languageFile, const char* key) {
 #ifndef BE_CLIENT_BINARY
     SEC_STRICTMODE_CHECK(strlen(key) != 0, key, "Key cannot be empty\n");
     SEC_STRICTMODE_CHECK(languageFile != NULL, key, "Language file cannot be null\n");
-    return BE_I18N_InternalTranslate(BE_Configuration_ParseFromFile(languageFile), key);
+    return BE_I18N_InternalTranslate(BA_Configuration_ParseFromFile(languageFile), key);
 #else
     BE_INTERFACEFUNCTION(const char*, FILE*, const char*);
     return function(languageFile, key);
@@ -57,7 +57,7 @@ const char* BE_I18N_TranslateFromFile(FILE* languageFile, const char* key) {
 const char* BE_I18N_Translate(const char* buffer, const char* key) {
 #ifndef BE_CLIENT_BINARY
     SEC_STRICTMODE_CHECK(strlen(key) != 0, key, "Key cannot be empty\n");
-    return BE_I18N_InternalTranslate(BE_Configuration_Parse(buffer), key);
+    return BE_I18N_InternalTranslate(BA_Configuration_Parse(buffer), key);
 #else
     BE_INTERFACEFUNCTION(const char*, const char*, const char*);
     return function(buffer, key);

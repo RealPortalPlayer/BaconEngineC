@@ -1,14 +1,14 @@
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <BaconAPI/ArgumentHandler.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <BaconAPI/Debugging/Assert.h>
+#include <BaconAPI/Math/Bitwise.h>
 
 #include "EngineLayers.h"
 #include "PrivateUI.h"
 #include "BaconEngine/Rendering/Layer.h"
-#include "BaconEngine/Math/Bitwise.h"
 #include "BaconEngine/Rendering/Renderer.h"
 #include "BaconEngine/Rendering/Window.h"
 
@@ -74,8 +74,8 @@ void BE_EngineLayers_RenderButtons(BE_PrivateUI_Window* uiWindow, BE_Vector2_Int
     updatedPosition.x += 5;
     updatedPosition.y += 5;
 
-    if (!BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_CLOSE) || !BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_MINIMIZE) || !BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_MAXIMIZE)) {
-        if (!BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_CLOSE))
+    if (!BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_CLOSE) || !BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_MINIMIZE) || !BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_MAXIMIZE)) {
+        if (!BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_CLOSE))
             BE_RENDERER_DRAW_BORDERED_RECTANGLE_SAME_COLOR(updatedPosition, BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, 10, 10), CLOSE_BUTTON_COLORS, 2);
         else
             BE_RENDERER_DRAW_BORDERED_RECTANGLE_SAME_COLOR(updatedPosition, BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, 10, 10), uiWindow->currentRenderPosition == 0 ? WINDOW_COLORS : INACTIVE_WINDOW_COLORS, 2);
@@ -83,8 +83,8 @@ void BE_EngineLayers_RenderButtons(BE_PrivateUI_Window* uiWindow, BE_Vector2_Int
         updatedPosition.x += 17;
     }
 
-    if (!BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_MINIMIZE) || !BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_MAXIMIZE)) {
-        if (!BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_MINIMIZE))
+    if (!BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_MINIMIZE) || !BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_MAXIMIZE)) {
+        if (!BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_MINIMIZE))
             BE_RENDERER_DRAW_BORDERED_RECTANGLE_SAME_COLOR(updatedPosition, BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, 10, 10), MINIMIZE_BUTTON_COLORS, 2);
         else
             BE_RENDERER_DRAW_BORDERED_RECTANGLE_SAME_COLOR(updatedPosition, BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, 10, 10), uiWindow->currentRenderPosition == 0 ? WINDOW_COLORS : INACTIVE_WINDOW_COLORS, 2);
@@ -92,7 +92,7 @@ void BE_EngineLayers_RenderButtons(BE_PrivateUI_Window* uiWindow, BE_Vector2_Int
         updatedPosition.x += 17;
     }
 
-    if (BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_MAXIMIZE))
+    if (BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_MAXIMIZE))
         return;
 
     BE_RENDERER_DRAW_BORDERED_RECTANGLE_SAME_COLOR(updatedPosition, BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, 10, 10), MAXIMIZE_BUTTON_COLORS, 2);
@@ -112,7 +112,7 @@ void BE_EngineLayers_UIRendering_OnUpdate(BE_Layer_UpdateTypes updateType) {
     for (int windowId = uiWindows->used - 1; windowId >= 0; windowId--) {
         BE_PrivateUI_Window* uiWindow = BA_DYNAMICARRAY_GET_ELEMENT_POINTER(BE_PrivateUI_Window, uiWindows, windowId);
 
-        if (BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_CLOSED))
+        if (BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_CLOSED))
             continue;
 
         if (uiWindow->position.x + uiWindow->size.x + 3 > windowSize.x)
@@ -127,10 +127,10 @@ void BE_EngineLayers_UIRendering_OnUpdate(BE_Layer_UpdateTypes updateType) {
         {
             int height = (int) uiWindow->size.y + 25;
 
-            if (BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_TITLE_BAR))
+            if (BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_TITLE_BAR))
                 height -= 22;
 
-            if (BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_MINIMIZED))
+            if (BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_MINIMIZED))
                 height = 22;
 
             if (uiWindow->position.y + height + 1 > (int) windowSize.y)
@@ -144,12 +144,12 @@ void BE_EngineLayers_UIRendering_OnUpdate(BE_Layer_UpdateTypes updateType) {
 
         // TODO: Calculate position and size depending on if it's maximized.
 
-        if (BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_TITLE_BAR)) {
+        if (BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_TITLE_BAR)) {
             BE_RENDERER_DRAW_BORDERED_RECTANGLE_SAME_COLOR(position, size, WINDOW_COLORS, 2);
             continue;
         }
 
-        if (BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_MINIMIZED)) {
+        if (BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_MINIMIZED)) {
             BE_RENDERER_DRAW_BORDERED_RECTANGLE_SAME_COLOR(position, BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, size.x, 20), TITLE_COLORS, 2);
             BE_EngineLayers_RenderButtons(uiWindow, position);
             continue;
@@ -172,7 +172,7 @@ BA_Boolean BE_EngineLayers_UIRendering_OnEvent(BE_Event event) {
     for (int windowId = 0; windowId < renderOrder->used; windowId++) {
         BE_PrivateUI_Window* uiWindow = BA_DYNAMICARRAY_GET_ELEMENT_POINTER(BE_PrivateUI_Window, renderOrder, windowId);
 
-        if (BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_CLOSED))
+        if (BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_CLOSED))
             continue;
 
         switch (event.type) {
@@ -188,10 +188,10 @@ BA_Boolean BE_EngineLayers_UIRendering_OnEvent(BE_Event event) {
                 {
 //                  int checkHeight = 24;
 
-//                  if (BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_TITLE_BAR))
+//                  if (BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_TITLE_BAR))
 //                      checkHeight = (int) uiWindow->size.y;
 
-//                  if (!BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NOT_MOVABLE) &&
+//                  if (!BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NOT_MOVABLE) &&
 //                      SDL_PointInRect(&mousePoint, &(SDL_Rect) {uiWindow->position.x, uiWindow->position.y, (int) uiWindow->size.x + 4, checkHeight})) {
 //                      beEngineLayersMovingUi = 1;
 //                      beEngineLayersMoveOffset = (BE_Vector2_Integer) {
@@ -202,15 +202,15 @@ BA_Boolean BE_EngineLayers_UIRendering_OnEvent(BE_Event event) {
               }
 
 //            if (SDL_PointInRect(&mousePoint, &(SDL_Rect) {uiWindow->position.x + 5, uiWindow->position.y + 5, 14, 14}) &&
-//                !BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_CLOSE)) {
+//                !BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_CLOSE)) {
 //                  BE_UI_ToggleWindowFlag(uiWindow->windowId, BE_UI_WINDOW_FLAG_CLOSED, 1);
 //
 //                  beEngineLayersMovingUi = 0;
 //            }
 //
 //            if (SDL_PointInRect(&mousePoint, &(SDL_Rect) {uiWindow->position.x + 22, uiWindow->position.y + 5, 14, 14}) &&
-//                !BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_MINIMIZE)) {
-//                  BE_BITWISE_TOGGLE_BIT(uiWindow->flags, BE_UI_WINDOW_FLAG_MINIMIZED);
+//                !BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_NO_MINIMIZE)) {
+//                  BA_BITWISE_TOGGLE_BIT(uiWindow->flags, BE_UI_WINDOW_FLAG_MINIMIZED);
 //
 //                  beEngineLayersMovingUi = 0;
 //              }

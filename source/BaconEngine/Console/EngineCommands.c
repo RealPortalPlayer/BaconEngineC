@@ -1,20 +1,20 @@
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <string.h>
 #include <signal.h>
 #include <SharedEngineCode/Paths.h>
 #include <BaconAPI/Debugging/Assert.h>
+#include <BaconAPI/Math/Bitwise.h>
 
 #include "EngineCommands.h"
 #include "BaconEngine/Console/Console.h"
 #include "BaconEngine/Rendering/Renderer.h"
 #include "../Rendering/EngineLayers.h"
 #include "BaconEngine/Rendering/Layer.h"
-#include "BaconEngine/ClientInformation.h"
+#include "BaconEngine/Client/Information.h"
 #include "BaconEngine/EngineMemoryInformation.h"
 #include "BaconEngine/Rendering/UI.h"
-#include "BaconEngine/Math/Bitwise.h"
 #include "BaconEngine/DeltaTime.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
@@ -101,8 +101,8 @@ void BE_EngineCommands_Initialize(void) {
 }
 
 void BE_EngineCommands_HelpPrint(BE_Command* command) {
-    if ((BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY) && !BE_ClientInformation_IsServerModeEnabled()) ||
-        (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
+    if ((BA_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY) && !BE_ClientInformation_IsServerModeEnabled()) ||
+        (BA_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
         return;
 
     BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "        %s", command->name);
@@ -117,7 +117,7 @@ void BE_EngineCommands_HelpPrint(BE_Command* command) {
 #endif
 
     for (int argumentId = 0; argumentId < command->arguments.used; argumentId++) {
-        BE_Command_Argument* argument = BA_DYNAMICARRAY_GET_ELEMENT(BE_Command_Argument, command->arguments, argumentId);
+        BE_ArgumentManager_Argument* argument = BA_DYNAMICARRAY_GET_ELEMENT(BE_ArgumentManager_Argument, command->arguments, argumentId);
 
         BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "%s", argumentId != 0 ? " " : " - args: ");
 
@@ -150,8 +150,8 @@ void BE_EngineCommands_Help(BE_Command_Context context) {
                 if (commandIdClient == -1)
                     commandIdClient = commandId;
 
-                if ((BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY) && !BE_ClientInformation_IsServerModeEnabled()) ||
-                    (BE_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
+                if ((BA_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_SERVER_ONLY) && !BE_ClientInformation_IsServerModeEnabled()) ||
+                    (BA_BITWISE_IS_BIT_SET(command->flags, BE_COMMAND_FLAG_CLIENT_ONLY) && BE_ClientInformation_IsServerModeEnabled()))
                     continue;
 
                 showClient++;
@@ -213,8 +213,8 @@ void BE_EngineCommands_Stop(void) {
 }
 
 void BE_EngineCommands_DebugInfo(void) {
-    BE_EngineMemoryInformation memoryInformation = BE_EngineMemoryInformation_Get();
-
+    char* message = BE_EngineMemoryInformation_GetAllocationInformation("   ");
+    
     BA_LOGGER_INFO("DeltaTime: %f seconds (%f milliseconds)\n"
                     "Command: %i/%i (%i realloc)\n"
                     "UI: %i rendered (%i/%i, %i realloc)\n"
@@ -226,11 +226,7 @@ void BE_EngineCommands_DebugInfo(void) {
                     "   Client directory: %s\n"
                     "   Engine binary path: %s\n"
                     "   Client binary path: %s\n"
-                    "Engine Memory: %zu bytes\n"
-                    "    Command: %zu allocated, %zu bytes\n"
-                    "    UI: %zu allocated, %zu bytes\n"
-                    "    DynamicArray: %zu allocated, %zu bytes\n"
-                    "    Layer: %zu allocated, %zu bytes\n",
+                    "Engine Memory: %zu allocations, %zu bytes\n%s\n",
                     BE_DeltaTime_GetSeconds(), BE_DeltaTime_GetMilliseconds(), // DeltaTime
                     BE_Console_GetCommandAmount(), BE_Console_GetAllocatedCommandsAmount(), BE_Console_GetCommandReallocationAmount(), // Command
                     BE_EngineLayers_GetUIWindowRenderCount(), BE_UI_GetWindowAmount(), BE_UI_GetAllocatedWindowsAmount(), BE_UI_GetWindowReallocationAmount(), // UI
@@ -241,11 +237,9 @@ void BE_EngineCommands_DebugInfo(void) {
                     SEC_Paths_GetClientDirectory(), // Client directory
                     SEC_Paths_GetEngineBinaryPath(), // Engine binary path
                     SEC_Paths_GetClientBinaryPath(), // Client binary path
-                    BE_EngineMemoryInformation_GetAllocatedBytes(), // Engine memory
-                    memoryInformation.command.allocatedAmount, memoryInformation.command.allocatedBytes, // Command memory
-                    memoryInformation.ui.allocatedAmount, memoryInformation.ui.allocatedBytes, // UI memory
-                    memoryInformation.dynamicArray.allocatedAmount, memoryInformation.dynamicArray.allocatedBytes, // DynamicArray memory
-                    memoryInformation.layer.allocatedAmount, memoryInformation.layer.allocatedBytes); // Layer memory
+                    BE_EngineMemoryInformation_GetAllocatedAmount(), BE_EngineMemoryInformation_GetAllocatedBytes(), // Engine memory
+                    message);
+    free(message);
 }
 
 void BE_EngineCommands_Say(BE_Command_Context context) {
@@ -269,12 +263,15 @@ void BE_EngineCommands_WhatAmI(void) {
         return;
     }
 
-    if (BE_Renderer_GetCurrentType() != BE_RENDERER_TYPE_TEXT) {
-        BA_LOGGER_INFO("Client\n");
-        return;
+    switch (BE_Renderer_GetCurrentType()) {
+        case BE_RENDERER_TYPE_OPENGL: BA_LOGGER_INFO("OpenGL Client\n"); return;
+        case BE_RENDERER_TYPE_VULKAN: BA_LOGGER_INFO("Vulkan Client\n"); return;
+        case BE_RENDERER_TYPE_METAL: BA_LOGGER_INFO("Metal Client\n"); return;
+        case BE_RENDERER_TYPE_DIRECTX: BA_LOGGER_INFO("DirectX Client\n"); return;
+        case BE_RENDERER_TYPE_SOFTWARE: BA_LOGGER_INFO("Client\n"); return;
+        case BE_RENDERER_TYPE_TEXT: BA_LOGGER_INFO("Headless Client\n"); return;
+        default: BA_ASSERT_ALWAYS("This shouldn't be reached\n");
     }
-
-    BA_LOGGER_INFO("Headless Client\n");
 }
 
 void BE_EngineCommands_Kick(BE_Command_Context context) {
@@ -298,5 +295,6 @@ void BE_EngineCommands_Echo(BE_Command_Context context) {
 
 void BE_EngineCommands_Crash(void) {
     raise(SIGSEGV);
+    BA_LOGGER_WARN("Failed to crash the engine?\n");
 }
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

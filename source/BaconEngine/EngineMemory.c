@@ -1,65 +1,83 @@
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <BaconAPI/ArgumentHandler.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <BaconAPI/Debugging/Assert.h>
+#include <BaconAPI/Debugging/StaticAssert.h>
+#include <BaconAPI/String.h>
 
-#include "EngineMemory.h"
+#ifndef BE_CLIENT_BINARY
+#   include "EngineMemory.h"
+#endif
+
+#include "InterfaceFunctions.h"
+#include "BaconEngine/EngineMemoryInformation.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
-static BE_EngineMemoryInformation beEngineMemoryInformation = {
+#ifndef BE_CLIENT_BINARY
+static BE_EngineMemoryInformation_MemoryTypeData beEngineMemoryInformation[] = {
+    {0, 0},
+    {0, 0},
+    {0, 0},
+    {0, 0},
+    {0, 0},
+    {0, 0},
+    {0, 0},
     {0, 0},
     {0, 0},
     {0, 0},
     {0, 0}
 };
 
+BA_STATIC_ASSERT_LOOKUP_TABLE_CHECK(beEngineMemoryInformation, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SIZE);
+
 BA_Boolean BE_EngineMemory_AllocateDeallocateLogsEnabled(void) {
-#ifdef BA_ALLOW_DEBUG_LOGS
+#   ifdef BA_ALLOW_DEBUG_LOGS
     static int enabled = -1;
 
     if (enabled == -1)
         enabled = !BA_ArgumentHandler_ContainsArgumentOrShort(SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOCATION, SEC_BUILTINARGUMENTS_DONT_PRINT_ENGINE_MEMORY_ALLOCATION_SHORT, 0);
 
     return enabled;
-#else
+#   else
     return BA_BOOLEAN_FALSE;
+#   endif
+}
+#endif
+
+const BE_EngineMemoryInformation_MemoryTypeData* BE_EngineMemoryInformation_Get(void) {
+#ifndef BE_CLIENT_BINARY
+    return beEngineMemoryInformation;
+#else
+    BE_INTERFACEFUNCTION(BE_EngineMemoryInformation_MemoryTypeData*, void);
+    return function();
 #endif
 }
 
-BE_EngineMemoryInformation BE_EngineMemoryInformation_Get(void) {
-    return beEngineMemoryInformation;
-}
-
 size_t BE_EngineMemoryInformation_GetAllocatedBytes(void) {
-    return beEngineMemoryInformation.command.allocatedBytes + beEngineMemoryInformation.ui.allocatedBytes +
-           beEngineMemoryInformation.dynamicArray.allocatedBytes + beEngineMemoryInformation.layer.allocatedBytes;
+#ifndef BE_CLIENT_BINARY
+    size_t allocatedBytes = 0;
+    
+    for (int i = 0; i < BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SIZE; i++)
+        allocatedBytes += beEngineMemoryInformation[i].allocatedBytes;
+    
+    return allocatedBytes;
+#else
+    BE_INTERFACEFUNCTION(size_t, void);
+    return function();
+#endif
 }
 
-BE_EngineMemoryInformation_MemoryType* BE_EngineMemory_GetMemoryTypeInformation(BE_EngineMemory_MemoryType memoryType) {
-    switch (memoryType) {
-        case BE_ENGINEMEMORY_MEMORY_TYPE_COMMAND:
-            return &beEngineMemoryInformation.command;
-
-        case BE_ENGINEMEMORY_MEMORY_TYPE_UI:
-            return &beEngineMemoryInformation.ui;
-
-        case BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY:
-            return &beEngineMemoryInformation.dynamicArray;
-
-        case BE_ENGINEMEMORY_MEMORY_TYPE_LAYER:
-            return &beEngineMemoryInformation.layer;
-
-        default:
-            BA_ASSERT_ALWAYS("This shouldn't be reached\n");
-    }
+#ifndef BE_CLIENT_BINARY
+BE_EngineMemoryInformation_MemoryTypeData* BE_EngineMemory_GetMemoryTypeInformation(BE_EngineMemoryInformation_MemoryType memoryType) {
+    BA_ASSERT(memoryType < BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SIZE, "This shouldn't happen\n");
+    return &beEngineMemoryInformation[memoryType];
 }
 
-void* BE_EngineMemory_AllocateMemory(size_t size, BE_EngineMemory_MemoryType memoryType) {
+void* BE_EngineMemory_AllocateMemory(size_t size, BE_EngineMemoryInformation_MemoryType memoryType) {
     void* pointer;
-    BE_EngineMemoryInformation_MemoryType* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(
-            memoryType);
+    BE_EngineMemoryInformation_MemoryTypeData* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(memoryType);
 
     if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
         BA_LOGGER_TRACE("Allocating memory\n"
@@ -75,9 +93,8 @@ void* BE_EngineMemory_AllocateMemory(size_t size, BE_EngineMemory_MemoryType mem
     return pointer;
 }
 
-void* BE_EngineMemory_ReallocateMemory(void* pointer, size_t oldSize, size_t newSize, BE_EngineMemory_MemoryType memoryType) {
-    BE_EngineMemoryInformation_MemoryType* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(
-            memoryType);
+void* BE_EngineMemory_ReallocateMemory(void* pointer, size_t oldSize, size_t newSize, BE_EngineMemoryInformation_MemoryType memoryType) {
+    BE_EngineMemoryInformation_MemoryTypeData* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(memoryType);
     void* newPointer;
 
     if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
@@ -94,8 +111,8 @@ void* BE_EngineMemory_ReallocateMemory(void* pointer, size_t oldSize, size_t new
     return newPointer;
 }
 
-void BE_EngineMemory_DeallocateMemory(void* pointer, size_t oldSize, BE_EngineMemory_MemoryType memoryType) {
-    BE_EngineMemoryInformation_MemoryType* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(memoryType);
+void BE_EngineMemory_DeallocateMemory(void* pointer, size_t oldSize, BE_EngineMemoryInformation_MemoryType memoryType) {
+    BE_EngineMemoryInformation_MemoryTypeData* memoryTypeInformation = BE_EngineMemory_GetMemoryTypeInformation(memoryType);
 
     if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
         BA_LOGGER_TRACE("Deallocating memory\n"
@@ -110,21 +127,78 @@ void BE_EngineMemory_DeallocateMemory(void* pointer, size_t oldSize, BE_EngineMe
     memoryTypeInformation->allocatedAmount--;
 }
 
-void BE_EngineMemory_AddSize(size_t size, BE_EngineMemory_MemoryType memoryType) {
+void BE_EngineMemory_AddSize(size_t size, BE_EngineMemoryInformation_MemoryType memoryType) {
     if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
         BA_LOGGER_TRACE("Adding to allocated bytes\n"
                         "Size: %zu\n"
                         "Type: %i\n", size, memoryType);
-    
+
     BE_EngineMemory_GetMemoryTypeInformation(memoryType)->allocatedBytes += size;
 }
 
-void BE_EngineMemory_RemoveSize(size_t size, BE_EngineMemory_MemoryType memoryType) {
+void BE_EngineMemory_RemoveSize(size_t size, BE_EngineMemoryInformation_MemoryType memoryType) {
     if (BE_EngineMemory_AllocateDeallocateLogsEnabled())
         BA_LOGGER_TRACE("Removing from allocated bytes\n"
                         "Size: %zu\n"
                         "Type: %i\n", size, memoryType);
-    
+
     BE_EngineMemory_GetMemoryTypeInformation(memoryType)->allocatedBytes -= size;
+}
+#endif
+
+char* BE_EngineMemoryInformation_GetAllocationInformation(const char* prefix) {
+#ifndef BE_CLIENT_BINARY
+    char* finalString = BA_String_Copy("%sCommand: %zu allocated, %zu bytes\n"
+                                       "%sUI: %zu allocated, %zu bytes\n"
+                                       "%sDynamicArray: %zu allocated, %zu bytes\n"
+                                       "%sLayer: %zu allocated, %zu bytes\n"
+                                       "%sServer: %zu allocated, %zu bytes\n"
+                                       "%s  Connected: %zu allocated, %zu bytes\n"
+                                       "%s  Client: %zu allocated, %zu bytes\n"
+                                       "%s  Client Socket: %zu allocated, %zu bytes\n"
+                                       "%sArgumentManager: %zu allocated, %zu bytes\n"
+                                       "%s  Name: %zu allocated, %zu bytes\n"
+                                       "%s  Argument: %zu allocated, %zu bytes\n"
+                                       "%s  Temporary Argument: %zu allocated, %zu bytes");
+
+    BA_ASSERT(finalString != NULL, "Failed to allocate memory for a string\n");
+    
+#   define BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(memoryType) prefix, beEngineMemoryInformation[memoryType].allocatedAmount, beEngineMemoryInformation[memoryType].allocatedBytes
+
+#   define BE_ENGINEMEMORY_ADD_INFORMATION(memoryType1, memoryType2, memoryType3) \
+prefix, beEngineMemoryInformation[memoryType1].allocatedAmount + beEngineMemoryInformation[memoryType2].allocatedAmount + beEngineMemoryInformation[memoryType3].allocatedAmount, beEngineMemoryInformation[memoryType1].allocatedBytes + beEngineMemoryInformation[memoryType2].allocatedBytes + beEngineMemoryInformation[memoryType3].allocatedBytes, \
+BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(memoryType1),                              \
+BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(memoryType2),                              \
+BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(memoryType3)
+    
+    BA_ASSERT(BA_String_Format(&finalString,
+                               BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_COMMAND),
+                               BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_UI),
+                               BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY),
+                               BE_ENGINEMEMORY_GET_MEMORY_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_LAYER),
+                               BE_ENGINEMEMORY_ADD_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CONNECTED, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CLIENT, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CLIENT_SOCKET),
+                               BE_ENGINEMEMORY_ADD_INFORMATION(BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_NAME, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_ARGUMENT, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_TEMPORARY_ARGUMENT)) != NULL, "Failed to format string\n");
+
+#   undef BE_ENGINEMEMORY_GET_MEMORY_INFORMATION
+    
+    return finalString;
+#else
+    BE_INTERFACEFUNCTION(char*, const char*);
+    return function(prefix);
+#endif
+}
+
+size_t BE_EngineMemoryInformation_GetAllocatedAmount(void) {
+#ifndef BE_CLIENT_BINARY
+    size_t finalAmount = 0;
+
+    for (int i = 0; i < BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SIZE; i++)
+        finalAmount += beEngineMemoryInformation[i].allocatedAmount;
+
+    return finalAmount;
+#else
+    BE_INTERFACEFUNCTION(size_t, void);
+    return function();
+#endif
 }
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

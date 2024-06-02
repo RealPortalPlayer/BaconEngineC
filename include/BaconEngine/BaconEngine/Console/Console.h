@@ -1,7 +1,7 @@
 // Purpose: Stores and manages commands.
 // Created on: 8/7/22 @ 10:03 AM
 
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
@@ -30,8 +30,8 @@ BE_BINARYEXPORT int BE_Console_GetAllocatedCommandsAmount(void);
  * @return Amount of times the maximum amount was reached.
  */
 BE_BINARYEXPORT int BE_Console_GetCommandReallocationAmount(void);
-BE_BINARYEXPORT void BE_Console_ExecuteCommand(const char* input); // TODO: Client
+BE_BINARYEXPORT void BE_Console_ExecuteCommand(const char* input, BE_Client client); // TODO: Client
 BE_BINARYEXPORT BA_Boolean BE_Console_IsEngineCommand(BE_Command command);
 BE_BINARYEXPORT void BE_Console_ExecuteFile(FILE* file);
-BE_BINARYEXPORT void BE_Console_ExecuteFileContents(const char* contents);
+BE_BINARYEXPORT void BE_Console_ExecuteListOfCommands(const char* contents);
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

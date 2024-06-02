@@ -1,4 +1,4 @@
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <BaconAPI/Internal/OperatingSystem.h>
@@ -22,7 +22,7 @@
 #endif
 
 #include "../InterfaceFunctions.h"
-#include "BaconEngine/ClientInformation.h"
+#include "BaconEngine/Client/Information.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
@@ -45,87 +45,117 @@ void BE_PrivateRenderer_Initialize(void) {
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!initialized, "Already initialized rendererFunctions\n");
 
     const char* specifiedRenderer = BA_ArgumentHandler_GetValue(SEC_BUILTINARGUMENTS_RENDERER, 0);
+    BE_Renderer_Types temporaryRenderer = BE_RENDERER_TYPE_TEXT;
 
-    if (BE_ClientInformation_IsServerModeEnabled() || (specifiedRenderer != NULL && BA_String_Equals(specifiedRenderer, "text", BA_BOOLEAN_TRUE))) {
-        textmode:
-        BA_LOGGER_INFO("Using no renderer\n");
-        BE_TextMode_Initialize();
-
-        beRendererCurrent = BE_RENDERER_TYPE_TEXT;
-        return;
-    }
-
+    if (BE_ClientInformation_IsServerModeEnabled() || (specifiedRenderer != NULL && BA_String_Equals(specifiedRenderer, "text", BA_BOOLEAN_TRUE)))
+        goto textmode;
+    
     if (specifiedRenderer != NULL) {
-        if (BA_String_Equals(specifiedRenderer, "opengl", BA_BOOLEAN_TRUE)) {
-#   ifndef BE_DISABLE_OPENGL
-//            opengl:
-            BA_LOGGER_INFO("Using OpenGL as the renderer\n");
-            BE_OpenGL_Initialize();
-
-            beRendererCurrent = BE_RENDERER_TYPE_OPENGL;
-#   else
-            BA_LOGGER_WARN("This binary has OpenGL disabled\n");
-            goto textmode;
-#   endif
-            return;
+        if (BA_String_Equals(specifiedRenderer, "opengl", BA_BOOLEAN_TRUE))
+            temporaryRenderer = BE_RENDERER_TYPE_OPENGL;
+        else if (BA_String_Equals(specifiedRenderer, "vulkan", BA_BOOLEAN_TRUE))
+            temporaryRenderer = BE_RENDERER_TYPE_VULKAN;
+        else if (BA_String_Equals(specifiedRenderer, "metal", BA_BOOLEAN_TRUE))
+            temporaryRenderer = BE_RENDERER_TYPE_METAL;
+        else if (BA_String_Equals(specifiedRenderer, "directx", BA_BOOLEAN_TRUE))
+             temporaryRenderer = BE_RENDERER_TYPE_DIRECTX;
+        else if (BA_String_Equals(specifiedRenderer, "software", BA_BOOLEAN_TRUE))
+            temporaryRenderer = BE_RENDERER_TYPE_SOFTWARE;
+        else {
+            BA_LOGGER_WARN("Invalid renderer: %s\n", specifiedRenderer);
+            goto defaults;
         }
-
-        if (BA_String_Equals(specifiedRenderer, "vulkan", BA_BOOLEAN_TRUE)) {
-#   if !BA_OPERATINGSYSTEM_APPLE
-//            vulkan:
-            BA_ASSERT_ALWAYS("Renderer not implemented\n");
-#   else
-            BA_LOGGER_WARN("Vulkan doesn't support Apple operating systems\n");
-            goto textmode;
-#   endif
-        }
-
-        if (BA_String_Equals(specifiedRenderer, "metal", BA_BOOLEAN_TRUE)) {
-#   if BA_OPERATINGSYSTEM_APPLE
-#       ifndef BE_DISABLE_METAL
-//            metal:
-            BA_LOGGER_INFO("Using Metal as the renderer");
-            BE_Metal_Initialize();
+    } else {
+        defaults:
+#   if BA_OPERATINGSYSTEM_LINUX || BA_OPERATINGSYSTEM_UNIX
+#       if !defined(BE_DISABLE_VULKAN)
+        temporaryRenderer = BE_RENDERER_TYPE_VULKAN;
+#       elif !defined(BE_DISABLE_OPENGL)
+        temporaryRenderer = BE_RENDERER_TYPE_OPENGL;
 #       else
-            BA_LOGGER_WARN("This binary has Metal disabled\n");
-            goto textmode;
+        temporaryRenderer = BE_RENDERER_TYPE_TEXT;
+#       endif
+#   elif BA_OPERATINGSYSTEM_APPLE
+#       if !defined(BE_DISABLE_METAL)
+        temporaryRenderer = BE_RENDERER_TYPE_METAL;
+#       elif !defined(BE_BE_DISABLE_OPENGL)
+        temporaryRenderer = BE_RENDERER_TYPE_METAL;
+#       else
+        temporaryRenderer = BE_RENDERER_TYPE_TEXT;
+#       endif
+#   elif BA_OPERATINGSYSTEM_WINDOWS
+#       if !defined(BE_DISABLE_DIRECTX)
+        temporaryRenderer = BE_RENDERER_TYPE_DIRECTX;
+#       else
+        temporaryRenderer = BE_RENDERER_TYPE_TEXT;
 #       endif
 #   else
-            BA_LOGGER_WARN("Metal only works on Apple operating systems\n");
-            goto textmode;
+        temporaryRenderer = BE_RENDERER_TYPE_TEXT;
 #   endif
-
-            return;
-        }
-
-        if (BA_String_Equals(specifiedRenderer, "directx", BA_BOOLEAN_TRUE)) {
-#   if BA_OPERATINGSYSTEM_WINDOWS
-//            directx:
-            BA_ASSERT_ALWAYS("Renderer not implemented\n");
-#   else
-            BA_LOGGER_WARN("DirectX only works on Microsoft operating systems\n");
-            goto textmode;
-#   endif
-            return;
-        }
-
-        if (BA_String_Equals(specifiedRenderer, "software", BA_BOOLEAN_TRUE)) {
-            BA_LOGGER_INFO("Using software rendering\n");
-            BA_LOGGER_WARN("This is going to lag; use a better renderer\n");
-
-#   if BA_OPERATINGSYSTEM_WINDOWS
-            BE_Windows_Initialize();
-#   else
-            BA_ASSERT_ALWAYS("No software renderer implementation for your OS\n");
-#   endif
-            return;
-        }
-
-        BA_LOGGER_WARN("Invalid renderer: %s\n", specifiedRenderer);
     }
 
-    // TODO: Automatically select renderer
-    goto textmode;
+    switch (temporaryRenderer) {
+        case BE_RENDERER_TYPE_OPENGL:
+#ifndef BE_DISABLE_OPENGL
+            BA_LOGGER_INFO("Using OpenGL as the renderer\n");
+            BE_OpenGL_Initialize();
+            break;
+#else
+            BA_LOGGER_WARN("This binary has OpenGL disabled\n");
+            goto textmode;
+#endif
+
+        case BE_RENDERER_TYPE_VULKAN:
+#if !BA_OPERATINGSYSTEM_APPLE
+            BA_ASSERT_ALWAYS("Vulkan not implemented\n");
+#else
+            BA_LOGGER_WARN("Vulkan doesn't support Apple operating systems\n");
+            goto textmode;
+#endif
+
+        case BE_RENDERER_TYPE_METAL:
+#if BA_OPERATINGSYSTEM_APPLE
+#   ifndef BBE_DISABLE_METAL
+            BA_LOGGER_INFO("Using Metal as the renderer");
+            BE_Metal_Initialize();
+            break;
+#   else
+            BA_LOGGER_WARN("This binary has Metal disabled\n");
+            goto textmode;
+#   endif
+#else
+            BA_LOGGER_WARN("Metal only works on Apple operating systems\n");
+            goto textmode;
+#endif
+
+        case BE_RENDERER_TYPE_DIRECTX:
+#if BA_OPERATINGSYSTEM_WINDOWS
+            BA_ASSERT_ALWAYS("DirectX not implemented\n");
+#else
+            BA_LOGGER_WARN("DirectX only works on Microsoft operating systems\n");
+            goto textmode;
+#endif
+
+        case BE_RENDERER_TYPE_SOFTWARE:
+            BA_LOGGER_INFO("Using software rendering\n");
+            BA_LOGGER_WARN("This is going to lag; use a better renderer\n");
+#if BA_OPERATINGSYSTEM_WINDOWS
+            BE_Windows_Initialize();
+            break;
+#else
+            BA_ASSERT_ALWAYS("No software renderer implementation for your OS\n");
+#endif
+
+        case BE_RENDERER_TYPE_TEXT:
+        textmode:
+            BA_LOGGER_INFO("Using no renderer\n");
+            BE_TextMode_Initialize();
+            
+            temporaryRenderer = BE_RENDERER_TYPE_TEXT;
+            break;
+    }
+    
+    beRendererCurrent = temporaryRenderer;
 }
 #endif
 

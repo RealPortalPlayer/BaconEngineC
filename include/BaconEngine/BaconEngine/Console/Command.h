@@ -1,7 +1,7 @@
 // Purpose: A basic command.
 // Created on: 8/7/22 @ 10:05 AM
 
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
@@ -11,10 +11,14 @@
 #include <BaconAPI/String.h>
 #include <BaconAPI/Storage/DynamicDictionary.h>
 
-#include "ArgumentManager.h"
+#include "BaconEngine/ArgumentManager.h"
 #include "BaconEngine/BinaryExport.h"
+#include "BaconEngine/BinaryExport.h"
+#include "BaconEngine/Server/Client.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
+struct BE_Command;
+
 typedef enum {
     BE_COMMAND_FLAG_NULL,
     
@@ -57,14 +61,17 @@ typedef struct { // TODO: Client
     const char* fullInput;
     const char* unparsedArguments;
     BA_DynamicDictionary arguments;
+
+    /**
+     * The client who ran the command.
+     * BE_CLIENT_UNCONNECTED when either the command was ran by the server, or the command is client only.
+     */
+    BE_Client client;
+
+    struct BE_Command* self;
 } BE_Command_Context;
 
-typedef struct {
-    char* name;
-    BA_Boolean required;
-} BE_Command_Argument;
-
-typedef struct {
+typedef struct BE_Command {
     const char* name;
     const char* description;
     BA_DynamicArray arguments;

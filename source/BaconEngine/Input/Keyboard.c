@@ -1,8 +1,9 @@
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include "BaconEngine/Input/Keyboard.h"
 #include "../InterfaceFunctions.h"
+#include "BaconAPI/Debugging/StaticAssert.h"
 
 #ifndef BE_CLIENT_BINARY
 #   include "../Platform/SpecificPlatformFunctions.h"
@@ -10,9 +11,20 @@
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 #ifndef BE_CLIENT_BINARY
-static char keyCodesCharArray[BE_KEYBOARD_KEY_CODE_SIZE] = {
+static char keyCodesCharArray[] = {
     1,
-
+    
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0,
+    
     '`', '1', '2',
     '3', '4', '5',
     '6', '7', '8',
@@ -20,7 +32,7 @@ static char keyCodesCharArray[BE_KEYBOARD_KEY_CODE_SIZE] = {
     '=', 0, 0,
     0, 0, 0,
     '/', '*', '-',
-
+    
     '\t', 'Q', 'W',
     'E', 'R', 'T',
     'Y', 'U', 'I',
@@ -28,26 +40,28 @@ static char keyCodesCharArray[BE_KEYBOARD_KEY_CODE_SIZE] = {
     ']', '\\', 0,
     0, 0, '7',
     '8', '9', '+',
-
+    
     0, 'A', 'S',
     'D', 'F', 'G',
     'H', 'J', 'K',
     'L', ';', '\'',
     '\n', '4', '5',
     '6',
-
+    
     0, 'Z', 'X',
     'C', 'V', 'B',
     'N', 'M', ',',
     '.', '/', 0,
     0, '1', '2',
     '3', 0,
-
+    
     0, 0, 0,
     ' ', 0, 0,
     0, 0, 0,
-    '0', '.'
+    0, '0', '.'
 };
+
+BA_STATIC_ASSERT_LOOKUP_TABLE_CHECK(keyCodesCharArray, BE_KEYBOARD_KEY_CODE_SIZE);
 #endif
 
 char BE_Keyboard_ConvertKeyCodeToCharacter(BE_Keyboard_KeyCodes keyCode) {

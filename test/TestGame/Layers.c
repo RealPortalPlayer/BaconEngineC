@@ -1,4 +1,4 @@
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <BaconEngine/Rendering/Layer.h>
@@ -117,7 +117,7 @@ int ColorModifierOnEvent(BE_Event event) {
         }
 
         if (event.data.keyboard.key == BE_KEYBOARD_KEY_CODE_D) {
-            BE_Console_ExecuteCommand("debuginfo");
+            BE_Console_ExecuteCommand("debuginfo", BE_CLIENT_UNCONNECTED);
             return 1;
         }
     }

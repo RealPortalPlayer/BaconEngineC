@@ -1,14 +1,14 @@
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <BaconAPI/Debugging/Assert.h>
 
 #include "TextMode.h"
 #include "../SpecificPlatformFunctions.h"
-#include "BaconEngine/ClientInformation.h"
+#include "BaconEngine/Client/Information.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
-void* BE_TextMode_PtrNoOperation(void) {
+void* BE_TextMode_PointerNoOperation(void) {
     return NULL;
 }
 
@@ -27,8 +27,8 @@ BE_Color3_Unsigned BE_TextMode_Color3NoOperation(void) {
 void BE_TextMode_Initialize(void) {
     BE_SpecificPlatformFunctions_Initialize(BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_SpecificPlatformFunctions,
         {
-            (void (*)(const char*, BE_Vector2_Unsigned, int)) &BE_TextMode_PtrNoOperation,
-            (const char*(*)(void)) &BE_TextMode_PtrNoOperation,
+            (void (*)(const char*, BE_Vector2_Unsigned, int)) &BE_TextMode_PointerNoOperation,
+            (const char*(*)(void)) &BE_TextMode_PointerNoOperation,
             &BE_TextMode_Vector2NoOperation,
             (BE_Vector2_Integer (*)(void)) &BE_TextMode_Vector2NoOperation,
             &BE_TextMode_IntNoOperation,

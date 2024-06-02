@@ -1,7 +1,7 @@
 // Purpose: Defines for all the built-in arguments.
 // Created on: 9/11/22 @ 12:40 AM
 
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #pragma once
@@ -34,3 +34,7 @@
 #endif
 #define SEC_BUILTINARGUMENTS_ENGINE "--engine"
 #define SEC_BUILTINARGUMENTS_ENGINE_SHORT "-e"
+#define SEC_BUILTINARGUMENTS_PORT "--port"
+#define SEC_BUILTINARGUMENTS_PORT_SHORT "-p"
+#define SEC_BUILTINARGUMENTS_MAX_PLAYERS "--max-players"
+#define SEC_BUILTINARGUMENTS_MAX_PLAYERS_SHORT "-mp"

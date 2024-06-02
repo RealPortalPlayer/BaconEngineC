@@ -1,13 +1,13 @@
-// Copyright (c) 2022, 2023, PortalPlayer <email@portalplayer.xyz>
+// Copyright (c) 2022, 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
 #include <SharedEngineCode/Debugging/StrictMode.h>
 #include <BaconAPI/Debugging/Assert.h>
+#include <BaconAPI/Math/Bitwise.h>
 
 #include "BaconEngine/Rendering/UI.h"
-#include "BaconEngine/Math/Bitwise.h"
 #include "../InterfaceFunctions.h"
-#include "BaconEngine/ClientInformation.h"
+#include "BaconEngine/Client/Information.h"
 
 #ifndef BE_CLIENT_BINARY
 #   include "../EngineMemory.h"
@@ -56,12 +56,12 @@ int BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector2_I
     beUIInitialized = BA_BOOLEAN_TRUE;
 
     BE_PrivateUI_Window* uiWindow = (BE_PrivateUI_Window*) BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateUI_Window),
-                                                                                          BE_ENGINEMEMORY_MEMORY_TYPE_UI);
+                                                                                          BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_UI);
 
     if (flags != BE_UI_WINDOW_FLAG_NULL) {
-        SEC_STRICTMODE_CHECK(!BE_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_NO_TITLE_BAR) || !BE_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_MINIMIZED), -1,
+        SEC_STRICTMODE_CHECK(!BA_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_NO_TITLE_BAR) || !BA_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_MINIMIZED), -1,
                             "Invalid window flags, cannot both be missing a title-bar and also be minimized");
-        SEC_STRICTMODE_CHECK(!BE_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_MINIMIZED) || !BE_BITWISE_IS_BIT_SET(flags, BE_EVENT_TYPE_WINDOW_MAXIMIZED), -1,
+        SEC_STRICTMODE_CHECK(!BA_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_MINIMIZED) || !BA_BITWISE_IS_BIT_SET(flags, BE_EVENT_TYPE_WINDOW_MAXIMIZED), -1,
                             "Invalid window flags, cannot both be minimized and maximized");
     }
 
@@ -100,10 +100,10 @@ BA_Boolean BE_UI_ToggleWindowFlag(int windowId, BE_UI_WindowFlags flag, BA_Boole
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
-    if (uiWindow == NULL || BE_BITWISE_IS_BIT_SET(uiWindow->flags, flag) == toggle)
+    if (uiWindow == NULL || BA_BITWISE_IS_BIT_SET(uiWindow->flags, flag) == toggle)
         return BA_BOOLEAN_FALSE;
 
-    BE_BITWISE_TOGGLE_BIT(uiWindow->flags, flag);
+    BA_BITWISE_TOGGLE_BIT(uiWindow->flags, flag);
     return BA_BOOLEAN_TRUE;
 #else
     BE_INTERFACEFUNCTION(BA_Boolean, int, BE_UI_WindowFlags, BA_Boolean);
@@ -130,7 +130,7 @@ BA_Boolean BE_UI_IsWindowStillOpen(int windowId) {
 
     BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
-    return uiWindow != NULL && !BE_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_CLOSED);
+    return uiWindow != NULL && !BA_BITWISE_IS_BIT_SET(uiWindow->flags, BE_UI_WINDOW_FLAG_CLOSED);
 #else
     BE_INTERFACEFUNCTION(BA_Boolean, int);
     return function(windowId);
@@ -208,14 +208,14 @@ void BE_PrivateUI_Destroy(void) {
         BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
         for (int elementId = 0; elementId < uiWindow->elements.used; elementId++)
-            BE_EngineMemory_DeallocateMemory(uiWindow->elements.internalArray[elementId], sizeof(BE_UI_Element), BE_ENGINEMEMORY_MEMORY_TYPE_UI);
+            BE_EngineMemory_DeallocateMemory(uiWindow->elements.internalArray[elementId], sizeof(BE_UI_Element), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_UI);
 
-        BE_EngineMemory_DeallocateMemory(uiWindow->elements.internalArray, sizeof(void*) * uiWindow->elements.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
-        BE_EngineMemory_DeallocateMemory(uiWindow, sizeof(BE_PrivateUI_Window), BE_ENGINEMEMORY_MEMORY_TYPE_UI);
+        BE_EngineMemory_DeallocateMemory(uiWindow->elements.internalArray, sizeof(void*) * uiWindow->elements.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
+        BE_EngineMemory_DeallocateMemory(uiWindow, sizeof(BE_PrivateUI_Window), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_UI);
     }
 
-    BE_EngineMemory_DeallocateMemory(beUIRenderOrder.internalArray, sizeof(void*) * beUIRenderOrder.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
-    BE_EngineMemory_DeallocateMemory(beUIWindows.internalArray, sizeof(void*) * beUIWindows.size, BE_ENGINEMEMORY_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BE_EngineMemory_DeallocateMemory(beUIRenderOrder.internalArray, sizeof(void*) * beUIRenderOrder.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BE_EngineMemory_DeallocateMemory(beUIWindows.internalArray, sizeof(void*) * beUIWindows.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 #endif
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

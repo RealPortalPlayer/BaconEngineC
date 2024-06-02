@@ -1,0 +1,7 @@
+// American English language file
+
+// Server errors
+server.error.invalid_packet=An invalid packet was sent to the server
+server.error.already_connected=You're already connected to this server
+server.error.server_full=This server is already full
+server.error.crash=An unexpected error occurred at the server

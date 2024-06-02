@@ -46,8 +46,8 @@ set(BE_SOURCE_FILES
         # Source files
         Rendering/Window.c
         Rendering/Renderer.c
-        ClientInformation.c
-        Console/ArgumentManager.c
+        Client/Information.c
+        ArgumentManager.c
         Console/Console.c
         Rendering/Layer.c
         Input/Keyboard.c
@@ -57,7 +57,10 @@ set(BE_SOURCE_FILES
         DeltaTime.c
         Storage/Package.c
         Storage/DefaultPackage.c
-        Configuration.c)
+        Server/Server.c
+        EngineMemory.c
+        Server/Packet.c
+        Server/Packets.c)
 
 add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         # Header files
@@ -75,17 +78,21 @@ add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         Storage/PrivateDynamicArray.h
         Storage/PrivateDynamicDictionary.h
         Storage/PrivateDefaultPackage.h
+        Server/PrivateServer.h
+        Server/PrivatePacket.h
+        Server/EnginePackets.h
+        PrivateArgumentManager.h
 
         # Source files
         EntryPoint.c
         Console/EngineCommands.c
-        EngineMemory.c
         Platform/SpecificPlatformFunctions.c
         Platform/TextMode/TextMode.c
         Rendering/EngineUIs.c
         Rendering/EngineLayers.c
         Storage/PrivateDynamicArray.c
-        Storage/PrivateDynamicDictionary.c)
+        Storage/PrivateDynamicDictionary.c
+        Server/EnginePackets.c)
 
 if(NOT BE_DISABLE_OPENGL)
     set(BE_LIBRARIES glfw OpenGL::GL glad)
@@ -139,7 +146,7 @@ if(NOT BE_DONT_SET_BINARY_OUTPUT_PATH)
     set_target_properties(BaconEngine PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${BE_OUTPUT_DIRECTORY}")
 endif()
 
-target_compile_definitions(BaconEngine PUBLIC BE_ENGINE_VERSION="${BE_ENGINE_VERSION}")
+target_compile_definitions(BaconEngine PUBLIC BE_ENGINE_VERSION="${BE_ENGINE_VERSION}" BE_ENGINE_NAME="${BE_ENGINE_NAME}")
 
 add_custom_target(BaconEngineDefaultPackage
         COMMAND ${CMAKE_COMMAND} -E tar cvf "${BE_OUTPUT_DIRECTORY}/Default.package" --format=zip .
@@ -147,6 +154,14 @@ add_custom_target(BaconEngineDefaultPackage
 
 if(EMSCRIPTEN)
     set_target_properties(BaconEngine PROPERTIES LINK_FLAGS "-sSIDE_MODULE=1")
+elseif(WIN32)
+    target_link_libraries(BaconEngine LINK_PRIVATE wsock32 ws2_32)
 endif()
+
+if(BE_DISABLE_NETWORK)
+    target_compile_definitions(BaconEngine PUBLIC BE_DISABLE_NETWORK)
+endif()
+
+ba_strip(BaconEngine)
 
 include(BaconEngineClient.cmake)
