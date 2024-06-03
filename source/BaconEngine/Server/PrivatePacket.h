@@ -34,3 +34,8 @@ void BE_PrivatePacket_Parse(BE_PrivateClient* client, struct sockaddr_in* descri
 void BE_PrivatePacket_Destroy(void);
 void BE_PrivatePacket_Send(struct sockaddr_in* socket, uint64_t operationCode, char data[BE_PACKET_MAXIMUM_DATA]);
 BA_CPLUSPLUS_SUPPORT_GUARD_END()
+
+#define BE_PRIVATEPACKET_STARTING_OPERATION_CODE 1000ul
+#define BE_PRIVATEPACKET_OPERATION_CODE_PING BE_PRIVATEPACKET_STARTING_OPERATION_CODE
+#define BE_PRIVATEPACKET_OPERATION_CODE_CONNECT (BE_PRIVATEPACKET_STARTING_OPERATION_CODE + 1ul)
+
