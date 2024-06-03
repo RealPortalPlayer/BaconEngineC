@@ -17,14 +17,14 @@ BA_CPLUSPLUS_SUPPORT_GUARD_START()
 BE_PACKET_PACKED(struct BE_PrivatePacket_Sent {
     char magic[BE_PRIVATEPACKET_MAGIC_LENGTH];
     uint64_t operationCode;
-    char data[BE_PACKET_MAXIMUM_DATA]; // TODO: char is limiting when it comes to numbers
+    char data[BE_PACKET_MAXIMUM_DATA];
     // TODO: Perhaps we can make data infinitely big by sending them in chunks?
 });
 
 typedef struct BE_PrivatePacket_Sent BE_PrivatePacket_Sent;
 
 typedef struct {
-    int16_t operationCode;
+    uint64_t operationCode;
     BA_Boolean acceptUnconnected;
     BE_Packet_Run Run;
 } BE_PrivatePacket_Registered;
