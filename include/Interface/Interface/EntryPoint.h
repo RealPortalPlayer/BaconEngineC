@@ -4,8 +4,6 @@
 // Copyright (c) 2023, 2024, PortalPlayer <email@portalplayer.xyz>
 // Licensed under MIT <https://opensource.org/licenses/MIT>
 
-#pragma once
-
 #ifdef I_INCLUDED_THE_ENTRY_POINT
 #   error You cannot include the entry-point more than once
 #endif
