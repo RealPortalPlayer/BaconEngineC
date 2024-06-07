@@ -12,25 +12,18 @@
 #include <string.h>
 #include <SharedEngineCode/BuiltInArguments.h>
 #include <BaconAPI/Thread.h>
-#include <BaconAPI/Internal/PlatformSpecific.h>
 #include <SharedEngineCode/Paths.h>
 #include <SharedEngineCode/Launcher.h>
 #include <BaconAPI/Debugging/Assert.h>
 #include <SharedEngineCode/Debugging/StrictMode.h>
 #include <errno.h>
 #include <BaconAPI/Number.h>
+#include <signal.h>
 
 #if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <unistd.h>
-#   include <signal.h>
-#   include <fcntl.h>
-#   include <netinet/in.h>
-#   include <arpa/inet.h>
 #elif BA_OPERATINGSYSTEM_WINDOWS
-#   include <signal.h>
-#   include <io.h>
 #   include <Windows.h>
-#   define fileno _fileno
 #   define write(file, message, size) _write(file, message, (unsigned) size) // HACK: This is a stupid idea, but it's the only way to make MSVC shut up.
 #endif
 
@@ -44,17 +37,18 @@
 #include "PrivateDeltaTime.h"
 #include "Console/PrivateConsole.h"
 #include "Rendering/PrivateRenderer.h"
-#include "BaconEngine/Console/Console.h"
 #include "Storage/PrivateDefaultPackage.h"
 #include "BaconEngine/Client/Information.h"
 #include "BaconEngine/Server/Server.h"
 #include "Server/PrivateServer.h"
 #include "Server/PrivatePacket.h"
+#include "Threads/CommandThread.h"
+
+#ifndef BE_DISABLE_NETWORK
+#   include "Threads/ServerThread.h"
+#endif
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
-BA_Boolean printedCursor = BA_BOOLEAN_FALSE;
-BA_Boolean commandThreadRunning = BA_BOOLEAN_FALSE;
-
 void BE_EntryPoint_SignalDetected(int receivedSignal) {
     switch (receivedSignal) {
         case SIGSEGV:
@@ -77,8 +71,8 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
             abort();
 
         case SIGINT:
-            if (!BE_ClientInformation_IsRunning() || !commandThreadRunning) {
-                if (!commandThreadRunning)
+            if (!BE_ClientInformation_IsRunning() || !BE_CommandThread_HasThreadStarted()) {
+                if (!BE_CommandThread_HasThreadStarted())
                     BA_LOGGER_WARN("Command thread is not running, using default behavior\n");
 
                 signal(SIGINT, SIG_DFL);
@@ -92,117 +86,13 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
 #endif
             
             printf("\n");
-            printedCursor = BA_BOOLEAN_FALSE;
+            BE_CommandThread_MarkCursorDirty();
             return;
 
         default:
             return;
     }
 }
-
-BA_THREAD_RETURN_VALUE BE_EntryPoint_CommandThreadFunction(void* argument) {
-    commandThreadRunning = BA_BOOLEAN_TRUE;
-
-    // TODO: Find fcntl replacement for Windows.
-#if !BA_OPERATINGSYSTEM_WINDOWS
-    fcntl(STDIN_FILENO, F_SETFL, fcntl(STDIN_FILENO, F_GETFL) | O_NONBLOCK);
-#endif
-
-    BA_LOGGER_DEBUG("Command thread started\n");
-    
-    while (BE_ClientInformation_IsRunning()) {
-        if (BE_Console_GetCommandAmount() == 0)
-            continue;
-
-        char input[4024];
-
-        memset(input, 0, 4024);
-
-        if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT && !printedCursor) {
-            BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "%c ", BE_ClientInformation_IsCheatsEnabled() ? '#' : '$');
-
-            printedCursor = BA_BOOLEAN_TRUE;
-        }
-
-        {
-            int written = 0;
-
-            // TODO: Arrow keys to go back in history.
-            // TODO: Allow backspacing
-            while (BE_ClientInformation_IsRunning()) {
-                char character = getc(stdin);
-                
-                if (character == EOF)
-                    continue;
-                
-                if (written >= sizeof(input) - 1 || character == '\n')
-                    break;
-                
-                input[written++] = character;
-            }
-        }
-        
-        if (input[0] != '\0')
-            BE_Console_ExecuteCommand(input, BE_CLIENT_UNCONNECTED);
-
-        printedCursor = BA_BOOLEAN_FALSE;
-    }
-
-    commandThreadRunning = BA_BOOLEAN_FALSE;
-
-#if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
-    return NULL;
-#else
-    return 0;
-#endif
-}
-
-#ifndef BE_DISABLE_NETWORK
-BA_THREAD_RETURN_VALUE BE_EntryPoint_ServerThreadFunction(void* argument) {
-#if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
-    fcntl(BE_PrivateServer_GetSocketDescriptor(), F_SETFL, O_NONBLOCK);
-#elif BA_OPERATINGSYSTEM_WINDOWS
-    {
-        ULONG enable = 1;
-        
-        ioctlsocket(BE_PrivateServer_GetSocketDescriptor(), FIONBIO, &enable);
-    }
-#endif
-    
-    while (BE_ClientInformation_IsRunning()) {
-        struct sockaddr_in clientInterface;
-        socklen_t clientSize = sizeof(clientInterface);
-        BE_PrivatePacket_Sent packet = {0};
-        ssize_t packetLength = recvfrom(BE_PrivateServer_GetSocketDescriptor(), &packet, sizeof(BE_PrivatePacket_Sent), 0, (struct sockaddr*) &clientInterface, &clientSize);
-
-        if (packetLength == -1) {
-#if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
-            if (errno == EWOULDBLOCK)
-                continue;
-#elif BA_OPERATINGSYSTEM_WINDOWS
-            if (WSAGetLastError() == WSAEWOULDBLOCK)
-                continue;
-#endif
-            
-            BA_LOGGER_ERROR("Errored while getting packet from client: %s\n", strerror(errno));
-            continue;
-        }
-
-        if (packetLength != sizeof(BE_PrivatePacket_Sent)) {
-            BA_LOGGER_ERROR("Invalid packet: size mismatch (%zu != %zu)\n", packetLength, sizeof(BE_PrivatePacket_Sent));
-            continue; // TODO: Disconnect
-        }
-        
-        BE_PrivatePacket_Parse(BE_PrivateServer_GetPrivateClientFromSocket(&clientInterface), &clientInterface, packet);
-    }
-
-#if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
-    return NULL;
-#else
-    return 0;
-#endif
-}
-#endif
 
 BE_BINARYEXPORT const char* BE_EntryPoint_GetVersion(void) {
     return BE_ENGINE_VERSION;
@@ -314,22 +204,17 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
         if (preParsedExitCode != NULL)
             return BA_Number_StringToInteger(preParsedExitCode, NULL, NULL, "Invalid exit code, defaulting to 0\n", 0);
     }
-
-    BA_Thread commandThread;
-
+    
     if (!BA_Thread_IsSingleThreaded()) {
         BA_LOGGER_INFO("Starting threads\n");
-
-        BA_Thread_Create(&commandThread, &BE_EntryPoint_CommandThreadFunction, NULL);
-    }
+        BE_CommandThread_Start();
 
 #ifndef BE_DISABLE_NETWORK
-    BA_Thread serverThread;
-
-    if (BE_ClientInformation_IsServerModeEnabled())
-        BA_Thread_Create(&serverThread, &BE_EntryPoint_ServerThreadFunction, NULL);
+        if (BE_ClientInformation_IsServerModeEnabled())
+            BE_ServerThread_Start();
 #endif
-    
+    }
+
     double deltaStart = 0;
 
     while (BE_ClientInformation_IsRunning()) {
@@ -358,14 +243,11 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
 
     if (!BA_Thread_IsSingleThreaded()) {
         BA_LOGGER_INFO("Waiting for thread shutdown (press CTRL+C if frozen)\n");
-        BA_Thread_Join(commandThread, NULL);
-        BA_LOGGER_DEBUG("Command thread ended\n");
+        BE_CommandThread_Stop();
 
 #ifndef BE_DISABLE_NETWORK
-        if (BE_ClientInformation_IsServerModeEnabled()) {
-            BA_Thread_Join(serverThread, NULL);
-            BA_LOGGER_DEBUG("Server thread ended\n");
-        }
+        if (BE_ClientInformation_IsServerModeEnabled())
+            BE_ServerThread_Stop();
 #endif
     }
     

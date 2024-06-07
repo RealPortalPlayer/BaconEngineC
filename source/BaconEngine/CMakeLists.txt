@@ -39,6 +39,15 @@ if(NOT BE_DISABLE_METAL AND APPLE)
             Platform/Metal/MetalWindow.m)
 endif()
 
+if(NOT BE_DISABLE_NETWORK)
+    set(BE_PRIVATE_SOURCE_FILES ${BE_PRIVATE_SOURCE_FILES}
+        # Header files
+        Threads/ServerThread.h
+    
+        # Source files
+        Threads/ServerThread.c)
+endif()
+
 set(BE_SOURCE_FILES
         # Header files
         InterfaceFunctions.h
@@ -82,6 +91,8 @@ add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         Server/PrivatePacket.h
         Server/EnginePackets.h
         PrivateArgumentManager.h
+        Threads/BaseThread.h
+        Threads/CommandThread.h
 
         # Source files
         EntryPoint.c
@@ -92,7 +103,8 @@ add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         Rendering/EngineLayers.c
         Storage/PrivateDynamicArray.c
         Storage/PrivateDynamicDictionary.c
-        Server/EnginePackets.c)
+        Server/EnginePackets.c
+        Threads/CommandThread.c)
 
 if(NOT BE_DISABLE_OPENGL)
     set(BE_LIBRARIES glfw OpenGL::GL glad)
