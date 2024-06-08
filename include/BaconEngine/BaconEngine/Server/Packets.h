@@ -10,3 +10,4 @@
 
 void BE_Packets_SendPing(BE_Client client);
 void BE_Packets_SendConnect(void);
+void BE_Packets_SendDisconnect(void);

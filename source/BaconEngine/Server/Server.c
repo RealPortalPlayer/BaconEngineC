@@ -256,4 +256,17 @@ BE_BINARYEXPORT BA_Boolean BE_Server_IsDisabled(void) {
 #endif
 }
 
+#ifndef BE_CLIENT_BINARY
+void BE_PrivateServer_RemoveConnection(struct sockaddr_in* clientDescriptor) {
+    for (int i = 0; i < beServerMaxPlayers; i++) {
+        if (beServerConnected[i]->publicClient == BE_CLIENT_UNCONNECTED || memcmp(beServerConnected[i]->socket, clientDescriptor, sizeof(struct sockaddr_in)) != 0)
+            continue;
+
+        BE_EngineMemory_DeallocateMemory(beServerConnected[i]->socket, sizeof(struct sockaddr_in), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CLIENT_SOCKET);
+        BE_EngineMemory_DeallocateMemory(beServerConnected[i], sizeof(BE_PrivateClient), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SERVER_CLIENT);
+
+        beServerConnected[i] = beServerGenericUnconnected;
+    }
+}
+#endif
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

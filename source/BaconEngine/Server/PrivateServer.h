@@ -25,4 +25,5 @@ BE_PRIVATECLIENT_SOCKET_TYPE BE_PrivateServer_GetSocketDescriptor(void);
 void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor);
 BE_PrivateClient* BE_PrivateServer_GetPrivateClientFromSocket(struct sockaddr_in* clientDescriptor);
 BE_PrivateClient* BE_PrivateServer_GetPrivateClientFromClient(BE_Client client);
+void BE_PrivateServer_RemoveConnection(struct sockaddr_in* clientDescriptor);
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

@@ -253,7 +253,7 @@ void BE_EngineCommands_Say(BE_Command_Context context) {
 }
 
 void BE_EngineCommands_Disconnect(BE_Command_Context context) {
-    // TODO: Send disconnect packet
+    BE_Packets_SendDisconnect();
     BE_Client_Disconnect();
 }
 
