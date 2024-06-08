@@ -6,6 +6,17 @@
 
 #pragma once
 
+#include <BaconAPI/Internal/CPlusPlusSupport.h>
+#include <stdint.h>
+#include <BaconAPI/Internal/Boolean.h>
+
+BA_CPLUSPLUS_SUPPORT_GUARD_START()
 typedef int BE_Client;
+
+BA_Boolean BE_Client_IsConnected(void);
+
+void BE_Client_StartConnection(const char* address, uint16_t port);
+void BE_Client_Disconnect(void);
+BA_CPLUSPLUS_SUPPORT_GUARD_END()
 
 #define BE_CLIENT_UNCONNECTED (-1)

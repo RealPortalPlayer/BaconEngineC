@@ -15,6 +15,9 @@
 #   include <Windows.h>
 #endif
 
+#define BE_PRIVATECLIENT_SOCKET_TYPE int
+#define BE_PRIVATECLIENT_INVALID_SOCKET (-1)
+
 #include "../AntiClientGuard.h"
 #include "BaconEngine/Server/Client.h"
 
@@ -23,4 +26,7 @@ typedef struct {
     BE_Client publicClient;
     struct sockaddr_in* socket;
 } BE_PrivateClient;
+
+BE_PRIVATECLIENT_SOCKET_TYPE BE_PrivateClient_GetSocketDescriptor(void);
+struct sockaddr_in* BE_PrivateClient_GetSocketAddress(void);
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

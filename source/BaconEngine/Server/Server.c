@@ -24,7 +24,7 @@
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 #if !defined(BE_CLIENT_BINARY) && !defined(BE_DISABLE_NETWORK)
-static BE_SERVER_SOCKET_TYPE beServerSocket = BE_SERVER_INVALID_SOCKET;
+static BE_PRIVATECLIENT_SOCKET_TYPE beServerSocket = BE_PRIVATECLIENT_INVALID_SOCKET;
 static unsigned beServerPort;
 static BE_PrivateClient** beServerConnected;
 static unsigned beServerMaxPlayers;
@@ -35,7 +35,7 @@ static BE_PrivateClient* beServerGenericUnconnected;
 BA_Boolean BE_Server_IsRunning(void) {
 #ifndef BE_CLIENT_BINARY
 #   ifndef BE_DISABLE_NETWORK
-    return beServerSocket != BE_SERVER_INVALID_SOCKET;
+    return beServerSocket != BE_PRIVATECLIENT_INVALID_SOCKET;
 #   else
     return BA_BOOLEAN_FALSE;
 #   endif
@@ -59,7 +59,7 @@ unsigned BE_Server_GetPort(void) {
 }
 
 #if !defined(BE_CLIENT_BINARY) && !defined(BE_DISABLE_NETWORK)
-BE_SERVER_SOCKET_TYPE BE_PrivateServer_GetSocketDescriptor(void) {
+BE_PRIVATECLIENT_SOCKET_TYPE BE_PrivateServer_GetSocketDescriptor(void) {
     return beServerSocket;
 }
 #endif
@@ -67,7 +67,7 @@ BE_SERVER_SOCKET_TYPE BE_PrivateServer_GetSocketDescriptor(void) {
 void BE_Server_Start(unsigned port) {
 #ifndef BE_CLIENT_BINARY
 #   ifndef BE_DISABLE_NETWORK
-    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket == BE_SERVER_INVALID_SOCKET, "Server is already running\n");
+    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket == BE_PRIVATECLIENT_INVALID_SOCKET, "Server is already running\n");
     SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(BE_ClientInformation_IsServerModeEnabled(), "Cannot start a server on a non-server client\n");
     BA_LOGGER_INFO("Starting server: 0.0.0.0:%d\n", port);
     
@@ -85,7 +85,7 @@ void BE_Server_Start(unsigned port) {
     beServerSocket = socket(AF_INET, SOCK_DGRAM, 0);
     beServerPort = port;
 
-    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket != BE_SERVER_INVALID_SOCKET, "Failed to create socket: %s\n", strerror(errno));
+    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket != BE_PRIVATECLIENT_INVALID_SOCKET, "Failed to create socket: %s\n", strerror(errno));
 
     {
         BA_ArgumentHandler_ShortResults maxPlayersResults;
@@ -153,7 +153,7 @@ void BE_PrivateServer_AddConnection(struct sockaddr_in* clientDescriptor) {
 void BE_Server_Stop(void) {
 #ifndef BE_CLIENT_BINARY
 #   ifndef BE_DISABLE_NETWORK
-    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket != BE_SERVER_INVALID_SOCKET, "Server is not running\n");
+    SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(beServerSocket != BE_PRIVATECLIENT_INVALID_SOCKET, "Server is not running\n");
     BA_LOGGER_INFO("Closing server\n");
     
     for (int i = 0; i < beServerMaxPlayers; i++) {
@@ -178,7 +178,7 @@ void BE_Server_Stop(void) {
     WSACleanup();
 #       endif
     
-    beServerSocket = BE_SERVER_INVALID_SOCKET;
+    beServerSocket = BE_PRIVATECLIENT_INVALID_SOCKET;
 #   else
     BA_LOGGER_ERROR("Networking code is disabled\n");
 #   endif

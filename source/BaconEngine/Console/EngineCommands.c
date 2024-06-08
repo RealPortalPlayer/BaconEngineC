@@ -6,6 +6,7 @@
 #include <SharedEngineCode/Paths.h>
 #include <BaconAPI/Debugging/Assert.h>
 #include <BaconAPI/Math/Bitwise.h>
+#include <BaconAPI/Number.h>
 
 #include "EngineCommands.h"
 #include "BaconEngine/Console/Console.h"
@@ -16,6 +17,7 @@
 #include "BaconEngine/EngineMemoryInformation.h"
 #include "BaconEngine/Rendering/UI.h"
 #include "BaconEngine/DeltaTime.h"
+#include "BaconEngine/Server/Packets.h"
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 void BE_EngineCommands_Help(BE_Command_Context context);
@@ -69,6 +71,9 @@ void BE_EngineCommands_Initialize(void) {
     BE_Command_Register("disconnect", "Disconnects from the server.", BE_COMMAND_FLAG_CLIENT_ONLY,
                         &BE_EngineCommands_Disconnect);
     BE_Command_Register("connect", "Connects to a server.", BE_COMMAND_FLAG_CLIENT_ONLY, &BE_EngineCommands_Connect);
+    {
+        BE_Command_AddArgument("server", BA_BOOLEAN_TRUE);
+    }
     BE_Command_Register("whatami", "Tells your current mode.", BE_COMMAND_FLAG_NULL,
                         (void (*)(BE_Command_Context)) &BE_EngineCommands_WhatAmI);
 
@@ -248,13 +253,25 @@ void BE_EngineCommands_Say(BE_Command_Context context) {
 }
 
 void BE_EngineCommands_Disconnect(BE_Command_Context context) {
-    (void) context;
-    BA_ASSERT_NOT_IMPLEMENTED();
+    // TODO: Send disconnect packet
+    BE_Client_Disconnect();
 }
 
 void BE_EngineCommands_Connect(BE_Command_Context context) {
-    (void) context;
-    BA_ASSERT_NOT_IMPLEMENTED();
+    BA_DynamicArray* serverDetails = BA_String_SplitCharacter(BE_ArgumentManager_GetString(context.arguments, "server", ""), ':');
+    int port = 5000;
+
+    if (serverDetails->used >= 2)
+        port = BA_Number_StringToUnsigned(serverDetails->internalArray[1], NULL, NULL, "Invalid port", 5000);
+
+    BE_Client_StartConnection(serverDetails->internalArray[0], port);
+    BE_Packets_SendConnect();
+
+    for (int i = 0; i < serverDetails->used; i++)
+        free(serverDetails->internalArray[i]);
+
+    free(serverDetails->internalArray);
+    free(serverDetails);
 }
 
 void BE_EngineCommands_WhatAmI(void) {

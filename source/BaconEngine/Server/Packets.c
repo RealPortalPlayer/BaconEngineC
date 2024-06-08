@@ -23,6 +23,6 @@ void BE_Packets_SendConnect(void) {
 #ifndef BE_CLIENT_BINARY
     BE_Packet_Send(BE_CLIENT_UNCONNECTED, BE_PRIVATEPACKET_OPERATION_CODE_CONNECT, NULL);
 #else
-    BE_INTERFACEFUNCTION(void)();
+    BE_INTERFACEFUNCTION(void, void)();
 #endif
 }

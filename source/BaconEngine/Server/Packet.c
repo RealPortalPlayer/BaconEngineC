@@ -5,6 +5,7 @@
 #include <string.h>
 #include <BaconAPI/Internal/Boolean.h>
 #include <BaconAPI/Debugging/Assert.h>
+#include <errno.h>
 
 #include "BaconEngine/Server/Packet.h"
 #include "../InterfaceFunctions.h"
@@ -56,7 +57,7 @@ BE_BINARYEXPORT void BE_Packet_Send(BE_Client client, uint64_t operationCode, ch
 #ifndef BE_CLIENT_BINARY
 #   ifndef BE_DISABLE_NETWORK
     if (client == BE_CLIENT_UNCONNECTED) {
-        // TODO: Send packet to server
+        BE_PrivatePacket_Send(BE_PrivateClient_GetSocketAddress(), operationCode, data);
         return;
     }
 
@@ -122,7 +123,10 @@ void BE_PrivatePacket_Send(struct sockaddr_in* socket, uint64_t operationCode, c
     if (data != NULL)
         memcpy(&packet.data, data, sizeof(char) * BE_PACKET_MAXIMUM_DATA);
     
-    sendto(BE_PrivateServer_GetSocketDescriptor(), &packet, sizeof(BE_PrivatePacket_Sent), 0, (struct sockaddr*) socket, sizeof(struct sockaddr_in));
+    if (sendto(BE_ClientInformation_IsServerModeEnabled() ? BE_PrivateServer_GetSocketDescriptor() : BE_PrivateClient_GetSocketDescriptor(), &packet, sizeof(BE_PrivatePacket_Sent), 0, (struct sockaddr*) socket, sizeof(struct sockaddr_in)) >= 0)
+        return;
+
+    BA_LOGGER_ERROR("Dropped packet due to error: %s (%i)\n", strerror(errno), errno);
 }
 #endif
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

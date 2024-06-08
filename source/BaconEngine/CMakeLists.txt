@@ -43,9 +43,11 @@ if(NOT BE_DISABLE_NETWORK)
     set(BE_PRIVATE_SOURCE_FILES ${BE_PRIVATE_SOURCE_FILES}
         # Header files
         Threads/ServerThread.h
+        Threads/ClientThread.h
     
         # Source files
-        Threads/ServerThread.c)
+        Threads/ServerThread.c
+        Threads/ClientThread.c)
 endif()
 
 set(BE_SOURCE_FILES
@@ -69,7 +71,8 @@ set(BE_SOURCE_FILES
         Server/Server.c
         EngineMemory.c
         Server/Packet.c
-        Server/Packets.c)
+        Server/Packets.c
+        Server/Client.c)
 
 add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         # Header files

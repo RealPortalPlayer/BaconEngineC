@@ -43,6 +43,7 @@
 #include "Server/PrivateServer.h"
 #include "Server/PrivatePacket.h"
 #include "Threads/CommandThread.h"
+#include "Threads/ClientThread.h"
 
 #ifndef BE_DISABLE_NETWORK
 #   include "Threads/ServerThread.h"
@@ -212,6 +213,8 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
 #ifndef BE_DISABLE_NETWORK
         if (BE_ClientInformation_IsServerModeEnabled())
             BE_ServerThread_Start();
+        else
+            BE_ClientThread_Start();
 #endif
     }
 
@@ -248,6 +251,8 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
 #ifndef BE_DISABLE_NETWORK
         if (BE_ClientInformation_IsServerModeEnabled())
             BE_ServerThread_Stop();
+        else
+            BE_ClientThread_Stop();
 #endif
     }
     
