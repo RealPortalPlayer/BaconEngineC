@@ -6,6 +6,7 @@
 #include <BaconAPI/Internal/Boolean.h>
 #include <BaconAPI/Debugging/Assert.h>
 #include <errno.h>
+#include <BaconAPI/Math/Bitwise.h>
 
 #include "BaconEngine/Server/Packet.h"
 #include "../InterfaceFunctions.h"
@@ -36,20 +37,20 @@ void BE_PrivatePacket_Initialize(void) {
 }
 #endif
 
-BE_BINARYEXPORT void BE_Packet_Register(uint64_t operationCode, BA_Boolean acceptUnconnected, BE_Packet_Run Run) {
+BE_BINARYEXPORT void BE_Packet_Register(uint64_t operationCode, BE_Packet_Flags flags, BE_Packet_Run Run) {
 #ifndef BE_CLIENT_BINARY
 #   ifndef BE_DISABLE_NETWORK
     BE_PrivatePacket_Registered* packet = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivatePacket_Registered), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_PACKET);
     
     packet->operationCode = operationCode;
-    packet->acceptUnconnected = acceptUnconnected;
+    packet->flags = flags;
     packet->Run = Run;
 
     BE_PrivateDynamicArray_CheckResize(&bePacketRegistered);
     BA_DynamicArray_AddElementToLast(&bePacketRegistered, packet);
 #   endif
 #else
-    BE_INTERFACEFUNCTION(void, uint64_t, BA_Boolean, BE_Packet_Run)(operationCode, acceptUnconnected, Run);
+    BE_INTERFACEFUNCTION(void, uint64_t, BE_Packet_Flags, BE_Packet_Run)(operationCode, flags, Run);
 #endif
 }
 
@@ -95,6 +96,21 @@ void BE_PrivatePacket_Parse(BE_PrivateClient* client, struct sockaddr_in* descri
     if (foundPacket == NULL) {
         // TODO: Disconnect
         BA_LOGGER_FATAL("Invalid packet: invalid operation code (%lu)\n", packet.operationCode);
+        return;
+    }
+
+    if (!BA_BITWISE_IS_BIT_SET(foundPacket->flags, BE_PACKET_FLAG_ALLOW_UNCONNECTED) && client->publicClient == BE_PACKET_FLAG_ALLOW_UNCONNECTED) {
+        BA_LOGGER_ERROR("Packet doesn't allow unconnected\n");
+        return;
+    }
+
+    if (!BA_BITWISE_IS_BIT_SET(foundPacket->flags, BE_PACKET_FLAG_ALLOW_SERVER_TO_CLIENT) && !BE_ClientInformation_IsServerModeEnabled()) {
+        BA_LOGGER_ERROR("Packet is server only\n");
+        return;
+    }
+
+    if (!BA_BITWISE_IS_BIT_SET(foundPacket->flags, BE_PACKET_FLAG_ALLOW_CLIENT_TO_SERVER) && BE_ClientInformation_IsServerModeEnabled()) {
+        BA_LOGGER_ERROR("Packet is client only\n");
         return;
     }
 

@@ -25,7 +25,7 @@ typedef struct BE_PrivatePacket_Sent BE_PrivatePacket_Sent;
 
 typedef struct {
     uint64_t operationCode;
-    BA_Boolean acceptUnconnected;
+    BE_Packet_Flags flags;
     BE_Packet_Run Run;
 } BE_PrivatePacket_Registered;
 
