@@ -1,0 +1,18 @@
+Client                      Server
+Connect ------------------>
+        <------------------ Connect Acknowledged
+        
+---------------------------------- LOOP
+Ping   ------------------->
+       <------------------- Ping Acknowledged
+----------------------------------
+
+(insert other packets)
+
+Disconnect --------------->
+                            (no response)
+
+(or)
+
+        <------------------ Kicked
+(no response)
