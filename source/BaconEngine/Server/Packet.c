@@ -7,6 +7,7 @@
 #include <BaconAPI/Debugging/Assert.h>
 #include <errno.h>
 #include <BaconAPI/Math/Bitwise.h>
+#include <SharedEngineCode/Debugging/StrictMode.h>
 
 #include "BaconEngine/Server/Packet.h"
 #include "../InterfaceFunctions.h"
@@ -58,6 +59,7 @@ BE_BINARYEXPORT void BE_Packet_Send(BE_Client client, uint64_t operationCode, ch
 #ifndef BE_CLIENT_BINARY
 #   ifndef BE_DISABLE_NETWORK
     if (client == BE_CLIENT_UNCONNECTED) {
+        SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BE_ClientInformation_IsServerModeEnabled(), "Servers cannot send packets to self\n");
         BE_PrivatePacket_Send(BE_PrivateClient_GetSocketAddress(), operationCode, data);
         return;
     }

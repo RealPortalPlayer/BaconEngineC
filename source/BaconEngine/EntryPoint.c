@@ -124,7 +124,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
 
 #define BE_ENTRYPOINT_CHECK_CLIENT_FUNCTION(type, variable, dummyFunction, message) \
 type variable = engineDetails->variable;                                            \
-if (engineDetails->variable == NULL) {                                          \
+if (engineDetails->variable == NULL) {                                              \
     BA_LOGGER_DEBUG(message);                                                       \
     variable = &dummyFunction;                                                      \
 } (void) NULL
