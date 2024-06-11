@@ -28,7 +28,7 @@ typedef struct {
 } BE_Layer_Functions;
 
 BE_BINARYEXPORT int BE_Layer_GetAmount(void);
-BE_BINARYEXPORT int BE_Layer_GetAllocatedLayersAmount(void);
+BE_BINARYEXPORT size_t BE_Layer_GetAllocatedLayersAmount(void);
 BE_BINARYEXPORT int BE_Layer_GetLayersReallocationAmount(void);
 BE_BINARYEXPORT BA_Boolean BE_Layer_Toggle(const char* name, BA_Boolean enable);
 BE_BINARYEXPORT BA_Boolean BE_Layer_IsToggled(const char* name);

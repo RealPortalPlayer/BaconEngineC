@@ -223,7 +223,7 @@ void BE_EngineCommands_DebugInfo(void) {
     BA_LOGGER_INFO("DeltaTime: %f seconds (%f milliseconds)\n"
                     "Command: %i/%i (%i realloc)\n"
                     "UI: %i rendered (%i/%i, %i realloc)\n"
-                    "Layer: %i/%i (%i realloc)\n"
+                    "Layer: %i/%zu (%i realloc)\n"
                     "Renderer: %i calls\n"
                     "Paths:\n"
                     "   Launcher directory: %s\n"

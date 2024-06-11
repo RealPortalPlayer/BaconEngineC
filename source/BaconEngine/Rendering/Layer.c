@@ -93,11 +93,11 @@ int BE_Layer_GetAmount(void) {
 #endif
 }
 
-int BE_Layer_GetAllocatedLayersAmount(void) {
+size_t BE_Layer_GetAllocatedLayersAmount(void) {
 #ifndef BE_CLIENT_BINARY
-    return beLayerInitialized ? (int) beLayerArray.size : 0;
+    return beLayerInitialized ? beLayerArray.size : 0;
 #else
-    BE_INTERFACEFUNCTION(int, void);
+    BE_INTERFACEFUNCTION(size_t, void);
     return function();
 #endif
 }
