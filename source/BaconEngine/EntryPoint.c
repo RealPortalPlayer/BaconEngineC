@@ -148,14 +148,18 @@ if (engineDetails->variable == NULL) {                                          
         BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "\n");
     }
 
-    if (BE_ClientInformation_IsServerModeEnabled() && !clientSupportsServer()) {
-        BA_LOGGER_FATAL("Client does not support servers\n");
-        return 1;
-    }
+    {
+        BA_Boolean supportsServers = clientSupportsServer();
+        
+        if (BE_ClientInformation_IsServerModeEnabled() && !supportsServers) {
+            BA_LOGGER_FATAL("Client does not support servers\n");
+            return 1;
+        }
 
-    if (BE_ClientInformation_IsServerModeEnabled() && BA_Thread_IsSingleThreaded()) {
-        BA_LOGGER_FATAL("Single-threaded server is not supported\n");
-        return 1;
+        if (supportsServers && BA_Thread_IsSingleThreaded()) {
+            BA_LOGGER_FATAL("This client doesn't support single-threaded mode\n");
+            return 1;
+        }
     }
 
     BE_PrivateDefaultPackage_Open();
