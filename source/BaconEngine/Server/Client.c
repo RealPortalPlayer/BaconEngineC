@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <BaconAPI/Debugging/Assert.h>
 #include <BaconAPI/Internal/OperatingSystem.h>
+#include <SharedEngineCode/Debugging/StrictMode.h>
 
 #if BA_OPERATINGSYSTEM_POSIX_COMPLIANT
 #   include <unistd.h>
@@ -18,7 +19,6 @@
 #include "BaconEngine/Server/Client.h"
 #include "../InterfaceFunctions.h"
 #include "BaconEngine/Client/Information.h"
-#include "SharedEngineCode/Debugging/StrictMode.h"
 
 #ifndef BE_CLIENT_BINARY
 #   include "PrivateServer.h"

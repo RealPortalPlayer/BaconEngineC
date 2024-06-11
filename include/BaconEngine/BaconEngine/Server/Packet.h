@@ -50,7 +50,6 @@ BE_BINARYEXPORT void BE_Packet_Register(uint64_t operationCode, BE_Packet_Flags 
 BE_BINARYEXPORT void BE_Packet_Send(BE_Client client, uint64_t operationCode, char data[BE_PACKET_MAXIMUM_DATA]);
 BA_CPLUSPLUS_SUPPORT_GUARD_END()
 
-
 #define BE_PACKET_CREATOR_HEADER(code) \
 char data[BE_PACKET_MAXIMUM_DATA] = {0}; \
 char* dataWriter = data;               \

@@ -96,6 +96,7 @@ add_library(BaconEngine SHARED ${BE_SOURCE_FILES} ${BE_PRIVATE_SOURCE_FILES}
         PrivateArgumentManager.h
         Threads/BaseThread.h
         Threads/CommandThread.h
+        DummyClient.h
 
         # Source files
         EntryPoint.c

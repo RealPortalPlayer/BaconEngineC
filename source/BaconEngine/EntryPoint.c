@@ -44,6 +44,7 @@
 #include "Server/PrivatePacket.h"
 #include "Threads/CommandThread.h"
 #include "Threads/ClientThread.h"
+#include "DummyClient.h"
 
 #ifndef BE_DISABLE_NETWORK
 #   include "Threads/ServerThread.h"
@@ -120,22 +121,24 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     BA_LOGGER_DEBUG("Initializing client interface\n");
     
     engineDetails->clientInitialize(engineDetails->launcherPath, engineDetails->enginePath, engineDetails->clientPath, engineDetails->engineBinary, engineDetails->argc, engineDetails->argv);
+
+#define BE_ENTRYPOINT_CHECK_CLIENT_FUNCTION(type, variable, dummyFunction, message) \
+type variable = engineDetails->variable;                                            \
+if (engineDetails->variable == NULL) {                                          \
+    BA_LOGGER_DEBUG(message);                                                       \
+    variable = &dummyFunction;                                                      \
+} (void) NULL
+    BE_ENTRYPOINT_CHECK_CLIENT_FUNCTION(SEC_Launcher_ClientStart, clientStart, I_EntryPoint_Start, "Client has no start function\n");
+    BE_ENTRYPOINT_CHECK_CLIENT_FUNCTION(SEC_Launcher_ClientShutdown, clientShutdown, I_EntryPoint_Shutdown, "Client has no shutdown function\n");
+    BE_ENTRYPOINT_CHECK_CLIENT_FUNCTION(SEC_Launcher_ClientSupportsServer, clientSupportsServer, I_EntryPoint_SupportsServers, "Client doesn't specify if it supports servers, so we're assuming it doesn't\n");
+    BE_ENTRYPOINT_CHECK_CLIENT_FUNCTION(SEC_Launcher_ClientGetName, clientGetName, BE_DummyClient_EmptyName, "Client doesn't specify a name, so we're defaulting to nothing\n");
+    BE_ENTRYPOINT_CHECK_CLIENT_FUNCTION(SEC_Launcher_ClientGetEngineName, clientGetEngineName, I_EntryPoint_GetEngineName, "Client doesn't specify the engine name, so we're defaulting with the current one\n");
+    BE_ENTRYPOINT_CHECK_CLIENT_FUNCTION(SEC_Launcher_ClientGetEngineVersion, clientGetEngineVersion, I_EntryPoint_GetEngineVersion, "Client doesn't specify the engine version, so we're defaulting with the current one\n");
+#undef BE_ENTRYPOINT_CHECK_CLIENT_FUNCTION
     
-    if (engineDetails->clientStart == NULL)
-        BA_LOGGER_DEBUG("Client has no start function\n");
-
-    if (engineDetails->clientShutdown == NULL)
-        BA_LOGGER_DEBUG("Client has no shutdown function\n");
-
-    if (engineDetails->clientSupportsServer == NULL)
-        BA_LOGGER_DEBUG("Client doesn't specify if it supports servers, assuming it doesn't\n");
-
-    if (engineDetails->clientGetName == NULL)
-        BA_LOGGER_DEBUG("Client doesn't specify a name, defaulting to nothing\n");
-
     {
-        const char* clientEngineName = engineDetails->clientGetName != NULL ? engineDetails->clientGetEngineName() : BE_ENGINE_NAME;
-        const char* clientEngineVersion = engineDetails->clientGetEngineVersion != NULL ? engineDetails->clientGetEngineVersion() : BE_ENGINE_VERSION;
+        const char* clientEngineName = clientGetEngineName();
+        const char* clientEngineVersion = clientGetEngineVersion();
         
         BA_LOGGER_INFO("Starting %s %s", BE_ENGINE_NAME, BE_ENGINE_VERSION);
 
@@ -145,7 +148,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
         BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "\n");
     }
 
-    if (BE_ClientInformation_IsServerModeEnabled() && (engineDetails->clientSupportsServer == NULL || !engineDetails->clientSupportsServer())) {
+    if (BE_ClientInformation_IsServerModeEnabled() && !clientSupportsServer()) {
         BA_LOGGER_FATAL("Client does not support servers\n");
         return 1;
     }
@@ -185,7 +188,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
                 height = BA_Number_StringToInteger(preParsedHeight, NULL, NULL, "Invalid height was supplied, ignoring...\n", height);
         }
 
-        BE_PrivateWindow_Initialize(engineDetails->clientGetName != NULL ? engineDetails->clientGetName() : "", BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, (unsigned) width, (unsigned) height));
+        BE_PrivateWindow_Initialize(clientGetName(), BA_CPLUSPLUS_SUPPORT_CREATE_STRUCT(BE_Vector2_Unsigned, (unsigned) width, (unsigned) height));
     }
 
     BE_PrivateUI_Initialize();
@@ -195,7 +198,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     BE_PrivatePacket_Initialize();
 #endif
     
-    BA_ASSERT(engineDetails->clientStart == NULL || engineDetails->clientStart(engineDetails->argc, engineDetails->argv) == 0, "Client start returned non-zero\n");
+    BA_ASSERT(clientStart(engineDetails->argc, engineDetails->argv) == 0, "Client start returned non-zero\n");
     BA_LOGGER_DEBUG("Registering signals\n");
     signal(SIGINT, &BE_EntryPoint_SignalDetected);
 
@@ -242,7 +245,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
         BE_ClientInformation_StopRunning();
 
     BA_LOGGER_TRACE("Client loop ended, shutting down\n");
-    BA_ASSERT(engineDetails->clientShutdown == NULL || engineDetails->clientShutdown() == 0, "Client shutdown returned non-zero\n");
+    BA_ASSERT(clientShutdown() == 0, "Client shutdown returned non-zero\n");
 
     if (!BA_Thread_IsSingleThreaded()) {
         BA_LOGGER_INFO("Waiting for thread shutdown (press CTRL+C if frozen)\n");
@@ -282,19 +285,5 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
     }
 
     return 0;
-}
-
-BE_BINARYEXPORT void I_EntryPoint_InitializeWrapper(void* engineBinary) {
-    (void) engineBinary;
-
-    BA_ASSERT_ALWAYS("I am not a client\n");
-}
-
-BE_BINARYEXPORT const char* I_EntryPoint_GetName(void) {
-    return BE_ENGINE_NAME " " BE_ENGINE_VERSION;
-}
-
-BE_BINARYEXPORT const char* BE_EntryPoint_GetName(void) {
-    return BE_ENGINE_NAME;
 }
 BA_CPLUSPLUS_SUPPORT_GUARD_END()
