@@ -57,18 +57,18 @@ BE_BASETHREAD_CREATE_IMPLEMENTATION(BE_CommandThread, beCommandThread, "command"
 
         memset(input, 0, 4024);
 
-        if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT && beCommandThreadCursorDirty) {
-            BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "%c ", BE_ClientInformation_IsCheatsEnabled() ? '#' : '$');
-
-            beCommandThreadCursorDirty = BA_BOOLEAN_FALSE;
-        }
-
         {
             int written = 0;
 
             // TODO: Arrow keys to go back in history.
             // TODO: Allow backspacing
             while (BE_ClientInformation_IsRunning()) {
+                if (BE_Renderer_GetCurrentType() == BE_RENDERER_TYPE_TEXT && beCommandThreadCursorDirty) {
+                    BA_Logger_LogImplementation(BA_BOOLEAN_FALSE, BA_LOGGER_LOG_LEVEL_INFO, "%c ", BE_ClientInformation_IsCheatsEnabled() ? '#' : '$');
+
+                    beCommandThreadCursorDirty = BA_BOOLEAN_FALSE;
+                }
+                
                 char character = getc(stdin);
                 
                 if (character == EOF)
