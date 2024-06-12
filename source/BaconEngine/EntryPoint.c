@@ -121,6 +121,7 @@ BE_BINARYEXPORT int BE_EntryPoint_StartBaconEngine(const SEC_Launcher_EngineDeta
 #endif
 
     BA_LOGGER_DEBUG("Initializing client interface\n");
+    BA_ASSERT(engineDetails->clientInitialize != NULL, "Client doesn't have an initializer, cannot continue\n");
     
     engineDetails->clientInitialize(engineDetails->launcherPath, engineDetails->enginePath, engineDetails->clientPath, engineDetails->engineBinary, engineDetails->argc, engineDetails->argv);
 
