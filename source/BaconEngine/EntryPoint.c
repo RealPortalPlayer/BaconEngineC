@@ -86,8 +86,10 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
             if (BA_Logger_IsLevelEnabled(BA_LOGGER_LOG_LEVEL_INFO))
                 printf(" (type 'exit' to quit)");
 #endif
-            
-            printf("\n");
+
+            if (BA_Logger_GetLogLevel() != BA_LOGGER_LOG_LEVEL_NULL)
+                printf("\n");
+        
             BE_CommandThread_MarkCursorDirty();
             return;
 
