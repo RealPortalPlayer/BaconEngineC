@@ -73,6 +73,8 @@ BE_BINARYEXPORT void BE_Packet_Send(BE_Client client, uint64_t operationCode, ch
 
 #if !defined(BE_CLIENT_BINARY) && !defined(BE_DISABLE_NETWORK)
 void BE_PrivatePacket_Parse(BE_PrivateClient* client, struct sockaddr_in* descriptor, BE_PrivatePacket_Sent packet) {
+    packet.terminator = '\0';
+
     BE_PrivatePacket_Registered* foundPacket = NULL;
 
     if (client->publicClient == BE_CLIENT_UNCONNECTED)

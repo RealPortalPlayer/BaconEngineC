@@ -18,6 +18,11 @@ BE_PACKET_PACKED(struct BE_PrivatePacket_Sent {
     char magic[BE_PRIVATEPACKET_MAGIC_LENGTH];
     uint64_t operationCode;
     char data[BE_PACKET_MAXIMUM_DATA];
+
+    /**
+     * Always zero
+     */
+    unsigned char terminator : 1;
     // TODO: Perhaps we can make data infinitely big by sending them in chunks?
 });
 
