@@ -8,3 +8,4 @@ Welcome to the documentation meta-document. This is an index of each of the docu
   - [/console/create.md](./console/create.md): Create a client/engine command
 * [/structure.md](./structure.md): The engines structure. Which libraries connect to what
 * [/thesaurus.md](./thesaurus.md): Dictionary
+* [/language.md](./language.md): Create and use a language file
