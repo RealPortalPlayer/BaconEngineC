@@ -91,12 +91,12 @@ const char* BE_ArgumentManager_GetString(BA_DynamicDictionary arguments, const c
 void BE_PrivateArgumentManager_ParseName(const char* input, char** name, int* argumentStartingIndex) {
     BA_DynamicArray* array = BA_String_SplitCharacter(input, ' ');
 
-    *name = BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_NAME);
+    *name = BA_Memory_Allocate(sizeof(char), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_NAME);
     (*name)[0] = '\0';
 
     if (array->used >= 1) {
         BA_String_Append(name, array->internalArray[0]);
-        BE_EngineMemory_AddSize(sizeof(char) * strlen(array->internalArray[0]), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_NAME);
+        BA_Memory_AddSize(sizeof(char) * strlen(array->internalArray[0]), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_NAME);
     }
     
     *argumentStartingIndex = (int) strlen(*name) + 1;
@@ -109,7 +109,7 @@ void BE_PrivateArgumentManager_ParseName(const char* input, char** name, int* ar
 }
 
 BA_Boolean BE_PrivateArgumentManager_ParseArguments(const char* input, int startingIndex, BA_Boolean fancyArgumentParsing, BA_DynamicArray comparedArguments, BA_DynamicDictionary* arguments) {
-    char* argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_TEMPORARY_ARGUMENT);
+    char* argument = (char*) BA_Memory_Allocate(sizeof(char), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_TEMPORARY_ARGUMENT);
     int current = 0;
     int quotePosition = -1;
     BA_Boolean doubleQuote = BA_BOOLEAN_FALSE;
@@ -125,7 +125,7 @@ BA_Boolean BE_PrivateArgumentManager_ParseArguments(const char* input, int start
         BA_Boolean validEscapeCharacter = BA_BOOLEAN_FALSE;
 
         if (added) {
-            argument = (char*) BE_EngineMemory_AllocateMemory(sizeof(char), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_TEMPORARY_ARGUMENT);
+            argument = (char*) BA_Memory_Allocate(sizeof(char), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_TEMPORARY_ARGUMENT);
 
             argument[0] = 0;
         }
@@ -188,12 +188,12 @@ BA_Boolean BE_PrivateArgumentManager_ParseArguments(const char* input, int start
 
         if (escaped && !validEscapeCharacter) {
             BA_LOGGER_ERROR("Parsing error: invalid escape character '%c', use double backslashes instead of one\n", input[index]);
-            BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * (strlen(argument) + 1), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_TEMPORARY_ARGUMENT);
+            BA_Memory_Deallocate(argument, sizeof(char) * (strlen(argument) + 1), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_TEMPORARY_ARGUMENT);
             return BA_BOOLEAN_FALSE;
         }
 
         BA_String_AppendCharacter(&argument, input[index]);
-        BE_EngineMemory_AddSize(sizeof(char), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_TEMPORARY_ARGUMENT);
+        BA_Memory_AddSize(sizeof(char), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_TEMPORARY_ARGUMENT);
 
         escaped = BA_BOOLEAN_FALSE;
     }
@@ -221,7 +221,7 @@ BA_Boolean BE_PrivateArgumentManager_ParseArguments(const char* input, int start
         }
 
         if (!added)
-            BE_EngineMemory_DeallocateMemory(argument, sizeof(char) * (strlen(argument) + 1), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_TEMPORARY_ARGUMENT);
+            BA_Memory_Deallocate(argument, sizeof(char) * (strlen(argument) + 1), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_ARGUMENT_MANAGER_TEMPORARY_ARGUMENT);
     }
     
     return BA_BOOLEAN_TRUE;

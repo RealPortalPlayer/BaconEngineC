@@ -67,7 +67,7 @@ void BE_Layer_Register(const char* name, BA_Boolean enabled, BE_Layer_Functions 
     for (int i = 0; i < (int) beLayerArray.used; i++)
         SEC_STRICTMODE_CHECK_NO_RETURN_VALUE(!BA_String_Equals(BA_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i)->name, name, BA_BOOLEAN_FALSE), "The layer '%s' is already registered\n", name);
 
-    BE_Layer_Internal* layer = (BE_Layer_Internal*) BE_EngineMemory_AllocateMemory(sizeof(BE_Layer_Internal), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_LAYER);
+    BE_Layer_Internal* layer = (BE_Layer_Internal*) BA_Memory_Allocate(sizeof(BE_Layer_Internal), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_LAYER);
 
     layer->name = name;
     layer->enabled = enabled;
@@ -224,9 +224,9 @@ void BE_PrivateLayer_DestroyLayers(void) {
     }
 
     for (int i = 0; i < beLayerArray.used; i++)
-        BE_EngineMemory_DeallocateMemory(BA_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i), sizeof(BE_Layer_Internal), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_LAYER);
+        BA_Memory_Deallocate(BA_DYNAMICARRAY_GET_ELEMENT(BE_Layer_Internal, beLayerArray, i), sizeof(BE_Layer_Internal), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_LAYER);
 
-    BE_EngineMemory_DeallocateMemory(beLayerArray.internalArray, sizeof(void*) * beLayerArray.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BA_Memory_Deallocate(beLayerArray.internalArray, sizeof(void*) * beLayerArray.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 #endif
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

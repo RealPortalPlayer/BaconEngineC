@@ -41,7 +41,7 @@ void BE_PrivatePacket_Initialize(void) {
 BE_BINARYEXPORT void BE_Packet_Register(uint64_t operationCode, BE_Packet_Flags flags, BE_Packet_Run Run) {
 #ifndef BE_CLIENT_BINARY
 #   ifndef BE_DISABLE_NETWORK
-    BE_PrivatePacket_Registered* packet = BE_EngineMemory_AllocateMemory(sizeof(BE_PrivatePacket_Registered), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_PACKET);
+    BE_PrivatePacket_Registered* packet = BA_Memory_Allocate(sizeof(BE_PrivatePacket_Registered), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_PACKET);
     
     packet->operationCode = operationCode;
     packet->flags = flags;
@@ -128,9 +128,9 @@ void BE_PrivatePacket_Destroy(void) {
     bePacketInitialized = BA_BOOLEAN_FALSE;
 
     for (int i = 0; i < bePacketRegistered.used; i++)
-        BE_EngineMemory_DeallocateMemory(bePacketRegistered.internalArray[i], sizeof(BE_PrivatePacket_Registered), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_PACKET);
+        BA_Memory_Deallocate(bePacketRegistered.internalArray[i], sizeof(BE_PrivatePacket_Registered), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_PACKET);
 
-    BE_EngineMemory_DeallocateMemory(bePacketRegistered.internalArray, sizeof(void*) * bePacketRegistered.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BA_Memory_Deallocate(bePacketRegistered.internalArray, sizeof(void*) * bePacketRegistered.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 
 void BE_PrivatePacket_Send(struct sockaddr_in* socket, uint64_t operationCode, char data[BE_PACKET_MAXIMUM_DATA]) {

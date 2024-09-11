@@ -12,7 +12,7 @@ BA_Boolean BE_PrivateDynamicArray_Create(BA_DynamicArray* array, size_t size) {
     if (size <= 0)
         return BA_BOOLEAN_FALSE;
 
-    array->internalArray = (void**) BE_EngineMemory_AllocateMemory(sizeof(void*) * size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
+    array->internalArray = (void**) BA_Memory_Allocate(sizeof(void*) * size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
     array->used = 0;
     array->size = size;
     array->frozen = BA_BOOLEAN_FALSE;
@@ -29,7 +29,7 @@ BA_Boolean BE_PrivateDynamicArray_CheckResize(BA_DynamicArray* array) {
     array->size *= 2;
     array->calledReallocate++;
     
-    void** newArray = (void**) BE_EngineMemory_ReallocateMemory(array->internalArray, sizeof(void*) * (array->size / 2), sizeof(void*) * array->size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
+    void** newArray = (void**) BA_Memory_Reallocate(array->internalArray, sizeof(void*) * (array->size / 2), sizeof(void*) * array->size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
 
     if (newArray == NULL)
         return BA_BOOLEAN_FALSE;

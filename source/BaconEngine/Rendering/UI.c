@@ -55,8 +55,7 @@ int BE_UI_RegisterWindow(const char* name, BE_UI_WindowFlags flags, BE_Vector2_I
 
     beUIInitialized = BA_BOOLEAN_TRUE;
 
-    BE_PrivateUI_Window* uiWindow = (BE_PrivateUI_Window*) BE_EngineMemory_AllocateMemory(sizeof(BE_PrivateUI_Window),
-                                                                                          BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_UI);
+    BE_PrivateUI_Window* uiWindow = (BE_PrivateUI_Window*) BA_Memory_Allocate(sizeof(BE_PrivateUI_Window), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_UI);
 
     if (flags != BE_UI_WINDOW_FLAG_NULL) {
         SEC_STRICTMODE_CHECK(!BA_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_NO_TITLE_BAR) || !BA_BITWISE_IS_BIT_SET(flags, BE_UI_WINDOW_FLAG_MINIMIZED), -1,
@@ -208,14 +207,14 @@ void BE_PrivateUI_Destroy(void) {
         BE_PrivateUI_Window* uiWindow = BE_UI_GetWindowFromId(windowId);
 
         for (int elementId = 0; elementId < uiWindow->elements.used; elementId++)
-            BE_EngineMemory_DeallocateMemory(uiWindow->elements.internalArray[elementId], sizeof(BE_UI_Element), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_UI);
+            BA_Memory_Deallocate(uiWindow->elements.internalArray[elementId], sizeof(BE_UI_Element), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_UI);
 
-        BE_EngineMemory_DeallocateMemory(uiWindow->elements.internalArray, sizeof(void*) * uiWindow->elements.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
-        BE_EngineMemory_DeallocateMemory(uiWindow, sizeof(BE_PrivateUI_Window), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_UI);
+        BA_Memory_Deallocate(uiWindow->elements.internalArray, sizeof(void*) * uiWindow->elements.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
+        BA_Memory_Deallocate(uiWindow, sizeof(BE_PrivateUI_Window), BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_UI);
     }
 
-    BE_EngineMemory_DeallocateMemory(beUIRenderOrder.internalArray, sizeof(void*) * beUIRenderOrder.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
-    BE_EngineMemory_DeallocateMemory(beUIWindows.internalArray, sizeof(void*) * beUIWindows.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BA_Memory_Deallocate(beUIRenderOrder.internalArray, sizeof(void*) * beUIRenderOrder.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
+    BA_Memory_Deallocate(beUIWindows.internalArray, sizeof(void*) * beUIWindows.size, BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_DYNAMIC_ARRAY);
 }
 #endif
 BA_CPLUSPLUS_SUPPORT_GUARD_END()

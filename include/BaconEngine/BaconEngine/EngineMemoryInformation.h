@@ -39,14 +39,9 @@ typedef enum {
     BE_ENGINEMEMORYINFORMATION_MEMORY_TYPE_SIZE
 } BE_EngineMemoryInformation_MemoryType;
 
-typedef struct {
-    size_t allocatedBytes;
-    size_t allocatedAmount;
-} BE_EngineMemoryInformation_MemoryTypeData;
-
-BE_BINARYEXPORT const BE_EngineMemoryInformation_MemoryTypeData* BE_EngineMemoryInformation_Get(void);
 BE_BINARYEXPORT size_t BE_EngineMemoryInformation_GetAllocatedBytes(void);
 BE_BINARYEXPORT size_t BE_EngineMemoryInformation_GetAllocatedAmount(void);
+BE_BINARYEXPORT size_t BE_EngineMemoryInformation_GetEnumeratorSize(void);
 
 /**
  * @note Free after usage
