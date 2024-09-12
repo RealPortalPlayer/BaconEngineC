@@ -27,6 +27,8 @@
 #   define write(file, message, size) _write(file, message, (unsigned) size) // HACK: This is a stupid idea, but it's the only way to make MSVC shut up.
 #endif
 
+#include <BaconAPI/Debugging/Stack.h>
+
 #include "BaconEngine/Rendering/Window.h"
 #include "BaconEngine/Rendering/Renderer.h"
 #include "BaconEngine/EngineMemoryInformation.h"
@@ -52,6 +54,14 @@
 
 BA_CPLUSPLUS_SUPPORT_GUARD_START()
 void BE_EntryPoint_SignalDetected(int receivedSignal) {
+    char* callTrace = NULL;
+
+    if (receivedSignal != SIGINT) {
+        signal(receivedSignal, SIG_DFL);
+
+        callTrace = BA_Stack_GetCallTrace();
+    }
+    
     switch (receivedSignal) {
         case SIGSEGV:
             if (BA_Logger_IsLevelEnabled(BA_LOGGER_LOG_LEVEL_FATAL)) {
@@ -64,10 +74,12 @@ void BE_EntryPoint_SignalDetected(int receivedSignal) {
                                         "If you suspect this is a problem with the engine, then please report it to us\n"
                                         "Users should avoid this client until further notice, as segmentation faults could be a sign of a lurking (and potentially dangerous) vulnerability\n"
                                         "This client will now exit\n");
-#undef BE_ENTRYPOINT_SAFE_PUTS
             }
 
-            signal(SIGSEGV, SIG_DFL);
+            BE_ENTRYPOINT_SAFE_PUTS("Stack:\n");
+            BE_ENTRYPOINT_SAFE_PUTS(callTrace);
+            BE_ENTRYPOINT_SAFE_PUTS("\n");
+#undef BE_ENTRYPOINT_SAFE_PUTS
             raise(SIGSEGV);
             ((void (*)(void)) NULL)();
             abort();
